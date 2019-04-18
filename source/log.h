@@ -1,7 +1,9 @@
-#ifndef LOG_H_
-#define LOG_H_
+#ifndef BTOOL_LOG_H_
+#define BTOOL_LOG_H_
 
 #include <string>
+
+namespace btool {
 
 class Log {
  public:
@@ -14,4 +16,6 @@ class Log {
   std::string section_;
 };
 
-#endif // LOG_H_
+}; // namespace btool
+
+#endif // BTOOL_LOG_H_

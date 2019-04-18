@@ -1,20 +1,34 @@
+#ifndef BTOOL_CLI_CLI_H_
+#define BTOOL_CLI_CLI_H_
+
 #include <vector>
 
 #include "error.h"
+#include "log.h"
 #include "cli/command.h"
 
-namespace btool::cli {
+namespace btool {
+namespace cli {
 
 class CLI {
 public:
-  void AddCommand(const Command& command) {
+  CLI(): log_(new Log("cli")) { }
+  ~CLI() { delete log_; }
+
+  void AddCommand(Command *command) {
     commands_.push_back(command);
   }
 
-  Error Run();
+  Error Run(int argc, const char *argv[]);
 
 private:
-  std::vector<Command> commands_;
+  ::btool::Log *log_;
+  std::vector<Command *> commands_;
+
+  Command *FindCommand(const char *arg) const;
 };
 
-}; // namespace btool::cli
+}; // namespace cli
+}; // namespace btool
+
+#endif // BTOOL_CLI_CLI_H_
