@@ -44,6 +44,7 @@ test: build/error_test build/cli_test
 
 .PHONY: containertest
 containertest:
+	clear
 	docker run --rm -it -v $(shell pwd):/etc/btool -w /etc/btool ankeesler/btool make test
 
 .PHONY: containerbuild

@@ -1,6 +1,7 @@
 #include "cli.h"
 
 #include <cstring>
+#include <vector>
 
 #include "error.h"
 
@@ -12,28 +13,27 @@ static bool is_flag(const char *arg) {
 }
 
 Error CLI::Run(int argc, const char *argv[]) {
+  Command *command = nullptr;
+  std::vector<const char *> args;
   for (int i = 0; i < argc; i++) {
     if (is_flag(argv[i])) {
-      log_->Println("found flag:");
-      log_->Println(argv[i]);
+      log_->Printf("found flag '%s' with arg '%s'\n", argv[i], argv[i+1]);
       i++;
-      log_->Println("with arg:");
-      log_->Println(argv[i]);
       // TODO: process flag
     } else {
-      log_->Println("searching for command:");
-      log_->Println(argv[i]);
-
-      Command *command = FindCommand(argv[i]);
-      if (command != NULL) {
-        return command->Run();
+      log_->Printf("command or arg: '%s'?\n", argv[i]);
+      if (command == nullptr && (command = FindCommand(argv[i])) != nullptr) {
+        log_->Println("command");
+      } else {
+        args.push_back(argv[i]);
+        log_->Println("arg");
       }
-
-      log_->Println("didn't find it");
     }
   }
 
-  return Error::Create("must supply sub command");
+  return (command != nullptr
+          ? command->Run(args)
+          : Error::Create("must supply sub command"));
 }
 
 Command *CLI::FindCommand(const char *arg) const {
@@ -42,7 +42,7 @@ Command *CLI::FindCommand(const char *arg) const {
       return command;
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 }; // namespace cli

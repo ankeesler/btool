@@ -11,6 +11,8 @@ class Log {
   Log(const std::string& section): section_(section) { }
 
   void Println(const std::string& message);
+  void Print(const std::string& message);
+  void Printf(const std::string& format, ...);
 
  private:
   std::string section_;
