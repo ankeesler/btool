@@ -14,12 +14,12 @@ void Log::Print(const std::string& message) {
   std::cout << "[" << section_ << "] " << message;
 }
 
-void Log::Printf(const std::string& format, ...) {
+void Log::Printf(const char *format, ...) {
   std::cout << "[" << section_ << "] ";
 
   va_list args;
   va_start(args, format);
-  vprintf(format.c_str(), args);
+  vprintf(format, args);
   va_end(args);
 }
 

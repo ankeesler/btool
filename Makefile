@@ -10,7 +10,7 @@ build:
 	mkdir build
 
 build/main.o: source/main.cc build
-	$(CC) -o $@ $< -O0 -g -Wall -Werror -c --std=c++11
+	$(CC) -Isource -o $@ $< -O0 -g -Wall -Werror -c --std=c++11
 
 build/%.o: source/%.cc source/%.h build
 	$(CC) -Isource -o $@ $< -O0 -g -Wall -Werror -c --std=c++11
@@ -24,7 +24,12 @@ build/%.o: source/cli/%.cc source/cli/%.h build
 build/%.o: test/cli/%.cc build
 	$(CC) -Isource -o $@ $< -O0 -g -Wall -Werror -c --std=c++11
 
-build/btool: build/main.o build/log.o
+build/btool: \
+		build/main.o \
+		build/log.o \
+		build/error.o \
+		build/cli.o \
+		build/create_class_command.o
 	$(CC) -o $@ $^
 
 build/error_test: build/error_test.o build/error.o

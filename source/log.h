@@ -12,7 +12,7 @@ class Log {
 
   void Println(const std::string& message);
   void Print(const std::string& message);
-  void Printf(const std::string& format, ...);
+  void Printf(const char *format, ...);
 
  private:
   std::string section_;

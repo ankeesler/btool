@@ -12,8 +12,8 @@ namespace cli {
 class Command {
 public:
   virtual ~Command() { }
-  virtual const ::std::string& Name() const = 0;
-  virtual btool::Error Run(const std::vector<const char *>&) = 0;
+  virtual const std::string& Name() const = 0;
+  virtual btool::Error Run(const std::vector<const char *>& args) = 0;
 };
 
 }; // namespace cli
