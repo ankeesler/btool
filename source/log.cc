@@ -6,21 +6,32 @@
 
 namespace btool {
 
-void Log::Println(const std::string& message) {
-  std::cout << "[" << section_ << "] " << message << std::endl;
+Log::Level Log::level = Log::Level::INFO;
+
+void Log::Println(Log::Level level, const std::string& message) {
+  if (Log::level <= level) {
+    std::cout << "[" << section_ << "] "
+              << "[" << level << "] "
+              << message << std::endl;
+  }
 }
 
-void Log::Print(const std::string& message) {
-  std::cout << "[" << section_ << "] " << message;
+void Log::Print(Log::Level level, const std::string& message) {
+  if (Log::level <= level) {
+    std::cout << "[" << section_ << "] "
+              << "[" << level << "] "
+              << message;
+  }
 }
 
-void Log::Printf(const char *format, ...) {
-  std::cout << "[" << section_ << "] ";
-
-  va_list args;
-  va_start(args, format);
-  vprintf(format, args);
-  va_end(args);
+void Log::Debugf(const char *format, ...) {
+  if (Log::level <= DEBUG) {
+    std::cout << "[" << section_ << "] " << "[" << Log::Level::DEBUG << "] ";
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+  }
 }
 
 }; // namespace btool

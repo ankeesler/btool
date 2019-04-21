@@ -17,16 +17,16 @@ Error CLI::Run(int argc, const char *argv[]) {
   std::vector<const char *> args;
   for (int i = 0; i < argc; i++) {
     if (is_flag(argv[i])) {
-      log_->Printf("found flag '%s' with arg '%s'\n", argv[i], argv[i+1]);
+      log_->Debugf("found flag '%s' with arg '%s'\n", argv[i], argv[i+1]);
       i++;
       // TODO: process flag
     } else {
-      log_->Printf("command or arg: '%s'?\n", argv[i]);
+      log_->Debugf("command or arg: '%s'?\n", argv[i]);
       if (command == nullptr && (command = FindCommand(argv[i])) != nullptr) {
-        log_->Println("command");
+        log_->Debugln("command");
       } else {
         args.push_back(argv[i]);
-        log_->Println("arg");
+        log_->Debugln("arg");
       }
     }
   }

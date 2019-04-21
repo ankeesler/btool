@@ -4,7 +4,7 @@
 
 int main(int argc, const char *argv[]) {
   btool::Log log("main");
-  log.Println("start");
+  log.Debugln("start");
   
   btool::CreateClassCommand create_class_command;
 
@@ -12,6 +12,6 @@ int main(int argc, const char *argv[]) {
   cli.AddCommand(&create_class_command);
   cli.Run(argc - 1, argv + 1);
 
-  log.Println("end");
+  log.Debugln("end");
   return 0;
 }
