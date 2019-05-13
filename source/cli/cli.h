@@ -22,7 +22,7 @@ public:
   Error Run(int argc, const char *argv[]);
 
 private:
-  ::btool::Log *log_;
+  btool::Log *log_;
   std::vector<Command *> commands_;
 
   Command *FindCommand(const char *arg) const;

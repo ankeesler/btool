@@ -5,19 +5,24 @@
 #include <vector>
 
 #include "cli/command.h"
+#include "fs.h"
 
 namespace btool {
 
 class CreateClassCommand : public btool::cli::Command {
 public:
-  virtual const std::string& Name() const {
+  CreateClassCommand(FS *fs): fs_(fs) { }
+
+  const std::string& Name() const {
     return name;
   }
   
-  virtual btool::Error Run(const std::vector<const char *>& args);
+  Error Run(const std::vector<const char *>& args);
 
 private:
   static const std::string name;
+
+  FS *fs_;
 };
 
 }; // namespace btool

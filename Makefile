@@ -38,14 +38,22 @@ build/error_test: build/error_test.o build/error.o
 build/cli_test: build/cli_test.o build/cli.o build/error.o build/log.o
 	$(CC) -o $@ $^ -lgmock_main -lgmock -lgtest
 
+build/create_class_command_test: build/create_class_command_test.o build/create_class_command.o build/error.o build/log.o
+	$(CC) -o $@ $^ -lgmock_main -lgmock -lgtest
+
+build/fs_impl_test: build/fs_impl_test.o build/fs_impl.o build/error.o build/log.o
+	$(CC) -o $@ $^ -lgmock_main -lgmock -lgtest
+
 .PHONY: run
 run: build/btool
 	./$<
 
 .PHONY: test
-test: build/error_test build/cli_test
+test: build/error_test build/cli_test build/create_class_command_test build/fs_impl_test
 	build/error_test
 	build/cli_test
+	build/create_class_command_test
+	build/fs_impl_test
 
 .PHONY: containertest
 containertest:

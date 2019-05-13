@@ -12,7 +12,7 @@ using ::testing::ReturnRef;
 using ::testing::StrictMock;
 
 class MockCommand : public btool::cli::Command {
- public:
+public:
   MOCK_CONST_METHOD0(Name, const std::string&());
   MOCK_METHOD1(Run, btool::Error(const std::vector<const char *>&));
 };

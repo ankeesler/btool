@@ -6,7 +6,7 @@ int main(int argc, const char *argv[]) {
   btool::Log log("main");
   log.Debugln("start");
   
-  btool::CreateClassCommand create_class_command;
+  btool::CreateClassCommand create_class_command(;
 
   btool::cli::CLI cli;
   cli.AddCommand(&create_class_command);
