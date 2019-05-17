@@ -88,14 +88,19 @@ func addToGraph(file string, g *graph.Graph, s *scanner.Scanner) error {
 	if err != nil {
 		return errors.Wrap(err, "scan")
 	}
+	log.Debugf("got %s includes from %s", includes, fileNode)
+
 	for _, include := range includes {
 		includeNode := &graph.Node{
-			Name: include,
+			Name: filepath.Join(
+				filepath.Dir(file),
+				include,
+			),
 		}
 		g.Add(fileNode, includeNode)
 		log.Debugf("added %s->%s dependency to graph", fileNode, includeNode)
 
-		cFile := strings.ReplaceAll(include, ".h", ".c")
+		cFile := strings.ReplaceAll(includeNode.Name, ".h", ".c")
 		if fileExists(cFile) {
 			cFileNode := &graph.Node{
 				Name: cFile,

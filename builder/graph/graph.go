@@ -2,6 +2,8 @@ package graph
 
 import (
 	"errors"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Graph struct {
@@ -39,6 +41,8 @@ func (g *Graph) Sort() ([]*Node, error) {
 
 	for i := 0; i < len(g.nodes); i++ {
 		toBeSorted = g.collectNodesWithoutDependencies(toBeSorted)
+		log.Debugf("graph: to be sorted: %s", toBeSorted)
+
 		if i >= len(toBeSorted) {
 			return nil, errors.New("cycle detected")
 		}
