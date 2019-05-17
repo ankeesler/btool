@@ -5,10 +5,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankeesler/btool/builder/graph"
+	"github.com/ankeesler/btool/scanner/graph"
+	"github.com/ankeesler/btool/testutil"
+	"github.com/sirupsen/logrus"
 )
 
 func TestSort(t *testing.T) {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(testutil.NewTestingFormatter(t))
+
 	a := &graph.Node{Name: "a"}
 	b := &graph.Node{Name: "b"}
 	c := &graph.Node{Name: "c"}
@@ -55,6 +60,15 @@ func TestSort(t *testing.T) {
 			err:    errors.New("cycle detected"),
 			sorted: []string{},
 		},
+		{
+			name: "only dependency node (b)",
+			graph: func() *graph.Graph {
+				// a -> b
+				return graph.New().Add(a, b)
+			},
+			err:    nil,
+			sorted: []string{"b", "a"},
+		},
 	}
 
 	for _, datum := range data {
@@ -69,7 +83,7 @@ func TestSort(t *testing.T) {
 			}
 		}
 
-		if ex, ac := len(acNodes), 6; ex != ac {
+		if ex, ac := len(datum.sorted), len(acNodes); ex != ac {
 			t.Errorf("%s: expected %d nodes, got %d", datum.name, ex, ac)
 		}
 

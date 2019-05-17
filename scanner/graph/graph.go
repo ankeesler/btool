@@ -1,9 +1,12 @@
+// Package graph provides a simple directed graph data structure.
 package graph
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 type Graph struct {
@@ -19,6 +22,8 @@ func New() *Graph {
 }
 
 func (g *Graph) Add(node, dependency *Node) *Graph {
+	logrus.Debugf("graph: add %s -> %s", node, dependency)
+
 	g.nodeNames[node.Name] = node
 
 	if _, ok := g.nodes[node.Name]; !ok {
@@ -27,6 +32,8 @@ func (g *Graph) Add(node, dependency *Node) *Graph {
 
 	if dependency != nil {
 		g.nodeNames[dependency.Name] = dependency
+		g.Add(dependency, nil)
+
 		g.nodes[node.Name][dependency.Name] = true
 	}
 
@@ -34,6 +41,8 @@ func (g *Graph) Add(node, dependency *Node) *Graph {
 }
 
 func (g *Graph) Sort() ([]*Node, error) {
+	logrus.Debugf("graph: sorting %d nodes", len(g.nodes))
+
 	g.resetForSort()
 
 	toBeSorted := make([]*Node, 0, len(g.nodes))
@@ -41,7 +50,7 @@ func (g *Graph) Sort() ([]*Node, error) {
 
 	for i := 0; i < len(g.nodes); i++ {
 		toBeSorted = g.collectNodesWithoutDependencies(toBeSorted)
-		log.Debugf("graph: to be sorted: %s", toBeSorted)
+		logrus.Debugf("graph: to be sorted: %s", toBeSorted)
 
 		if i >= len(toBeSorted) {
 			return nil, errors.New("cycle detected")
@@ -54,6 +63,19 @@ func (g *Graph) Sort() ([]*Node, error) {
 	}
 
 	return sorted, nil
+}
+
+func (g *Graph) String() string {
+	buf := bytes.NewBuffer([]byte{})
+
+	for nodeName, dependenciesNames := range g.nodes {
+		buf.WriteString(fmt.Sprintf("%s:\n", nodeName))
+		for dependencyName, _ := range dependenciesNames {
+			buf.WriteString(fmt.Sprintf("> %s\n", dependencyName))
+		}
+	}
+
+	return buf.String()
 }
 
 func (g *Graph) updateForSortedNode(sortedNode *Node) {

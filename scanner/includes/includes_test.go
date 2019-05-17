@@ -1,10 +1,10 @@
-package scanner_test
+package includes_test
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/ankeesler/btool/builder/scanner"
+	"github.com/ankeesler/btool/scanner/includes"
 )
 
 func TestScan(t *testing.T) {
@@ -36,8 +36,7 @@ func TestScan(t *testing.T) {
 	}
 
 	for _, datum := range data {
-		s := scanner.New()
-		includes, err := s.Scan([]byte(datum.data))
+		includes, err := includes.Parse([]byte(datum.data))
 		if err != nil {
 			t.Error(err)
 		}
