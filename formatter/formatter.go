@@ -1,23 +1,20 @@
-package testutil
+// Package formatter provides a custom logrus formatter for btool.
+package formatter
 
 import (
 	"fmt"
-	"testing"
 
 	"github.com/sirupsen/logrus"
 )
 
-type TestingFormatter struct {
-	t *testing.T
+type formatter struct {
 }
 
-func NewTestingFormatter(t *testing.T) *TestingFormatter {
-	return &TestingFormatter{
-		t: t,
-	}
+func New() logrus.Formatter {
+	return &formatter{}
 }
 
-func (tf *TestingFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+func (f *formatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var file string
 	var line int
 	if entry.HasCaller() {

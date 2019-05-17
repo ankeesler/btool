@@ -28,6 +28,8 @@ func New(fs afero.Fs, root string) *Scanner {
 }
 
 func (s *Scanner) Scan() (*graph.Graph, error) {
+	logrus.Info("scanning from root " + s.root)
+
 	s.graph = graph.New()
 
 	logrus.Debugf("walking fs from root %s", s.root)

@@ -6,8 +6,11 @@ import (
 	"path/filepath"
 
 	"github.com/ankeesler/btool/builder"
+	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/scanner"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/afero"
 )
 
 func main() {
@@ -22,6 +25,7 @@ func run() error {
 		return errors.Wrap(err, "getwd")
 	}
 
+	root := flag.Store("root", cwd, "Path to project root")
 	store := flag.String("store", filepath.Join(cwd, ".btool"), "Path to btool store")
 	target := flag.String("target", "main.c", "Path to build target")
 	logLevel := flag.String("loglevel", "info", "Log level")
@@ -34,11 +38,7 @@ func run() error {
 		return nil
 	}
 
-	log.SetFormatter(&log.TextFormatter{
-		ForceColors:     true,
-		FullTimestamp:   true,
-		TimestampFormat: "15:04:05.000000000",
-	})
+	log.SetFormatter(formatter.New())
 
 	level, err := log.ParseLevel(*logLevel)
 	if err != nil {
@@ -46,8 +46,15 @@ func run() error {
 	}
 	log.SetLevel(level)
 
+	fs := afero.NewOsFs()
+
+	g, err := scanner.New(fs, root)
+	if err != nil {
+		return errors.Wrap(err, "scan")
+	}
+
 	b := builder.New(*store)
-	if err := b.Build(*target); err != nil {
+	if err := b.Build(g); err != nil {
 		return errors.Wrap(err, "build")
 	}
 
