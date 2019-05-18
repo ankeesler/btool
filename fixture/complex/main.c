@@ -6,5 +6,6 @@
 #include "dep-1/dep-1a.h"
 #include "dep-2/dep-2a.h"
 int main(int argc, char *argv[]) {
+  printf("hey! i am running!\n");
   return 0;
 }

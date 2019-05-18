@@ -126,6 +126,7 @@ var ComplexProject = Project{
 			},
 			ExtraContent: `
 int main(int argc, char *argv[]) {
+  printf("hey! i am running!\n");
   return 0;
 }
 `,
