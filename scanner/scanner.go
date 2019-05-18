@@ -5,6 +5,7 @@ package scanner
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/ankeesler/btool/scanner/includes"
@@ -27,7 +28,20 @@ func New(fs afero.Fs, root string) *Scanner {
 	}
 }
 
-func (s *Scanner) Scan() (*graph.Graph, error) {
+func (s *Scanner) ScanFile(file string) (*graph.Graph, error) {
+	logrus.Info("scanning from file " + file)
+
+	s.graph = graph.New()
+
+	logrus.Debugf("walking dependencies from file %s", file)
+	if err := s.walk(file, make(map[string]bool)); err != nil {
+		return nil, errors.Wrap(err, "walk")
+	}
+
+	return s.graph, nil
+}
+
+func (s *Scanner) ScanRoot() (*graph.Graph, error) {
 	logrus.Info("scanning from root " + s.root)
 
 	s.graph = graph.New()
@@ -92,4 +106,50 @@ func (s *Scanner) resolveIncludePath(include, dir string) (string, error) {
 	}
 
 	return "", errors.New("cannot resolve include: " + include)
+}
+
+func (s *Scanner) walk(file string, visited map[string]bool) error {
+	if visited[file] {
+		return nil
+	}
+
+	visited[file] = true
+
+	data, err := afero.ReadFile(s.fs, file)
+	if err != nil {
+		return errors.Wrap(err, "read file "+file)
+	}
+	logrus.Debugf("read file %s", file)
+
+	fileNode := &graph.Node{
+		Name: file,
+	}
+	s.graph.Add(fileNode, nil)
+
+	includes, err := includes.Parse(data)
+	if err != nil {
+		return errors.Wrap(err, "parse includes")
+	}
+	logrus.Debugf("parsed includes %s", includes)
+
+	for _, include := range includes {
+		includePath, err := s.resolveIncludePath(include, filepath.Dir(file))
+		if err != nil {
+			return errors.Wrap(err, "resolve include path "+include)
+		}
+
+		includeNode := &graph.Node{
+			Name: includePath,
+		}
+		s.graph.Add(fileNode, includeNode)
+
+		sourcePath := strings.Replace(includePath, ".h", ".c", 1)
+		if exists, _ := afero.Exists(s.fs, sourcePath); exists {
+			if err := s.walk(sourcePath, visited); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

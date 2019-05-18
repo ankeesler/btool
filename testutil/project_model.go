@@ -11,6 +11,100 @@ import (
 	"github.com/spf13/afero"
 )
 
+var BasicProject = Project{
+	Name: "Basic",
+	Root: "/tuna/root",
+	Nodes: []ProjectNode{
+		ProjectNode{
+			Name: "main.c",
+			Includes: []string{
+				"\"master.h\"",
+				"\"dep-0/dep-0a.h\"",
+			},
+			Dependencies: []string{
+				"master.h",
+				"dep-0/dep-0a.h",
+			},
+		},
+		ProjectNode{
+			Name: "master.h",
+			Includes: []string{
+				"<stdlib.h>",
+			},
+			Dependencies: []string{},
+		},
+		ProjectNode{
+			Name: "dep-0/dep-0a.c",
+			Includes: []string{
+				"\"dep-0a.h\"",
+			},
+			Dependencies: []string{
+				"dep-0/dep-0a.h",
+			},
+		},
+		ProjectNode{
+			Name:         "dep-0/dep-0a.h",
+			Includes:     []string{},
+			Dependencies: []string{},
+		},
+	},
+}
+
+var BasicProjectWithExtra = Project{
+	Name: "BasicWithExtra",
+	Root: "/tuna/root",
+	Nodes: []ProjectNode{
+		ProjectNode{
+			Name: "main.c",
+			Includes: []string{
+				"\"master.h\"",
+				"\"dep-0/dep-0a.h\"",
+			},
+			Dependencies: []string{
+				"master.h",
+				"dep-0/dep-0a.h",
+			},
+		},
+		ProjectNode{
+			Name: "master.h",
+			Includes: []string{
+				"<stdlib.h>",
+			},
+			Dependencies: []string{},
+		},
+		ProjectNode{
+			Name: "dep-0/dep-0a.c",
+			Includes: []string{
+				"\"dep-0a.h\"",
+			},
+			Dependencies: []string{
+				"dep-0/dep-0a.h",
+			},
+		},
+		ProjectNode{
+			Name:         "dep-0/dep-0a.h",
+			Includes:     []string{},
+			Dependencies: []string{},
+		},
+		ProjectNode{
+			Name: "dep-1/dep-1a.c",
+			Includes: []string{
+				"\"dep-0/dep-0a.h\"",
+				"\"dep-1a.h\"",
+			},
+			Dependencies: []string{
+				"dep-0/dep-0a.h",
+				"dep-1/dep-1a.h",
+			},
+		},
+		ProjectNode{
+			Name:         "dep-1/dep-1a.h",
+			Includes:     []string{},
+			Dependencies: []string{},
+		},
+	},
+}
+
 var ComplexProject = Project{
 	Name: "Complex",
 	Root: "/tuna/root",
