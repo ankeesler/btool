@@ -36,7 +36,7 @@ func TestSort(t *testing.T) {
 				return graph.New().Add(a, b).Add(b, c).Add(c, d).Add(b, e).Add(e, f).Add(f, d).Add(d, nil)
 			},
 			err:    nil,
-			sorted: []string{"d", "cf", "fc", "e", "b", "a"},
+			sorted: []string{"d", "c", "f", "e", "b", "a"},
 		},
 		{
 			name: "delayed cycle",

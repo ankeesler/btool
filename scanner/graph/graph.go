@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"sort"
 
 	"github.com/sirupsen/logrus"
 )
@@ -95,6 +96,7 @@ func (g *Graph) resetForSort() {
 }
 
 func (g *Graph) collectNodesWithoutDependencies(nodesWithoutDependencies []*Node) []*Node {
+	newNodes := make([]*Node, 0, 2)
 	for nodeName, dependencies := range g.nodes {
 		if nodeNameInSlice(nodeName, nodesWithoutDependencies) {
 			continue
@@ -109,11 +111,14 @@ func (g *Graph) collectNodesWithoutDependencies(nodesWithoutDependencies []*Node
 		}
 
 		if withoutDependencies {
-			nodesWithoutDependencies = append(nodesWithoutDependencies, g.nodeNames[nodeName])
+			newNodes = append(newNodes, g.nodeNames[nodeName])
 		}
 	}
 
-	return nodesWithoutDependencies
+	sort.Slice(newNodes, func(i, j int) bool {
+		return newNodes[i].Name < newNodes[j].Name
+	})
+	return append(nodesWithoutDependencies, newNodes...)
 }
 
 func nodeNameInSlice(nodeName string, slice []*Node) bool {
