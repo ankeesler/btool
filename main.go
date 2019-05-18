@@ -10,14 +10,15 @@ import (
 	"github.com/ankeesler/btool/builder/linker"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/scanner"
+	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }
 
@@ -29,6 +30,8 @@ func run() error {
 
 	root := flag.String("root", cwd, "Path to project root")
 	store := flag.String("store", filepath.Join(cwd, ".btool"), "Path to btool store")
+	target := flag.String("target", "", "The file to build")
+	scan := flag.Bool("scan", false, "Only perform scan and print out graph")
 	logLevel := flag.String("loglevel", "info", "Log level")
 	help := flag.Bool("help", false, "Print this help message")
 
@@ -39,20 +42,30 @@ func run() error {
 		return nil
 	}
 
-	log.SetFormatter(formatter.New())
+	logrus.SetFormatter(formatter.New())
 
-	level, err := log.ParseLevel(*logLevel)
+	level, err := logrus.ParseLevel(*logLevel)
 	if err != nil {
 		return errors.Wrap(err, "parse log level")
 	}
-	log.SetLevel(level)
+	logrus.SetLevel(level)
 
 	fs := afero.NewOsFs()
 
+	var g *graph.Graph
 	s := scanner.New(fs, *root)
-	g, err := s.Scan()
+	if *target == "" {
+		g, err = s.ScanRoot()
+	} else {
+		g, err = s.ScanFile(*target)
+	}
 	if err != nil {
 		return errors.Wrap(err, "scan")
+	}
+
+	if *scan {
+		logrus.Infof("graph:\n%s", g)
+		return nil
 	}
 
 	b := builder.New(

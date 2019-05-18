@@ -1,10 +1,10 @@
-#include "main-dep-0/main-dep-0.h"
-#include "main-dep-1/main-dep-1a.h"
-#include "main-dep-1/main-dep-1b.h"
-#include "main-dep-2/main-dep-2.h"
-#include "main-dep-3/main-dep-3.h"
-#include "master.h"
+// main.c
 
+#include <stdio.h>
+#include "master.h"
+#include "dep-0/dep-0a.h"
+#include "dep-1/dep-1a.h"
+#include "dep-2/dep-2a.h"
 int main(int argc, char *argv[]) {
   return 0;
 }

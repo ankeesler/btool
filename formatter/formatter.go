@@ -4,6 +4,7 @@ package formatter
 import (
 	"fmt"
 
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 )
 
@@ -15,22 +16,28 @@ func New() logrus.Formatter {
 }
 
 func (f *formatter) Format(entry *logrus.Entry) ([]byte, error) {
-	var file string
-	var line int
-	if entry.HasCaller() {
-		file = entry.Caller.File
-		line = entry.Caller.Line
-	} else {
-		file = "?"
-		line = 0
-	}
-
 	s := fmt.Sprintf(
-		"btool | %s | %s:%d | %s\n",
-		entry.Level,
-		file,
-		line,
-		entry.Message,
+		"%s | %s | %s\n",
+		color.CyanString("btool"),
+		colorLevel(entry.Level),
+		color.BlackString(entry.Message),
 	)
 	return []byte(s), nil
+}
+
+func colorLevel(level logrus.Level) string {
+	switch level {
+	case logrus.DebugLevel:
+		return color.HiBlackString("%-5s", level)
+	case logrus.InfoLevel:
+		return color.BlueString("%-5s", level)
+	case logrus.WarnLevel:
+		return color.YellowString("%-5s", level)
+	case logrus.ErrorLevel:
+		return color.HiRedString("%-5s", level)
+	case logrus.FatalLevel:
+		return color.RedString("%-5s", level)
+	default:
+		return color.BlackString("%-5s", level)
+	}
 }

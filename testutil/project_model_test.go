@@ -19,11 +19,11 @@ func TestComplexProject(t *testing.T) {
 		testutil.ComplexProject,
 	} {
 		t.Run(project.Name, func(t *testing.T) {
-			if g := testutil.ComplexProject.Graph(); g == nil {
+			if g := project.Graph(); g == nil {
 				t.Errorf("expected g to not be nil")
 			}
 
-			if err := testutil.ComplexProject.PopulateFS(afero.NewMemMapFs()); err != nil {
+			if err := project.PopulateFS(afero.NewMemMapFs()); err != nil {
 				t.Error(err)
 			}
 		})
