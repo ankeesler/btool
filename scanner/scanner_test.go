@@ -21,34 +21,34 @@ func TestScan(t *testing.T) {
 			Root: "/tuna/root",
 			Nodes: []testutil.ProjectNode{
 				testutil.ProjectNode{
-					Name: "/tuna/root/main.c",
+					Name: "main.c",
 					Includes: []string{
 						"\"master.h\"",
 						"\"dep-0/dep-0a.h\"",
 					},
 					Dependencies: []string{
-						"/tuna/root/master.h",
-						"/tuna/root/dep-0/dep-0a.h",
+						"master.h",
+						"dep-0/dep-0a.h",
 					},
 				},
 				testutil.ProjectNode{
-					Name: "/tuna/root/master.h",
+					Name: "master.h",
 					Includes: []string{
 						"<stdlib.h>",
 					},
 					Dependencies: []string{},
 				},
 				testutil.ProjectNode{
-					Name: "/tuna/root/dep-0/dep-0a.c",
+					Name: "dep-0/dep-0a.c",
 					Includes: []string{
 						"\"dep-0a.h\"",
 					},
 					Dependencies: []string{
-						"/tuna/root/dep-0/dep-0a.h",
+						"dep-0/dep-0a.h",
 					},
 				},
 				testutil.ProjectNode{
-					Name:         "/tuna/root/dep-0/dep-0a.h",
+					Name:         "dep-0/dep-0a.h",
 					Includes:     []string{},
 					Dependencies: []string{},
 				},

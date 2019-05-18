@@ -1,9 +1,7 @@
 package linker
 
 import (
-	"bytes"
 	"fmt"
-	"io"
 	"os/exec"
 
 	"github.com/pkg/errors"
@@ -17,23 +15,16 @@ func New() *Linker {
 	return &Linker{}
 }
 
-func (c *Linker) Link(output io.Writer, inputs []io.Reader) error {
-	errBuf := bytes.NewBuffer([]byte{})
-
+func (c *Linker) Link(output string, inputs []string) error {
+	args := append([]string{"-o", output}, inputs...)
 	cmd := exec.Command(
 		"clang",
-		"-c",
-		"-o",
-		"-",
-		"-",
+		args...,
 	)
-	cmd.Stdin = io.MultiReader(inputs...)
-	cmd.Stdout = output
-	cmd.Stderr = errBuf
 
 	logrus.Debugf("running link command %s", cmd.Args)
-	if err := cmd.Run(); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("run linker (%s)", errBuf.String()))
+	if msg, err := cmd.CombinedOutput(); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("run linker\n%s", string(msg)))
 	}
 
 	return nil

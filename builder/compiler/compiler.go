@@ -15,18 +15,19 @@ func New() *Compiler {
 	return &Compiler{}
 }
 
-func (c *Compiler) Compile(output, input string) error {
+func (c *Compiler) Compile(output, input, root string) error {
 	cmd := exec.Command(
 		"clang",
 		"-c",
 		"-o",
 		output,
 		input,
+		"-I"+root,
 	)
 
 	logrus.Debugf("running compiler command %s", cmd.Args)
-	if stderr, err := cmd.CombinedOutput(); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("run compiler:\n%s", string(stderr)))
+	if msg, err := cmd.CombinedOutput(); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("run compiler:\n%s", string(msg)))
 	}
 
 	return nil

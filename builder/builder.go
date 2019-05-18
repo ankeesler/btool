@@ -4,7 +4,6 @@ package builder
 
 import (
 	"fmt"
-	"io"
 	"path/filepath"
 	"strings"
 
@@ -81,7 +80,7 @@ func (b *Builder) compile(node *graph.Node) (afero.File, error) {
 		strings.Replace(rootRelNodeName, ".c", ".o", 1),
 	)
 	outputDir := filepath.Dir(outputFile)
-	if err := b.fs.MkdirAll(outputDir, 0600); err != nil {
+	if err := b.fs.MkdirAll(outputDir, 0700); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
 	}
 
@@ -97,7 +96,7 @@ func (b *Builder) compile(node *graph.Node) (afero.File, error) {
 	}
 	defer input.Close()
 
-	if err := b.c.Compile(output.Name(), input.Name()); err != nil {
+	if err := b.c.Compile(output.Name(), input.Name(), b.root); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("compile %s", output.Name()))
 	}
 
@@ -113,7 +112,7 @@ func (b *Builder) link(objects []afero.File) error {
 		"out",
 	)
 	outputDir := filepath.Dir(outputFile)
-	if err := b.fs.MkdirAll(outputDir, 0600); err != nil {
+	if err := b.fs.MkdirAll(outputDir, 0700); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
 	}
 
@@ -123,17 +122,17 @@ func (b *Builder) link(objects []afero.File) error {
 	}
 	defer output.Close()
 
-	if err := b.l.Link(output, convertFilesToReaders(objects)); err != nil {
+	if err := b.l.Link(output.Name(), convertFilesToNames(objects)); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("link %s", output.Name()))
 	}
 
 	return nil
 }
 
-func convertFilesToReaders(files []afero.File) []io.Reader {
-	readers := make([]io.Reader, 0, len(files))
+func convertFilesToNames(files []afero.File) []string {
+	names := make([]string, 0, len(files))
 	for _, file := range files {
-		readers = append(readers, file)
+		names = append(names, file.Name())
 	}
-	return readers
+	return names
 }

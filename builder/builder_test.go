@@ -16,17 +16,31 @@ func TestBuild(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
-	fs := afero.NewMemMapFs()
-	if err := testutil.ComplexProject.PopulateFS(fs); err != nil {
+	fs := afero.NewOsFs()
+
+	rootDir, err := afero.TempDir(fs, "", "btool_builder_test_root")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fs.RemoveAll(rootDir)
+
+	storeDir, err := afero.TempDir(fs, "", "btool_builder_test_store")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fs.RemoveAll(storeDir)
+
+	project := testutil.ComplexProject
+	project.Root = rootDir
+	if err := project.PopulateFS(fs); err != nil {
 		t.Fatal(err)
 	}
 
-	root := "/tuna/root"
-	store := "/tmp/btool-store"
+	store := storeDir
 	c := compiler.New()
 	l := linker.New()
-	b := builder.New(fs, root, store, c, l)
-	if err := b.Build(testutil.ComplexProject.Graph()); err != nil {
+	b := builder.New(fs, project.Root, store, c, l)
+	if err := b.Build(project.Graph()); err != nil {
 		t.Fatal(err)
 	}
 }

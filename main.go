@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/ankeesler/btool/builder"
+	"github.com/ankeesler/btool/builder/compiler"
+	"github.com/ankeesler/btool/builder/linker"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/scanner"
 	"github.com/pkg/errors"
@@ -25,9 +27,8 @@ func run() error {
 		return errors.Wrap(err, "getwd")
 	}
 
-	root := flag.Store("root", cwd, "Path to project root")
+	root := flag.String("root", cwd, "Path to project root")
 	store := flag.String("store", filepath.Join(cwd, ".btool"), "Path to btool store")
-	target := flag.String("target", "main.c", "Path to build target")
 	logLevel := flag.String("loglevel", "info", "Log level")
 	help := flag.Bool("help", false, "Print this help message")
 
@@ -48,12 +49,19 @@ func run() error {
 
 	fs := afero.NewOsFs()
 
-	g, err := scanner.New(fs, root)
+	s := scanner.New(fs, *root)
+	g, err := s.Scan()
 	if err != nil {
 		return errors.Wrap(err, "scan")
 	}
 
-	b := builder.New(*store)
+	b := builder.New(
+		fs,
+		*root,
+		*store,
+		compiler.New(),
+		linker.New(),
+	)
 	if err := b.Build(g); err != nil {
 		return errors.Wrap(err, "build")
 	}
