@@ -2,6 +2,7 @@ package graph_test
 
 import (
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -92,6 +93,99 @@ func TestSort(t *testing.T) {
 				t.Errorf("%s: node %d does not match (%s not in %s)", datum.name, i, ac, ex)
 			}
 		}
+	}
+}
+
+func TestWalk(t *testing.T) {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(formatter.New())
+
+	a := &graph.Node{Name: "a"}
+	b := &graph.Node{Name: "b"}
+	c := &graph.Node{Name: "c"}
+	d := &graph.Node{Name: "d"}
+	e := &graph.Node{Name: "e"}
+
+	data := []struct {
+		name    string
+		graph   func() *graph.Graph
+		root    string
+		visits  []string
+		failure bool
+	}{
+		{
+			name: "Basic1",
+			graph: func() *graph.Graph {
+				// a -> b -> c
+				// d -> e
+				return graph.New().Add(a, b).Add(b, c).Add(d, e)
+			},
+			root:    "a",
+			visits:  []string{"a", "b", "c"},
+			failure: false,
+		},
+		{
+			name: "Basic2",
+			graph: func() *graph.Graph {
+				// a -> b -> c
+				// d -> e
+				return graph.New().Add(a, b).Add(b, c).Add(d, e)
+			},
+			root:    "d",
+			visits:  []string{"d", "e"},
+			failure: false,
+		},
+		{
+			name: "EndOfAPath",
+			graph: func() *graph.Graph {
+				// a -> b -> c
+				// d -> e
+				return graph.New().Add(a, b).Add(b, c).Add(d, e)
+			},
+			root:    "e",
+			visits:  []string{"e"},
+			failure: false,
+		},
+		{
+			name: "Cycle",
+			graph: func() *graph.Graph {
+				// a -> b -> c
+				// ^         v
+				//  \ < - < /
+				return graph.New().Add(a, b).Add(b, c).Add(c, a)
+			},
+			root:    "a",
+			visits:  []string{"a", "b", "c"},
+			failure: false,
+		},
+		{
+			name: "UnknownNode",
+			graph: func() *graph.Graph {
+				// a -> b -> c
+				return graph.New().Add(a, b).Add(b, c)
+			},
+			root:    "z",
+			visits:  []string{},
+			failure: true,
+		},
+	}
+
+	for _, datum := range data {
+		t.Run(datum.name, func(t *testing.T) {
+			g := datum.graph()
+
+			acVisits := make([]string, 0, 2)
+			if err := g.Walk(datum.root, func(node *graph.Node) error {
+				acVisits = append(acVisits, node.Name)
+				return nil
+			}); err != nil && !datum.failure {
+				t.Fatal(err)
+			}
+
+			if !reflect.DeepEqual(datum.visits, acVisits) {
+				t.Fatalf("expected visits %s != actual visits %s", datum.visits, acVisits)
+			}
+		})
 	}
 }
 

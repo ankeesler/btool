@@ -3,10 +3,10 @@ package graph
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"sort"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -41,6 +41,7 @@ func (g *Graph) Add(node, dependency *Node) *Graph {
 	return g
 }
 
+// Topological sort.
 func (g *Graph) Sort() ([]*Node, error) {
 	logrus.Debugf("graph: sorting %d nodes", len(g.nodes))
 
@@ -66,6 +67,14 @@ func (g *Graph) Sort() ([]*Node, error) {
 	return sorted, nil
 }
 
+// Walk the graph in a "breadth" first way.
+func (g *Graph) Walk(root string, handler func(node *Node) error) error {
+	if g.nodeNames[root] == nil {
+		return errors.New("unknown node name " + root)
+	}
+	return g.walk(root, handler, make(map[string]bool))
+}
+
 func (g *Graph) String() string {
 	buf := bytes.NewBuffer([]byte{})
 
@@ -77,6 +86,30 @@ func (g *Graph) String() string {
 	}
 
 	return buf.String()
+}
+
+func (g *Graph) walk(
+	root string,
+	handler func(node *Node) error,
+	visited map[string]bool,
+) error {
+	if visited[root] {
+		return nil
+	}
+
+	if err := handler(g.nodeNames[root]); err != nil {
+		return errors.Wrap(err, fmt.Sprintf("handle %s", root))
+	}
+
+	visited[root] = true
+
+	for dependency, _ := range g.nodes[root] {
+		if err := g.walk(dependency, handler, visited); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (g *Graph) updateForSortedNode(sortedNode *Node) {
