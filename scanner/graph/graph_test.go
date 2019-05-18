@@ -5,14 +5,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/scanner/graph"
-	"github.com/ankeesler/btool/testutil"
 	"github.com/sirupsen/logrus"
 )
 
 func TestSort(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(testutil.NewTestingFormatter(t))
+	logrus.SetFormatter(formatter.New())
 
 	a := &graph.Node{Name: "a"}
 	b := &graph.Node{Name: "b"}
