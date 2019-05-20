@@ -203,3 +203,19 @@ func TestAdd(t *testing.T) {
 		t.Errorf("expected length 2, got %d", l)
 	}
 }
+
+func TestString(t *testing.T) {
+	a := &graph.Node{Name: "a"}
+	b := &graph.Node{Name: "b"}
+	c := &graph.Node{Name: "c"}
+	makeGraph := func() *graph.Graph {
+		// a -> b -> c
+		return graph.New().Add(a, b).Add(b, c).Add(c, a)
+	}
+
+	g0, g1 := makeGraph(), makeGraph()
+	g0S, g1S := g0.String(), g1.String()
+	if g0S != g1S {
+		t.Fatalf("'%s' != '%s'", g0S, g1S)
+	}
+}

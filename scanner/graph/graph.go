@@ -78,14 +78,34 @@ func (g *Graph) Walk(root string, handler func(node *Node) error) error {
 func (g *Graph) String() string {
 	buf := bytes.NewBuffer([]byte{})
 
-	for nodeName, dependenciesNames := range g.nodes {
+	for _, nodeName := range sortKeys0(g.nodes) {
+		dependenciesNames := g.nodes[nodeName]
 		buf.WriteString(fmt.Sprintf("%s:\n", nodeName))
-		for dependencyName, _ := range dependenciesNames {
+
+		for _, dependencyName := range sortKeys1(dependenciesNames) {
 			buf.WriteString(fmt.Sprintf("> %s\n", dependencyName))
 		}
 	}
 
 	return buf.String()
+}
+
+func sortKeys0(m map[string]map[string]bool) []string {
+	keys := make([]string, 0, len(m))
+	for key, _ := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
+func sortKeys1(m map[string]bool) []string {
+	keys := make([]string, 0, len(m))
+	for key, _ := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func (g *Graph) walk(
