@@ -14,10 +14,13 @@ const (
 
 func main() {
 	fs := afero.NewOsFs()
-	for _, project := range []testutil.Project{
-		testutil.BasicProject,
-		testutil.BasicProjectWithExtra,
-		testutil.ComplexProject,
+	for _, project := range []*testutil.Project{
+		testutil.BasicProjectC(),
+		testutil.BasicProjectCC(),
+		testutil.BasicProjectWithExtraC(),
+		testutil.BasicProjectWithExtraCC(),
+		testutil.ComplexProjectC(),
+		testutil.ComplexProjectCC(),
 	} {
 		project.Root = filepath.Join(root, project.Name)
 		if err := project.PopulateFS(fs); err != nil {

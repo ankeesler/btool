@@ -96,12 +96,14 @@ func (s *Scanner) addToGraph(path string, info os.FileInfo, err error) error {
 
 func (s *Scanner) resolveIncludePath(include, dir string) (string, error) {
 	rootRelJoin := filepath.Join(s.root, include)
-	if exists, _ := afero.Exists(s.fs, rootRelJoin); exists {
+	//if exists, _ := afero.Exists(s.fs, rootRelJoin); exists {
+	if s.exists(rootRelJoin) {
 		return rootRelJoin, nil
 	}
 
 	dirRelJoin := filepath.Join(dir, include)
-	if exists, _ := afero.Exists(s.fs, dirRelJoin); exists {
+	//if exists, _ := afero.Exists(s.fs, dirRelJoin); exists {
+	if s.exists(dirRelJoin) {
 		return filepath.Join(dir, include), nil
 	}
 
@@ -143,13 +145,23 @@ func (s *Scanner) walk(file string, visited map[string]bool) error {
 		}
 		s.graph.Add(fileNode, includeNode)
 
-		sourcePath := strings.Replace(includePath, ".h", ".c", 1)
-		if exists, _ := afero.Exists(s.fs, sourcePath); exists {
-			if err := s.walk(sourcePath, visited); err != nil {
+		sourcePathC := strings.Replace(includePath, ".h", ".c", 1)
+		sourcePathCC := strings.Replace(includePath, ".h", ".cc", 1)
+		if s.exists(sourcePathC) {
+			if err := s.walk(sourcePathC, visited); err != nil {
+				return err
+			}
+		} else if s.exists(sourcePathCC) {
+			if err := s.walk(sourcePathCC, visited); err != nil {
 				return err
 			}
 		}
 	}
 
 	return nil
+}
+
+func (s *Scanner) exists(path string) bool {
+	exists, _ := afero.Exists(s.fs, path)
+	return exists
 }

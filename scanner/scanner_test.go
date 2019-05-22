@@ -17,9 +17,13 @@ func TestScanRoot(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
-	projects := []testutil.Project{
-		testutil.BasicProject,
-		testutil.ComplexProject,
+	projects := []*testutil.Project{
+		testutil.BasicProjectC(),
+		testutil.BasicProjectCC(),
+		testutil.BasicProjectWithExtraC(),
+		testutil.BasicProjectWithExtraCC(),
+		testutil.ComplexProjectC(),
+		testutil.ComplexProjectCC(),
 	}
 
 	for _, project := range projects {
@@ -47,35 +51,57 @@ func TestScanFile(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
+	basicProjectC := testutil.BasicProjectC()
+	basicProjectCC := testutil.BasicProjectCC()
+	basicProjectWithExtraC := testutil.BasicProjectWithExtraC()
+	basicProjectWithExtraCC := testutil.BasicProjectWithExtraCC()
+
 	data := []struct {
-		project testutil.Project
-		exG     *graph.Graph
+		p    *testutil.Project
+		file string
+		exG  *graph.Graph
 	}{
 		{
-			project: testutil.BasicProject,
-			exG:     testutil.BasicProject.Graph(),
+			p:    basicProjectC,
+			file: "main.c",
+			exG:  basicProjectC.Graph(),
 		},
 		{
-			project: testutil.BasicProjectWithExtra,
-			exG:     testutil.BasicProject.Graph(),
+			p:    basicProjectCC,
+			file: "main.cc",
+			exG:  basicProjectCC.Graph(),
+		},
+		{
+			p:    basicProjectWithExtraC,
+			file: "main.c",
+			exG:  basicProjectC.Graph(),
+		},
+		{
+			p:    basicProjectWithExtraCC,
+			file: "main.cc",
+			exG:  basicProjectCC.Graph(),
 		},
 
-		// eh, this should probably work...but it doesn't...
+		// This should probably work...but it doesn't.
 		//{
-		//	project: testutil.ComplexProject,
-		//	exG:     testutil.ComplexProject.Graph(),
+		//	p: complexProjectC,
+		//	exG: complexProjectC.GraphG(),
+		//},
+		//{
+		//	p: complexProjectCC,
+		//	exG: complexProjectCC.GraphG(),
 		//},
 	}
 
 	for _, datum := range data {
-		t.Run(datum.project.Name, func(t *testing.T) {
+		t.Run(datum.p.Name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			if err := datum.project.PopulateFS(fs); err != nil {
+			if err := datum.p.PopulateFS(fs); err != nil {
 				t.Fatal(err)
 			}
 
-			file := filepath.Join(datum.project.Root, "main.c")
-			acG, err := scanner.New(fs, datum.project.Root).ScanFile(file)
+			file := filepath.Join(datum.p.Root, datum.file)
+			acG, err := scanner.New(fs, datum.p.Root).ScanFile(file)
 			if err != nil {
 				t.Fatal(err)
 			}

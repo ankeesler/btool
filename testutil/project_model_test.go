@@ -13,10 +13,13 @@ func TestComplexProject(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
-	for _, project := range []testutil.Project{
-		testutil.BasicProject,
-		testutil.BasicProjectWithExtra,
-		testutil.ComplexProject,
+	for _, project := range []*testutil.Project{
+		testutil.BasicProjectC(),
+		testutil.BasicProjectCC(),
+		testutil.BasicProjectWithExtraC(),
+		testutil.BasicProjectWithExtraCC(),
+		testutil.ComplexProjectC(),
+		testutil.ComplexProjectCC(),
 	} {
 		t.Run(project.Name, func(t *testing.T) {
 			if g := project.Graph(); g == nil {

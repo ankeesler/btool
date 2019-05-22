@@ -2,21 +2,24 @@ package testutil
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"gopkg.in/yaml.v2"
 )
 
-var BasicProject = Project{
+var basicProject = Project{
 	Name: "Basic",
 	Root: "/tuna/root",
-	Nodes: []ProjectNode{
-		ProjectNode{
-			Name: "main.c",
+	Nodes: []*ProjectNode{
+		&ProjectNode{
+			Name: "main.FILE_EXTENSION",
 			Includes: []string{
 				"\"master.h\"",
 				"\"dep-0/dep-0a.h\"",
@@ -26,15 +29,15 @@ var BasicProject = Project{
 				"dep-0/dep-0a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "master.h",
 			Includes: []string{
 				"<stdlib.h>",
 			},
 			Dependencies: []string{},
 		},
-		ProjectNode{
-			Name: "dep-0/dep-0a.c",
+		&ProjectNode{
+			Name: "dep-0/dep-0a.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0a.h\"",
 			},
@@ -42,7 +45,7 @@ var BasicProject = Project{
 				"dep-0/dep-0a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name:         "dep-0/dep-0a.h",
 			Includes:     []string{},
 			Dependencies: []string{},
@@ -50,12 +53,12 @@ var BasicProject = Project{
 	},
 }
 
-var BasicProjectWithExtra = Project{
+var basicProjectWithExtra = Project{
 	Name: "BasicWithExtra",
 	Root: "/tuna/root",
-	Nodes: []ProjectNode{
-		ProjectNode{
-			Name: "main.c",
+	Nodes: []*ProjectNode{
+		&ProjectNode{
+			Name: "main.FILE_EXTENSION",
 			Includes: []string{
 				"\"master.h\"",
 				"\"dep-0/dep-0a.h\"",
@@ -65,15 +68,15 @@ var BasicProjectWithExtra = Project{
 				"dep-0/dep-0a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "master.h",
 			Includes: []string{
 				"<stdlib.h>",
 			},
 			Dependencies: []string{},
 		},
-		ProjectNode{
-			Name: "dep-0/dep-0a.c",
+		&ProjectNode{
+			Name: "dep-0/dep-0a.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0a.h\"",
 			},
@@ -81,13 +84,13 @@ var BasicProjectWithExtra = Project{
 				"dep-0/dep-0a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name:         "dep-0/dep-0a.h",
 			Includes:     []string{},
 			Dependencies: []string{},
 		},
-		ProjectNode{
-			Name: "dep-1/dep-1a.c",
+		&ProjectNode{
+			Name: "dep-1/dep-1a.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
 				"\"dep-1a.h\"",
@@ -97,7 +100,7 @@ var BasicProjectWithExtra = Project{
 				"dep-1/dep-1a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name:         "dep-1/dep-1a.h",
 			Includes:     []string{},
 			Dependencies: []string{},
@@ -105,12 +108,12 @@ var BasicProjectWithExtra = Project{
 	},
 }
 
-var ComplexProject = Project{
+var complexProject = Project{
 	Name: "Complex",
 	Root: "/tuna/root",
-	Nodes: []ProjectNode{
-		ProjectNode{
-			Name: "main.c",
+	Nodes: []*ProjectNode{
+		&ProjectNode{
+			Name: "main.FILE_EXTENSION",
 			Includes: []string{
 				"<stdio.h>",
 				"\"master.h\"",
@@ -132,7 +135,7 @@ int main(int argc, char *argv[]) {
 `,
 		},
 
-		ProjectNode{
+		&ProjectNode{
 			Name: "master.h",
 			Includes: []string{
 				"<stdlib.h>",
@@ -140,8 +143,8 @@ int main(int argc, char *argv[]) {
 			Dependencies: []string{},
 		},
 
-		ProjectNode{
-			Name: "dep-0/dep-0a.c",
+		&ProjectNode{
+			Name: "dep-0/dep-0a.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0a.h\"",
 			},
@@ -149,14 +152,14 @@ int main(int argc, char *argv[]) {
 				"dep-0/dep-0a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name:         "dep-0/dep-0a.h",
 			Includes:     []string{},
 			Dependencies: []string{},
 		},
 
-		ProjectNode{
-			Name: "dep-1/dep-1a.c",
+		&ProjectNode{
+			Name: "dep-1/dep-1a.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
 				"\"dep-1a.h\"",
@@ -166,7 +169,7 @@ int main(int argc, char *argv[]) {
 				"dep-1/dep-1a.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "dep-1/dep-1a.h",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
@@ -176,8 +179,8 @@ int main(int argc, char *argv[]) {
 			},
 		},
 
-		ProjectNode{
-			Name: "dep-2/dep-2a.c",
+		&ProjectNode{
+			Name: "dep-2/dep-2a.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
 				"\"dep-2a.h\"",
@@ -189,7 +192,7 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "dep-2/dep-2a.h",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
@@ -200,8 +203,8 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2.h",
 			},
 		},
-		ProjectNode{
-			Name: "dep-2/dep-2b.c",
+		&ProjectNode{
+			Name: "dep-2/dep-2b.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
 				"\"dep-2b.h\"",
@@ -213,7 +216,7 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "dep-2/dep-2b.h",
 			Includes: []string{
 				"\"dep-0/dep-0a.h\"",
@@ -224,7 +227,7 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "dep-2/dep-2.h",
 			Includes: []string{
 				"<stdio.h>",
@@ -234,8 +237,8 @@ int main(int argc, char *argv[]) {
 				"dep-0/dep-0a.h",
 			},
 		},
-		ProjectNode{
-			Name: "dep-2/dep-2-1/dep-2-1.c",
+		&ProjectNode{
+			Name: "dep-2/dep-2-1/dep-2-1.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-2/dep-2.h\"",
 				"\"dep-2-1.h\"",
@@ -245,7 +248,7 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2-1/dep-2-1.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "dep-2/dep-2-1/dep-2-1.h",
 			Includes: []string{
 				"\"dep-2/dep-2.h\"",
@@ -254,8 +257,8 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2.h",
 			},
 		},
-		ProjectNode{
-			Name: "dep-2/dep-2-2/dep-2-2.c",
+		&ProjectNode{
+			Name: "dep-2/dep-2-2/dep-2-2.FILE_EXTENSION",
 			Includes: []string{
 				"\"dep-2/dep-2.h\"",
 				"\"dep-2-2.h\"",
@@ -265,7 +268,7 @@ int main(int argc, char *argv[]) {
 				"dep-2/dep-2-2/dep-2-2.h",
 			},
 		},
-		ProjectNode{
+		&ProjectNode{
 			Name: "dep-2/dep-2-2/dep-2-2.h",
 			Includes: []string{
 				"\"dep-2/dep-2.h\"",
@@ -277,17 +280,95 @@ int main(int argc, char *argv[]) {
 	},
 }
 
+func BasicProjectC() *Project {
+	return executeTemplate(deepCopy(&basicProject), "c")
+}
+
+func BasicProjectCC() *Project {
+	return executeTemplate(deepCopy(&basicProject), "cc")
+}
+
+func BasicProjectWithExtraC() *Project {
+	return executeTemplate(deepCopy(&basicProjectWithExtra), "c")
+}
+
+func BasicProjectWithExtraCC() *Project {
+	return executeTemplate(deepCopy(&basicProjectWithExtra), "cc")
+}
+
+func ComplexProjectC() *Project {
+	return executeTemplate(deepCopy(&complexProject), "c")
+}
+
+func ComplexProjectCC() *Project {
+	return executeTemplate(deepCopy(&complexProject), "cc")
+}
+
+func deepCopy(project *Project) *Project {
+	bytes, err := yaml.Marshal(project)
+	if err != nil {
+		panic(err)
+	}
+
+	newProject := new(Project)
+	if err := yaml.Unmarshal(bytes, newProject); err != nil {
+		panic(err)
+	}
+
+	return newProject
+}
+
+func executeTemplate(project *Project, extension string) *Project {
+	project.Name = project.Name + strings.ToUpper(extension)
+	for _, node := range project.Nodes {
+		node.Name = strings.Replace(
+			node.Name,
+			".FILE_EXTENSION",
+			"."+extension,
+			1,
+		)
+
+		if strings.HasSuffix(node.Name, ".h") && extension == "cc" {
+			class := hex.EncodeToString([]byte(node.Name))
+			node.ExtraContent = fmt.Sprintf(`
+#ifndef CLASS_%s_H_
+#define CLASS_%s_H_
+
+class Class%s {
+public:
+  Class%s() { foo_ = 1; }
+
+private:
+  int foo_;
+};
+
+#endif // CLASS_%s_H_
+`, class, class, class, class, class)
+		}
+	}
+	return project
+}
+
 type ProjectNode struct {
-	Name         string
-	Includes     []string
-	Dependencies []string
-	ExtraContent string
+	Name         string   `yaml:"name"`
+	Includes     []string `yaml:"includes"`
+	Dependencies []string `yaml:"dependencies"`
+	ExtraContent string   `yaml:"extra_content"`
 }
 
 type Project struct {
-	Name  string
-	Root  string
-	Nodes []ProjectNode
+	Name  string         `yaml:"name"`
+	Root  string         `yaml:"root"`
+	Nodes []*ProjectNode `yaml:"nodes"`
+}
+
+func (p *Project) String() string {
+	bytes, err := yaml.Marshal(p)
+	if err != nil {
+		return fmt.Sprintf("error marshalling project: %s", err.Error())
+	} else {
+		return string(bytes)
+	}
 }
 
 func (p *Project) PopulateFS(fs afero.Fs) error {

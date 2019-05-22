@@ -41,7 +41,7 @@ func (b *Builder) Build(graph *graph.Graph) error {
 		return errors.Wrap(err, "sort graph")
 	}
 
-	objects := make([]afero.File, 0, 2)
+	objects := make([]afero.File, 0)
 	defer func() {
 		for _, object := range objects {
 			object.Close()
@@ -50,11 +50,19 @@ func (b *Builder) Build(graph *graph.Graph) error {
 
 	for _, node := range nodes {
 		logrus.Debugf("looking at sorted node %s", node)
+		var object afero.File
+		var err error
 		if strings.HasSuffix(node.Name, ".c") {
-			object, err := b.compile(node)
-			if err != nil {
-				return errors.Wrap(err, "compile")
-			}
+			object, err = b.compile(node, ".c", b.c.CompileC)
+		} else if strings.HasSuffix(node.Name, ".cc") {
+			object, err = b.compile(node, ".cc", b.c.CompileCC)
+		}
+
+		if err != nil {
+			return errors.Wrap(err, "compile")
+		}
+
+		if object != nil {
 			objects = append(objects, object)
 		}
 	}
@@ -66,7 +74,11 @@ func (b *Builder) Build(graph *graph.Graph) error {
 	return nil
 }
 
-func (b *Builder) compile(node *graph.Node) (afero.File, error) {
+func (b *Builder) compile(
+	node *graph.Node,
+	extension string,
+	compileFunc func(output, input, include string) error,
+) (afero.File, error) {
 	logrus.Infof("compiling node %s", node)
 
 	rootRelNodeName, err := filepath.Rel(b.root, node.Name)
@@ -77,7 +89,7 @@ func (b *Builder) compile(node *graph.Node) (afero.File, error) {
 	outputFile := filepath.Join(
 		b.store,
 		"objects",
-		strings.Replace(rootRelNodeName, ".c", ".o", 1),
+		strings.Replace(rootRelNodeName, extension, ".o", 1),
 	)
 	outputDir := filepath.Dir(outputFile)
 	if err := b.fs.MkdirAll(outputDir, 0700); err != nil {
@@ -96,7 +108,7 @@ func (b *Builder) compile(node *graph.Node) (afero.File, error) {
 	}
 	defer input.Close()
 
-	if err := b.c.Compile(output.Name(), input.Name(), b.root); err != nil {
+	if err := compileFunc(output.Name(), input.Name(), b.root); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("compile %s", output.Name()))
 	}
 

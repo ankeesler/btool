@@ -30,17 +30,25 @@ func TestBuild(t *testing.T) {
 	}
 	defer fs.RemoveAll(storeDir)
 
-	project := testutil.ComplexProject
-	project.Root = rootDir
-	if err := project.PopulateFS(fs); err != nil {
-		t.Fatal(err)
+	projects := []*testutil.Project{
+		testutil.ComplexProjectC(),
+		testutil.ComplexProjectCC(),
 	}
 
-	store := storeDir
-	c := compiler.New()
-	l := linker.New()
-	b := builder.New(fs, project.Root, store, c, l)
-	if err := b.Build(project.Graph()); err != nil {
-		t.Fatal(err)
+	for _, project := range projects {
+		t.Run(project.Name, func(t *testing.T) {
+			project.Root = rootDir
+			if err := project.PopulateFS(fs); err != nil {
+				t.Fatal(err)
+			}
+
+			store := storeDir
+			c := compiler.New()
+			l := linker.New()
+			b := builder.New(fs, project.Root, store, c, l)
+			if err := b.Build(project.Graph()); err != nil {
+				t.Fatal(err)
+			}
+		})
 	}
 }
