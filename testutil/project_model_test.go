@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-func TestComplexProject(t *testing.T) {
+func TestProjects(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
@@ -20,6 +20,8 @@ func TestComplexProject(t *testing.T) {
 		testutil.BasicProjectWithExtraCC(),
 		testutil.ComplexProjectC(),
 		testutil.ComplexProjectCC(),
+		testutil.BigProjectC(),
+		testutil.BigProjectCC(),
 	} {
 		t.Run(project.Name, func(t *testing.T) {
 			if g := project.Graph(); g == nil {

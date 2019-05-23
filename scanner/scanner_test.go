@@ -24,6 +24,8 @@ func TestScanRoot(t *testing.T) {
 		testutil.BasicProjectWithExtraCC(),
 		testutil.ComplexProjectC(),
 		testutil.ComplexProjectCC(),
+		testutil.BigProjectC(),
+		testutil.BigProjectCC(),
 	}
 
 	for _, project := range projects {
@@ -40,8 +42,8 @@ func TestScanRoot(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if !reflect.DeepEqual(exG, acG) {
-				t.Fatalf("expected:\nvvv\n%s\n^^^\nactual:\nvvv\n%s\n^^^\n", exG, acG)
+			if err := graph.Equal(exG, acG); err != nil {
+				t.Fatal(err)
 			}
 		})
 	}
@@ -85,11 +87,19 @@ func TestScanFile(t *testing.T) {
 		// This should probably work...but it doesn't.
 		//{
 		//	p: complexProjectC,
-		//	exG: complexProjectC.GraphG(),
+		//	exG: complexProjectC.Graph(),
 		//},
 		//{
 		//	p: complexProjectCC,
-		//	exG: complexProjectCC.GraphG(),
+		//	exG: complexProjectCC.Graph(),
+		//},
+		//{
+		//	p: bigProjectC,
+		//	exG: bigProjectC.Graph(),
+		//},
+		//{
+		//	p: bigProjectCC,
+		//	exG: bigProjectCC.Graph(),
 		//},
 	}
 

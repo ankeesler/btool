@@ -33,6 +33,8 @@ func TestBuild(t *testing.T) {
 	projects := []*testutil.Project{
 		testutil.ComplexProjectC(),
 		testutil.ComplexProjectCC(),
+		testutil.BigProjectC(),
+		testutil.BigProjectCC(),
 	}
 
 	for _, project := range projects {

@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 var basicProject = Project{
@@ -304,6 +304,119 @@ func ComplexProjectCC() *Project {
 	return executeTemplate(deepCopy(&complexProject), "cc")
 }
 
+func BigProjectC() *Project {
+	return generateBigProject("c")
+}
+
+func BigProjectCC() *Project {
+	return generateBigProject("cc")
+}
+
+func generateBigProject(extension string) *Project {
+	p := &Project{
+		Name:  "BigProject" + strings.ToUpper(extension),
+		Root:  "/tuna/root",
+		Nodes: make([]*ProjectNode, 0),
+	}
+
+	// Generate a "common" directory with 100 .h files
+	// No dependencies in each file.
+	for i := 0; i < 100; i++ {
+		prefix := fmt.Sprintf("common/common-%02d.", i)
+		includeNode := &ProjectNode{
+			Name:         prefix + "h",
+			Includes:     []string{},
+			Dependencies: []string{},
+		}
+		if extension == "cc" {
+			includeNode.ExtraContent = generateClass(prefix + "h")
+		}
+
+		p.Nodes = append(p.Nodes, includeNode)
+		p.Nodes = append(p.Nodes, &ProjectNode{
+			Name: prefix + extension,
+			Includes: []string{
+				"\"" + prefix + "h" + "\"",
+			},
+			Dependencies: []string{
+				prefix + "h",
+			},
+		})
+	}
+
+	// Generate 25 .h files for 4 levels.
+	// Give each .h file 4 "common" dependencies.
+	for i := 0; i < 100; i++ {
+		var prefix string
+		for j := 0; j < (i/25)+1; j++ {
+			prefix += fmt.Sprintf("level-%02d/", j)
+		}
+
+		prefix += fmt.Sprintf("file-%02d.", i)
+		includeNode := &ProjectNode{
+			Name:         prefix + "h",
+			Includes:     []string{},
+			Dependencies: []string{},
+		}
+		if extension == "cc" {
+			includeNode.ExtraContent = generateClass(prefix + "h")
+		}
+
+		sourceNode := &ProjectNode{
+			Name: prefix + extension,
+			Includes: []string{
+				"\"" + prefix + "h" + "\"",
+			},
+			Dependencies: []string{
+				prefix + "h",
+			},
+		}
+
+		for j := 0; j < 4; j++ {
+			include := fmt.Sprintf("common/common-%02d.h", (i*j)%100)
+			includeQuoted := fmt.Sprintf("\"%s\"", include)
+			includeNode.Includes = append(includeNode.Includes, includeQuoted)
+			includeNode.Dependencies = append(includeNode.Dependencies, include)
+			sourceNode.Includes = append(sourceNode.Includes, includeQuoted)
+			sourceNode.Dependencies = append(sourceNode.Dependencies, include)
+		}
+
+		p.Nodes = append(p.Nodes, includeNode)
+		p.Nodes = append(p.Nodes, sourceNode)
+	}
+
+	// Generate main with 10 includes from the common directory
+	// and 10 includes from the level-00 directory.
+	mainNode := &ProjectNode{
+		Name: "main." + extension,
+		Includes: []string{
+			"<stdio.h>",
+		},
+		Dependencies: []string{},
+		ExtraContent: `
+int main(int argc, char *argv[]) {
+	printf("hey! i am a large project!\n");
+	return 0;
+}
+`,
+	}
+	for i := 0; i < 10; i++ {
+		include := fmt.Sprintf("common/common-%02d.h", i)
+		includeQuoted := fmt.Sprintf("\"%s\"", include)
+		mainNode.Includes = append(mainNode.Includes, includeQuoted)
+		mainNode.Dependencies = append(mainNode.Dependencies, include)
+
+		include = fmt.Sprintf("level-00/file-%02d.h", i)
+		includeQuoted = fmt.Sprintf("\"%s\"", include)
+		mainNode.Includes = append(mainNode.Includes, includeQuoted)
+		mainNode.Dependencies = append(mainNode.Dependencies, include)
+	}
+
+	p.Nodes = append(p.Nodes, mainNode)
+
+	return p
+}
+
 func deepCopy(project *Project) *Project {
 	bytes, err := yaml.Marshal(project)
 	if err != nil {
@@ -329,8 +442,15 @@ func executeTemplate(project *Project, extension string) *Project {
 		)
 
 		if strings.HasSuffix(node.Name, ".h") && extension == "cc" {
-			class := hex.EncodeToString([]byte(node.Name))
-			node.ExtraContent = fmt.Sprintf(`
+			node.ExtraContent = generateClass(node.Name)
+		}
+	}
+	return project
+}
+
+func generateClass(name string) string {
+	class := hex.EncodeToString([]byte(name))
+	return fmt.Sprintf(`
 #ifndef CLASS_%s_H_
 #define CLASS_%s_H_
 
@@ -344,9 +464,6 @@ private:
 
 #endif // CLASS_%s_H_
 `, class, class, class, class, class)
-		}
-	}
-	return project
 }
 
 type ProjectNode struct {

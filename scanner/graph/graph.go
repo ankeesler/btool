@@ -90,6 +90,38 @@ func (g *Graph) String() string {
 	return buf.String()
 }
 
+func Equal(left, right *Graph) error {
+	if err := superset(left, right); err != nil {
+		return errors.Wrap(err, "left -> right")
+	} else if err := superset(right, left); err != nil {
+		return errors.Wrap(err, "right -> left")
+	} else {
+		return nil
+	}
+}
+
+func superset(left, right *Graph) error {
+	for _, nodeName := range sortKeys0(left.nodes) {
+		dependenciesNames := left.nodes[nodeName]
+		otherDependenciesNames, ok := right.nodes[nodeName]
+		if !ok {
+			return fmt.Errorf("node %s does not exist", nodeName)
+		}
+
+		for _, dependencyName := range sortKeys1(dependenciesNames) {
+			_, ok := otherDependenciesNames[dependencyName]
+			if !ok {
+				return fmt.Errorf(
+					"node %s is missing dependency %s",
+					nodeName,
+					dependencyName,
+				)
+			}
+		}
+	}
+	return nil
+}
+
 func sortKeys0(m map[string]map[string]bool) []string {
 	keys := make([]string, 0, len(m))
 	for key, _ := range m {

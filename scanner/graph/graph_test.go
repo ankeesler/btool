@@ -219,3 +219,67 @@ func TestString(t *testing.T) {
 		t.Fatalf("'%s' != '%s'", g0S, g1S)
 	}
 }
+
+func TestEqual(t *testing.T) {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(formatter.New())
+
+	a := &graph.Node{Name: "a"}
+	b := &graph.Node{Name: "b"}
+	c := &graph.Node{Name: "c"}
+	d := &graph.Node{Name: "d"}
+	e := &graph.Node{Name: "e"}
+
+	data := []struct {
+		name    string
+		g0, g1  *graph.Graph
+		failure bool
+	}{
+		{
+			// a -> b -> c
+			// vs
+			// a -> b -> c
+			name:    "Correct",
+			g0:      graph.New().Add(a, b).Add(b, c),
+			g1:      graph.New().Add(a, b).Add(b, c),
+			failure: false,
+		},
+		{
+			// a -> b -> c
+			// vs
+			// d -> e
+			name:    "Wrong",
+			g0:      graph.New().Add(a, b).Add(b, c),
+			g1:      graph.New().Add(d, e),
+			failure: true,
+		},
+		{
+			// a -> b -> c
+			// ^         v
+			//  \ < - < /
+			// vs
+			// a -> b -> c
+			// ^         v
+			//  \ < - < /
+			name:    "Cycle",
+			g0:      graph.New().Add(a, b).Add(b, c).Add(c, a),
+			g1:      graph.New().Add(a, b).Add(b, c).Add(c, a),
+			failure: false,
+		},
+	}
+
+	for _, datum := range data {
+		t.Run(datum.name, func(t *testing.T) {
+			err := graph.Equal(datum.g0, datum.g1)
+			if err != nil {
+				if !datum.failure {
+					t.Fatalf("expected success, got %s", err.Error())
+				}
+			} else {
+				if datum.failure {
+					t.Fatal("expected failure")
+				}
+			}
+		})
+	}
+}
