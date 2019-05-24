@@ -2,7 +2,7 @@
 
 Push to start C/C++ building!
 
-```bash
+```
 $ ./btool -root fixture/ComplexCC/ -target fixture/ComplexCC/main.cc
 btool |  info | scanning from file fixture/ComplexCC/main.cc
 btool |  info | building graph
