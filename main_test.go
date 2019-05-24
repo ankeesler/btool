@@ -19,11 +19,11 @@ func TestBuildingC(t *testing.T) {
 
 	output, err := exec.Command(
 		btool,
-		"-root",
+		"--root",
 		"fixture/ComplexC",
-		"-store",
+		"--store",
 		store,
-		"-target",
+		"build",
 		"fixture/ComplexC/main.c",
 	).CombinedOutput()
 	if err != nil {
@@ -55,11 +55,11 @@ func TestBuildingCC(t *testing.T) {
 
 	output, err := exec.Command(
 		btool,
-		"-root",
+		"--root",
 		"fixture/ComplexCC",
-		"-store",
+		"--store",
 		store,
-		"-target",
+		"build",
 		"fixture/ComplexCC/main.cc",
 	).CombinedOutput()
 	if err != nil {
@@ -91,11 +91,11 @@ func TestScanningC(t *testing.T) {
 
 	output0, err := exec.Command(
 		btool,
-		"-root",
+		"--root",
 		"fixture/BasicC",
-		"-store",
+		"--store",
 		store,
-		"-scan",
+		"scan",
 	).CombinedOutput()
 	if err != nil {
 		t.Fatal(string(output0), err)
@@ -103,12 +103,11 @@ func TestScanningC(t *testing.T) {
 
 	output1, err := exec.Command(
 		btool,
-		"-root",
+		"--root",
 		"fixture/BasicC",
-		"-store",
+		"--store",
 		store,
-		"-scan",
-		"-target",
+		"scan",
 		"fixture/BasicC/main.c",
 	).CombinedOutput()
 	if err != nil {
@@ -127,11 +126,11 @@ func TestScanningCC(t *testing.T) {
 
 	output0, err := exec.Command(
 		btool,
-		"-root",
+		"--root",
 		"fixture/BasicCC",
-		"-store",
+		"--store",
 		store,
-		"-scan",
+		"scan",
 	).CombinedOutput()
 	if err != nil {
 		t.Fatal(string(output0), err)
@@ -139,12 +138,11 @@ func TestScanningCC(t *testing.T) {
 
 	output1, err := exec.Command(
 		btool,
-		"-root",
+		"--root",
 		"fixture/BasicCC",
-		"-store",
+		"--store",
 		store,
-		"-scan",
-		"-target",
+		"scan",
 		"fixture/BasicCC/main.cc",
 	).CombinedOutput()
 	if err != nil {

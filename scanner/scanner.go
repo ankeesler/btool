@@ -3,6 +3,7 @@
 package scanner
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -47,7 +48,26 @@ func (s *Scanner) ScanRoot() (*graph.Graph, error) {
 	s.graph = graph.New()
 
 	logrus.Debugf("walking fs from root %s", s.root)
-	if err := afero.Walk(s.fs, s.root, s.addToGraph); err != nil {
+	if err := afero.Walk(
+		s.fs,
+		s.root,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return errors.Wrap(err, "walk")
+			}
+
+			if info.IsDir() {
+				logrus.Debugf("skipping directory %s", path)
+				return nil
+			}
+
+			if err := s.addToGraph(path); err != nil {
+				return errors.Wrap(err, fmt.Sprintf("add %s to graph", path))
+			}
+
+			return nil
+		},
+	); err != nil {
 		return nil, errors.Wrap(err, "walk")
 	}
 
@@ -56,12 +76,7 @@ func (s *Scanner) ScanRoot() (*graph.Graph, error) {
 
 // Everything in the graph is absolute! It is easier that way since the path
 // we are passed in this function is absolute.
-func (s *Scanner) addToGraph(path string, info os.FileInfo, err error) error {
-	if info.IsDir() {
-		logrus.Debugf("skipping directory %s", path)
-		return nil
-	}
-
+func (s *Scanner) addToGraph(path string) error {
 	data, err := afero.ReadFile(s.fs, path)
 	if err != nil {
 		return errors.Wrap(err, "read file "+path)
@@ -96,13 +111,11 @@ func (s *Scanner) addToGraph(path string, info os.FileInfo, err error) error {
 
 func (s *Scanner) resolveIncludePath(include, dir string) (string, error) {
 	rootRelJoin := filepath.Join(s.root, include)
-	//if exists, _ := afero.Exists(s.fs, rootRelJoin); exists {
 	if s.exists(rootRelJoin) {
 		return rootRelJoin, nil
 	}
 
 	dirRelJoin := filepath.Join(dir, include)
-	//if exists, _ := afero.Exists(s.fs, dirRelJoin); exists {
 	if s.exists(dirRelJoin) {
 		return filepath.Join(dir, include), nil
 	}
