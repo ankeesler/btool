@@ -43,6 +43,10 @@ func Init() (*cobra.Command, error) {
 
 			return nil
 		},
+		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+			logrus.Infof("success")
+			return nil
+		},
 	}
 	rootCmdFlags := rootCmd.PersistentFlags()
 	rootCmdFlags.StringVar(&root, "root", cwd, "Path to project root")
@@ -98,6 +102,26 @@ func Init() (*cobra.Command, error) {
 		},
 	}
 	rootCmd.AddCommand(buildCmd)
+
+	cleanCmd := &cobra.Command{
+		Use:   "clean",
+		Short: "Clean build data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			b := builder.New(
+				fs,
+				root,
+				store,
+				compiler.New(),
+				linker.New(),
+			)
+			if err := b.Clean(); err != nil {
+				return errors.Wrap(err, "clean")
+			}
+
+			return nil
+		},
+	}
+	rootCmd.AddCommand(cleanCmd)
 
 	return rootCmd, nil
 }

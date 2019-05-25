@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-func TestBuild(t *testing.T) {
+func TestBuildIntegration(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 

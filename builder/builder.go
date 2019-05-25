@@ -3,27 +3,27 @@
 package builder
 
 import (
-	"fmt"
-	"path/filepath"
-	"strings"
-
-	"github.com/ankeesler/btool/builder/compiler"
-	"github.com/ankeesler/btool/builder/linker"
-	"github.com/ankeesler/btool/scanner/graph"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
+
+type Compiler interface {
+	CompileC(output, input, root string) error
+	CompileCC(output, input, root string) error
+}
+
+type Linker interface {
+	Link(output string, inputs []string) error
+}
 
 type Builder struct {
 	fs    afero.Fs
 	root  string
 	store string
-	c     *compiler.Compiler
-	l     *linker.Linker
+	c     Compiler
+	l     Linker
 }
 
-func New(fs afero.Fs, root, store string, c *compiler.Compiler, l *linker.Linker) *Builder {
+func New(fs afero.Fs, root, store string, c Compiler, l Linker) *Builder {
 	return &Builder{
 		fs:    fs,
 		root:  root,
@@ -31,120 +31,4 @@ func New(fs afero.Fs, root, store string, c *compiler.Compiler, l *linker.Linker
 		c:     c,
 		l:     l,
 	}
-}
-
-func (b *Builder) Build(graph *graph.Graph) error {
-	logrus.Info("building graph")
-
-	nodes, err := graph.Sort()
-	if err != nil {
-		return errors.Wrap(err, "sort graph")
-	}
-
-	objects := make([]afero.File, 0)
-	defer func() {
-		for _, object := range objects {
-			object.Close()
-		}
-	}()
-
-	for _, node := range nodes {
-		logrus.Debugf("looking at sorted node %s", node)
-		var object afero.File
-		var err error
-		if strings.HasSuffix(node.Name, ".c") {
-			object, err = b.compile(node, ".c", b.c.CompileC)
-		} else if strings.HasSuffix(node.Name, ".cc") {
-			object, err = b.compile(node, ".cc", b.c.CompileCC)
-		}
-
-		if err != nil {
-			return errors.Wrap(err, "compile")
-		}
-
-		if object != nil {
-			objects = append(objects, object)
-		}
-	}
-
-	if err := b.link(objects); err != nil {
-		return errors.Wrap(err, "link")
-	}
-
-	return nil
-}
-
-func (b *Builder) compile(
-	node *graph.Node,
-	extension string,
-	compileFunc func(output, input, include string) error,
-) (afero.File, error) {
-	logrus.Infof("compiling node %s", node)
-
-	rootRelNodeName, err := filepath.Rel(b.root, node.Name)
-	if err != nil {
-		return nil, errors.Wrap(err, "rel")
-	}
-
-	outputFile := filepath.Join(
-		b.store,
-		"objects",
-		strings.Replace(rootRelNodeName, extension, ".o", 1),
-	)
-	outputDir := filepath.Dir(outputFile)
-	if err := b.fs.MkdirAll(outputDir, 0700); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
-	}
-
-	output, err := b.fs.Create(outputFile)
-	if err != nil {
-		return nil, errors.Wrap(err, "create output")
-	}
-	// should be closed by the caller!
-
-	input, err := b.fs.Open(node.Name)
-	if err != nil {
-		return nil, errors.Wrap(err, "open input")
-	}
-	defer input.Close()
-
-	if err := compileFunc(output.Name(), input.Name(), b.root); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("compile %s", output.Name()))
-	}
-
-	return output, nil
-}
-
-func (b *Builder) link(objects []afero.File) error {
-	logrus.Infof("linking")
-
-	outputFile := filepath.Join(
-		b.store,
-		"binaries",
-		"out",
-	)
-	outputDir := filepath.Dir(outputFile)
-	if err := b.fs.MkdirAll(outputDir, 0700); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
-	}
-
-	output, err := b.fs.Create(outputFile)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("create output (%s)", outputFile))
-	}
-	defer output.Close()
-
-	if err := b.l.Link(output.Name(), convertFilesToNames(objects)); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("link %s", output.Name()))
-	}
-
-	return nil
-}
-
-func convertFilesToNames(files []afero.File) []string {
-	names := make([]string, 0, len(files))
-	for _, file := range files {
-		names = append(names, file.Name())
-	}
-	return names
 }
