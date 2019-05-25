@@ -210,6 +210,8 @@ func TestString(t *testing.T) {
 	c := &graph.Node{Name: "c"}
 	makeGraph := func() *graph.Graph {
 		// a -> b -> c
+		// ^         v
+		//  \ < - < /
 		return graph.New().Add(a, b).Add(b, c).Add(c, a)
 	}
 
@@ -281,5 +283,35 @@ func TestEqual(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestEdges(t *testing.T) {
+	a := &graph.Node{Name: "a"}
+	b := &graph.Node{Name: "b"}
+	c := &graph.Node{Name: "c"}
+
+	// a -> b -> c
+	g := graph.New().Add(a, b).Add(b, c)
+
+	acAEdges := g.Edges(a)
+	if ex, ac := 1, len(acAEdges); ex != ac {
+		t.Errorf("expected %d, actual %d", ex, ac)
+	}
+	if acAEdges[0] != b {
+		t.Errorf("expected %s, actual %s", acAEdges[0], b)
+	}
+
+	acBEdges := g.Edges(b)
+	if ex, ac := 1, len(acBEdges); ex != ac {
+		t.Errorf("expected %d, actual %d", ex, ac)
+	}
+	if acBEdges[0] != c {
+		t.Errorf("expected %s, actual %s", acBEdges[0], c)
+	}
+
+	acCEdges := g.Edges(c)
+	if ex, ac := 0, len(acCEdges); ex != ac {
+		t.Errorf("expected %d, actual %d", ex, ac)
 	}
 }

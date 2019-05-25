@@ -1,6 +1,7 @@
 package builder_test
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -155,6 +156,28 @@ func TestBuildUnit(t *testing.T) {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
 			if ex, ac := 1, len(l.calls); ex != ac {
+				t.Errorf("expected %d, got %d", ex, ac)
+			}
+
+			// Change the master.h header so that main.cc needs to be re-compiled.
+			if err := afero.WriteFile(
+				fs,
+				filepath.Join(project.Root, "master.h"),
+				[]byte("// new data"),
+				0600,
+			); err != nil {
+				t.Fatal(err)
+			}
+
+			// Third build should involve main.cc getting re-compiled, and stuff to
+			// get re-linked.
+			if err := b.Build(project.Graph()); err != nil {
+				t.Fatal(err)
+			}
+			if ex, ac := 3, len(c.calls(cc)); ex != ac {
+				t.Errorf("expected %d, got %d", ex, ac)
+			}
+			if ex, ac := 2, len(l.calls); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
 		})

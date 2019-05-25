@@ -90,6 +90,19 @@ func (g *Graph) String() string {
 	return buf.String()
 }
 
+func (g *Graph) Edges(node *Node) []*Node {
+	edgesMap, ok := g.nodes[node.Name]
+	if !ok {
+		return nil
+	}
+
+	edges := make([]*Node, 0, len(edgesMap))
+	for edgeName := range edgesMap {
+		edges = append(edges, g.nodeNames[edgeName])
+	}
+	return edges
+}
+
 func Equal(left, right *Graph) error {
 	if err := superset(left, right); err != nil {
 		return errors.Wrap(err, "left -> right")

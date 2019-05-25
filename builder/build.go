@@ -9,7 +9,6 @@ import (
 	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/afero"
 )
 
 func (b *Builder) Build(graph *graph.Graph) error {
@@ -28,9 +27,9 @@ func (b *Builder) Build(graph *graph.Graph) error {
 		var object string
 		var err error
 		if strings.HasSuffix(node.Name, ".c") {
-			object, err = b.compile(node, ".c", b.c.CompileC)
+			object, err = b.compile(graph, node, ".c", b.c.CompileC)
 		} else if strings.HasSuffix(node.Name, ".cc") {
-			object, err = b.compile(node, ".cc", b.c.CompileCC)
+			object, err = b.compile(graph, node, ".cc", b.c.CompileCC)
 		}
 
 		if err != nil {
@@ -50,6 +49,7 @@ func (b *Builder) Build(graph *graph.Graph) error {
 }
 
 func (b *Builder) compile(
+	graph *graph.Graph,
 	node *graph.Node,
 	extension string,
 	compileFunc func(output, input, include string) error,
@@ -65,7 +65,13 @@ func (b *Builder) compile(
 		strings.Replace(rootRelNodeName, extension, ".o", 1),
 	)
 
-	if older, err := b.isFileOlder(outputFile, node.Name); err != nil {
+	dependencies := collectDepenencies(node, graph)
+	logrus.Debugf("dependencies of %s are %s", node.Name, dependencies)
+
+	if older, err := b.isFileOlder(
+		outputFile,
+		dependencies...,
+	); err != nil {
 		return "", errors.Wrap(err, "is file older")
 	} else if older {
 		logrus.Infof("compile: %s (up to date)", node.Name)
@@ -120,6 +126,7 @@ func (b *Builder) isFileOlder(from string, tos ...string) (bool, error) {
 	fromStat, err := b.fs.Stat(from)
 	if err != nil {
 		if os.IsNotExist(err) {
+			logrus.Debugf("%s does not exist", from)
 			return false, nil
 		} else {
 			return false, errors.Wrap(err, "stat from")
@@ -130,6 +137,7 @@ func (b *Builder) isFileOlder(from string, tos ...string) (bool, error) {
 		toStat, err := b.fs.Stat(to)
 		if err != nil {
 			if os.IsNotExist(err) {
+				logrus.Debugf("%s does not exist", to)
 				return false, nil
 			} else {
 				return false, errors.Wrap(err, "stat to")
@@ -153,10 +161,14 @@ func (b *Builder) isFileOlder(from string, tos ...string) (bool, error) {
 	return true, nil
 }
 
-func convertFilesToNames(files []afero.File) []string {
-	names := make([]string, 0, len(files))
-	for _, file := range files {
-		names = append(names, file.Name())
+func collectDepenencies(node *graph.Node, graph *graph.Graph) []string {
+	edges := graph.Edges(node)
+
+	dependencies := make([]string, 0, len(edges)+1)
+	for _, edge := range edges {
+		dependencies = append(dependencies, edge.Name)
 	}
-	return names
+	dependencies = append(dependencies, node.Name)
+
+	return dependencies
 }
