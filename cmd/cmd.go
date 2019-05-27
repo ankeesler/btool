@@ -7,6 +7,7 @@ import (
 	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/builder/compiler"
 	"github.com/ankeesler/btool/builder/linker"
+	"github.com/ankeesler/btool/generator"
 	"github.com/ankeesler/btool/scanner"
 	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/pkg/errors"
@@ -122,6 +123,26 @@ func Init() (*cobra.Command, error) {
 		},
 	}
 	rootCmd.AddCommand(cleanCmd)
+
+	classCmd := &cobra.Command{
+		Use:     "class <path/without/file/extension>",
+		Short:   "Generate class",
+		Example: "btool class path/to/some/class/without/extension",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			config := generator.Config{
+				Root: root,
+				Name: "btool",
+			}
+			g := generator.New(fs, &config)
+			if err := g.Class(args[0]); err != nil {
+				return errors.Wrap(err, "class")
+			}
+
+			return nil
+		},
+	}
+	rootCmd.AddCommand(classCmd)
 
 	return rootCmd, nil
 }
