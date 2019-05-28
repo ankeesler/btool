@@ -28,16 +28,16 @@ func (f *formatter) Format(entry *logrus.Entry) ([]byte, error) {
 func colorLevel(level logrus.Level) string {
 	switch level {
 	case logrus.DebugLevel:
-		return color.HiBlackString("%5s", level)
+		return color.HiBlackString("%7s", level)
 	case logrus.InfoLevel:
-		return color.HiBlueString("%5s", level)
+		return color.HiBlueString("%7s", level)
 	case logrus.WarnLevel:
-		return color.HiYellowString("%5s", level)
+		return color.YellowString("%7s", level)
 	case logrus.ErrorLevel:
-		return color.HiRedString("%5s", level)
+		return color.HiRedString("%7s", level)
 	case logrus.FatalLevel:
-		return color.HiRedString("%5s", level)
+		return color.HiRedString("%7s", level)
 	default:
-		return fmt.Sprintf("%5s", level)
+		return fmt.Sprintf("%7s", level)
 	}
 }

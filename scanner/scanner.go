@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/ankeesler/btool/scanner/includes"
 	"github.com/pkg/errors"
@@ -16,16 +17,16 @@ import (
 )
 
 type Scanner struct {
-	fs   afero.Fs
-	root string
+	fs     afero.Fs
+	config *config.Config
 
 	graph *graph.Graph
 }
 
-func New(fs afero.Fs, root string) *Scanner {
+func New(fs afero.Fs, config *config.Config) *Scanner {
 	return &Scanner{
-		fs:   fs,
-		root: root,
+		fs:     fs,
+		config: config,
 	}
 }
 
@@ -43,14 +44,14 @@ func (s *Scanner) ScanFile(file string) (*graph.Graph, error) {
 }
 
 func (s *Scanner) ScanRoot() (*graph.Graph, error) {
-	logrus.Info("scanning from root " + s.root)
+	logrus.Info("scanning from root " + s.config.Root)
 
 	s.graph = graph.New()
 
-	logrus.Debugf("walking fs from root %s", s.root)
+	logrus.Debugf("walking fs from root %s", s.config.Root)
 	if err := afero.Walk(
 		s.fs,
-		s.root,
+		s.config.Root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return errors.Wrap(err, "walk")
@@ -110,7 +111,7 @@ func (s *Scanner) addToGraph(path string) error {
 }
 
 func (s *Scanner) resolveIncludePath(include, dir string) (string, error) {
-	rootRelJoin := filepath.Join(s.root, include)
+	rootRelJoin := filepath.Join(s.config.Root, include)
 	if s.exists(rootRelJoin) {
 		return rootRelJoin, nil
 	}

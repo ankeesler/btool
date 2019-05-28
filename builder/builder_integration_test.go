@@ -6,6 +6,7 @@ import (
 	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/builder/compiler"
 	"github.com/ankeesler/btool/builder/linker"
+	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/testutil"
 	"github.com/sirupsen/logrus"
@@ -24,11 +25,11 @@ func TestBuildIntegration(t *testing.T) {
 	}
 	defer fs.RemoveAll(rootDir)
 
-	storeDir, err := afero.TempDir(fs, "", "btool_builder_test_store")
+	configDir, err := afero.TempDir(fs, "", "btool_builder_test_config")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(storeDir)
+	defer fs.RemoveAll(configDir)
 
 	projects := []*testutil.Project{
 		testutil.ComplexProjectC(),
@@ -44,10 +45,20 @@ func TestBuildIntegration(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			store := storeDir
+			cache, err := afero.TempDir(fs, "", "builder_integration_test")
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer fs.RemoveAll(cache)
+
+			cfg := config.Config{
+				Name:  "some-project-name",
+				Root:  project.Root,
+				Cache: cache,
+			}
 			c := compiler.New()
 			l := linker.New()
-			b := builder.New(fs, project.Root, store, c, l)
+			b := builder.New(fs, &cfg, c, l)
 			if err := b.Build(project.Graph()); err != nil {
 				t.Fatal(err)
 			}

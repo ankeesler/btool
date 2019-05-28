@@ -5,13 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/generator"
 	"github.com/spf13/afero"
 )
 
 func TestClass(t *testing.T) {
 	data := []struct {
-		config generator.Config
+		config config.Config
 
 		path string
 
@@ -22,7 +23,7 @@ func TestClass(t *testing.T) {
 		class     string
 	}{
 		{
-			config: generator.Config{
+			config: config.Config{
 				Root: "/tuna/root",
 				Name: "projectname",
 			},
@@ -36,7 +37,7 @@ func TestClass(t *testing.T) {
 			class:     "Basic",
 		},
 		{
-			config: generator.Config{
+			config: config.Config{
 				Root: "/tuna/root",
 				Name: "projectname",
 			},
@@ -50,7 +51,7 @@ func TestClass(t *testing.T) {
 			class:     "BasicSnakeCase",
 		},
 		{
-			config: generator.Config{
+			config: config.Config{
 				Root: "/tuna/root",
 				Name: "dash-project-name",
 			},
@@ -64,7 +65,7 @@ func TestClass(t *testing.T) {
 			class:     "BasicSnakeCase",
 		},
 		{
-			config: generator.Config{
+			config: config.Config{
 				Root: "/tuna/root",
 				Name: "projectname",
 			},
@@ -74,7 +75,7 @@ func TestClass(t *testing.T) {
 			failure: true,
 		},
 		{
-			config: generator.Config{
+			config: config.Config{
 				Root: "/tuna/root",
 				Name: "projectname",
 			},
@@ -88,7 +89,7 @@ func TestClass(t *testing.T) {
 			class:     "Class",
 		},
 		{
-			config: generator.Config{
+			config: config.Config{
 				Root: "/tuna/root",
 				Name: "projectname",
 			},

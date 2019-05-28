@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/scanner"
 	"github.com/ankeesler/btool/scanner/graph"
@@ -37,7 +38,12 @@ func TestScanRoot(t *testing.T) {
 
 			exG := project.Graph()
 
-			acG, err := scanner.New(fs, project.Root).ScanRoot()
+			c := config.Config{
+				Name:  "some-project-name",
+				Root:  project.Root,
+				Cache: "/some/cache/root",
+			}
+			acG, err := scanner.New(fs, &c).ScanRoot()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -110,8 +116,13 @@ func TestScanFile(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			c := config.Config{
+				Name:  "some-project-name",
+				Root:  datum.p.Root,
+				Cache: "/some/cache/root",
+			}
 			file := filepath.Join(datum.p.Root, datum.file)
-			acG, err := scanner.New(fs, datum.p.Root).ScanFile(file)
+			acG, err := scanner.New(fs, &c).ScanFile(file)
 			if err != nil {
 				t.Fatal(err)
 			}

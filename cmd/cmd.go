@@ -7,6 +7,7 @@ import (
 	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/builder/compiler"
 	"github.com/ankeesler/btool/builder/linker"
+	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/generator"
 	"github.com/ankeesler/btool/scanner"
 	"github.com/ankeesler/btool/scanner/graph"
@@ -24,8 +25,10 @@ func Init() (*cobra.Command, error) {
 
 	var (
 		root     string
-		store    string
+		cache    string
 		logLevel string
+
+		c config.Config
 	)
 
 	fs := afero.NewOsFs()
@@ -42,6 +45,12 @@ func Init() (*cobra.Command, error) {
 			}
 			logrus.SetLevel(level)
 
+			c = config.Config{
+				Name:  filepath.Base(root),
+				Root:  root,
+				Cache: cache,
+			}
+
 			return nil
 		},
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
@@ -50,8 +59,8 @@ func Init() (*cobra.Command, error) {
 		},
 	}
 	rootCmdFlags := rootCmd.PersistentFlags()
-	rootCmdFlags.StringVar(&root, "root", cwd, "Path to project root")
-	rootCmdFlags.StringVar(&store, "store", filepath.Join(cwd, ".btool"), "Path to btool store")
+	rootCmdFlags.StringVar(&root, "root", filepath.Join(cwd, ".btool"), "Path to project root")
+	rootCmdFlags.StringVar(&cache, "cache", os.TempDir(), "Path to build cache")
 	rootCmdFlags.StringVar(&logLevel, "loglevel", "info", "Log level")
 
 	scanCmd := &cobra.Command{
@@ -60,7 +69,7 @@ func Init() (*cobra.Command, error) {
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var g *graph.Graph
-			s := scanner.New(fs, root)
+			s := scanner.New(fs, &c)
 			if len(args) == 0 {
 				g, err = s.ScanRoot()
 			} else {
@@ -82,16 +91,15 @@ func Init() (*cobra.Command, error) {
 		Short: "Build file",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := scanner.New(fs, root)
-			g, err := s.ScanFile(args[0])
+			scanner := scanner.New(fs, &c)
+			g, err := scanner.ScanFile(args[0])
 			if err != nil {
 				return errors.Wrap(err, "scan")
 			}
 
 			b := builder.New(
 				fs,
-				root,
-				store,
+				&c,
 				compiler.New(),
 				linker.New(),
 			)
@@ -110,8 +118,7 @@ func Init() (*cobra.Command, error) {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			b := builder.New(
 				fs,
-				root,
-				store,
+				&c,
 				compiler.New(),
 				linker.New(),
 			)
@@ -130,11 +137,7 @@ func Init() (*cobra.Command, error) {
 		Example: "btool class path/to/some/class/without/extension",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := generator.Config{
-				Root: root,
-				Name: "btool",
-			}
-			g := generator.New(fs, &config)
+			g := generator.New(fs, &c)
 			if err := g.Class(args[0]); err != nil {
 				return errors.Wrap(err, "class")
 			}

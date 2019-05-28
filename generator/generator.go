@@ -7,22 +7,18 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/ankeesler/btool/config"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
-type Config struct {
-	Root string
-	Name string
-}
-
 type Generator struct {
 	fs     afero.Fs
-	config *Config
+	config *config.Config
 }
 
-func New(fs afero.Fs, config *Config) *Generator {
+func New(fs afero.Fs, config *config.Config) *Generator {
 	return &Generator{
 		fs:     fs,
 		config: config,

@@ -3,6 +3,9 @@
 package builder
 
 import (
+	"path/filepath"
+
+	"github.com/ankeesler/btool/config"
 	"github.com/spf13/afero"
 )
 
@@ -16,19 +19,31 @@ type Linker interface {
 }
 
 type Builder struct {
-	fs    afero.Fs
-	root  string
-	store string
-	c     Compiler
-	l     Linker
+	fs     afero.Fs
+	config *config.Config
+	c      Compiler
+	l      Linker
 }
 
-func New(fs afero.Fs, root, store string, c Compiler, l Linker) *Builder {
+func New(fs afero.Fs, config *config.Config, c Compiler, l Linker) *Builder {
 	return &Builder{
-		fs:    fs,
-		root:  root,
-		store: store,
-		c:     c,
-		l:     l,
+		fs:     fs,
+		config: config,
+		c:      c,
+		l:      l,
 	}
+}
+
+func (b *Builder) objectsDir() string {
+	return filepath.Join(
+		b.config.Cache,
+		"objects",
+	)
+}
+
+func (b *Builder) binariesDir() string {
+	return filepath.Join(
+		b.config.Cache,
+		"binaries",
+	)
 }

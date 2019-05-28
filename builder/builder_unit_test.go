@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ankeesler/btool/builder"
+	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/testutil"
 	"github.com/pkg/errors"
@@ -127,17 +128,16 @@ func TestBuildUnit(t *testing.T) {
 
 			cc := strings.HasSuffix(project.Name, "CC")
 
+			cfg := config.Config{
+				Name:  "some-project-name",
+				Root:  project.Root,
+				Cache: "/some/cache/root",
+			}
 			c := newFakeCompiler(fs)
 			l := newFakeLinker(fs)
-			b := builder.New(
-				fs,
-				project.Root,
-				"/tmp/store",
-				c,
-				l,
-			)
+			b := builder.New(fs, &cfg, c, l)
 
-			// First build is successful and should load everything into the store.
+			// First build is successful and should load everything into the build cache.
 			if err := b.Build(project.Graph()); err != nil {
 				t.Fatal(err)
 			}

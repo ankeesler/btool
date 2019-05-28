@@ -54,14 +54,13 @@ func (b *Builder) compile(
 	extension string,
 	compileFunc func(output, input, include string) error,
 ) (string, error) {
-	rootRelNodeName, err := filepath.Rel(b.root, node.Name)
+	rootRelNodeName, err := filepath.Rel(b.config.Root, node.Name)
 	if err != nil {
 		return "", errors.Wrap(err, "rel")
 	}
 
 	outputFile := filepath.Join(
-		b.store,
-		"objects",
+		b.objectsDir(),
 		strings.Replace(rootRelNodeName, extension, ".o", 1),
 	)
 
@@ -85,7 +84,7 @@ func (b *Builder) compile(
 		return "", errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
 	}
 
-	if err := compileFunc(outputFile, node.Name, b.root); err != nil {
+	if err := compileFunc(outputFile, node.Name, b.config.Root); err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("compile %s", outputFile))
 	}
 
@@ -93,12 +92,7 @@ func (b *Builder) compile(
 }
 
 func (b *Builder) link(objects []string) error {
-	outputFile := filepath.Join(
-		b.store,
-		"binaries",
-		"out",
-	)
-
+	outputFile := filepath.Join(b.binariesDir(), "out")
 	if older, err := b.isFileOlder(outputFile, objects...); err != nil {
 		return errors.Wrap(err, "is file older")
 	} else if older {
