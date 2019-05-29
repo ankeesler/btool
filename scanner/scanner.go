@@ -159,20 +159,31 @@ func (s *Scanner) walk(file string, visited map[string]bool) error {
 		}
 		s.graph.Add(fileNode, includeNode)
 
-		sourcePathC := strings.Replace(includePath, ".h", ".c", 1)
-		sourcePathCC := strings.Replace(includePath, ".h", ".cc", 1)
-		if s.exists(sourcePathC) {
-			if err := s.walk(sourcePathC, visited); err != nil {
-				return err
-			}
-		} else if s.exists(sourcePathCC) {
-			if err := s.walk(sourcePathCC, visited); err != nil {
+		sources := s.sourcesForInclude(includePath)
+		for _, source := range sources {
+			if err := s.walk(source, visited); err != nil {
 				return err
 			}
 		}
 	}
 
 	return nil
+}
+
+func (s *Scanner) sourcesForInclude(includePath string) []string {
+	sources := make([]string, 0)
+
+	sourcePathC := strings.Replace(includePath, ".h", ".c", 1)
+	if s.exists(sourcePathC) {
+		sources = append(sources, sourcePathC)
+	}
+
+	sourcePathCC := strings.Replace(includePath, ".h", ".cc", 1)
+	if s.exists(sourcePathCC) {
+		sources = append(sources, sourcePathCC)
+	}
+
+	return sources
 }
 
 func (s *Scanner) exists(path string) bool {
