@@ -524,8 +524,12 @@ func (p *Project) Graph() *graph.Graph {
 		g.Add(pathNode, nil)
 
 		for _, dependency := range node.Dependencies {
+			dependencyPath := dependency
+			if !filepath.IsAbs(dependencyPath) {
+				dependencyPath = filepath.Join(p.Root, dependency)
+			}
 			dependencyNode := &graph.Node{
-				Name: filepath.Join(p.Root, dependency),
+				Name: dependencyPath,
 			}
 			g.Add(pathNode, dependencyNode)
 		}

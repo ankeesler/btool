@@ -8,6 +8,7 @@ import (
 	"github.com/ankeesler/btool/builder/compiler"
 	"github.com/ankeesler/btool/builder/linker"
 	"github.com/ankeesler/btool/config"
+	"github.com/ankeesler/btool/deps"
 	"github.com/ankeesler/btool/generator"
 	"github.com/ankeesler/btool/scanner"
 	"github.com/ankeesler/btool/scanner/graph"
@@ -28,10 +29,10 @@ func Init() (*cobra.Command, error) {
 		cache    string
 		logLevel string
 
-		c config.Config
+		s *scanner.Scanner
+		b *builder.Builder
+		g *generator.Generator
 	)
-
-	fs := afero.NewOsFs()
 
 	rootCmd := &cobra.Command{
 		Use:           "btool",
@@ -45,11 +46,22 @@ func Init() (*cobra.Command, error) {
 			}
 			logrus.SetLevel(level)
 
-			c = config.Config{
+			fs := afero.NewOsFs()
+			c := config.Config{
 				Name:  filepath.Base(root),
 				Root:  root,
 				Cache: cache,
 			}
+			d := deps.New(fs, cache)
+
+			s = scanner.New(fs, &c, d)
+			b = builder.New(
+				fs,
+				&c,
+				compiler.New(),
+				linker.New(),
+			)
+			g = generator.New(fs, &c)
 
 			return nil
 		},
@@ -69,7 +81,6 @@ func Init() (*cobra.Command, error) {
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var g *graph.Graph
-			s := scanner.New(fs, &c)
 			if len(args) == 0 {
 				g, err = s.ScanRoot()
 			} else {
@@ -91,18 +102,11 @@ func Init() (*cobra.Command, error) {
 		Short: "Build file",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			scanner := scanner.New(fs, &c)
-			g, err := scanner.ScanFile(args[0])
+			g, err := s.ScanFile(args[0])
 			if err != nil {
 				return errors.Wrap(err, "scan")
 			}
 
-			b := builder.New(
-				fs,
-				&c,
-				compiler.New(),
-				linker.New(),
-			)
 			if err := b.Build(g); err != nil {
 				return errors.Wrap(err, "build")
 			}
@@ -116,12 +120,6 @@ func Init() (*cobra.Command, error) {
 		Use:   "clean",
 		Short: "Clean build data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			b := builder.New(
-				fs,
-				&c,
-				compiler.New(),
-				linker.New(),
-			)
 			if err := b.Clean(); err != nil {
 				return errors.Wrap(err, "clean")
 			}
@@ -137,7 +135,6 @@ func Init() (*cobra.Command, error) {
 		Example: "btool class path/to/some/class/without/extension",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			g := generator.New(fs, &c)
 			if err := g.Class(args[0]); err != nil {
 				return errors.Wrap(err, "class")
 			}

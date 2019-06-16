@@ -16,17 +16,28 @@ import (
 	"github.com/spf13/afero"
 )
 
+//go:generate counterfeiter . Resolver
+
+// A Resolver turns #include's into actual include and source files on disk.
+type Resolver interface {
+	ResolveInclude(include string) (string, error)
+	ResolveSources(include string) ([]string, error)
+}
+
+// A Scanner walks through a codebase and builds a dependency graph.
 type Scanner struct {
-	fs     afero.Fs
-	config *config.Config
+	fs       afero.Fs
+	config   *config.Config
+	resolver Resolver
 
 	graph *graph.Graph
 }
 
-func New(fs afero.Fs, config *config.Config) *Scanner {
+func New(fs afero.Fs, config *config.Config, resolver Resolver) *Scanner {
 	return &Scanner{
-		fs:     fs,
-		config: config,
+		fs:       fs,
+		config:   config,
+		resolver: resolver,
 	}
 }
 
@@ -96,7 +107,7 @@ func (s *Scanner) addToGraph(path string) error {
 	logrus.Debugf("parsed includes %s", includes)
 
 	for _, include := range includes {
-		includePath, err := s.resolveIncludePath(include, filepath.Dir(path))
+		includePath, err := s.resolveInclude(include, filepath.Dir(path))
 		if err != nil {
 			return errors.Wrap(err, "resolve include path "+include)
 		}
@@ -108,20 +119,6 @@ func (s *Scanner) addToGraph(path string) error {
 	}
 
 	return nil
-}
-
-func (s *Scanner) resolveIncludePath(include, dir string) (string, error) {
-	rootRelJoin := filepath.Join(s.config.Root, include)
-	if s.exists(rootRelJoin) {
-		return rootRelJoin, nil
-	}
-
-	dirRelJoin := filepath.Join(dir, include)
-	if s.exists(dirRelJoin) {
-		return filepath.Join(dir, include), nil
-	}
-
-	return "", errors.New("cannot resolve include: " + include)
 }
 
 func (s *Scanner) walk(file string, visited map[string]bool) error {
@@ -149,7 +146,7 @@ func (s *Scanner) walk(file string, visited map[string]bool) error {
 	logrus.Debugf("parsed includes %s", includes)
 
 	for _, include := range includes {
-		includePath, err := s.resolveIncludePath(include, filepath.Dir(file))
+		includePath, err := s.resolveInclude(include, filepath.Dir(file))
 		if err != nil {
 			return errors.Wrap(err, "resolve include path "+include)
 		}
@@ -159,7 +156,11 @@ func (s *Scanner) walk(file string, visited map[string]bool) error {
 		}
 		s.graph.Add(fileNode, includeNode)
 
-		sources := s.sourcesForInclude(includePath)
+		sources, err := s.resolveSources(includePath)
+		if err != nil {
+			return errors.Wrap(err, "sources for includes")
+		}
+
 		for _, source := range sources {
 			if err := s.walk(source, visited); err != nil {
 				return err
@@ -170,7 +171,27 @@ func (s *Scanner) walk(file string, visited map[string]bool) error {
 	return nil
 }
 
-func (s *Scanner) sourcesForInclude(includePath string) []string {
+func (s *Scanner) resolveInclude(include, dir string) (string, error) {
+	rootRelJoin := filepath.Join(s.config.Root, include)
+	if s.exists(rootRelJoin) {
+		return rootRelJoin, nil
+	}
+
+	dirRelJoin := filepath.Join(dir, include)
+	if s.exists(dirRelJoin) {
+		return filepath.Join(dir, include), nil
+	}
+
+	if resolvedInclude, err := s.resolver.ResolveInclude(include); err != nil {
+		return "", errors.Wrap(err, "resolve include")
+	} else if resolvedInclude != "" {
+		return resolvedInclude, nil
+	}
+
+	return "", errors.New("cannot resolve include: " + include)
+}
+
+func (s *Scanner) resolveSources(includePath string) ([]string, error) {
 	sources := make([]string, 0)
 
 	sourcePathC := strings.Replace(includePath, ".h", ".c", 1)
@@ -183,7 +204,13 @@ func (s *Scanner) sourcesForInclude(includePath string) []string {
 		sources = append(sources, sourcePathCC)
 	}
 
-	return sources
+	if moreSources, err := s.resolver.ResolveSources(includePath); err != nil {
+		return nil, errors.Wrap(err, "resolve source")
+	} else {
+		sources = append(sources, moreSources...)
+	}
+
+	return sources, nil
 }
 
 func (s *Scanner) exists(path string) bool {
