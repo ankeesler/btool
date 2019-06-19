@@ -3,12 +3,14 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/builder/compiler"
 	"github.com/ankeesler/btool/builder/linker"
 	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/deps"
+	"github.com/ankeesler/btool/deps/downloader"
 	"github.com/ankeesler/btool/generator"
 	"github.com/ankeesler/btool/scanner"
 	"github.com/ankeesler/btool/scanner/graph"
@@ -52,7 +54,12 @@ func Init() (*cobra.Command, error) {
 				Root:  root,
 				Cache: cache,
 			}
-			d := deps.New(fs, cache)
+			downloader := downloader.New(func(file string) bool {
+				return strings.HasSuffix(file, ".c") ||
+					strings.HasSuffix(file, ".cc") ||
+					strings.HasSuffix(file, ".h")
+			})
+			d := deps.New(fs, cache, downloader)
 
 			s = scanner.New(fs, &c, d)
 			b = builder.New(

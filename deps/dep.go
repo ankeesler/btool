@@ -30,5 +30,10 @@ var deps = []dep{
 			"gtest/gtest.h",
 			"gmock/gmock.h",
 		},
+		sources: []string{
+			"googletest-release-1.8.1/googletest/src/gtest-all.cc",
+			"googletest-release-1.8.1/googlemock/src/gmock-all.cc",
+			"googletest-release-1.8.1/googlemock/src/gmock_main.cc",
+		},
 	},
 }

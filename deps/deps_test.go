@@ -1,10 +1,11 @@
 package deps_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/ankeesler/btool/deps"
-	"github.com/ankeesler/btool/deps/depsfakes"
+	"github.com/ankeesler/btool/deps/downloader"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -16,7 +17,9 @@ func TestResolveInclude(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 	cache := "/tuna/cache"
-	downloader := &depsfakes.FakeDownloader{}
+	downloader := downloader.New(func(s string) bool {
+		return strings.HasSuffix(s, ".h")
+	})
 	d := deps.New(fs, cache, downloader)
 
 	// unknown include
@@ -46,13 +49,15 @@ func TestResolveInclude(t *testing.T) {
 	}
 }
 
-func TestResolveSoruces(t *testing.T) {
+func TestResolveSources(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
 	fs := afero.NewMemMapFs()
 	cache := "/tuna/cache"
-	downloader := &depsfakes.FakeDownloader{}
+	downloader := downloader.New(func(s string) bool {
+		return strings.HasSuffix(s, ".cc")
+	})
 	d := deps.New(fs, cache, downloader)
 
 	// unknown include
@@ -62,22 +67,30 @@ func TestResolveSoruces(t *testing.T) {
 		t.Error("expected <nil>, got", sources)
 	}
 
-	//// googletest
-	//include, err := d.ResolveInclude("gtest/gtest.h")
-	//if err != nil {
-	//	t.Error(err)
-	//} else if exists, err := afero.Exists(fs, include); err != nil {
-	//	t.Error(err)
-	//} else if !exists {
-	//	t.Error("gtest: expected file to exist:", include)
-	//}
-	//
-	//include, err = d.ResolveInclude("gmock/gmock.h")
-	//if err != nil {
-	//	t.Error(err)
-	//} else if exists, err := afero.Exists(fs, include); err != nil {
-	//	t.Error(err)
-	//} else if !exists {
-	//	t.Error("gmock: expected file to exist:", include)
-	//}
+	// googletest
+	sources, err := d.ResolveSources("gtest/gtest.h")
+	if err != nil {
+		t.Error(err)
+	} else {
+		for _, source := range sources {
+			if exists, err := afero.Exists(fs, source); err != nil {
+				t.Error(err)
+			} else if !exists {
+				t.Error("gtest: expected file to exist:", source)
+			}
+		}
+	}
+
+	sources, err = d.ResolveSources("gmock/gmock.h")
+	if err != nil {
+		t.Error(err)
+	} else {
+		for _, source := range sources {
+			if exists, err := afero.Exists(fs, source); err != nil {
+				t.Error(err)
+			} else if !exists {
+				t.Error("gmock: expected file to exist:", source)
+			}
+		}
+	}
 }

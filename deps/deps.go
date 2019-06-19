@@ -2,14 +2,13 @@
 package deps
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
-
-//go:generate counterfeiter . Downloader
 
 type Downloader interface {
 	Download(fs afero.Fs, destDir, url, sha256 string) error
@@ -58,17 +57,26 @@ func (d *Deps) ResolveSources(include string) ([]string, error) {
 	if dep == nil {
 		return nil, nil
 	}
+	logrus.Debugf("resolved include %s as dep %s", include, dep.name)
 
-	for _, source := range dep.sources {
-		path := filepath.Join(d.depPath(dep), source)
-		if exists, _ := afero.Exists(d.fs, path); !exists {
-			if err := d.downloadDep(dep); err != nil {
-				return nil, errors.Wrap(err, "download dep")
-			}
+	if d.needsDownload(dep) {
+		if err := d.downloadDep(dep); err != nil {
+			return nil, errors.Wrap(err, "download dep")
 		}
 	}
 
-	return dep.sources, nil
+	sourcesPaths := make([]string, 0)
+	for _, source := range dep.sources {
+		path := filepath.Join(d.depPath(dep), source)
+		if exists, err := afero.Exists(d.fs, path); err != nil {
+			return nil, errors.Wrap(err, path+" exists")
+		} else if !exists {
+			return nil, fmt.Errorf("expected source %s to exist", source)
+		}
+		sourcesPaths = append(sourcesPaths, path)
+	}
+
+	return sourcesPaths, nil
 }
 
 func (d *Deps) depPath(dep *dep) string {
