@@ -83,7 +83,7 @@ func (g *Graph) String() string {
 		buf.WriteString(fmt.Sprintf("%s:\n", nodeName))
 
 		for _, dependencyName := range sortKeys1(dependenciesNames) {
-			buf.WriteString(fmt.Sprintf("> %s\n", dependencyName))
+			buf.WriteString(fmt.Sprintf(">> %s\n", dependencyName))
 		}
 	}
 
