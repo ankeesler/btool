@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	root = "/Users/ankeesler/developer/btool/fixture" // :(
+	root = "/Users/ankeesler/workspace/btool/fixture" // :(
 )
 
 func main() {

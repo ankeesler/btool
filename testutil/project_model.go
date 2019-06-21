@@ -60,6 +60,7 @@ var basicProjectWithExtra = Project{
 		&ProjectNode{
 			Name: "main.FILE_EXTENSION",
 			Includes: []string{
+				"<stdio.h>",
 				"\"master.h\"",
 				"\"dep-0/dep-0a.h\"",
 			},
@@ -67,6 +68,12 @@ var basicProjectWithExtra = Project{
 				"master.h",
 				"dep-0/dep-0a.h",
 			},
+			ExtraContent: `
+int main(int argc, char *argv[]) {
+  printf("hey! i am running!\n");
+  return 0;
+}
+`,
 		},
 		&ProjectNode{
 			Name: "master.h",
@@ -105,6 +112,16 @@ var basicProjectWithExtra = Project{
 			Includes:     []string{},
 			Dependencies: []string{},
 		},
+		//&ProjectNode{
+		//	Name: "dep-1/dep-1a-test.FILE_EXTENSION",
+		//	Includes: []string{
+		//		"\"dep-1a.h\"",
+		//		"\"gtest/gtest.h\"",
+		//	},
+		//	Dependencies: []string{
+		//		"dep-1/dep-1a.h",
+		//	},
+		//},
 	},
 }
 

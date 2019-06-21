@@ -10,6 +10,5 @@ require (
 	github.com/sirupsen/logrus v1.4.1
 	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v0.0.4
-	golang.org/x/tools v0.0.0-20190618233249-04b924abaa25 // indirect
 	gopkg.in/yaml.v2 v2.2.2
 )
