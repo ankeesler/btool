@@ -6,8 +6,7 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool/builder"
-	"github.com/ankeesler/btool/builder/compiler"
-	"github.com/ankeesler/btool/builder/linker"
+	"github.com/ankeesler/btool/builder/toolchain"
 	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/deps"
 	"github.com/ankeesler/btool/deps/downloader"
@@ -65,8 +64,7 @@ func Init() (*cobra.Command, error) {
 			b = builder.New(
 				fs,
 				&c,
-				compiler.New(),
-				linker.New(),
+				toolchain.New("clang", "clang++", "clang"),
 			)
 			g = generator.New(fs, &c)
 

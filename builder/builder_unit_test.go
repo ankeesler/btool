@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ankeesler/btool/builder"
+	"github.com/ankeesler/btool/builder/builderfakes"
 	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/testutil"
@@ -14,99 +15,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
-
-type fakeCompilerCompileCall struct {
-	output, input, root string
-}
-
-type fakeCompiler struct {
-	fs      afero.Fs
-	callsC  []*fakeCompilerCompileCall
-	callsCC []*fakeCompilerCompileCall
-}
-
-func newFakeCompiler(fs afero.Fs) *fakeCompiler {
-	return &fakeCompiler{
-		fs:      fs,
-		callsC:  make([]*fakeCompilerCompileCall, 0),
-		callsCC: make([]*fakeCompilerCompileCall, 0),
-	}
-}
-
-func (fc *fakeCompiler) CompileC(output, input, root string) error {
-	logrus.Debugf("fake c compile %s", output)
-
-	// Sleeping to simulate compiler calls.
-	time.Sleep(time.Millisecond * 100)
-	if err := afero.WriteFile(fc.fs, output, []byte("compile"), 0600); err != nil {
-		return errors.Wrap(err, "link")
-	}
-
-	fc.callsC = append(fc.callsC, &fakeCompilerCompileCall{
-		output: output,
-		input:  input,
-		root:   root,
-	})
-	return nil
-}
-
-func (fc *fakeCompiler) CompileCC(output, input, root string) error {
-	logrus.Debugf("fake cc compile %s", output)
-
-	// Sleeping to simulate compiler calls.
-	time.Sleep(time.Millisecond * 100)
-	if err := afero.WriteFile(fc.fs, output, []byte("compile"), 0600); err != nil {
-		return errors.Wrap(err, "link")
-	}
-
-	fc.callsCC = append(fc.callsCC, &fakeCompilerCompileCall{
-		output: output,
-		input:  input,
-		root:   root,
-	})
-	return nil
-}
-
-func (fc *fakeCompiler) calls(cc bool) []*fakeCompilerCompileCall {
-	if cc {
-		return fc.callsCC
-	} else {
-		return fc.callsC
-	}
-}
-
-type fakeLinkerLinkCall struct {
-	output string
-	inputs []string
-}
-
-type fakeLinker struct {
-	fs    afero.Fs
-	calls []*fakeLinkerLinkCall
-}
-
-func newFakeLinker(fs afero.Fs) *fakeLinker {
-	return &fakeLinker{
-		fs:    fs,
-		calls: make([]*fakeLinkerLinkCall, 0),
-	}
-}
-
-func (fl *fakeLinker) Link(output string, inputs []string) error {
-	logrus.Debugf("fake link %s", output)
-
-	// Sleeping to simulate linker calls.
-	time.Sleep(time.Millisecond * 100)
-	if err := afero.WriteFile(fl.fs, output, []byte("link"), 0700); err != nil {
-		return errors.Wrap(err, "link")
-	}
-
-	fl.calls = append(fl.calls, &fakeLinkerLinkCall{
-		output: output,
-		inputs: inputs,
-	})
-	return nil
-}
 
 func TestBuildUnit(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
@@ -133,18 +41,17 @@ func TestBuildUnit(t *testing.T) {
 				Root:  project.Root,
 				Cache: "/some/cache/root",
 			}
-			c := newFakeCompiler(fs)
-			l := newFakeLinker(fs)
-			b := builder.New(fs, &cfg, c, l)
+			tc := wireFakeToolchain(fs)
+			b := builder.New(fs, &cfg, tc)
 
 			// First build is successful and should load everything into the build cache.
 			if err := b.Build(project.Graph()); err != nil {
 				t.Fatal(err)
 			}
-			if ex, ac := 2, len(c.calls(cc)); ex != ac {
+			if ex, ac := 2, compileCallCount(tc, cc); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
-			if ex, ac := 1, len(l.calls); ex != ac {
+			if ex, ac := 1, tc.LinkCallCount(); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
 
@@ -152,10 +59,10 @@ func TestBuildUnit(t *testing.T) {
 			if err := b.Build(project.Graph()); err != nil {
 				t.Fatal(err)
 			}
-			if ex, ac := 2, len(c.calls(cc)); ex != ac {
+			if ex, ac := 2, compileCallCount(tc, cc); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
-			if ex, ac := 1, len(l.calls); ex != ac {
+			if ex, ac := 1, tc.LinkCallCount(); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
 
@@ -174,12 +81,62 @@ func TestBuildUnit(t *testing.T) {
 			if err := b.Build(project.Graph()); err != nil {
 				t.Fatal(err)
 			}
-			if ex, ac := 3, len(c.calls(cc)); ex != ac {
+			if ex, ac := 3, compileCallCount(tc, cc); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
-			if ex, ac := 2, len(l.calls); ex != ac {
+			if ex, ac := 2, tc.LinkCallCount(); ex != ac {
 				t.Errorf("expected %d, got %d", ex, ac)
 			}
 		})
+	}
+}
+
+func wireFakeToolchain(fs afero.Fs) *builderfakes.FakeToolchain {
+	t := &builderfakes.FakeToolchain{}
+
+	t.CompileCStub = func(output, input string, includeDirs []string) error {
+		logrus.Debugf("fake c compile %s", output)
+
+		// Sleeping to simulate toolchain calls.
+		time.Sleep(time.Millisecond * 100)
+		if err := afero.WriteFile(fs, output, []byte("compile"), 0600); err != nil {
+			return errors.Wrap(err, "link")
+		}
+
+		return nil
+	}
+
+	t.CompileCCStub = func(output, input string, includeDirs []string) error {
+		logrus.Debugf("fake c compile %s", output)
+
+		// Sleeping to simulate toolchain calls.
+		time.Sleep(time.Millisecond * 100)
+		if err := afero.WriteFile(fs, output, []byte("compile"), 0600); err != nil {
+			return errors.Wrap(err, "compile")
+		}
+
+		return nil
+	}
+
+	t.LinkStub = func(output string, inputs []string) error {
+		logrus.Debugf("fake link %s", output)
+
+		// Sleeping to simulate toolchain calls.
+		time.Sleep(time.Millisecond * 100)
+		if err := afero.WriteFile(fs, output, []byte("link"), 0700); err != nil {
+			return errors.Wrap(err, "link")
+		}
+
+		return nil
+	}
+
+	return t
+}
+
+func compileCallCount(t *builderfakes.FakeToolchain, cc bool) int {
+	if cc {
+		return t.CompileCCCallCount()
+	} else {
+		return t.CompileCCallCount()
 	}
 }

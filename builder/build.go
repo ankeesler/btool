@@ -27,9 +27,9 @@ func (b *Builder) Build(graph *graph.Graph) error {
 		var object string
 		var err error
 		if strings.HasSuffix(node.Name, ".c") {
-			object, err = b.compile(graph, node, ".c", b.c.CompileC)
+			object, err = b.compile(graph, node, ".c", b.t.CompileC)
 		} else if strings.HasSuffix(node.Name, ".cc") {
-			object, err = b.compile(graph, node, ".cc", b.c.CompileCC)
+			object, err = b.compile(graph, node, ".cc", b.t.CompileCC)
 		}
 
 		if err != nil {
@@ -52,7 +52,7 @@ func (b *Builder) compile(
 	graph *graph.Graph,
 	node *graph.Node,
 	extension string,
-	compileFunc func(output, input, include string) error,
+	compileFunc func(output, input string, includeDirs []string) error,
 ) (string, error) {
 	rootRelNodeName, err := filepath.Rel(b.config.Root, node.Name)
 	if err != nil {
@@ -84,7 +84,7 @@ func (b *Builder) compile(
 		return "", errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
 	}
 
-	if err := compileFunc(outputFile, node.Name, b.config.Root); err != nil {
+	if err := compileFunc(outputFile, node.Name, []string{b.config.Root}); err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("compile %s", outputFile))
 	}
 
@@ -107,7 +107,7 @@ func (b *Builder) link(objects []string) error {
 		return errors.Wrap(err, fmt.Sprintf("mkdir (%s)", outputDir))
 	}
 
-	if err := b.l.Link(outputFile, objects); err != nil {
+	if err := b.t.Link(outputFile, objects); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("link %s", outputFile))
 	}
 

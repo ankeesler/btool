@@ -9,28 +9,25 @@ import (
 	"github.com/spf13/afero"
 )
 
-type Compiler interface {
-	CompileC(output, input, root string) error
-	CompileCC(output, input, root string) error
-}
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Toolchain
 
-type Linker interface {
+type Toolchain interface {
+	CompileC(output, input string, includeDirs []string) error
+	CompileCC(output, input string, includeDirs []string) error
 	Link(output string, inputs []string) error
 }
 
 type Builder struct {
 	fs     afero.Fs
 	config *config.Config
-	c      Compiler
-	l      Linker
+	t      Toolchain
 }
 
-func New(fs afero.Fs, config *config.Config, c Compiler, l Linker) *Builder {
+func New(fs afero.Fs, config *config.Config, t Toolchain) *Builder {
 	return &Builder{
 		fs:     fs,
 		config: config,
-		c:      c,
-		l:      l,
+		t:      t,
 	}
 }
 

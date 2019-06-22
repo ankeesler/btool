@@ -4,8 +4,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/builder"
-	"github.com/ankeesler/btool/builder/compiler"
-	"github.com/ankeesler/btool/builder/linker"
+	"github.com/ankeesler/btool/builder/toolchain"
 	"github.com/ankeesler/btool/config"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/testutil"
@@ -56,9 +55,8 @@ func TestBuildIntegration(t *testing.T) {
 				Root:  project.Root,
 				Cache: cache,
 			}
-			c := compiler.New()
-			l := linker.New()
-			b := builder.New(fs, &cfg, c, l)
+			tc := toolchain.New("clang", "clang++", "clang")
+			b := builder.New(fs, &cfg, tc)
 			if err := b.Build(project.Graph()); err != nil {
 				t.Fatal(err)
 			}
