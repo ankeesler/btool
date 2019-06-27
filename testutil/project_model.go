@@ -5,8 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 
+	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/scanner/graph"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -553,4 +555,50 @@ func (p *Project) Graph() *graph.Graph {
 	}
 
 	return g
+}
+
+// TODO: this is totally redundant! This should be ported to use the new node.Node.
+func (p *Project) Nodes0() []*node.Node {
+	nodes := make([]*node.Node, 0, len(p.Nodes))
+	nodesMap := make(map[string]*node.Node)
+
+	for _, n := range p.Nodes {
+		newN := &node.Node{
+			Name:    n.Name,
+			Sources: sources(n.Name),
+			Headers: headers(n.Name),
+		}
+		nodes = append(nodes, newN)
+		nodesMap[n.Name] = newN
+	}
+
+	for _, n := range p.Nodes {
+		newN := nodesMap[n.Name]
+		for _, d := range n.Dependencies {
+			newD := nodesMap[d]
+			newN.Dependencies = append(newN.Dependencies, newD)
+		}
+	}
+
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].Name < nodes[j].Name
+	})
+
+	return nodes
+}
+
+func sources(name string) []string {
+	if strings.HasSuffix(name, ".c") || strings.HasSuffix(name, ".cc") {
+		return []string{name}
+	} else {
+		return []string{}
+	}
+}
+
+func headers(name string) []string {
+	if strings.HasSuffix(name, ".h") {
+		return []string{name}
+	} else {
+		return []string{}
+	}
 }

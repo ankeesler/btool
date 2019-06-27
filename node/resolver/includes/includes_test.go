@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ankeesler/btool/scanner/includes"
+	"github.com/ankeesler/btool/node/resolver/includes"
 )
 
 func TestScan(t *testing.T) {
