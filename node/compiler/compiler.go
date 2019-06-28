@@ -5,6 +5,7 @@ package compiler
 import (
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . C
@@ -17,13 +18,15 @@ type C interface {
 
 type Compiler struct {
 	c     C
+	fs    afero.Fs
 	root  string
 	cache string
 }
 
-func New(c C, root, cache string) *Compiler {
+func New(c C, fs afero.Fs, root, cache string) *Compiler {
 	return &Compiler{
 		c:     c,
+		fs:    fs,
 		root:  root,
 		cache: cache,
 	}

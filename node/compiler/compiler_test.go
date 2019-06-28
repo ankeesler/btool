@@ -7,11 +7,12 @@ import (
 	"github.com/ankeesler/btool/node/compiler/compilerfakes"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
+	"github.com/spf13/afero"
 )
 
 func TestHandle(t *testing.T) {
 	c := &compilerfakes.FakeC{}
-	compiler := compiler.New(c, "/", "/cache")
+	compiler := compiler.New(c, afero.NewMemMapFs(), "/", "/cache")
 
 	nodes := testutil.BasicNodes
 	exNodes := testutil.AddObjects(nodes)
