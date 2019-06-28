@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankeesler/btool/deps/downloader"
 	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/node/resolver/downloader"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"

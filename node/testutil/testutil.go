@@ -70,7 +70,9 @@ func PopulateFS(nodes []*node.Node, fs afero.Fs) {
 		content := bytes.NewBuffer([]byte{})
 		content.WriteString(fmt.Sprintf("// %s\n", node.Name))
 		for _, dependency := range node.Dependencies {
-			content.WriteString(fmt.Sprintf("\n#include %s", dependency.Name))
+			for _, header := range dependency.Headers {
+				content.WriteString(fmt.Sprintf("\n#include \"%s\"", header))
+			}
 		}
 		//if node.ExtraContent != "" {
 		//	content.WriteString(node.ExtraContent)

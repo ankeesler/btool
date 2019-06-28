@@ -6,6 +6,7 @@ type Node struct {
 	Sources      []string
 	Headers      []string
 	Dependencies []*Node
+	IncludePaths []string
 }
 
 func (n *Node) String() string {
