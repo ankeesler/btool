@@ -2,11 +2,20 @@
 package node
 
 type Node struct {
-	Name         string
-	Sources      []string
-	Headers      []string
+	// Unique name.
+	Name string
+
+	// On-disk .c/.cc and .h files.
+	Sources []string
+	Headers []string
+
 	Dependencies []*Node
+
+	// -I include paths needed in compiler invocation.
 	IncludePaths []string
+
+	// Object archives for the Sources. On-disk files.
+	Objects []string
 }
 
 func (n *Node) String() string {
