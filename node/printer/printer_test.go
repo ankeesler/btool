@@ -2,11 +2,12 @@ package printer_test
 
 import (
 	"bytes"
-	"reflect"
 	"testing"
 
+	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/printer"
 	"github.com/ankeesler/btool/node/testutil"
+	"github.com/go-test/deep"
 )
 
 func TestHandle(t *testing.T) {
@@ -35,7 +36,7 @@ main.c
 		t.Error(ex, "!=", ac)
 	}
 
-	if !reflect.DeepEqual(nodes, testutil.BasicNodesC) {
-		t.Error(nodes, "!=", testutil.BasicNodesC)
+	if diff := deep.Equal(nodes, []*node.Node(testutil.BasicNodesC)); diff != nil {
+		t.Error(diff)
 	}
 }

@@ -27,11 +27,11 @@ func TestHandle(t *testing.T) {
 	}{
 		{
 			name:  "BasicC",
-			nodes: testutil.BasicNodesC,
+			nodes: testutil.BasicNodesC.WithObjects(),
 		},
 		{
 			name:  "BasicCC",
-			nodes: testutil.BasicNodesCC,
+			nodes: testutil.BasicNodesCC.WithObjects(),
 		},
 	}
 
@@ -41,14 +41,13 @@ func TestHandle(t *testing.T) {
 			c := wireFakeCompiler(fs)
 			compiler := compiler.New(c, fs, "/", "/cache")
 
-			nodes := initObjects(datum.nodes)
-			testutil.PopulateFS(nodes, fs)
-			exNodes := addObjects(nodes)
+			testutil.PopulateFS(datum.nodes, fs)
+			exNodes := addObjects(datum.nodes)
 
 			cc := strings.HasSuffix(datum.name, "CC")
 
 			// First build is successful and should load everything into the build cache.
-			acNodes, err := compiler.Handle(nodes)
+			acNodes, err := compiler.Handle(datum.nodes)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -60,7 +59,7 @@ func TestHandle(t *testing.T) {
 			}
 
 			// Second build should involve nothing getting re-compiled.
-			acNodes, err = compiler.Handle(nodes)
+			acNodes, err = compiler.Handle(datum.nodes)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -82,7 +81,7 @@ func TestHandle(t *testing.T) {
 			}
 
 			// Third build should involve main and dep-1 getting re-compiled.
-			acNodes, err = compiler.Handle(nodes)
+			acNodes, err = compiler.Handle(datum.nodes)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -94,14 +93,6 @@ func TestHandle(t *testing.T) {
 			}
 		})
 	}
-}
-
-func initObjects(nodes []*node.Node) []*node.Node {
-	// TODO: this should be initialized in the testutil package.
-	for _, n := range nodes {
-		n.Objects = make([]string, 0)
-	}
-	return nodes
 }
 
 func addObjects(nodes []*node.Node) []*node.Node {

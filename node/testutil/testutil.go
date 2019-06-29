@@ -11,22 +11,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-func RemoveDependencies(nodes []*node.Node) []*node.Node {
-	//newNodes := deepCopy(nodes)
-	//for _, n := range newNodes {
-	//	n.Dependencies = nil
-	//}
-	//return newNodes
-
-	// TODO: this is broken! No No no no no no nooo!!
-	newNodes := make([]*node.Node, len(nodes))
-	copy(newNodes, nodes)
-	for _, n := range newNodes {
-		n.Dependencies = nil
-	}
-	return newNodes
-}
-
 func PopulateFS(nodes []*node.Node, fs afero.Fs) {
 	for _, node := range nodes {
 		content := bytes.NewBuffer([]byte{})
