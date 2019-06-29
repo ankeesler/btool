@@ -15,6 +15,12 @@ var (
 		Headers:      []string{},
 		Dependencies: []*node.Node{&Dep0h},
 	}
+	Dep0cc = node.Node{
+		Name:         "dep-0/dep-0.cc",
+		Sources:      []string{"dep-0/dep-0.cc"},
+		Headers:      []string{},
+		Dependencies: []*node.Node{&Dep0h},
+	}
 
 	Dep1h = node.Node{
 		Name:         "dep-1/dep-1.h",
@@ -28,6 +34,12 @@ var (
 		Headers:      []string{},
 		Dependencies: []*node.Node{&Dep1h, &Dep0h},
 	}
+	Dep1cc = node.Node{
+		Name:         "dep-1/dep-1.cc",
+		Sources:      []string{"dep-1/dep-1.cc"},
+		Headers:      []string{},
+		Dependencies: []*node.Node{&Dep1h, &Dep0h},
+	}
 
 	Mainc = node.Node{
 		Name:         "main.c",
@@ -35,14 +47,28 @@ var (
 		Headers:      []string{},
 		Dependencies: []*node.Node{&Dep1h, &Dep0h},
 	}
+	Maincc = node.Node{
+		Name:         "main.cc",
+		Sources:      []string{"main.cc"},
+		Headers:      []string{},
+		Dependencies: []*node.Node{&Dep1h, &Dep0h},
+	}
 )
 
 var (
-	BasicNodes = []*node.Node{
+	BasicNodesC = []*node.Node{
 		&Dep0c,
 		&Dep0h,
 		&Dep1c,
 		&Dep1h,
 		&Mainc,
+	}
+
+	BasicNodesCC = []*node.Node{
+		&Dep0cc,
+		&Dep0h,
+		&Dep1cc,
+		&Dep1h,
+		&Maincc,
 	}
 )

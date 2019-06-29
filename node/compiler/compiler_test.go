@@ -2,6 +2,7 @@ package compiler_test
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -20,58 +21,78 @@ func TestHandle(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
-	fs := afero.NewMemMapFs()
-	c := wireFakeCompiler(fs)
-	compiler := compiler.New(c, fs, "/", "/cache")
-
-	nodes := initObjects(testutil.BasicNodes)
-	testutil.PopulateFS(nodes, fs)
-	exNodes := addObjects(nodes)
-
-	// First build is successful and should load everything into the build cache.
-	acNodes, err := compiler.Handle(nodes)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if diff := deep.Equal(exNodes, acNodes); diff != nil {
-		t.Error(diff)
-	}
-	if ex, ac := 3, compileCallCount(c, false); ex != ac {
-		t.Errorf("expected %d, got %d", ex, ac)
+	data := []struct {
+		name  string
+		nodes []*node.Node
+	}{
+		{
+			name:  "BasicC",
+			nodes: testutil.BasicNodesC,
+		},
+		{
+			name:  "BasicCC",
+			nodes: testutil.BasicNodesCC,
+		},
 	}
 
-	// Second build should involve nothing getting re-compiled.
-	acNodes, err = compiler.Handle(nodes)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if diff := deep.Equal(exNodes, acNodes); diff != nil {
-		t.Error(diff)
-	}
-	if ex, ac := 3, compileCallCount(c, false); ex != ac {
-		t.Errorf("expected %d, got %d", ex, ac)
-	}
+	for _, datum := range data {
+		t.Run(datum.name, func(t *testing.T) {
+			fs := afero.NewMemMapFs()
+			c := wireFakeCompiler(fs)
+			compiler := compiler.New(c, fs, "/", "/cache")
 
-	// Change the dep-1/dep-1.h header so that main and dep-1 need to be re-compiled.
-	if err := afero.WriteFile(
-		fs,
-		filepath.Join("/", "dep-1/dep-1.h"),
-		[]byte("// new data"),
-		0600,
-	); err != nil {
-		t.Fatal(err)
-	}
+			nodes := initObjects(datum.nodes)
+			testutil.PopulateFS(nodes, fs)
+			exNodes := addObjects(nodes)
 
-	// Third build should involve main and dep-1 getting re-compiled.
-	acNodes, err = compiler.Handle(nodes)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if diff := deep.Equal(exNodes, acNodes); diff != nil {
-		t.Error(diff)
-	}
-	if ex, ac := 5, compileCallCount(c, false); ex != ac {
-		t.Errorf("expected %d, got %d", ex, ac)
+			cc := strings.HasSuffix(datum.name, "CC")
+
+			// First build is successful and should load everything into the build cache.
+			acNodes, err := compiler.Handle(nodes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if diff := deep.Equal(exNodes, acNodes); diff != nil {
+				t.Error(diff)
+			}
+			if ex, ac := 3, compileCallCount(c, cc); ex != ac {
+				t.Errorf("expected %d, got %d", ex, ac)
+			}
+
+			// Second build should involve nothing getting re-compiled.
+			acNodes, err = compiler.Handle(nodes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if diff := deep.Equal(exNodes, acNodes); diff != nil {
+				t.Error(diff)
+			}
+			if ex, ac := 3, compileCallCount(c, cc); ex != ac {
+				t.Errorf("expected %d, got %d", ex, ac)
+			}
+
+			// Change the dep-1/dep-1.h header so that main and dep-1 need to be re-compiled.
+			if err := afero.WriteFile(
+				fs,
+				filepath.Join("/", "dep-1/dep-1.h"),
+				[]byte("// new data"),
+				0600,
+			); err != nil {
+				t.Fatal(err)
+			}
+
+			// Third build should involve main and dep-1 getting re-compiled.
+			acNodes, err = compiler.Handle(nodes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if diff := deep.Equal(exNodes, acNodes); diff != nil {
+				t.Error(diff)
+			}
+			if ex, ac := 5, compileCallCount(c, cc); ex != ac {
+				t.Errorf("expected %d, got %d", ex, ac)
+			}
+		})
 	}
 }
 

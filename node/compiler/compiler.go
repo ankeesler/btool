@@ -74,7 +74,6 @@ func (c *Compiler) handleSource(n *node.Node, source string) (string, error) {
 		compileFunc = c.c.CompileC
 	} else if strings.HasSuffix(n.Name, ".cc") {
 		compileFunc = c.c.CompileCC
-		// TODO: c++ support
 	} else {
 		return "", fmt.Errorf("file is not compilable: %s", source)
 	}

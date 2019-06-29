@@ -23,7 +23,7 @@ func TestHandle(t *testing.T) {
 	}{
 		{
 			name:      "Basic",
-			exNodes:   testutil.RemoveDependencies(testutil.BasicNodes),
+			exNodes:   testutil.RemoveDependencies(testutil.BasicNodesC),
 			exSuccess: true,
 		},
 	}

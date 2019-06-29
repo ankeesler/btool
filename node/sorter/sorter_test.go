@@ -38,7 +38,7 @@ func TestHandle(t *testing.T) {
 
 	// Sad.
 	testutil.Dep0h.Dependencies = []*node.Node{&testutil.Mainc}
-	ac, err = s.Handle(testutil.BasicNodes)
+	ac, err = s.Handle(testutil.BasicNodesC)
 	if err == nil {
 		t.Error("expected failure")
 	}

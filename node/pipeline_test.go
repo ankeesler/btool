@@ -17,9 +17,9 @@ func TestPipeline(t *testing.T) {
 	logrus.SetFormatter(formatter.New())
 
 	goodHandlerA := &nodefakes.FakeHandler{}
-	goodHandlerA.HandleReturnsOnCall(0, testutil.BasicNodes, nil)
+	goodHandlerA.HandleReturnsOnCall(0, testutil.BasicNodesC, nil)
 	goodHandlerB := &nodefakes.FakeHandler{}
-	goodHandlerB.HandleReturnsOnCall(0, testutil.BasicNodes, nil)
+	goodHandlerB.HandleReturnsOnCall(0, testutil.BasicNodesC, nil)
 	badHandler := &nodefakes.FakeHandler{}
 	badHandler.HandleReturnsOnCall(0, nil, errors.New("some error"))
 

@@ -24,8 +24,8 @@ func TestLocalHandle(t *testing.T) {
 	}{
 		{
 			name:      "Basic",
-			nodes:     testutil.RemoveDependencies(testutil.BasicNodes),
-			exNodes:   testutil.BasicNodes,
+			nodes:     testutil.RemoveDependencies(testutil.BasicNodesC),
+			exNodes:   testutil.BasicNodesC,
 			exSuccess: true,
 		},
 	}

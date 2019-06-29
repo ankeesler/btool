@@ -13,7 +13,7 @@ func TestHandle(t *testing.T) {
 	buf := bytes.NewBuffer([]byte{})
 	p := printer.New(buf)
 
-	nodes, err := p.Handle(testutil.BasicNodes)
+	nodes, err := p.Handle(testutil.BasicNodesC)
 	if err != nil {
 		t.Error(err)
 	}
@@ -35,7 +35,7 @@ main.c
 		t.Error(ex, "!=", ac)
 	}
 
-	if !reflect.DeepEqual(nodes, testutil.BasicNodes) {
-		t.Error(nodes, "!=", testutil.BasicNodes)
+	if !reflect.DeepEqual(nodes, testutil.BasicNodesC) {
+		t.Error(nodes, "!=", testutil.BasicNodesC)
 	}
 }
