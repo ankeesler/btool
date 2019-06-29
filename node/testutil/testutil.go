@@ -11,51 +11,6 @@ import (
 	"github.com/spf13/afero"
 )
 
-var (
-	Dep0h = node.Node{
-		Name:         "dep-0/dep-0.h",
-		Sources:      []string{},
-		Headers:      []string{"dep-0/dep-0.h"},
-		Dependencies: []*node.Node{},
-	}
-	Dep0c = node.Node{
-		Name:         "dep-0/dep-0.c",
-		Sources:      []string{"dep-0/dep-0.c"},
-		Headers:      []string{},
-		Dependencies: []*node.Node{&Dep0h},
-	}
-
-	Dep1h = node.Node{
-		Name:         "dep-1/dep-1.h",
-		Sources:      []string{},
-		Headers:      []string{"dep-1/dep-1.h"},
-		Dependencies: []*node.Node{&Dep0h},
-	}
-	Dep1c = node.Node{
-		Name:         "dep-1/dep-1.c",
-		Sources:      []string{"dep-1/dep-1.c"},
-		Headers:      []string{},
-		Dependencies: []*node.Node{&Dep1h, &Dep0h},
-	}
-
-	Mainc = node.Node{
-		Name:         "main.c",
-		Sources:      []string{"main.c"},
-		Headers:      []string{},
-		Dependencies: []*node.Node{&Dep1h, &Dep0h},
-	}
-)
-
-var (
-	BasicNodes = []*node.Node{
-		&Dep0c,
-		&Dep0h,
-		&Dep1c,
-		&Dep1h,
-		&Mainc,
-	}
-)
-
 func RemoveDependencies(nodes []*node.Node) []*node.Node {
 	//newNodes := deepCopy(nodes)
 	//for _, n := range newNodes {
@@ -68,24 +23,6 @@ func RemoveDependencies(nodes []*node.Node) []*node.Node {
 	copy(newNodes, nodes)
 	for _, n := range newNodes {
 		n.Dependencies = nil
-	}
-	return newNodes
-}
-
-func AddObjects(nodes []*node.Node) []*node.Node {
-	newNodes := make([]*node.Node, len(nodes))
-	copy(newNodes, nodes)
-	for _, n := range newNodes {
-		n.Objects = []string{}
-		for _, s := range n.Sources {
-			n.Objects = append(
-				n.Objects,
-				filepath.Join(
-					"/cache",
-					s+".o",
-				),
-			)
-		}
 	}
 	return newNodes
 }
@@ -116,7 +53,7 @@ func PopulateFS(nodes []*node.Node, fs afero.Fs) {
 	}
 }
 
-func deepCopy(nodes []*node.Node) []*node.Node {
+func DeepCopy(nodes []*node.Node) []*node.Node {
 	oldNew := make(map[*node.Node]*node.Node)
 	newNodes := make([]*node.Node, 0, len(nodes))
 
