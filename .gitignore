@@ -2,3 +2,4 @@ btool
 .#*
 *.o
 main
+*_test
