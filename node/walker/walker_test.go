@@ -18,7 +18,7 @@ func TestHandle(t *testing.T) {
 
 	data := []struct {
 		name      string
-		exNodes   []*node.Node
+		exNodes   testutil.Nodes
 		exSuccess bool
 	}{
 		{
@@ -30,7 +30,7 @@ func TestHandle(t *testing.T) {
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			testutil.PopulateFS(datum.exNodes, fs)
+			datum.exNodes.PopulateFS(fs)
 
 			w := walker.New(fs, "/")
 
@@ -46,7 +46,7 @@ func TestHandle(t *testing.T) {
 				return
 			}
 
-			if diff := deep.Equal(datum.exNodes, acNodes); diff != nil {
+			if diff := deep.Equal(datum.exNodes.Cast(), acNodes); diff != nil {
 				t.Error(diff)
 			}
 		})

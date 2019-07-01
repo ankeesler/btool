@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/printer"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
@@ -36,7 +35,7 @@ main.c
 		t.Error(ex, "!=", ac)
 	}
 
-	if diff := deep.Equal(nodes, []*node.Node(testutil.BasicNodesC)); diff != nil {
+	if diff := deep.Equal(nodes, testutil.BasicNodesC.Cast()); diff != nil {
 		t.Error(diff)
 	}
 }

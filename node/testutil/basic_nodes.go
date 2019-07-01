@@ -55,8 +55,6 @@ var (
 	}
 )
 
-type Nodes []*node.Node
-
 var (
 	BasicNodesC Nodes = []*node.Node{
 		&Dep0c,
@@ -74,17 +72,3 @@ var (
 		&Maincc,
 	}
 )
-
-func (nodes Nodes) WithoutDependencies() Nodes {
-	for _, n := range nodes {
-		n.Dependencies = nil
-	}
-	return nodes
-}
-
-func (nodes Nodes) WithObjects() Nodes {
-	for _, n := range nodes {
-		n.Objects = make([]string, 0)
-	}
-	return nodes
-}

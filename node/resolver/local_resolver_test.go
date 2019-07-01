@@ -18,7 +18,7 @@ func TestLocalHandle(t *testing.T) {
 
 	data := []struct {
 		name      string
-		nodes     []*node.Node
+		nodes     testutil.Nodes
 		exNodes   []*node.Node
 		exSuccess bool
 	}{
@@ -32,7 +32,7 @@ func TestLocalHandle(t *testing.T) {
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			testutil.PopulateFS(datum.nodes, fs)
+			datum.nodes.PopulateFS(fs)
 
 			l := resolver.NewLocal(fs, "/")
 

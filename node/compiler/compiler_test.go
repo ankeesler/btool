@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/compiler"
 	"github.com/ankeesler/btool/node/compiler/compilerfakes"
 	"github.com/ankeesler/btool/node/testutil"
@@ -23,7 +22,7 @@ func TestHandle(t *testing.T) {
 
 	data := []struct {
 		name  string
-		nodes []*node.Node
+		nodes testutil.Nodes
 	}{
 		{
 			name:  "BasicC",
@@ -41,8 +40,8 @@ func TestHandle(t *testing.T) {
 			c := wireFakeCompiler(fs)
 			compiler := compiler.New(c, fs, "/", "/cache")
 
-			testutil.PopulateFS(datum.nodes, fs)
-			exNodes := addObjects(datum.nodes)
+			datum.nodes.PopulateFS(fs)
+			exNodes := addObjects(datum.nodes).Cast()
 
 			cc := strings.HasSuffix(datum.name, "CC")
 
@@ -95,8 +94,8 @@ func TestHandle(t *testing.T) {
 	}
 }
 
-func addObjects(nodes []*node.Node) []*node.Node {
-	newNodes := testutil.DeepCopy(nodes)
+func addObjects(nodes testutil.Nodes) testutil.Nodes {
+	newNodes := nodes.Copy()
 	for _, n := range newNodes {
 		for _, s := range n.Sources {
 			object := filepath.Join(
