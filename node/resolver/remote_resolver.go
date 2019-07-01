@@ -2,28 +2,34 @@ package resolver
 
 import (
 	"path/filepath"
-	"strings"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/resolver/downloader"
 	"github.com/ankeesler/btool/node/resolver/includes"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Downloader
+
+type Downloader interface {
+	Download(afero.Fs, string, string, string) error
+}
+
 // Resolves dependencies outside of a project.
 type Remote struct {
 	fs    afero.Fs
 	root  string
 	cache string
+	d     Downloader
 }
 
-func NewRemote(fs afero.Fs, root string, cache string) *Remote {
+func NewRemote(fs afero.Fs, root string, cache string, d Downloader) *Remote {
 	return &Remote{
 		fs:    fs,
 		root:  root,
 		cache: cache,
+		d:     d,
 	}
 }
 
@@ -84,7 +90,7 @@ func (r *Remote) resolveInclude(include string) (*node.Node, error) {
 		return nil, nil
 	}
 
-	destDir := filepath.Join(r.cache, d.name)
+	destDir := filepath.Join(r.cache, "dependencies", d.name)
 
 	if exists, err := afero.Exists(r.fs, destDir); err != nil {
 		return nil, errors.Wrap(err, "exists")
@@ -96,11 +102,7 @@ func (r *Remote) resolveInclude(include string) (*node.Node, error) {
 		}
 		logrus.Debugf("downloading to dir %s", destDir)
 
-		// TODO: eh, this doesn't really follow the current pattern of golang dependencies.
-		downloader := downloader.New(func(s string) bool {
-			return strings.HasSuffix(s, ".c") || strings.HasSuffix(s, ".cc")
-		})
-		if err := downloader.Download(r.fs, destDir, d.url, d.sha256); err != nil {
+		if err := r.d.Download(r.fs, destDir, d.url, d.sha256); err != nil {
 			return nil, errors.Wrap(err, "download")
 		}
 	}
