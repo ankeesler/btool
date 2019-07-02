@@ -1,20 +1,16 @@
 .PHONY: default
 default: test
 
-%.c.o: %.c %.h
-	clang --std=c11 -g -Wall -Werror -O0 -o $@ -c $<
+CC=clang
+CFLAGS=--std=c11 -g -Wall -Werror -O0
 
-%.c.o: %.c
-	clang --std=c11 -g -Wall -Werror -O0 -o $@ -c $<
-
-blah_test: blah.c.o blah_test.c.o log.c.o
+blah_test: blah.o blah_test.o log.o
 	clang -o $@ $^ -lmcgoo
 
-collect_test: collect.c.o collect_test.c.o blah.c.o log.c.o
+collect_test: collect.o collect_test.o blah.o log.o
 	clang -o $@ $^ -lmcgoo
 
-btool: main.c.o log.c.o blah.c.o collect.c.o
-	clang -o $@ $^
+btool: btool.o log.o blah.o collect.o
 
 .PHONY: lint
 lint:
