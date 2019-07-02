@@ -16,16 +16,20 @@ collect_test: collect.c.o collect_test.c.o blah.c.o log.c.o
 btool: main.c.o log.c.o blah.c.o collect.c.o
 	clang -o $@ $^
 
+.PHONY: lint
+lint:
+	clang-format -i $(shell find . -type d -name fixture -prune -o -type f -name "*.[ch]" -print)
+	git diff-index --quiet HEAD -- $(find find . -type d -name fixture -prune -o -type f -name "*.[ch]" -print)
+
 .PHONY: clean
 clean:
 	find . -name "*.o" | xargs rm -f
 	rm -f btool
 
 .PHONY: test
-test: blah_test collect_test btool
+test: lint blah_test collect_test btool
 	./blah_test
 	./collect_test
 	./btool --root fixture/BasicC build main.c && ./main
 
 # TODO: vagrant
-# TODO: clang linter?
