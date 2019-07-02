@@ -7,7 +7,7 @@ default: test
 %.c.o: %.c
 	clang --std=c11 -g -Wall -Werror -O0 -o $@ -c $<
 
-blah_test: blah.c.o blah_test.c.o
+blah_test: blah.c.o blah_test.c.o log.c.o
 	clang -o $@ $^ -lmcgoo
 
 collect_test: collect.c.o collect_test.c.o blah.c.o log.c.o

@@ -6,10 +6,8 @@
 
 #include "error.h"
 
-error_t collect_blahs(const char *root, const char *target, blah_list_t *l) {
-  const char *p = root; // TODO: join me with target
-
-  FILE *f = fopen(p, "r");
+error_t collect_blahs(const char *target, blah_list_t *l) {
+  FILE *f = fopen(target, "r");
   if (f == NULL) {
     return strerror(errno);
   }

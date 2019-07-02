@@ -3,4 +3,4 @@
 
 #include <stdlib.h>
 
-error_t collect_blahs(const char *root, const char *target, blah_list_t *l);
+error_t collect_blahs(const char *target, blah_list_t *l);
