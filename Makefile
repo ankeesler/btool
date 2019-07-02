@@ -22,10 +22,11 @@ clean:
 	find . -name "*.o" | xargs rm -f
 	rm -f btool
 
+run_%: %
+	./$<
+
 .PHONY: test
-test: lint blah_test collect_test btool
-	./blah_test
-	./collect_test
+test: lint run_blah_test run_collect_test btool
 	./btool --root fixture/BasicC build main.c && ./main
 
 # TODO: vagrant
