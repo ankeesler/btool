@@ -29,24 +29,22 @@ static void add_include(const char *);
 
 %start lines
 
-%debug
-
 %%
 
-lines: line
-     | lines line
+lines: line { printf("aaa '%s' '%s'\n", $$, $1); }
+     | lines line { printf("bbb '%s' '%s' '%s'\n", $$, $1, $2); }
      ;
 
-line: PARSER_NEWLINE
-    | include PARSER_NEWLINE
-    | PARSER_ANYTHING PARSER_NEWLINE
+line: PARSER_NEWLINE { printf("ccc '%s' '%s'\n", $$, $1); }
+    | include PARSER_NEWLINE { printf("ddd '%s' '%s' '%s'\n", $$, $1, $2); }
+    | PARSER_ANYTHING PARSER_NEWLINE { printf("eee '%s' '%s' '%s'\n", $$, $1, $2); }
     ;
 
 include: PARSER_INCLUDE PARSER_QUOTE path PARSER_QUOTE { add_include($3); }
        ;
     
-path: PARSER_FILE
-    | path PARSER_SLASH PARSER_FILE
+path: PARSER_FILE { printf("fff '%s' '%s'\n", $$, $1); }
+    | path PARSER_SLASH PARSER_FILE  { printf("ggg '%s' '%s' '%s'\n", $$, $1, $2); }
     ;
 
 %%
