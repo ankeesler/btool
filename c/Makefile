@@ -39,7 +39,7 @@ run_%: %
 	./$<
 
 .PHONY: test
-test: lint run_blah_test run_collect_test btool
+test: lint run_blah_test run_collect_test run_include_parser_test btool
 	./btool --root fixture/BasicC build main.c && ./main
 
 # TODO: vagrant
