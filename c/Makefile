@@ -5,9 +5,9 @@ CC=clang
 CFLAGS=--std=c11 -g -Wall -Werror -O0
 
 YACC=bison
-YFLAGS=-d -y
+YFLAGS=-d -y --debug
 LEX=flex
-LFLAGS=
+LFLAGS=--debug
 
 blah_test: blah.o blah_test.o log.o
 	clang -o $@ $^ -lmcgoo
@@ -17,6 +17,9 @@ collect_test: collect.o collect_test.o blah.o log.o
 
 include_parser_test: include_parser.o include_lexer.o include_parser_test.o log.o
 	clang -o $@ $^ -lmcgoo
+
+include_parser: include_parser.o include_lexer.o log.o
+	clang -o $@ $^ -ly
 
 parser_test: parser.o parser_test.o log.o
 	clang -o $@ $^ -lmcgoo

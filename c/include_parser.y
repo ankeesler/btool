@@ -22,31 +22,15 @@ static void add_include(const char *);
 
 %token PARSER_INCLUDE
 %token PARSER_QUOTE
-%token PARSER_SLASH
-%token PARSER_FILE
-%token PARSER_NEWLINE
 %token PARSER_ANYTHING
 
 %start lines
 
 %%
 
-lines: line { printf("aaa '%s' '%s'\n", $$, $1); }
-     | lines line { printf("bbb '%s' '%s' '%s'\n", $$, $1, $2); }
+lines: PARSER_INCLUDE PARSER_QUOTE PARSER_ANYTHING PARSER_QUOTE { add_include($3); }
+     | PARSER_ANYTHING lines
      ;
-
-line: PARSER_NEWLINE { printf("ccc '%s' '%s'\n", $$, $1); }
-    | include PARSER_NEWLINE { printf("ddd '%s' '%s' '%s'\n", $$, $1, $2); }
-    | PARSER_ANYTHING PARSER_NEWLINE { printf("eee '%s' '%s' '%s'\n", $$, $1, $2); }
-    ;
-
-include: PARSER_INCLUDE PARSER_QUOTE path PARSER_QUOTE { add_include($3); }
-       ;
-    
-path: PARSER_FILE { printf("fff '%s' '%s'\n", $$, $1); }
-    | path PARSER_SLASH PARSER_FILE  { printf("ggg '%s' '%s' '%s'\n", $$, $1, $2); }
-    ;
-
 %%
 
 static void add_include(const char *i) {

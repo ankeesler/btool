@@ -6,12 +6,9 @@
 
 %%
 
-[ \t]                        { ; }
-"#include"                   { return PARSER_INCLUDE; }
+[ \t\n]                      { ; }
+#include                     { return PARSER_INCLUDE; }
 \"                           { return PARSER_QUOTE; }
-"/"                          { return PARSER_SLASH; }
-[a-zA-Z0-9\.\-_]+            { return PARSER_FILE; }
-\n                           { return PARSER_NEWLINE; }
 .*                           { return PARSER_ANYTHING; }
 
 %%
