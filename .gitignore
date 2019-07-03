@@ -3,3 +3,4 @@ btool
 *.o
 main
 *_test
+*.tab.[ch]
