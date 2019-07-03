@@ -5,7 +5,7 @@ CC=clang
 CFLAGS=--std=c11 -g -Wall -Werror -O0
 
 YACC=bison
-YFLAGS=-d -y --debug
+YFLAGS=-d --yacc --debug --verbose
 LEX=flex
 LFLAGS=--debug
 

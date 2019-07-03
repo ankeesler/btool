@@ -6,10 +6,11 @@
 
 %%
 
-[ \t\n]                      { ; }
-#include                     { return PARSER_INCLUDE; }
-\"                           { return PARSER_QUOTE; }
-.*                           { return PARSER_ANYTHING; }
+[ \t]                        { ; }
+\n                           { return T_NEWLINE; }
+\"                           { return T_QUOTE; }
+#include                     { return T_INCLUDE; }
+.*                           { return T_ANYTHING; }
 
 %%
 

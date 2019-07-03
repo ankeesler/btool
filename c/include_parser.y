@@ -20,17 +20,23 @@ static void add_include(const char *);
 
 %}
 
-%token PARSER_INCLUDE
-%token PARSER_QUOTE
-%token PARSER_ANYTHING
+%token T_NEWLINE
+%token T_QUOTE
+%token T_INCLUDE
+%token T_ANYTHING
 
 %start lines
 
 %%
 
-lines: PARSER_INCLUDE PARSER_QUOTE PARSER_ANYTHING PARSER_QUOTE { add_include($3); }
-     | PARSER_ANYTHING lines
+lines:
+     | lines line
      ;
+
+line: T_NEWLINE
+    | T_INCLUDE T_QUOTE T_ANYTHING T_QUOTE T_NEWLINE { add_include($3); }
+    | T_ANYTHING T_NEWLINE
+    ;
 %%
 
 static void add_include(const char *i) {
