@@ -21,9 +21,6 @@ include_parser_test: include_parser.o include_lexer.o include_parser_test.o log.
 include_parser: include_parser.o include_lexer.o log.o
 	clang -o $@ $^ -ly
 
-parser_test: parser.o parser_test.o log.o
-	clang -o $@ $^ -lmcgoo
-
 btool: btool.o log.o blah.o collect.o
 
 .PHONY: lint

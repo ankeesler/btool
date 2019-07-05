@@ -10,7 +10,7 @@
 \n                           { return T_NEWLINE; }
 \"                           { return T_QUOTE; }
 #include                     { return T_INCLUDE; }
-.*                           { return T_ANYTHING; }
+[a-zA-Z\-_0-9\./]+           { return T_FILE; }
 
 %%
 

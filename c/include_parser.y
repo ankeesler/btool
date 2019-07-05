@@ -23,7 +23,7 @@ static void add_include(const char *);
 %token T_NEWLINE
 %token T_QUOTE
 %token T_INCLUDE
-%token T_ANYTHING
+%token T_FILE
 
 %start lines
 
@@ -34,8 +34,7 @@ lines:
      ;
 
 line: T_NEWLINE
-    | T_INCLUDE T_QUOTE T_ANYTHING T_QUOTE T_NEWLINE { add_include($3); }
-    | T_ANYTHING T_NEWLINE
+    | T_INCLUDE T_QUOTE T_FILE T_QUOTE T_NEWLINE { add_include($3); }
     ;
 %%
 
