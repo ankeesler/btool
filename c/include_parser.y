@@ -40,6 +40,10 @@ line: T_NEWLINE
 
 static void add_include(const char *i) {
   log_printf("include %s\n", i);
+
+  if (include_buf_idx < include_buf_size) {
+    include_buf[include_buf_idx++] = i;
+  }
 }
 
 error_t parse_includes(FILE *f, const char **buf, int *buf_size) {

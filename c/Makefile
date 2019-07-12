@@ -5,9 +5,9 @@ CC=clang
 CFLAGS=--std=c11 -g -Wall -Werror -O0
 
 YACC=bison
-YFLAGS=-d --yacc --debug --verbose
+YFLAGS=-d --yacc
 LEX=flex
-LFLAGS=--debug
+LFLAGS=
 
 blah_test: blah.o blah_test.o log.o
 	clang -o $@ $^ -lmcgoo
@@ -33,7 +33,7 @@ clean:
 	find . -name "*.o" | xargs rm -f
 	rm -f btool
 	rm -f *_test
-	rm -f *.tab.[ch]
+	rm -f *.tab.[ch] include_parser.c include_lexer.c include_parser
 
 run_%: %
 	./$<

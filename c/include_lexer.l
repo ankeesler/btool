@@ -1,6 +1,8 @@
 %option noyywrap
 
 %{
+#define YYSTYPE const char *
+
 #include "y.tab.h"
 %}
 
@@ -10,7 +12,7 @@
 \n                           { return T_NEWLINE; }
 \"                           { return T_QUOTE; }
 #include                     { return T_INCLUDE; }
-[a-zA-Z\-_0-9\./]+           { return T_FILE; }
+[a-zA-Z\-_0-9\./]+           { yylval = strdup(yytext); return T_FILE; }
 
 %%
 
