@@ -6,10 +6,11 @@
 
 static int happy_test(void) {
   blah_list_t l;
-  error_t error = collect_blahs("fixture/BasicC/main.c", &l);
+  error_t error = collect_blahs("../fixture/BasicC/main.c", &l);
+  note(error);
   expect(error == NULL);
 
-  blah_t *mainc = blah_list_find(&l, "main.c");
+  blah_t *mainc = blah_list_find(&l, "../fixture/BasicC/main.c");
   expect(mainc != NULL);
   // TODO: dependencies...
 

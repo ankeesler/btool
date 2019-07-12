@@ -15,6 +15,10 @@ error_t collect_blahs(const char *target, blah_list_t *l) {
   blah_t *b = blah_new(target);
   blah_list_add(l, b);
 
+  if (path_is_c(target)) {
+    
+  }
+
   if (fclose(f) != 0) {
     return strerror(errno);
   }

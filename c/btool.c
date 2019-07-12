@@ -3,6 +3,9 @@
 #include "error.h"
 #include "log.h"
 
+// TODO: string memory allocation is nuts.
+// TODO: use strNcmp and cousins.
+
 static char *target = "main.c";
 
 int main(int argc, char *argv[]) {
