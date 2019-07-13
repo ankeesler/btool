@@ -28,7 +28,7 @@ btool: btool.o log.o blah.o collect.o
 
 .PHONY: lint
 lint:
-	#clang-format -i $(shell find . -type d -name fixture -prune -o -type f -name "*.[ch]" -print)
+	clang-format -i $(shell find . -type d -name fixture -prune -o -type f -name "*.[ch]" -print)
 	#git diff-index --quiet HEAD -- $(find find . -type d -name fixture -prune -o -type f -name "*.[ch]" -print)
 
 .PHONY: clean

@@ -44,7 +44,7 @@ error_t collect_blahs(const char *target, blah_list_t *l) {
 
 static error_t collect_includes(FILE *f, blah_list_t *l) {
   const char *includes[MAX_INCLUDES];
-  int includes_size = sizeof(includes)/sizeof(includes[0]);
+  int includes_size = sizeof(includes) / sizeof(includes[0]);
   error_t e = parse_includes(f, includes, &includes_size);
   if (e != NULL) {
     return e;

@@ -14,7 +14,8 @@ static int happy_test(void) {
 
   blah_t *mainc = blah_list_find(&l, "fixture/basic_c/main.c");
   expect(mainc != NULL);
-  blah_t *masterh = blah_list_find((blah_list_t*)mainc->dependencies, "fixture/basic_c/master.h");
+  blah_t *masterh = blah_list_find((blah_list_t *)mainc->dependencies,
+                                   "fixture/basic_c/master.h");
   expect(masterh != NULL);
   // TODO: dependencies...
 
