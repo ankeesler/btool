@@ -5,3 +5,4 @@ main
 *_test
 *.tab.[ch]
 *~
+include_parser
