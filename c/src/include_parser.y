@@ -22,7 +22,6 @@ static void add_include(const char *);
 %}
 
 %token T_INCLUDE
-%token T_QUOTE
 %token T_FILE
 %token T_ANYTHING
 
@@ -31,8 +30,8 @@ static void add_include(const char *);
 %%
 
 lines:
-     | lines T_INCLUDE T_QUOTE T_FILE T_QUOTE { add_include($4); }
-     | lines T_INCLUDE T_ANYTHING T_FILE T_ANYTHING
+     | lines T_INCLUDE '"' T_FILE '"' { add_include($4); }
+     | lines T_INCLUDE '<' T_FILE '>'
      | lines T_ANYTHING
      ;
 

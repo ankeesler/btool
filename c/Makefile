@@ -7,7 +7,7 @@ CFLAGS=--std=c11 -g -Wall -Werror -O0 -Isrc -I.
 YACC=bison
 YFLAGS=-d --yacc
 LEX=flex
-LFLAGS=--debug
+LFLAGS=
 
 blah_test: src/blah.o test/blah_test.o src/log.o
 	clang -o $@ $^ -lmcgoo

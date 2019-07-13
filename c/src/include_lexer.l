@@ -1,5 +1,6 @@
 %option noyywrap
 %option yylineno
+%option debug
 
 %{
 #define YYSTYPE const char *
@@ -10,10 +11,10 @@
 %%
 
 [ \t]                        { ; }
+["<>]                        { return yytext[0]; }
 #include                     { return T_INCLUDE; }
-\"                           { return T_QUOTE; }
 [a-zA-Z\-_0-9\./]+           { yylval = strdup(yytext); return T_FILE; }
-.                            { return T_ANYTHING; }
+.+                           { return T_ANYTHING; }
 
 %%
 
