@@ -2,29 +2,29 @@
 default: test
 
 CC=clang
-CFLAGS=--std=c11 -g -Wall -Werror -O0
+CFLAGS=--std=c11 -g -Wall -Werror -O0 -Isrc -I.
 
 YACC=bison
 YFLAGS=-d --yacc
 LEX=flex
 LFLAGS=--debug
 
-blah_test: blah.o blah_test.o log.o
+blah_test: src/blah.o test/blah_test.o src/log.o
 	clang -o $@ $^ -lmcgoo
 
-collect_test: collect.o collect_test.o blah.o log.o path.o include_parser.o include_lexer.o
+collect_test: src/collect.o test/collect_test.o src/blah.o src/log.o src/path.o src/include_parser.o src/include_lexer.o
 	clang -o $@ $^ -lmcgoo
 
-path_test: path.o path_test.o log.o
+path_test: src/path.o test/path_test.o src/log.o
 	clang -o $@ $^ -lmcgoo
 
-include_parser_test: include_parser.o include_lexer.o include_parser_test.o log.o
+include_parser_test: src/include_parser.o src/include_lexer.o test/include_parser_test.o src/log.o
 	clang -o $@ $^ -lmcgoo
 
-include_parser: include_parser.o include_lexer.o log.o
+include_parser: src/include_parser.o src/include_lexer.o src/log.o
 	clang -o $@ $^ -ly
 
-btool: btool.o log.o blah.o collect.o
+btool: src/btool.o src/log.o src/blah.o src/collect.o
 
 .PHONY: lint
 lint:
