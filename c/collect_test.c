@@ -6,21 +6,24 @@
 
 static int happy_test(void) {
   blah_list_t l;
-  error_t error = collect_blahs("../fixture/BasicC/main.c", &l);
+  blah_list_init(&l);
+
+  error_t error = collect_blahs("fixture/basic_c/main.c", &l);
   note(error);
   expect(error == NULL);
 
-  blah_t *mainc = blah_list_find(&l, "../fixture/BasicC/main.c");
+  blah_t *mainc = blah_list_find(&l, "fixture/basic_c/main.c");
   expect(mainc != NULL);
+  blah_t *masterh = blah_list_find((blah_list_t*)mainc->dependencies, "fixture/basic_c/master.h");
+  expect(masterh != NULL);
   // TODO: dependencies...
 
-  blah_t *maino = blah_list_find(&l, "main.o");
+  blah_t *maino = blah_list_find(&l, "fixture/basic_c/main.o");
   expect(maino != NULL);
   // TODO: dependencies...
 
   // TODO: all other files...
 
-  expect(blah_list_find(&l, "main.o") != NULL);
   expect(blah_list_find(&l, "dep-0/dep-0.c") != NULL);
   expect(blah_list_find(&l, "dep-0/dep-0.h") != NULL);
   expect(blah_list_find(&l, "dep-0/dep-0.o") != NULL);

@@ -66,8 +66,16 @@ static int test(void) {
   return 0;
 }
 
+static int dependencies(void) {
+  blah_t *b0 = blah_new("/some/path/to/file.c");
+  blah_t *b1 = blah_new("/some/path/to/other_file.c");
+  blah_list_add((blah_list_t *)b0->dependencies, b1);
+  return 0;
+}
+
 int main(int argc, char *argv[]) {
   announce();
   run(test);
+  run(dependencies);
   return 0;
 }

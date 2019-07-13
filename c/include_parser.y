@@ -8,8 +8,9 @@
 #define YYSTYPE const char *
 
 extern int yylex();
-extern FILE* yyin;
 extern void yyerror(const char *);
+extern FILE* yyin;
+extern int yylineno;
 
 static error_t error;
 static const char **include_buf;
@@ -20,31 +21,29 @@ static void add_include(const char *);
 
 %}
 
-%token T_NEWLINE
-%token T_QUOTE
 %token T_INCLUDE
+%token T_QUOTE
 %token T_FILE
+%token T_ANYTHING
 
 %start lines
 
 %%
 
 lines:
-     | lines line
+     | lines T_INCLUDE T_QUOTE T_FILE T_QUOTE { add_include($4); }
+     | lines T_INCLUDE T_ANYTHING T_FILE T_ANYTHING
+     | lines T_ANYTHING
      ;
 
-line: T_NEWLINE
-    | T_INCLUDE T_QUOTE T_FILE T_QUOTE T_NEWLINE { add_include($3); }
-    ;
 %%
 
 static void add_include(const char *i) {
-  log_printf("include %s\n", i);
+  log_printf("include %s", i);
 
   if (include_buf_idx < include_buf_size) {
-    include_buf[include_buf_idx] = i;
+    include_buf[include_buf_idx++] = i;
   }
-  include_buf_idx++;
 }
 
 error_t parse_includes(FILE *f, const char **buf, int *buf_size) {
@@ -62,5 +61,6 @@ error_t parse_includes(FILE *f, const char **buf, int *buf_size) {
 }
 
 void yyerror(const char *e) {
+  log_printf("%s, line %d", e, yylineno);
   error = e;
 }

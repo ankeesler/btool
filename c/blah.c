@@ -15,6 +15,8 @@ blah_t *blah_new(const char *path) {
 
   b->next = NULL;
 
+  blah_list_init(b->dependencies);
+
   return b;
 }
 

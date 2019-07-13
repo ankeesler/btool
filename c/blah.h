@@ -20,6 +20,7 @@ typedef struct {
   blah_t *head;
 } blah_list_t;
 
+#define blah_list_init(l) do { ((blah_list_t *)(l))->head = NULL; } while (0);
 void blah_list_add(blah_list_t *l, blah_t *b);
 blah_t *blah_list_find(blah_list_t *l, const char *path);
 #define blah_list_for_each(l, b)                                               \

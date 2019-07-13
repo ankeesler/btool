@@ -7,12 +7,12 @@ CFLAGS=--std=c11 -g -Wall -Werror -O0
 YACC=bison
 YFLAGS=-d --yacc
 LEX=flex
-LFLAGS=
+LFLAGS=--debug
 
 blah_test: blah.o blah_test.o log.o
 	clang -o $@ $^ -lmcgoo
 
-collect_test: collect.o collect_test.o blah.o log.o
+collect_test: collect.o collect_test.o blah.o log.o path.o include_parser.o include_lexer.o
 	clang -o $@ $^ -lmcgoo
 
 path_test: path.o path_test.o log.o
@@ -36,7 +36,7 @@ clean:
 	find . -name "*.o" | xargs rm -f
 	rm -f btool
 	rm -f *_test
-	rm -f *.tab.[ch] include_parser.c include_lexer.c include_parser
+	rm -f *.tab.[ch] include_parser.c include_lexer.c include_parser y.output
 
 run_%: %
 	./$<
