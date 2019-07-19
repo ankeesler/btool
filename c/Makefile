@@ -27,7 +27,7 @@ include_parser: src/include_parser_with_main.o src/log.o src/str_buf.o
 path_test: src/path.o test/path_test.o src/log.o
 	clang -o $@ $^ -lmcgoo
 
-str_buf_test: src/str_buf.o src/str_buf_test.o
+str_buf_test: src/str_buf.o test/str_buf_test.o
 	clang -o $@ $^ -lmcgoo
 
 btool: btool.o log.o blah.o collect.o
