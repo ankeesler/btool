@@ -17,6 +17,11 @@ static int test(void) {
   expectString(buf[2], "file_underscore.h");
   expectString(buf[3], "path/to/file_underscore.h");
 
+  free((void *)buf[0]);
+  free((void *)buf[1]);
+  free((void *)buf[2]);
+  free((void *)buf[3]);
+
   expectEquals(fclose(f), 0);
 
   return 0;

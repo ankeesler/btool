@@ -44,8 +44,7 @@ lint:
 clean:
 	find . -name "*.o" | xargs rm -f
 	rm -f btool
-	rm -f *_test
-	rm -f *.tab.[ch] include_parser.c include_lexer.c include_parser y.output
+	rm -f *_test include_parser
 
 run_%: %
 	./$<

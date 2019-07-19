@@ -18,10 +18,19 @@ static int happy_test(void) {
                                    "fixture/basic_c/master.h");
   expect(masterh != NULL);
   // TODO: dependencies...
+  expect(blah_list_find((blah_list_t *)mainc->dependencies, "master.h") !=
+         NULL);
+  expect(blah_list_find((blah_list_t *)mainc->dependencies, "dep_0/dep_0.h") !=
+         NULL);
+  expect(blah_list_find((blah_list_t *)mainc->dependencies, "dep_1/dep_1.h") !=
+         NULL);
 
   blah_t *maino = blah_list_find(&l, "fixture/basic_c/main.o");
   expect(maino != NULL);
-  // TODO: dependencies...
+  expect(blah_list_find((blah_list_t *)mainc->dependencies, "main.c") != NULL);
+
+  blah_t *masterh = blah_list_find(&l, "master.h");
+  expect(masterh != NULL);
 
   // TODO: all other files...
 
