@@ -30,6 +30,9 @@ path_test: src/path.o test/path_test.o src/log.o
 str_buf_test: src/str_buf.o test/str_buf_test.o
 	clang -o $@ $^ -lmcgoo
 
+build_test: src/build.o test/build_test.o src/log.o src/blah.o
+	clang -o $@ $^ -lmcgoo
+
 btool: btool.o log.o blah.o collect.o
 
 .PHONY: lint
@@ -54,6 +57,7 @@ test: \
     run_path_test \
     run_str_buf_test \
     run_collect_test \
+    run_build_test \
     btool
 	./btool --root fixture/BasicC build main.c && ./main
 
