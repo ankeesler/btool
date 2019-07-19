@@ -6,7 +6,7 @@ static int test(void) {
   FILE *f = fopen("fixture/file.c", "r");
   expect(f != NULL);
 
-  const char *buf[4];
+  char *buf[4];
   int buf_size = sizeof(buf) / sizeof(buf[0]);
   error_t e = parse_includes(f, buf, &buf_size);
   expectEquals(e, NULL);

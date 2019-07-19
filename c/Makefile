@@ -33,7 +33,16 @@ str_buf_test: src/str_buf.o test/str_buf_test.o
 build_test: src/build.o test/build_test.o src/log.o src/blah.o
 	clang -o $@ $^ -lmcgoo
 
-btool: btool.o log.o blah.o collect.o
+btool: \
+    src/btool.o \
+    src/log.o \
+    src/blah.o \
+    src/collect.o \
+    src/path.o \
+    src/str_buf.o \
+    src/build.o \
+    src/include_parser.o
+	clang -o $@ $^
 
 .PHONY: lint
 lint:
