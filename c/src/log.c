@@ -3,10 +3,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-void log_printf(const char *format, ...) {
+void __log_printf(const char *file, int line, const char *format, ...) {
   va_list list;
   va_start(list, format);
-  printf("btool: ");
+  printf("btool:%s:%d | ", file, line);
   vprintf(format, list);
   printf("\n");
   fflush(stdout);
