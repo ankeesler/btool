@@ -29,9 +29,6 @@ static int happy_test(void) {
   expect(maino != NULL);
   expect(blah_list_find((blah_list_t *)mainc->dependencies, "main.c") != NULL);
 
-  blah_t *masterh = blah_list_find(&l, "master.h");
-  expect(masterh != NULL);
-
   // TODO: all other files...
 
   expect(blah_list_find(&l, "dep-0/dep-0.c") != NULL);
