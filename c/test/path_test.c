@@ -2,6 +2,13 @@
 
 #include <unit-test.h>
 
+static int dir_test(void) {
+  expectString("", path_dir("file.h"));
+  expectString("path/to", path_dir("path/to/file.h"));
+  expectString("path/to", path_dir("path/to/file_with_underscore.c"));
+  return 0;
+}
+
 static int base_test(void) {
   expectString("file.h", path_base("file.h"));
   expectString("file.h", path_base("path/to/file.h"));
@@ -30,10 +37,18 @@ static int new_ext_test(void) {
   return 0;
 }
 
+static int join_test(void) {
+  expectString("path/file.h", path_join("path", "file.h"));
+  expectString("path/to/file.h", path_join("path/to", "file.h"));
+  return 0;
+}
+
 int main(int argc, char *argv[]) {
   announce();
   run(base_test);
   run(ext_test);
   run(new_ext_test);
+  run(dir_test);
+  run(join_test);
   return 0;
 }

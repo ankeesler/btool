@@ -5,6 +5,6 @@
 
 #include "error.h"
 
-error_t parse_includes(FILE *f, const char **buf, int *buf_size);
+error_t parse_includes(FILE *f, char **buf, int *buf_size);
 
 #endif // __INCLUDE_PARSER_H__

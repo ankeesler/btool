@@ -23,7 +23,7 @@ const char *path_ext(const char *path) {
   }
 }
 
-const char *path_new_ext(const char *path, const char *ext) {
+char *path_new_ext(const char *path, const char *ext) {
   char *c = strrchr(path, '.');
   int size = c - path + strlen(ext) + 1;
   char *path_cpy = (char *)malloc(sizeof(char) * size);
@@ -34,4 +34,23 @@ const char *path_new_ext(const char *path, const char *ext) {
   }
 
   return path_cpy;
+}
+
+char *path_dir(const char *path) {
+  char *path_cpy = strdup(path);
+  char *c = strrchr(path_cpy, '/');
+  if (c == NULL) {
+    return "";
+  } else {
+    *c = '\0';
+    return path_cpy;
+  }
+}
+
+char *path_join(const char *one, const char *two) {
+  char *path = (char *)malloc(strlen(one) + strlen(two) + 1);
+  char *finger = stpcpy(path, one);
+  *finger++ = '/';
+  strcpy(finger, two);
+  return path;
 }

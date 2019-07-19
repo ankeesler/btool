@@ -6,6 +6,7 @@
 // TODO: string memory allocation is nuts.
 // TODO: use strNcmp and cousins.
 // TODO: having to specify (struct blah_list_t *) sometimes is annoying.
+// TODO: reuse blah_t instances.
 
 static char *target = "main.c";
 

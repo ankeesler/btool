@@ -69,7 +69,14 @@ static int test(void) {
 static int dependencies(void) {
   blah_t *b0 = blah_new("/some/path/to/file.c");
   blah_t *b1 = blah_new("/some/path/to/other_file.c");
-  blah_list_add((blah_list_t *)b0->dependencies, b1);
+  blah_t *b2 = blah_new("file.h");
+  blah_t *b3 = blah_new("master.h");
+
+  blah_list_add((blah_list_t *)b0->dependencies, b2);
+  blah_list_add((blah_list_t *)b0->dependencies, b3);
+
+  blah_list_add((blah_list_t *)b1->dependencies, b3);
+
   return 0;
 }
 

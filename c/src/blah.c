@@ -50,6 +50,10 @@ blah_t *blah_list_find(blah_list_t *l, const char *path) {
   return NULL;
 }
 
+blah_t *blah_list_find_dependency(blah_list_t *l, const char *path) {
+  return NULL;
+}
+
 void blah_list_log(blah_list_t *l) {
   blah_list_for_each(l, b) { log_printf("%s", b->path); }
 }

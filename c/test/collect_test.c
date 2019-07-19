@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <unit-test.h>
 
 #include "blah.h"
@@ -8,35 +9,43 @@ static int happy_test(void) {
   blah_list_t l;
   blah_list_init(&l);
 
-  error_t error = collect_blahs("fixture/basic_c/main.c", &l);
-  note(error);
+  expectEquals(chdir("fixture/basic_c"), 0);
+
+  error_t error = collect_blahs("main.c", &l);
   expect(error == NULL);
 
-  blah_t *mainc = blah_list_find(&l, "fixture/basic_c/main.c");
-  expect(mainc != NULL);
-  blah_t *masterh = blah_list_find((blah_list_t *)mainc->dependencies,
-                                   "fixture/basic_c/master.h");
-  expect(masterh != NULL);
-  // TODO: dependencies...
-  expect(blah_list_find((blah_list_t *)mainc->dependencies, "master.h") !=
-         NULL);
-  expect(blah_list_find((blah_list_t *)mainc->dependencies, "dep_0/dep_0.h") !=
-         NULL);
-  expect(blah_list_find((blah_list_t *)mainc->dependencies, "dep_1/dep_1.h") !=
-         NULL);
-
-  blah_t *maino = blah_list_find(&l, "fixture/basic_c/main.o");
+  blah_t *maino = blah_list_find(&l, "main.o");
   expect(maino != NULL);
-  expect(blah_list_find((blah_list_t *)mainc->dependencies, "main.c") != NULL);
+  blah_t *mainc = blah_list_find((blah_list_t *)maino->dependencies, "main.c");
+  expect(mainc != NULL);
 
-  // TODO: all other files...
+  blah_t *masterh =
+    blah_list_find((blah_list_t *)mainc->dependencies, "master.h");
+  expect(masterh != NULL);
+  blah_t *dep0h =
+    blah_list_find((blah_list_t *)mainc->dependencies, "dep_0/dep_0.h");
+  expect(dep0h != NULL);
+  blah_t *dep1h =
+    blah_list_find((blah_list_t *)mainc->dependencies, "dep_1/dep_1.h");
+  expect(dep1h != NULL);
 
-  expect(blah_list_find(&l, "dep-0/dep-0.c") != NULL);
-  expect(blah_list_find(&l, "dep-0/dep-0.h") != NULL);
-  expect(blah_list_find(&l, "dep-0/dep-0.o") != NULL);
-  expect(blah_list_find(&l, "dep-1/dep-1.c") != NULL);
-  expect(blah_list_find(&l, "dep-1/dep-1.h") != NULL);
-  expect(blah_list_find(&l, "dep-1/dep-1.o") != NULL);
+  blah_t *dep0o = blah_list_find(&l, "dep_0/dep_0.o");
+  expect(dep0o != NULL);
+  blah_t *dep0c =
+    blah_list_find((blah_list_t *)dep0o->dependencies, "dep_0/dep_0.c");
+  expect(dep0c != NULL);
+  dep0h = blah_list_find((blah_list_t *)dep0c->dependencies, "dep_0/dep_0.h");
+  expect(dep0h != NULL);
+
+  blah_t *dep1o = blah_list_find(&l, "dep_1/dep_1.o");
+  expect(dep1o != NULL);
+  blah_t *dep1c =
+    blah_list_find((blah_list_t *)dep1o->dependencies, "dep_1/dep_1.c");
+  expect(dep1c != NULL);
+  dep1h = blah_list_find((blah_list_t *)dep1c->dependencies, "dep_1/dep_1.h");
+  expect(dep1h != NULL);
+  dep0c = blah_list_find((blah_list_t *)dep1h->dependencies, "dep_0/dep_0.h");
+  expect(dep0h != NULL);
 
   return 0;
 }

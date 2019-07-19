@@ -19,14 +19,14 @@ typedef enum {
 
 } state_e;
 
-static error_t parse_include_line(FILE *f, const char **buf, int *buf_size);
-static error_t parse_include(FILE *f, const char **buf, int *buf_size);
+static error_t parse_include_line(FILE *f, char **buf, int *buf_size);
+static error_t parse_include(FILE *f, char **buf, int *buf_size);
 
-error_t parse_includes(FILE *f, const char **buf, int *buf_size) {
+error_t parse_includes(FILE *f, char **buf, int *buf_size) {
   char c = EOF;
   error_t e = NULL;
   state_e prev_s, cur_s = NONE;
-  int buf_idx;
+  int buf_idx = 0;
 
   do {
     prev_s = cur_s;
@@ -90,7 +90,7 @@ error_t parse_includes(FILE *f, const char **buf, int *buf_size) {
   return NULL;
 }
 
-static error_t parse_include_line(FILE *f, const char **buf, int *buf_idx) {
+static error_t parse_include_line(FILE *f, char **buf, int *buf_idx) {
   char include[8]; // "include" + '\0'
   const int include_len = sizeof(include) / sizeof(include[0]) - 1;
   bzero(include, include_len);
@@ -122,7 +122,7 @@ static error_t parse_include_line(FILE *f, const char **buf, int *buf_idx) {
   }
 }
 
-static error_t parse_include(FILE *f, const char **buf, int *buf_idx) {
+static error_t parse_include(FILE *f, char **buf, int *buf_idx) {
   char c;
   str_buf *sb = str_buf_new();
   char *str = NULL;
@@ -153,7 +153,7 @@ static error_t parse_include(FILE *f, const char **buf, int *buf_idx) {
 #ifdef INCLUDE_PARSER_WITH_MAIN
 
 int main(int argc, char *argv[]) {
-  const char *buf[64];
+  char *buf[64];
   int buf_size = sizeof(buf) / sizeof(buf[0]);
   error_t e = parse_includes(stdin, buf, &buf_size);
   if (e != NULL) {
