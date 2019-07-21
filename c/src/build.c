@@ -39,3 +39,31 @@ static error_t build_blah(blah_t *b) {
 
   return NULL;
 }
+
+// ---
+
+typedef struct {
+  blah_graph_t *g;
+} build_ctx_t;
+static error_t build_blah(blah_t *b, void *ctx);
+
+error_t build(blah_graph_t *g, const char *path) {
+  build_ctx_t build_ctx;
+  build_ctx.g = g;
+
+  error_t e = blah_graph_walk_dependencies(g, path, build_blah, build_ctx);
+  if (e != NULL) {
+    return e;
+  }
+
+  blah_t *b = blah_graph_find(path);
+  log_printf("resolving %s", b->path);
+  e = (*b->resolver_f)((struct blah_tag *)b, b->resolver_ctx);
+  if (e != NULL) {
+    return e;
+  }
+
+  return e;
+}
+
+static error_t build_blah(blah_t *b, void *ctx) { return NULL; }

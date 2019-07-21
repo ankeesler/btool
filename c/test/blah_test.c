@@ -1,6 +1,9 @@
 #include "blah.h"
 
+#include <string.h>
 #include <unit-test.h>
+
+#include "path.h"
 
 static int test(void) {
   blah_list_t l;
@@ -80,9 +83,135 @@ static int dependencies(void) {
   return 0;
 }
 
+static blah_t *walk_data[10];
+static int walk_data_count = 0;
+static error_t walk(blah_t *b) {
+  walk_data[walk_data_count++] = b;
+  return NULL;
+}
+
+static int graph(void) {
+  blah_graph_t g;
+  blah_graph_init(&g);
+
+  for (int i = 0; i < 3; i++) {
+    const char buf[] = {'0' + i, '\0'};
+
+    char *ofile = path_join(buf, "file.o");
+    char *cfile = path_join(buf, "file.c");
+    char *hfile = path_join(buf, "file.h");
+
+    blah_t *o = blah_graph_add_node(&g, ofile);
+    expect(o != NULL);
+    expectString(o->path, ofile);
+    blah_t *c = blah_graph_add_node(&g, cfile);
+    expect(c != NULL);
+    expectString(c->path, cfile);
+    blah_t *h = blah_graph_add_node(&g, hfile);
+    expect(h != NULL);
+    expectString(h->path, hfile);
+
+    blah_t *o_again = blah_graph_add_node(&g, ofile);
+    expectEquals(o, o_again);
+    blah_t *c_again = blah_graph_add_node(&g, cfile);
+    expectEquals(c, c_again);
+    blah_t *h_again = blah_graph_add_node(&g, hfile);
+    expectEquals(h, h_again);
+
+    free(ofile);
+    free(cfile);
+    free(hfile);
+  }
+
+  for (int i = 0; i < 3; i++) {
+    const char buf[] = {'0' + i, '\0'};
+
+    char *ofile = path_join(buf, "file.o");
+    char *cfile = path_join(buf, "file.c");
+    char *hfile = path_join(buf, "file.h");
+
+    blah_t *o = blah_graph_find_node(&g, ofile);
+    expect(o != NULL);
+    expectString(o->path, ofile);
+    blah_t *c = blah_graph_find_node(&g, cfile);
+    expect(c != NULL);
+    expectString(o->path, ofile);
+    blah_t *h = blah_graph_find_node(&g, hfile);
+    expect(h != NULL);
+    expectString(o->path, ofile);
+
+    blah_t *o_again = blah_graph_add_node(&g, ofile);
+    expectEquals(o, o_again);
+    blah_t *c_again = blah_graph_add_node(&g, cfile);
+    expectEquals(c, c_again);
+    blah_t *h_again = blah_graph_add_node(&g, hfile);
+    expectEquals(h, h_again);
+
+    free(ofile);
+    free(cfile);
+    free(hfile);
+  }
+
+  blah_t *nope = blah_graph_find_node(&g, "file.c");
+  expect(nope == NULL);
+
+  for (int i = 0; i < 3; i++) {
+    const char buf[] = {'0' + i, '\0'};
+
+    char *ofile = path_join(buf, "file.o");
+    char *cfile = path_join(buf, "file.c");
+    char *hfile = path_join(buf, "file.h");
+
+    blah_t *o = blah_graph_find_node(&g, ofile);
+    expect(o != NULL);
+    expectString(o->path, ofile);
+    blah_t *c = blah_graph_find_node(&g, cfile);
+    expect(c != NULL);
+    expectString(o->path, ofile);
+    blah_t *h = blah_graph_find_node(&g, hfile);
+    expect(h != NULL);
+    expectString(o->path, ofile);
+
+    blah_t *c_edge = blah_graph_add_edge(&g, ofile, cfile);
+    expectEquals(c_edge, c);
+    blah_t *h_edge = blah_graph_add_edge(&g, cfile, hfile);
+    expectEquals(h_edge, h);
+
+    free(ofile);
+    free(cfile);
+    free(hfile);
+  }
+
+  blah_graph_add_edge(&g, "2/file.c", "0/file.h");
+
+  blah_graph_log(&g);
+
+  walk_data_count = 0;
+  blah_graph_walk_nodes(&g, walk);
+  expectEquals(walk_data_count, 9);
+  for (int i = 0; i < 3; i++) {
+    const char buf[] = {'0' + i, '\0'};
+
+    char *ofile = path_join(buf, "file.o");
+    char *cfile = path_join(buf, "file.c");
+    char *hfile = path_join(buf, "file.h");
+
+    expectString(walk_data[i]->path, ofile);
+    expectString(walk_data[i]->path, cfile);
+    expectString(walk_data[i]->path, hfile);
+
+    free(ofile);
+    free(cfile);
+    free(hfile);
+  }
+
+  return 0;
+}
+
 int main(int argc, char *argv[]) {
   announce();
   run(test);
   run(dependencies);
+  run(graph);
   return 0;
 }

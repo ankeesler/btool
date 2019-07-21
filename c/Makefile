@@ -9,7 +9,7 @@ YFLAGS=-d --yacc
 LEX=flex
 LFLAGS=
 
-blah_test: src/blah.o test/blah_test.o src/log.o
+blah_test: src/blah.o test/blah_test.o src/log.o src/path.o
 	clang -o $@ $^ -lmcgoo
 
 collect_test: src/collect.o test/collect_test.o src/blah.o src/log.o src/path.o src/include_parser.o src/str_buf.o
