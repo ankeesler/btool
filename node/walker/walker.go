@@ -13,31 +13,29 @@ import (
 )
 
 type Walker struct {
-	fs   afero.Fs
-	root string
+	fs afero.Fs
 }
 
 // New creates a new Walker with a root directory. The root directory will be the
 // starting place for the walk.
-func New(fs afero.Fs, root string) *Walker {
+func New(fs afero.Fs) *Walker {
 	return &Walker{
-		fs:   fs,
-		root: root,
+		fs: fs,
 	}
 }
 
-func (w *Walker) Handle(nodes []*node.Node) ([]*node.Node, error) {
-	logrus.Info("scanning from root " + w.root)
+func (w *Walker) Handle(c *node.Config, nodes []*node.Node) ([]*node.Node, error) {
+	logrus.Info("scanning from root " + c.Root)
 
 	if err := afero.Walk(
 		w.fs,
-		w.root,
+		c.Root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return errors.Wrap(err, "walk")
 			}
 
-			rootRelPath, err := filepath.Rel(w.root, path)
+			rootRelPath, err := filepath.Rel(c.Root, path)
 			if err != nil {
 				return errors.Wrap(err, "rel")
 			}

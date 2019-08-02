@@ -23,22 +23,18 @@ type C interface {
 }
 
 type Compiler struct {
-	c     C
-	fs    afero.Fs
-	root  string
-	cache string
+	c  C
+	fs afero.Fs
 }
 
-func New(c C, fs afero.Fs, root, cache string) *Compiler {
+func New(c C, fs afero.Fs) *Compiler {
 	return &Compiler{
-		c:     c,
-		fs:    fs,
-		root:  root,
-		cache: cache,
+		c:  c,
+		fs: fs,
 	}
 }
 
-func (c *Compiler) Handle(nodes []*node.Node) ([]*node.Node, error) {
+func (c *Compiler) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
 	for _, node := range nodes {
 		if err := c.handleNode(node); err != nil {
 			return nil, errors.Wrap(err, "handle node "+node.Name)
@@ -79,7 +75,7 @@ func (c *Compiler) handleSource(n *node.Node, source string) (string, error) {
 	}
 
 	inputFile := filepath.Join(
-		c.root,
+		c.Root,
 		source,
 	)
 
@@ -109,7 +105,7 @@ func (c *Compiler) handleSource(n *node.Node, source string) (string, error) {
 	if err := compileFunc(
 		outputFile,
 		inputFile,
-		append(n.IncludePaths, c.root),
+		append(n.IncludePaths, c.Root),
 	); err != nil {
 		return "", errors.Wrap(err, fmt.Sprintf("compile %s", outputFile))
 	}
@@ -131,7 +127,7 @@ func (c *Compiler) isFileOlder(from string, tos []*node.Node) (bool, error) {
 	}
 
 	for _, to := range tos {
-		toStat, err := c.fs.Stat(filepath.Join(c.root, to.Name))
+		toStat, err := c.fs.Stat(filepath.Join(c.Root, to.Name))
 		if err != nil {
 			if os.IsNotExist(err) {
 				logrus.Debugf("%s does not exist", to)
