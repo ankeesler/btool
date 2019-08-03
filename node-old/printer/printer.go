@@ -18,7 +18,7 @@ func New(writer io.Writer) *Printer {
 	}
 }
 
-func (p *Printer) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
+func (p *Printer) Handle(nodes []*node.Node) ([]*node.Node, error) {
 	for _, node := range nodes {
 		fmt.Fprintf(p.writer, "%s\n", node)
 		for _, dependency := range node.Dependencies {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"path/filepath"
-	"strings"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/sirupsen/logrus"
@@ -15,7 +14,14 @@ type Nodes []*node.Node
 
 func (nodes Nodes) WithoutDependencies() Nodes {
 	for _, n := range nodes {
-		n.Dependencies = make([]*node.Node, 0)
+		n.Dependencies = nil
+	}
+	return nodes
+}
+
+func (nodes Nodes) WithObjects() Nodes {
+	for _, n := range nodes {
+		n.Objects = make([]string, 0)
 	}
 	return nodes
 }
@@ -54,8 +60,8 @@ func (nodes Nodes) PopulateFS(fs afero.Fs) {
 		content := bytes.NewBuffer([]byte{})
 		content.WriteString(fmt.Sprintf("// %s\n", node.Name))
 		for _, dependency := range node.Dependencies {
-			if strings.HasSuffix(dependency.Name, "h") {
-				content.WriteString(fmt.Sprintf("\n#include \"%s\"", dependency.Name))
+			for _, header := range dependency.Headers {
+				content.WriteString(fmt.Sprintf("\n#include \"%s\"", header))
 			}
 		}
 		//if node.ExtraContent != "" {

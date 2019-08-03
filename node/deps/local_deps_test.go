@@ -1,48 +1,42 @@
-package walker_test
+package deps_test
 
 import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/node/deps"
 	"github.com/ankeesler/btool/node/testutil"
-	"github.com/ankeesler/btool/node/walker"
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
-func TestHandle(t *testing.T) {
+func TestLocalHandle(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
 	data := []struct {
 		name      string
-		exNodes   testutil.Nodes
+		nodes     testutil.Nodes
+		exNodes   []*node.Node
 		exSuccess bool
 	}{
 		{
 			name:      "Basic",
-			exNodes:   testutil.BasicNodesC.WithoutDependencies(),
-			exSuccess: true,
-		},
-		{
-			name:      "Basic",
-			exNodes:   testutil.BasicNodesCC.WithoutDependencies(),
+			nodes:     testutil.BasicNodesC.WithoutDependencies(),
+			exNodes:   testutil.BasicNodesC,
 			exSuccess: true,
 		},
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			datum.exNodes.PopulateFS(fs)
+			datum.nodes.PopulateFS(fs)
 
-			w := walker.New(fs)
+			l := deps.NewLocal(fs, "/")
 
-			cfg := node.Config{
-				Root: "/",
-			}
-			acNodes, err := w.Handle(&cfg, []*node.Node{})
+			acNodes, err := l.Handle(datum.nodes)
 			if datum.exSuccess {
 				if err != nil {
 					t.Fatal(err)
@@ -54,7 +48,7 @@ func TestHandle(t *testing.T) {
 				return
 			}
 
-			if diff := deep.Equal(datum.exNodes.Cast(), acNodes); diff != nil {
+			if diff := deep.Equal(datum.exNodes, acNodes); diff != nil {
 				t.Error(diff)
 			}
 		})

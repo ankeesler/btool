@@ -16,7 +16,7 @@ func New() *Sorter {
 	return &Sorter{}
 }
 
-func (s *Sorter) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
+func (s *Sorter) Handle(nodes []*node.Node) ([]*node.Node, error) {
 	logrus.Debugf("sorting %d nodes", len(nodes))
 
 	sorted := make([]*node.Node, 0, len(nodes))

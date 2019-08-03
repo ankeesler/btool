@@ -4,6 +4,7 @@ package walker
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
@@ -23,18 +24,18 @@ func New(fs afero.Fs) *Walker {
 	}
 }
 
-func (w *Walker) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
-	logrus.Info("scanning from root " + cfg.Root)
+func (w *Walker) Handle(c *node.Config, nodes []*node.Node) ([]*node.Node, error) {
+	logrus.Info("scanning from root " + c.Root)
 
 	if err := afero.Walk(
 		w.fs,
-		cfg.Root,
+		c.Root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return errors.Wrap(err, "walk")
 			}
 
-			rootRelPath, err := filepath.Rel(cfg.Root, path)
+			rootRelPath, err := filepath.Rel(c.Root, path)
 			if err != nil {
 				return errors.Wrap(err, "rel")
 			}
@@ -46,7 +47,11 @@ func (w *Walker) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, err
 				logrus.Debugf("looking at file %s", rootRelPath)
 			}
 
-			nodes = append(nodes, node.New(rootRelPath))
+			nodes = append(nodes, &node.Node{
+				Name:    rootRelPath,
+				Sources: sources(rootRelPath),
+				Headers: headers(rootRelPath),
+			})
 
 			return nil
 		},
@@ -55,4 +60,20 @@ func (w *Walker) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, err
 	}
 
 	return nodes, nil
+}
+
+func sources(name string) []string {
+	if strings.HasSuffix(name, ".c") || strings.HasSuffix(name, ".cc") {
+		return []string{name}
+	} else {
+		return []string{}
+	}
+}
+
+func headers(name string) []string {
+	if strings.HasSuffix(name, ".h") {
+		return []string{name}
+	} else {
+		return []string{}
+	}
 }

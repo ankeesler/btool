@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/printer"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
@@ -14,8 +13,7 @@ func TestHandle(t *testing.T) {
 	buf := bytes.NewBuffer([]byte{})
 	p := printer.New(buf)
 
-	cfg := node.Config{}
-	nodes, err := p.Handle(&cfg, testutil.BasicNodesC)
+	nodes, err := p.Handle(testutil.BasicNodesC)
 	if err != nil {
 		t.Error(err)
 	}

@@ -26,23 +26,15 @@ func TestHandle(t *testing.T) {
 			exNodes:   testutil.BasicNodesC.WithoutDependencies(),
 			exSuccess: true,
 		},
-		{
-			name:      "Basic",
-			exNodes:   testutil.BasicNodesCC.WithoutDependencies(),
-			exSuccess: true,
-		},
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
 			datum.exNodes.PopulateFS(fs)
 
-			w := walker.New(fs)
+			w := walker.New(fs, "/")
 
-			cfg := node.Config{
-				Root: "/",
-			}
-			acNodes, err := w.Handle(&cfg, []*node.Node{})
+			acNodes, err := w.Handle([]*node.Node{})
 			if datum.exSuccess {
 				if err != nil {
 					t.Fatal(err)

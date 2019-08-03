@@ -8,11 +8,10 @@ import (
 )
 
 type FakeHandler struct {
-	HandleStub        func(*node.Config, []*node.Node) ([]*node.Node, error)
+	HandleStub        func([]*node.Node) ([]*node.Node, error)
 	handleMutex       sync.RWMutex
 	handleArgsForCall []struct {
-		arg1 *node.Config
-		arg2 []*node.Node
+		arg1 []*node.Node
 	}
 	handleReturns struct {
 		result1 []*node.Node
@@ -26,22 +25,21 @@ type FakeHandler struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHandler) Handle(arg1 *node.Config, arg2 []*node.Node) ([]*node.Node, error) {
-	var arg2Copy []*node.Node
-	if arg2 != nil {
-		arg2Copy = make([]*node.Node, len(arg2))
-		copy(arg2Copy, arg2)
+func (fake *FakeHandler) Handle(arg1 []*node.Node) ([]*node.Node, error) {
+	var arg1Copy []*node.Node
+	if arg1 != nil {
+		arg1Copy = make([]*node.Node, len(arg1))
+		copy(arg1Copy, arg1)
 	}
 	fake.handleMutex.Lock()
 	ret, specificReturn := fake.handleReturnsOnCall[len(fake.handleArgsForCall)]
 	fake.handleArgsForCall = append(fake.handleArgsForCall, struct {
-		arg1 *node.Config
-		arg2 []*node.Node
-	}{arg1, arg2Copy})
-	fake.recordInvocation("Handle", []interface{}{arg1, arg2Copy})
+		arg1 []*node.Node
+	}{arg1Copy})
+	fake.recordInvocation("Handle", []interface{}{arg1Copy})
 	fake.handleMutex.Unlock()
 	if fake.HandleStub != nil {
-		return fake.HandleStub(arg1, arg2)
+		return fake.HandleStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -56,17 +54,17 @@ func (fake *FakeHandler) HandleCallCount() int {
 	return len(fake.handleArgsForCall)
 }
 
-func (fake *FakeHandler) HandleCalls(stub func(*node.Config, []*node.Node) ([]*node.Node, error)) {
+func (fake *FakeHandler) HandleCalls(stub func([]*node.Node) ([]*node.Node, error)) {
 	fake.handleMutex.Lock()
 	defer fake.handleMutex.Unlock()
 	fake.HandleStub = stub
 }
 
-func (fake *FakeHandler) HandleArgsForCall(i int) (*node.Config, []*node.Node) {
+func (fake *FakeHandler) HandleArgsForCall(i int) []*node.Node {
 	fake.handleMutex.RLock()
 	defer fake.handleMutex.RUnlock()
 	argsForCall := fake.handleArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
+	return argsForCall.arg1
 }
 
 func (fake *FakeHandler) HandleReturns(result1 []*node.Node, result2 error) {

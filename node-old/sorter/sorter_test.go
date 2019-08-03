@@ -16,30 +16,29 @@ func TestHandle(t *testing.T) {
 	logrus.SetFormatter(formatter.New())
 
 	s := sorter.New()
-	cfg := node.Config{}
 
 	// Happy.
-	ac, err := s.Handle(&cfg, []*node.Node{
-		testutil.Mainc,
-		testutil.Dep1h,
-		testutil.Dep0h,
+	ac, err := s.Handle([]*node.Node{
+		&testutil.Mainc,
+		&testutil.Dep1h,
+		&testutil.Dep0h,
 	})
 	if err != nil {
 		t.Error(err)
 	}
 
 	ex := []*node.Node{
-		testutil.Dep0h,
-		testutil.Dep1h,
-		testutil.Mainc,
+		&testutil.Dep0h,
+		&testutil.Dep1h,
+		&testutil.Mainc,
 	}
 	if !reflect.DeepEqual(ex, ac) {
 		t.Error(ex, "!=", ac)
 	}
 
 	// Sad.
-	testutil.Dep0h.Dependencies = []*node.Node{testutil.Mainc}
-	ac, err = s.Handle(&cfg, testutil.BasicNodesC)
+	testutil.Dep0h.Dependencies = []*node.Node{&testutil.Mainc}
+	ac, err = s.Handle(testutil.BasicNodesC)
 	if err == nil {
 		t.Error("expected failure")
 	}

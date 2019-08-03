@@ -12,11 +12,11 @@ type Handler interface {
 	Handle(*Config, []*Node) ([]*Node, error)
 }
 
-func Pipeline(cfg *Config, handlers ...Handler) error {
+func Pipeline(c *Config, handlers ...Handler) error {
 	nodes := make([]*Node, 0)
 	for _, handler := range handlers {
 		var err error
-		nodes, err = handler.Handle(cfg, nodes)
+		nodes, err = handler.Handle(c, nodes)
 		if err != nil {
 			return err
 		}

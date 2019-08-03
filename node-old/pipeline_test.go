@@ -23,15 +23,13 @@ func TestPipeline(t *testing.T) {
 	badHandler := &nodefakes.FakeHandler{}
 	badHandler.HandleReturnsOnCall(0, nil, errors.New("some error"))
 
-	cfg := node.Config{}
-
 	// Happy.
-	if err := node.Pipeline(&cfg, goodHandlerA, goodHandlerB); err != nil {
+	if err := node.Pipeline(goodHandlerA, goodHandlerB); err != nil {
 		t.Error(err)
 	}
 
 	// Sad.
-	if err := node.Pipeline(&cfg, goodHandlerA, badHandler, goodHandlerB); err == nil {
+	if err := node.Pipeline(goodHandlerA, badHandler, goodHandlerB); err == nil {
 		t.Error("expected failure")
 	} else if err.Error() != "some error" {
 		t.Error("expected 'some error'")
