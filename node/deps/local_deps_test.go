@@ -32,11 +32,14 @@ func TestLocalHandle(t *testing.T) {
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			datum.nodes.PopulateFS(fs)
+			datum.nodes.PopulateFS("/", fs)
 
-			l := deps.NewLocal(fs, "/")
+			l := deps.NewLocal(fs)
 
-			acNodes, err := l.Handle(datum.nodes)
+			cfg := node.Config{
+				Root: "/",
+			}
+			acNodes, err := l.Handle(&cfg, datum.nodes)
 			if datum.exSuccess {
 				if err != nil {
 					t.Fatal(err)

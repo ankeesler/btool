@@ -49,7 +49,7 @@ func (nodes Nodes) Cast() []*node.Node {
 	return []*node.Node(nodes)
 }
 
-func (nodes Nodes) PopulateFS(fs afero.Fs) {
+func (nodes Nodes) PopulateFS(root string, fs afero.Fs) {
 	for _, node := range nodes {
 		content := bytes.NewBuffer([]byte{})
 		content.WriteString(fmt.Sprintf("// %s\n", node.Name))
@@ -62,7 +62,7 @@ func (nodes Nodes) PopulateFS(fs afero.Fs) {
 		//	content.WriteString(node.ExtraContent)
 		//}
 
-		file := filepath.Join("/", node.Name)
+		file := filepath.Join(root, node.Name)
 		dir := filepath.Dir(file)
 		if err := fs.MkdirAll(dir, 0700); err != nil {
 			panic(err)

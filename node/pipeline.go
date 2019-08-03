@@ -9,6 +9,7 @@ type Config struct {
 }
 
 type Handler interface {
+	// TODO: stop returning []*Node! The reference is passed in!
 	Handle(*Config, []*Node) ([]*Node, error)
 }
 

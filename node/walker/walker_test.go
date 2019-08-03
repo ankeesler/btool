@@ -35,7 +35,7 @@ func TestHandle(t *testing.T) {
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			fs := afero.NewMemMapFs()
-			datum.exNodes.PopulateFS(fs)
+			datum.exNodes.PopulateFS("/", fs)
 
 			w := walker.New(fs)
 

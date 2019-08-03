@@ -18,10 +18,12 @@ type Downloader interface {
 
 // Resolves dependencies outside of a project.
 type Remote struct {
-	fs    afero.Fs
+	fs afero.Fs
+	d  Downloader
+
+	// TODO: these should come from the config.
 	root  string
 	cache string
-	d     Downloader
 }
 
 func NewRemote(fs afero.Fs, root string, cache string, d Downloader) *Remote {
