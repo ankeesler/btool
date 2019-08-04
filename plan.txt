@@ -1,0 +1,65 @@
+handlers:
+- walker (collect via the fs)
+- executabler (collect via the target for link targets)
+- objector (collect via the target for compile targets)
+- all (create objects for each source)
+- printer (print all of the nodes and their dependencies)
+- local deps (fill in local dependencies)
+- remote deps (fill in remote dependencies)
+- alpha_sorter (sort nodes and dependencies in alphanumeric order)
+- sorter (topological sort nodes)
+
+node/
+pipeline/
+  handlers/
+    fs.go
+    print.go
+    topo_sort.go
+    deps_local.go
+    deps_remote.go
+    alpha_sort.go
+    object.go
+    all_object.go
+    executable.go
+
+node/
+  node.go
+  util.go
+  testutil/
+    nodes.go
+    basic_nodes.go
+    testutil.go
+pipeline/
+  pipeline.go
+  pipeline_test.go
+  ctx.go
+handlers/
+  fs.go
+  fs_test.go
+  print.go
+  print_test.go
+  topo_sort.go
+  topo_sort_test.go
+  deps_local.go
+  deps_local_test.go
+  deps_remote.go
+  deps_remote_test.go
+  alpha_sort.go
+  alpha_sort_test.go
+  object.go
+  object_test.go
+  all_objects.go
+  all_objects_test.go
+  executable.go
+  executable_test.go
+  resolve.go
+  resolve_test.gp
+build.go
+btool.go
+cmd/
+  btool/
+    main.go
+  genfixture/
+    main.go
+integration/
+  integration_test.go // genfixture and then btool build
