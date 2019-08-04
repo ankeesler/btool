@@ -44,13 +44,16 @@ func testObject(t *testing.T) {
 
 func build(path string) (string, error) {
 	name := filepath.Join(os.TempDir(), filepath.Base(path))
-	if err := exec.Command(
+	cmd := exec.Command(
 		"go",
 		"build",
 		"-o",
 		name,
 		path,
-	).Run(); err != nil {
+	)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
 		return "", err
 	}
 

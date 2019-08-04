@@ -6,6 +6,9 @@ type Config struct {
 	Root   string
 	Cache  string
 	Target string
+
+	CCompiler  string
+	CCCompiler string
 }
 
 type Handler interface {

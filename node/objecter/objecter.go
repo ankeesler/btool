@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool/node"
+	"github.com/sirupsen/logrus"
 )
 
 // Objecter is a node.Handler that creates build targets from a provided target.
@@ -37,7 +38,24 @@ func (o *Objecter) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, e
 		return nil, fmt.Errorf("unknown source for object %s", cfg.Target)
 	}
 
-	nodes = append(nodes, node.New(cfg.Target).Dependency(d))
+	var comp string
+	if c != nil {
+		comp = cfg.CCompiler
+	} else { // cc != nil
+		comp = cfg.CCCompiler
+	}
+
+	logrus.Debugf("adding %s -> %s", cfg.Target, d.Name)
+	n := node.New(cfg.Target).Dependency(d)
+	n.Resolver = &compiler{
+		comp:     comp,
+		source:   d.Name,
+		includes: []string{cfg.Root},
+
+		dir: cfg.Root,
+	}
+
+	nodes = append(nodes, n)
 
 	return nodes, nil
 }

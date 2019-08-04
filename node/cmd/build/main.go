@@ -11,7 +11,6 @@ import (
 	"github.com/ankeesler/btool/node/builder"
 	"github.com/ankeesler/btool/node/deps"
 	"github.com/ankeesler/btool/node/objecter"
-	"github.com/ankeesler/btool/node/resolver"
 	"github.com/ankeesler/btool/node/sorter"
 	"github.com/ankeesler/btool/node/walker"
 	"github.com/sirupsen/logrus"
@@ -34,6 +33,9 @@ func main() {
 		Root:   *root,
 		Cache:  *cache,
 		Target: *target,
+
+		CCompiler:  "clang",
+		CCCompiler: "clang++",
 	}
 
 	fs := afero.NewOsFs()
@@ -47,7 +49,6 @@ func main() {
 		deps.NewLocal(fs),
 		objecter.New(),
 		sorter.NewAlpha(),
-		resolver.NewNoop(),
 		builder.New(),
 	); err != nil {
 		logrus.Error(err)

@@ -40,8 +40,10 @@ func build(n *node.Node) error {
 	}
 
 	logrus.Debugf("resolving %s", n.Name)
-	if err := n.Resolver.Resolve(n); err != nil {
-		return errors.Wrap(err, "resolve "+n.Name)
+	if n.Resolver != nil {
+		if err := n.Resolver.Resolve(n); err != nil {
+			return errors.Wrap(err, "resolve "+n.Name)
+		}
 	}
 
 	return nil
