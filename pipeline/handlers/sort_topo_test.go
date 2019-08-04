@@ -32,10 +32,6 @@ func TestSortTopo(t *testing.T) {
 		t.Fatal()
 	}
 
-	//dep0h := *testutil.Dep0h
-	//dep1h := *testutil.Dep1h
-	//mainc := *testutil.Mainc
-
 	// Happy.
 	ctx := pipeline.NewCtxBuilder().Nodes(
 		[]*node.Node{

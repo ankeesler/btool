@@ -30,6 +30,10 @@ func main() {
 
 	for fixture, nodes := range fixtures {
 		fixtureRoot := filepath.Join(*root, fixture)
+		if err := os.RemoveAll(fixtureRoot); err != nil {
+			fmt.Printf("error: %s", err.Error())
+			os.Exit(1)
+		}
 		fmt.Printf("Generating %s...\n", fixtureRoot)
 
 		nodes.PopulateFS(fixtureRoot, fs)
