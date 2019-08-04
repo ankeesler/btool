@@ -58,9 +58,10 @@ func (nodes Nodes) PopulateFS(root string, fs afero.Fs) {
 				content.WriteString(fmt.Sprintf("\n#include \"%s\"", dependency.Name))
 			}
 		}
-		//if node.ExtraContent != "" {
-		//	content.WriteString(node.ExtraContent)
-		//}
+
+		if node.Name == "main.c" {
+			content.WriteString("\nint main(int argc, char *argv[]) { return 0; }")
+		}
 
 		file := filepath.Join(root, node.Name)
 		dir := filepath.Dir(file)
