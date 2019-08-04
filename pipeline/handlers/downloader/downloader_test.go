@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/node/deps/downloader"
+	"github.com/ankeesler/btool/pipeline/handlers/downloader"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"

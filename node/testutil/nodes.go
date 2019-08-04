@@ -54,7 +54,7 @@ func (nodes Nodes) PopulateFS(root string, fs afero.Fs) {
 		content := bytes.NewBuffer([]byte{})
 		content.WriteString(fmt.Sprintf("// %s\n", node.Name))
 		for _, dependency := range node.Dependencies {
-			if strings.HasSuffix(dependency.Name, "h") {
+			if strings.HasSuffix(dependency.Name, ".h") {
 				content.WriteString(fmt.Sprintf("\n#include \"%s\"", dependency.Name))
 			}
 		}

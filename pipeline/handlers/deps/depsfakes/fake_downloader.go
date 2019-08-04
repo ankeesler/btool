@@ -4,7 +4,7 @@ package depsfakes
 import (
 	"sync"
 
-	"github.com/ankeesler/btool/node/deps"
+	"github.com/ankeesler/btool/pipeline/handlers/deps"
 	"github.com/spf13/afero"
 )
 

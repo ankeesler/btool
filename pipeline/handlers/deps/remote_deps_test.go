@@ -5,9 +5,9 @@ import (
 
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/deps"
-	"github.com/ankeesler/btool/node/deps/depsfakes"
 	"github.com/ankeesler/btool/node/testutil"
+	"github.com/ankeesler/btool/pipeline/handlers/deps"
+	"github.com/ankeesler/btool/pipeline/handlers/deps/depsfakes"
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/deps/includes"
+	"github.com/ankeesler/btool/pipeline/handlers/includes"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
