@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/pipeline"
 	"github.com/ankeesler/btool/pipeline/pipelinefakes"
 	"github.com/sirupsen/logrus"
@@ -17,9 +16,19 @@ func TestPipeline(t *testing.T) {
 	logrus.SetFormatter(formatter.New())
 
 	goodHandlerA := &pipelinefakes.FakeHandler{}
+	goodHandlerA.HandleStub = func(ctx *pipeline.Ctx) {
+		ctx.KV["key"] = "value"
+	}
 	goodHandlerB := &pipelinefakes.FakeHandler{}
+	goodHandlerB.HandleStub = func(ctx *pipeline.Ctx) {
+		if ctx.KV["key"] != "value" {
+			t.Error("expected kv entry")
+		}
+	}
 	badHandler := &pipelinefakes.FakeHandler{}
-	badHandler.HandleReturns(nil, errors.New("some error"))
+	badHandler.HandleStub = func(ctx *pipeline.Ctx) {
+		ctx.Err = errors.New("some error")
+	}
 	badHandler.NameReturns("bad handler")
 
 	ctx := pipeline.NewCtx()
@@ -41,7 +50,7 @@ func TestPipeline(t *testing.T) {
 	data := []struct {
 		ex              int
 		callCountFunc   func() int
-		argsForCallFunc func(int) (*pipeline.Ctx, []*node.Node)
+		argsForCallFunc func(int) *pipeline.Ctx
 	}{
 		{
 			ex:              2,
@@ -66,7 +75,7 @@ func TestPipeline(t *testing.T) {
 
 		ex := ctx
 		for i := 0; i < datum.callCountFunc(); i++ {
-			ac, _ := datum.argsForCallFunc(i)
+			ac := datum.argsForCallFunc(i)
 			if ex != ac {
 				t.Error(ex, "!=", ac)
 			}

@@ -4,24 +4,14 @@ package pipelinefakes
 import (
 	"sync"
 
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/pipeline"
 )
 
 type FakeHandler struct {
-	HandleStub        func(*pipeline.Ctx, []*node.Node) ([]*node.Node, error)
+	HandleStub        func(*pipeline.Ctx)
 	handleMutex       sync.RWMutex
 	handleArgsForCall []struct {
 		arg1 *pipeline.Ctx
-		arg2 []*node.Node
-	}
-	handleReturns struct {
-		result1 []*node.Node
-		result2 error
-	}
-	handleReturnsOnCall map[int]struct {
-		result1 []*node.Node
-		result2 error
 	}
 	NameStub        func() string
 	nameMutex       sync.RWMutex
@@ -37,28 +27,16 @@ type FakeHandler struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHandler) Handle(arg1 *pipeline.Ctx, arg2 []*node.Node) ([]*node.Node, error) {
-	var arg2Copy []*node.Node
-	if arg2 != nil {
-		arg2Copy = make([]*node.Node, len(arg2))
-		copy(arg2Copy, arg2)
-	}
+func (fake *FakeHandler) Handle(arg1 *pipeline.Ctx) {
 	fake.handleMutex.Lock()
-	ret, specificReturn := fake.handleReturnsOnCall[len(fake.handleArgsForCall)]
 	fake.handleArgsForCall = append(fake.handleArgsForCall, struct {
 		arg1 *pipeline.Ctx
-		arg2 []*node.Node
-	}{arg1, arg2Copy})
-	fake.recordInvocation("Handle", []interface{}{arg1, arg2Copy})
+	}{arg1})
+	fake.recordInvocation("Handle", []interface{}{arg1})
 	fake.handleMutex.Unlock()
 	if fake.HandleStub != nil {
-		return fake.HandleStub(arg1, arg2)
+		fake.HandleStub(arg1)
 	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.handleReturns
-	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *FakeHandler) HandleCallCount() int {
@@ -67,43 +45,17 @@ func (fake *FakeHandler) HandleCallCount() int {
 	return len(fake.handleArgsForCall)
 }
 
-func (fake *FakeHandler) HandleCalls(stub func(*pipeline.Ctx, []*node.Node) ([]*node.Node, error)) {
+func (fake *FakeHandler) HandleCalls(stub func(*pipeline.Ctx)) {
 	fake.handleMutex.Lock()
 	defer fake.handleMutex.Unlock()
 	fake.HandleStub = stub
 }
 
-func (fake *FakeHandler) HandleArgsForCall(i int) (*pipeline.Ctx, []*node.Node) {
+func (fake *FakeHandler) HandleArgsForCall(i int) *pipeline.Ctx {
 	fake.handleMutex.RLock()
 	defer fake.handleMutex.RUnlock()
 	argsForCall := fake.handleArgsForCall[i]
-	return argsForCall.arg1, argsForCall.arg2
-}
-
-func (fake *FakeHandler) HandleReturns(result1 []*node.Node, result2 error) {
-	fake.handleMutex.Lock()
-	defer fake.handleMutex.Unlock()
-	fake.HandleStub = nil
-	fake.handleReturns = struct {
-		result1 []*node.Node
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeHandler) HandleReturnsOnCall(i int, result1 []*node.Node, result2 error) {
-	fake.handleMutex.Lock()
-	defer fake.handleMutex.Unlock()
-	fake.HandleStub = nil
-	if fake.handleReturnsOnCall == nil {
-		fake.handleReturnsOnCall = make(map[int]struct {
-			result1 []*node.Node
-			result2 error
-		})
-	}
-	fake.handleReturnsOnCall[i] = struct {
-		result1 []*node.Node
-		result2 error
-	}{result1, result2}
+	return argsForCall.arg1
 }
 
 func (fake *FakeHandler) Name() string {

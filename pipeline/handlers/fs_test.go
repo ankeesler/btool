@@ -1,12 +1,12 @@
-package walker_test
+package handlers_test
 
 import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/testutil"
-	"github.com/ankeesler/btool/node/walker"
+	"github.com/ankeesler/btool/pipeline"
+	"github.com/ankeesler/btool/pipeline/handlers"
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -34,27 +34,27 @@ func TestHandle(t *testing.T) {
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
+			root := "/"
+
 			fs := afero.NewMemMapFs()
-			datum.exNodes.PopulateFS("/", fs)
+			datum.exNodes.PopulateFS(root, fs)
 
-			w := walker.New(fs)
+			h := handlers.NewWalker(fs)
 
-			cfg := node.Config{
-				Root: "/",
-			}
-			acNodes, err := w.Handle(&cfg, []*node.Node{})
+			ctx := pipeline.NewCtxBuilder().Root(root).Build()
+			h.Handle(ctx)
 			if datum.exSuccess {
-				if err != nil {
-					t.Fatal(err)
+				if ctx.Err != nil {
+					t.Fatal(ctx.Err)
 				}
 			} else {
-				if err == nil {
+				if ctx.Err == nil {
 					t.Fatal("expected failure")
 				}
 				return
 			}
 
-			if diff := deep.Equal(datum.exNodes.Cast(), acNodes); diff != nil {
+			if diff := deep.Equal(datum.exNodes.Cast(), ctx.Nodes); diff != nil {
 				t.Error(diff)
 			}
 		})

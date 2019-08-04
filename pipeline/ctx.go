@@ -1,6 +1,10 @@
 package pipeline
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/ankeesler/btool/node"
+)
 
 // The following are core pieces of information that apply to every member of
 // the Pipeline.
@@ -14,41 +18,27 @@ const (
 	CtxLinker     = "pipeline.linker"
 )
 
-// Ctx provides a key-value store of information about a particular Pipeline
-// instance. Members of the Pipeline can Get or Set keys on this store to provide
-// information to other members of the Pipeline.
+// Ctx provides 3 things:
+//   - the node.Node list on which this Pipeline is operating
+//   - an error that represents whether there has been a failure
+//   - a key-value store of information about a particular Pipeline
 type Ctx struct {
-	kv map[string][]string
+	Nodes []*node.Node
+	Err   error
+	KV    map[string]string
 }
 
-// NewCtx creates a new Ctx with an empty key-value store.
+// NewCtx creates a new Ctx with an empty node.Node list, nil error, and empty
+// key-value store.
 func NewCtx() *Ctx {
 	return &Ctx{
-		kv: make(map[string][]string),
+		Nodes: make([]*node.Node, 0),
+		Err:   nil,
+		KV:    make(map[string]string),
 	}
-}
-
-// Get returns the value associated with the key in the Ctx instance. Iff nil is
-// returned, then there is no value associated with this key.
-func (ctx *Ctx) Get(key string) []string {
-	return ctx.kv[key]
-}
-
-// Set appends the provided value to array associated with the provided key. The
-// same Ctx object is returned in order to make calling this multiple times
-// easier.
-//   ctx := NewCtx().Append("a", "b").Append("a", "c").Append("z", "y")
-func (ctx *Ctx) Append(key, value string) *Ctx {
-	valueCurrent := ctx.kv[key]
-	if valueCurrent == nil {
-		valueCurrent = make([]string, 0)
-		ctx.kv[key] = valueCurrent
-	}
-	valueCurrent = append(valueCurrent, value)
-	return ctx
 }
 
 // String returns a string representation of the Ctx.
 func (ctx *Ctx) String() string {
-	return fmt.Sprintf("%s", ctx.kv)
+	return fmt.Sprintf("%s/%s/%s", ctx.Nodes, ctx.Err, ctx.KV)
 }
