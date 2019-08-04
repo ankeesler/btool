@@ -26,7 +26,7 @@ func NewFS(effess afero.Fs) pipeline.Handler {
 func (fs *fs) Handle(ctx *pipeline.Ctx) {
 	root := ctx.KV[pipeline.CtxRoot]
 
-	logrus.Info("scanning from root " + root)
+	logrus.Debugf("scanning from root %s", root)
 
 	if err := afero.Walk(
 		fs.effess,

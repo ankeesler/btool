@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -8,32 +9,67 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	genfixture, err := build("github.com/ankeesler/btool/node/cmd/genfixture")
+	genfixture, err := build("github.com/ankeesler/btool/cmd/genfixture")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	build, err := build("github.com/ankeesler/btool/node/cmd/build")
+	build, err := build("github.com/ankeesler/btool/cmd/btool")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	root := filepath.Join(os.TempDir(), "btool_node_integration_test")
-	os.RemoveAll(root)
-	os.MkdirAll(root, 0755)
-	if err := exec.Command(genfixture, "-root", root).Run(); err != nil {
+	tmpDir, err := ioutil.TempDir("", "btool_node_integration_test")
+	if err != nil {
 		t.Fatal(err)
 	}
+	//defer os.RemoveAll(tmpDir)
+
+	if err := exec.Command(genfixture, "-root", tmpDir).Run(); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log("tmpDir:", tmpDir)
 
 	t.Run("Object", func(t *testing.T) {
-		if err := exec.Command(
-			build,
-			"-target",
-			"main.o",
-			"-root",
-			root,
-		).Run(); err != nil {
-			t.Error(err)
+		names := []string{"BasicC", "BasicCC"}
+		for _, name := range names {
+			t.Run(name, func(t *testing.T) {
+				root := filepath.Join(tmpDir, name)
+
+				if output, err := exec.Command(
+					build,
+					"-target",
+					"main.o",
+					"-root",
+					root,
+				).CombinedOutput(); err != nil {
+					t.Error(err, ":", string(output))
+				}
+			})
+		}
+	})
+
+	t.Run("Executable", func(t *testing.T) {
+		names := []string{"BasicC", "BasicCC"}
+		for _, name := range names {
+			t.Run(name, func(t *testing.T) {
+				root := filepath.Join(tmpDir, name)
+
+				if output, err := exec.Command(
+					build,
+					"-target",
+					"main",
+					"-root",
+					root,
+				).CombinedOutput(); err != nil {
+					t.Error(err, ":", string(output))
+				}
+
+				if err := exec.Command(filepath.Join(root, "main")).Run(); err != nil {
+					t.Error(err)
+				}
+			})
 		}
 	})
 }

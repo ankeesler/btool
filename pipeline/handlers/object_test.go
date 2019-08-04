@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
@@ -20,17 +21,14 @@ func TestObject(t *testing.T) {
 	data := []struct {
 		name  string
 		nodes testutil.Nodes
-		ext   string
 	}{
 		{
 			name:  "BasicC",
 			nodes: testutil.BasicNodesC.Copy(),
-			ext:   ".c",
 		},
 		{
 			name:  "BasicCC",
 			nodes: testutil.BasicNodesCC.Copy(),
-			ext:   ".cc",
 		},
 	}
 
@@ -58,15 +56,16 @@ func TestObject(t *testing.T) {
 			).Build()
 
 			var compiler string
-			if datum.ext == ".c" {
-				compiler = compilerC
-			} else if datum.ext == ".cc" {
+			var ext string
+			if strings.HasSuffix(datum.name, "CC") {
 				compiler = compilerCC
+				ext = ".cc"
 			} else {
-				t.Fatalf("unknown compiler for extension %s", datum.ext)
+				compiler = compilerC
+				ext = ".c"
 			}
 
-			source := "dep-1/dep-1" + datum.ext
+			source := "dep-1/dep-1" + ext
 			sourceN := node.Find(source, ctx.Nodes)
 			if sourceN == nil {
 				t.Fatal()

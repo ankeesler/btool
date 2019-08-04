@@ -2,6 +2,7 @@ package btool
 
 import (
 	"github.com/ankeesler/btool/pipeline"
+	"github.com/ankeesler/btool/pipeline/handlers"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
@@ -23,29 +24,23 @@ type Cfg struct {
 func Build(cfg *Cfg) error {
 	fs := afero.NewOsFs()
 
-	ctx := pipeline.NewCtx().Append(
-		pipeline.CtxRoot,
+	ctx := pipeline.NewCtxBuilder().Root(
 		cfg.Root,
-	).Append(
-		pipeline.CtxCache,
+	).Cache(
 		cfg.Cache,
-	).Append(
-		pipeline.CtxTarget,
+	).Target(
 		cfg.Target,
-	).Append(
-		pipeline.CtxCompilerC,
+	).CompilerC(
 		cfg.CompilerC,
-	).Append(
-		pipeline.CtxCompilerCC,
+	).CompilerCC(
 		cfg.CompilerCC,
-	).Append(
-		pipeline.CtxLinker,
+	).Linker(
 		cfg.Linker,
-	)
+	).Build()
 
 	p := pipeline.New(
 		ctx,
-		handlers.NewWalker(fs),
+		handlers.NewFS(fs),
 		handlers.NewDepsLocal(fs),
 		handlers.NewObject(),
 		handlers.NewExecutable(),

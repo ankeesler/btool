@@ -59,7 +59,12 @@ func objectNFromSourceN(ctx *pipeline.Ctx, sourceN *node.Node) *node.Node {
 	ext := filepath.Ext(sourceN.Name)
 	object := strings.ReplaceAll(sourceN.Name, ext, ".o")
 
-	logrus.Debugf("adding %s -> %s", object, sourceN.Name)
+	logrus.Debugf(
+		"adding %s -> %s with compiler %s",
+		object,
+		sourceN.Name,
+		compiler,
+	)
 	objectN := node.New(object).Dependency(sourceN)
 	objectN.Resolver = resolvers.NewCompile(root, compiler, []string{root})
 
@@ -70,9 +75,9 @@ func getCompiler(ctx *pipeline.Ctx, n *node.Node) string {
 	ext := filepath.Ext(n.Name)
 	switch ext {
 	case ".c":
-		return ctx.KV[pipeline.CtxCompilerCC]
-	case ".cc":
 		return ctx.KV[pipeline.CtxCompilerC]
+	case ".cc":
+		return ctx.KV[pipeline.CtxCompilerCC]
 	default:
 		return ""
 	}

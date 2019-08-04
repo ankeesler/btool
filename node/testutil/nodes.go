@@ -59,7 +59,7 @@ func (nodes Nodes) PopulateFS(root string, fs afero.Fs) {
 			}
 		}
 
-		if node.Name == "main.c" {
+		if node.Name == "main.c" || node.Name == "main.cc" {
 			content.WriteString("\nint main(int argc, char *argv[]) { return 0; }")
 		}
 

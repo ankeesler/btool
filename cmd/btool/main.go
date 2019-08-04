@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/ankeesler/btool"
-	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/formatter"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -16,6 +15,7 @@ func main() {
 	logrus.SetFormatter(formatter.New())
 	if err := run(); err != nil {
 		logrus.Error(err)
+		os.Exit(1)
 	}
 }
 
@@ -32,23 +32,22 @@ func run() error {
 		os.Exit(1)
 	}
 
-	level, err := logrus.ParseLevel(logLevel)
+	level, err := logrus.ParseLevel(*loglevel)
 	if err != nil {
 		return errors.Wrap(err, "parse log level")
 	}
 	logrus.SetLevel(level)
 
 	cfg := btool.Cfg{
-		Root:   root,
-		Cache:  cache,
-		Target: target,
+		Root:   *root,
+		Cache:  *cache,
+		Target: *target,
 
 		CompilerC:  "clang",
 		CompilerCC: "clang++",
 		Linker:     "clang",
 	}
-	b := builder.New(&cfg)
-	if err := b.Build(); err != nil {
+	if err := btool.Build(&cfg); err != nil {
 		return errors.Wrap(err, "build")
 	}
 
