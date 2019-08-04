@@ -1,4 +1,4 @@
-package objecter
+package resolvers
 
 import (
 	"os/exec"
@@ -8,14 +8,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type linker struct {
-	link string
-	dir  string
+type link struct {
+	dir    string
+	linker string
 }
 
-func (l *linker) Resolve(n *node.Node) error {
+// NewLink returns a node.Resolver that links a bunch of object files into
+// an executable.
+func NewLink(dir, linker string) node.Resolver {
+	return &link{
+		dir:    dir,
+		linker: linker,
+	}
+}
+
+func (l *link) Resolve(n *node.Node) error {
 	cmd := exec.Command(
-		l.link,
+		l.linker,
 		"-o",
 		n.Name,
 	)

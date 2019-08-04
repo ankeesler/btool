@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"sort"
-
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/pipeline"
 )
@@ -17,16 +15,7 @@ func NewSortAlpha() pipeline.Handler {
 }
 
 func (sa *sortAlpha) Handle(ctx *pipeline.Ctx) {
-	sorht(ctx.Nodes)
-	for _, n := range ctx.Nodes {
-		sorht(n.Dependencies)
-	}
-}
-
-func sorht(nodes []*node.Node) {
-	sort.Slice(nodes, func(i, j int) bool {
-		return nodes[i].Name < nodes[j].Name
-	})
+	node.SortAlpha(ctx.Nodes)
 }
 
 func (sa *sortAlpha) Name() string { return "alpha sort" }
