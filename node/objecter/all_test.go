@@ -37,10 +37,10 @@ func TestHandle(t *testing.T) {
 			fs := afero.NewMemMapFs()
 			datum.exNodes.PopulateFS("/", fs)
 
-			w := objecter.New()
+			a := objecter.NewAll()
 
 			cfg := node.Config{}
-			acNodes, err := w.Handle(&cfg, datum.nodes.Copy())
+			acNodes, err := a.Handle(&cfg, datum.nodes.Copy())
 			if err != nil {
 				t.Fatal(err)
 			}

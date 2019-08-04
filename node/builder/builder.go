@@ -17,7 +17,7 @@ func New() *Builder {
 }
 
 func (b *Builder) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
-	n := findNode(cfg.Target, nodes)
+	n := node.Find(cfg.Target, nodes)
 	if n == nil {
 		return nil, fmt.Errorf("unknown target %s", cfg.Target)
 	}
@@ -27,15 +27,6 @@ func (b *Builder) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, er
 	}
 
 	return nodes, nil
-}
-
-func findNode(target string, nodes []*node.Node) *node.Node {
-	for _, n := range nodes {
-		if n.Name == target {
-			return n
-		}
-	}
-	return nil
 }
 
 func build(n *node.Node) error {
