@@ -11,25 +11,25 @@ import (
 	"github.com/spf13/afero"
 )
 
-type walker struct {
-	fs afero.Fs
+type fs struct {
+	effess afero.Fs
 }
 
-// NewWalker creates pipeline.Handler that walks a file tree from a root and
+// NewFile creates pipeline.Handler that walks a file tree from a root and
 // collects .c/.cc and .h files.
-func NewWalker(fs afero.Fs) pipeline.Handler {
-	return &walker{
-		fs: fs,
+func NewFS(effess afero.Fs) pipeline.Handler {
+	return &fs{
+		effess: effess,
 	}
 }
 
-func (w *walker) Handle(ctx *pipeline.Ctx) {
+func (fs *fs) Handle(ctx *pipeline.Ctx) {
 	root := ctx.KV[pipeline.CtxRoot]
 
 	logrus.Info("scanning from root " + root)
 
 	if err := afero.Walk(
-		w.fs,
+		fs.effess,
 		root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -63,4 +63,4 @@ func (w *walker) Handle(ctx *pipeline.Ctx) {
 	}
 }
 
-func (w *walker) Name() string { return "walker" }
+func (fs *fs) Name() string { return "fs" }

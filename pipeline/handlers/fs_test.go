@@ -23,12 +23,12 @@ func TestHandle(t *testing.T) {
 	}{
 		{
 			name:      "BasicC",
-			exNodes:   testutil.BasicNodesC.WithoutDependencies(),
+			exNodes:   testutil.BasicNodesC.Copy().WithoutDependencies(),
 			exSuccess: true,
 		},
 		{
 			name:      "BasicCC",
-			exNodes:   testutil.BasicNodesCC.WithoutDependencies(),
+			exNodes:   testutil.BasicNodesCC.Copy().WithoutDependencies(),
 			exSuccess: true,
 		},
 	}
@@ -39,7 +39,7 @@ func TestHandle(t *testing.T) {
 			fs := afero.NewMemMapFs()
 			datum.exNodes.PopulateFS(root, fs)
 
-			h := handlers.NewWalker(fs)
+			h := handlers.NewFS(fs)
 
 			ctx := pipeline.NewCtxBuilder().Root(root).Build()
 			h.Handle(ctx)
