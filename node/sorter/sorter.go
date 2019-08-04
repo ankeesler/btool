@@ -1,4 +1,6 @@
 // Package sorter provides a node.Handler that performs a topological sort on nodes.
+//
+// It also provides an alphabetical sorter (Alpha).
 package sorter
 
 import (

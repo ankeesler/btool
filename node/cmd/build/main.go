@@ -46,7 +46,7 @@ func main() {
 		walker.New(fs),
 		deps.NewLocal(fs),
 		objecter.New(),
-		sorter.New(),
+		sorter.NewAlpha(),
 		resolver.NewNoop(),
 		builder.New(),
 	); err != nil {

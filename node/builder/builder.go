@@ -42,11 +42,13 @@ func build(n *node.Node) error {
 	logrus.Debugf("building %s", n.Name)
 
 	for _, d := range n.Dependencies {
+		logrus.Debugf("building dependency %s", d.Name)
 		if err := build(d); err != nil {
 			return errors.Wrap(err, "build "+d.Name)
 		}
 	}
 
+	logrus.Debugf("resolving %s", n.Name)
 	if err := n.Resolver.Resolve(n); err != nil {
 		return errors.Wrap(err, "resolve "+n.Name)
 	}
