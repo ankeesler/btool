@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/afero"
 )
 
-func TestHandle(t *testing.T) {
+func TestFS(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 

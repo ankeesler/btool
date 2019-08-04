@@ -1,4 +1,4 @@
-package sorter_test
+package handlers_test
 
 import (
 	"reflect"
@@ -6,16 +6,16 @@ import (
 
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/sorter"
+	"github.com/ankeesler/btool/pipeline"
+	"github.com/ankeesler/btool/pipeline/handlers"
 	"github.com/sirupsen/logrus"
 )
 
-func TestAlphaHandle(t *testing.T) {
+func TestSortAlpha(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(formatter.New())
 
-	s := sorter.NewAlpha()
-	cfg := node.Config{}
+	h := handlers.NewSortAlpha()
 
 	nodeA := node.New("a")
 	nodeB := node.New("b")
@@ -36,9 +36,10 @@ func TestAlphaHandle(t *testing.T) {
 		nodeCCpy.Dependency(node3).Dependency(node2).Dependency(node1),
 	}
 
-	ac, err := s.Handle(&cfg, nodes)
-	if err != nil {
-		t.Error(err)
+	ctx := pipeline.NewCtxBuilder().Nodes(nodes).Build()
+	h.Handle(ctx)
+	if ctx.Err != nil {
+		t.Error(ctx.Err)
 	}
 
 	ex := []*node.Node{
@@ -46,7 +47,7 @@ func TestAlphaHandle(t *testing.T) {
 		nodeB,
 		nodeC.Dependency(node1).Dependency(node2).Dependency(node3),
 	}
-	if !reflect.DeepEqual(ex, ac) {
-		t.Error(ex, "!=", ac)
+	if !reflect.DeepEqual(ex, ctx.Nodes) {
+		t.Error(ex, "!=", ctx.Nodes)
 	}
 }

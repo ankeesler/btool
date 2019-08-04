@@ -1,24 +1,26 @@
-// Package sorter provides a node.Handler that performs a topological sort on nodes.
-//
-// It also provides an alphabetical sorter (Alpha).
-package sorter
+package handlers
 
 import (
-	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/pipeline"
 	"github.com/sirupsen/logrus"
 )
 
-type Sorter struct {
+type sortTopo struct {
 }
 
-func New() *Sorter {
-	return &Sorter{}
+// NewSortTopo provides a pipeline.Handler that sorts a node.Node list in
+// topological order.
+func NewSortTopo() pipeline.Handler {
+	return &sortTopo{}
 }
 
-func (s *Sorter) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
+func (st *sortTopo) Handle(ctx *pipeline.Ctx) {
+	nodes := ctx.Nodes
+
 	logrus.Debugf("sorting %d nodes", len(nodes))
 
 	sorted := make([]*node.Node, 0, len(nodes))
@@ -29,7 +31,8 @@ func (s *Sorter) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, err
 		logrus.Debug("nodesWithoutDependencies:", nodesWithoutDependencies)
 
 		if len(nodesWithoutDependencies) == 0 {
-			return nil, errors.New("cycle detected")
+			ctx.Err = fmt.Errorf("cycle detected, cannot proceed past %v", sortedSet)
+			return
 		}
 
 		sorted = append(sorted, nodesWithoutDependencies...)
@@ -38,8 +41,10 @@ func (s *Sorter) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, err
 		}
 	}
 
-	return sorted, nil
+	ctx.Nodes = sorted
 }
+
+func (st *sortTopo) Name() string { return "topo sort" }
 
 func collectNodesWithoutDependencies(
 	nodes []*node.Node,
