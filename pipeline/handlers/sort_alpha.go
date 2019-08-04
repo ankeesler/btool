@@ -12,7 +12,7 @@ type sortAlpha struct {
 
 // NewSortAlpha returns a pipeline.Handler that sorts a node.Node list and its
 // dependencies in alphanumeric order.
-func NewSortAlpha() *sortAlpha {
+func NewSortAlpha() pipeline.Handler {
 	return &sortAlpha{}
 }
 

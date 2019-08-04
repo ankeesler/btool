@@ -29,6 +29,13 @@ node/
     nodes.go
     basic_nodes.go
     testutil.go
+  resolver/
+    compile.go
+    link.go
+    generate_c.go
+    generate_cc.go
+    generate_h.go
+    noop.go
 pipeline/
   pipeline.go
   pipeline_test.go
