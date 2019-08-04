@@ -32,9 +32,7 @@ func (o *Objecter) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, e
 		d = c
 	} else if cc != nil {
 		d = cc
-	}
-
-	if d == nil {
+	} else if d == nil {
 		return nil, fmt.Errorf("unknown source for object %s", cfg.Target)
 	}
 

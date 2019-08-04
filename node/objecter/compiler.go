@@ -32,7 +32,7 @@ func (c *compiler) Resolve(n *node.Node) error {
 	}
 	cmd.Dir = c.dir
 
-	logrus.Debugf("running %s from %s", cmd.Args, cmd.Dir)
+	logrus.Debugf("compiler: running %s from %s", cmd.Args, cmd.Dir)
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(o))

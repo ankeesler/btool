@@ -46,6 +46,12 @@ func (w *Walker) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, err
 				logrus.Debugf("looking at file %s", rootRelPath)
 			}
 
+			ext := filepath.Ext(rootRelPath)
+			if ext != ".c" && ext != ".cc" && ext != ".h" {
+				return nil
+			}
+
+			logrus.Debugf("adding node %s", rootRelPath)
 			nodes = append(nodes, node.New(rootRelPath))
 
 			return nil
