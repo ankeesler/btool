@@ -21,7 +21,6 @@ pipeline/
     object.go
     all_object.go
     executable.go
-
 node/
   node.go
   util.go

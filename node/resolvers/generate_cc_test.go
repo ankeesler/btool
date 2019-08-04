@@ -1,4 +1,4 @@
-package generator_test
+package resolvers_test
 
 //import (
 //	"fmt"
