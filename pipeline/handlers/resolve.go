@@ -1,33 +1,39 @@
-// Package builder provides a node.Handler that actually runs the node.Resolver's
-// in the node list.
-package builder
+package handlers
 
 import (
 	"fmt"
 
 	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/pipeline"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
-type Builder struct{}
+type resolve struct{}
 
-func New() *Builder {
-	return &Builder{}
+// NewResolve returns a pipeline.Handler that runs all of the node.Resolver graph
+// for a particular target.
+func NewResolve() pipeline.Handler {
+	return &resolve{}
 }
 
-func (b *Builder) Handle(cfg *node.Config, nodes []*node.Node) ([]*node.Node, error) {
-	n := node.Find(cfg.Target, nodes)
+func (r *resolve) Handle(ctx *pipeline.Ctx) {
+	target := ctx.KV[pipeline.CtxTarget]
+	nodes := ctx.Nodes
+
+	n := node.Find(target, nodes)
 	if n == nil {
-		return nil, fmt.Errorf("unknown target %s", cfg.Target)
+		ctx.Err = fmt.Errorf("unknown target %s", target)
+		return
 	}
 
 	if err := build(n); err != nil {
-		return nil, errors.Wrap(err, "build")
+		ctx.Err = errors.Wrap(err, "build")
+		return
 	}
-
-	return nodes, nil
 }
+
+func (r *resolve) Name() string { return "resolve" }
 
 func build(n *node.Node) error {
 	logrus.Debugf("building %s", n.Name)
