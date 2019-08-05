@@ -1,6 +1,8 @@
 // Package node provides a project-wide abstraction of a build-able unit.
 package node
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Resolver
+
 // A Resolver interface is something that brings a node into existence on disk.
 //
 // For example, it might write out a file that a node is representing.
