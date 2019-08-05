@@ -44,7 +44,7 @@ func Build(cfg *Cfg) error {
 		handlers.NewDepsLocal(fs),
 		handlers.NewObject(),
 		handlers.NewExecutable(),
-		handlers.NewResolve(),
+		handlers.NewResolve(fs),
 	)
 	if err := p.Run(); err != nil {
 		return errors.Wrap(err, "pipeline run")
