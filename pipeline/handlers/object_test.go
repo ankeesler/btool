@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -70,7 +71,8 @@ func TestObject(t *testing.T) {
 			if sourceN == nil {
 				t.Fatal()
 			}
-			objectN := node.New(target).Dependency(sourceN)
+			name := filepath.Join(cache, filepath.Base(root), target)
+			objectN := node.New(name).Dependency(sourceN)
 			objectN.Resolver = resolvers.NewCompile(root, compiler, []string{root})
 			exNodes := append(datum.nodes.Copy().Cast(), objectN)
 

@@ -31,8 +31,11 @@ func (r *resolve) Handle(ctx *pipeline.Ctx) {
 
 	n := node.Find(target, nodes)
 	if n == nil {
-		ctx.Err = fmt.Errorf("unknown target %s", target)
-		return
+		n = node.Find(makeCachePath(ctx, target), nodes)
+		if n == nil {
+			ctx.Err = fmt.Errorf("unknown target %s", target)
+			return
+		}
 	}
 
 	built := make(map[*node.Node]bool)
@@ -69,30 +72,34 @@ func (r *resolve) resolve(
 		}
 	}
 
-	file := filepath.Join(ctx.KV[pipeline.CtxRoot], n.Name)
-	logrus.Debugf("resolving %s", file)
+	logrus.Debugf("resolving %s", n.Name)
 
 	var t time.Time
 	if n.Resolver != nil {
 		exists := true
-		stat, err := r.fs.Stat(file)
+		stat, err := r.fs.Stat(n.Name)
 		if err != nil {
 			if !os.IsNotExist(err) {
-				return time.Time{}, errors.Wrap(err, "stat "+file)
+				return time.Time{}, errors.Wrap(err, "stat "+n.Name)
 			} else {
 				exists = false
 			}
 		}
 
 		if !exists || latestT.After(stat.ModTime()) {
+			dir := filepath.Dir(n.Name)
+			if err := r.fs.MkdirAll(dir, 0755); err != nil {
+				return time.Time{}, errors.Wrap(err, "mkdir "+dir)
+			}
+
 			if err := n.Resolver.Resolve(n); err != nil {
 				return time.Time{}, errors.Wrap(err, "resolve "+n.Name)
 			}
 		}
 
-		stat, err = r.fs.Stat(file)
+		stat, err = r.fs.Stat(n.Name)
 		if err != nil {
-			return time.Time{}, errors.Wrap(err, "stat "+file)
+			return time.Time{}, errors.Wrap(err, "stat "+n.Name)
 		}
 		t = stat.ModTime()
 	}

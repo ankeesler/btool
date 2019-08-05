@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -37,6 +38,7 @@ func TestExecutable(t *testing.T) {
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			root := "/root"
+			cache := "/cache"
 			target := "main"
 			compilerC := "cc"
 			compilerCC := "c++"
@@ -47,6 +49,8 @@ func TestExecutable(t *testing.T) {
 				datum.nodes,
 			).Root(
 				root,
+			).Cache(
+				cache,
 			).Target(
 				target,
 			).CompilerC(
@@ -68,7 +72,8 @@ func TestExecutable(t *testing.T) {
 				compiler = compilerC
 			}
 
-			executableN := node.New(target)
+			name := filepath.Join(cache, filepath.Base(root), target)
+			executableN := node.New(name)
 			executableN.Resolver = resolvers.NewLink(root, linker)
 
 			exNodes := datum.nodesWithObjects
@@ -76,6 +81,8 @@ func TestExecutable(t *testing.T) {
 			for _, n := range exNodes {
 				if strings.HasSuffix(n.Name, ".o") {
 					executableN.Dependency(n)
+
+					n.Name = filepath.Join(cache, filepath.Base(root), n.Name)
 					n.Resolver = resolvers.NewCompile(root, compiler, []string{root})
 				}
 			}

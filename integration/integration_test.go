@@ -36,6 +36,7 @@ func TestBuild(t *testing.T) {
 		for _, name := range names {
 			t.Run(name, func(t *testing.T) {
 				root := filepath.Join(tmpDir, name)
+				cache := filepath.Join(tmpDir, "cache")
 
 				if output, err := exec.Command(
 					build,
@@ -43,6 +44,8 @@ func TestBuild(t *testing.T) {
 					"main.o",
 					"-root",
 					root,
+					"-cache",
+					cache,
 				).CombinedOutput(); err != nil {
 					t.Error(err, ":", string(output))
 				}
@@ -55,6 +58,7 @@ func TestBuild(t *testing.T) {
 		for _, name := range names {
 			t.Run(name, func(t *testing.T) {
 				root := filepath.Join(tmpDir, name)
+				cache := filepath.Join(tmpDir, "cache")
 
 				if output, err := exec.Command(
 					build,
@@ -62,11 +66,15 @@ func TestBuild(t *testing.T) {
 					"main",
 					"-root",
 					root,
+					"-cache",
+					cache,
 				).CombinedOutput(); err != nil {
 					t.Error(err, ":", string(output))
 				}
 
-				if err := exec.Command(filepath.Join(root, "main")).Run(); err != nil {
+				if err := exec.Command(
+					filepath.Join(cache, filepath.Base(root), "main"),
+				).Run(); err != nil {
 					t.Error(err)
 				}
 			})

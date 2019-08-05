@@ -50,7 +50,8 @@ func (e *executable) Handle(ctx *pipeline.Ctx) {
 	objectNodes = collectObjects(ctx, dN, objectNodes)
 
 	linker := ctx.KV[pipeline.CtxLinker]
-	targetN := node.New(target)
+	name := makeCachePath(ctx, target)
+	targetN := node.New(name)
 	for _, objectN := range objectNodes {
 		ctx.Nodes = append(ctx.Nodes, objectN)
 		targetN.Dependency(objectN)
