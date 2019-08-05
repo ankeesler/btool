@@ -31,16 +31,13 @@ func (r *resolve) Handle(ctx *pipeline.Ctx) {
 
 	n := node.Find(target, nodes)
 	if n == nil {
-		n = node.Find(makeCachePath(ctx, target), nodes)
-		if n == nil {
-			ctx.Err = fmt.Errorf("unknown target %s", target)
-			return
-		}
+		ctx.Err = fmt.Errorf("unknown target %s", target)
+		return
 	}
 
 	built := make(map[*node.Node]bool)
 	if _, err := r.resolve(ctx, n, built); err != nil {
-		ctx.Err = errors.Wrap(err, "build")
+		ctx.Err = errors.Wrap(err, "resolve")
 		return
 	}
 }
@@ -56,15 +53,15 @@ func (r *resolve) resolve(
 		return time.Time{}, nil
 	}
 
-	logrus.Debugf("building %s", n.Name)
+	logrus.Debugf("resolving %s", n.Name)
 
 	latestT := time.Unix(0, 0)
 	for _, d := range n.Dependencies {
-		logrus.Debugf("building dependency %s", d.Name)
+		logrus.Debugf("resolving dependency %s", d.Name)
 
 		t, err := r.resolve(ctx, d, built)
 		if err != nil {
-			return time.Time{}, errors.Wrap(err, "build "+d.Name)
+			return time.Time{}, errors.Wrap(err, "resolve "+d.Name)
 		}
 
 		if t.After(latestT) {
@@ -72,7 +69,7 @@ func (r *resolve) resolve(
 		}
 	}
 
-	logrus.Debugf("resolving %s", n.Name)
+	logrus.Debugf("really resolving %s", n.Name)
 
 	var t time.Time
 	if n.Resolver != nil {
@@ -93,7 +90,7 @@ func (r *resolve) resolve(
 			}
 
 			if err := n.Resolver.Resolve(n); err != nil {
-				return time.Time{}, errors.Wrap(err, "resolve "+n.Name)
+				return time.Time{}, errors.Wrap(err, "really resolve "+n.Name)
 			}
 		}
 

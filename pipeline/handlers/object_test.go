@@ -76,6 +76,10 @@ func TestObject(t *testing.T) {
 			objectN.Resolver = resolvers.NewCompile(root, compiler, []string{root})
 			exNodes := append(datum.nodes.Copy().Cast(), objectN)
 
+			symlinkN := node.New(target).Dependency(objectN)
+			symlinkN.Resolver = resolvers.NewSymlink()
+			exNodes = append(exNodes, symlinkN)
+
 			h.Handle(ctx)
 			if ctx.Err != nil {
 				t.Error(ctx.Err)

@@ -23,13 +23,18 @@ func TestBuild(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//defer os.RemoveAll(tmpDir)
+	defer os.RemoveAll(tmpDir)
 
 	if err := exec.Command(genfixture, "-root", tmpDir).Run(); err != nil {
 		t.Fatal(err)
 	}
 
 	t.Log("tmpDir:", tmpDir)
+
+	wd := filepath.Join(tmpDir, "wd")
+	if err := os.Mkdir(wd, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Run("Object", func(t *testing.T) {
 		names := []string{"BasicC", "BasicCC"}
@@ -38,7 +43,7 @@ func TestBuild(t *testing.T) {
 				root := filepath.Join(tmpDir, name)
 				cache := filepath.Join(tmpDir, "cache")
 
-				if output, err := exec.Command(
+				cmd := exec.Command(
 					build,
 					"-target",
 					"main.o",
@@ -46,8 +51,10 @@ func TestBuild(t *testing.T) {
 					root,
 					"-cache",
 					cache,
-				).CombinedOutput(); err != nil {
-					t.Error(err, ":", string(output))
+				)
+				cmd.Dir = wd
+				if output, err := cmd.CombinedOutput(); err != nil {
+					t.Fatal(err, ":", string(output))
 				}
 			})
 		}
@@ -60,7 +67,7 @@ func TestBuild(t *testing.T) {
 				root := filepath.Join(tmpDir, name)
 				cache := filepath.Join(tmpDir, "cache")
 
-				if output, err := exec.Command(
+				cmd := exec.Command(
 					build,
 					"-target",
 					"main",
@@ -68,8 +75,10 @@ func TestBuild(t *testing.T) {
 					root,
 					"-cache",
 					cache,
-				).CombinedOutput(); err != nil {
-					t.Error(err, ":", string(output))
+				)
+				cmd.Dir = wd
+				if output, err := cmd.CombinedOutput(); err != nil {
+					t.Fatal(err, ":", string(output))
 				}
 
 				if err := exec.Command(

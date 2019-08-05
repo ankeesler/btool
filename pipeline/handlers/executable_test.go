@@ -87,6 +87,10 @@ func TestExecutable(t *testing.T) {
 				}
 			}
 
+			symlinkN := node.New(target).Dependency(executableN)
+			symlinkN.Resolver = resolvers.NewSymlink()
+			exNodes = append(exNodes, symlinkN)
+
 			node.SortAlpha(ctx.Nodes)
 			node.SortAlpha(exNodes)
 

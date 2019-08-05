@@ -58,6 +58,10 @@ func (e *executable) Handle(ctx *pipeline.Ctx) {
 	}
 	targetN.Resolver = resolvers.NewLink(ctx.KV[pipeline.CtxRoot], linker)
 	ctx.Nodes = append(ctx.Nodes, targetN)
+
+	symlinkN := node.New(target).Dependency(targetN)
+	symlinkN.Resolver = resolvers.NewSymlink()
+	ctx.Nodes = append(ctx.Nodes, symlinkN)
 }
 
 func (e *executable) Name() string { return "executable" }

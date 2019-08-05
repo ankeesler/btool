@@ -48,6 +48,10 @@ func (o *object) Handle(ctx *pipeline.Ctx) {
 
 	objectN := objectNFromSourceN(ctx, dN)
 	ctx.Nodes = append(ctx.Nodes, objectN)
+
+	symlinkN := node.New(target).Dependency(objectN)
+	symlinkN.Resolver = resolvers.NewSymlink()
+	ctx.Nodes = append(ctx.Nodes, symlinkN)
 }
 
 func (o *object) Name() string { return "object" }
