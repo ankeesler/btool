@@ -24,71 +24,54 @@ func TestBuild(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(tmpDir)
-
-	if err := exec.Command(genfixture, "-root", tmpDir).Run(); err != nil {
-		t.Fatal(err)
-	}
-
 	t.Log("tmpDir:", tmpDir)
 
-	wd := filepath.Join(tmpDir, "wd")
-	if err := os.Mkdir(wd, 0755); err != nil {
-		t.Fatal(err)
+	testCases := []testCase{
+		{
+			name:     "object",
+			testFunc: object,
+		},
+		{
+			name:     "executable",
+			testFunc: executable,
+		},
 	}
 
-	t.Run("Object", func(t *testing.T) {
-		names := []string{"BasicC", "BasicCC"}
-		for _, name := range names {
-			t.Run(name, func(t *testing.T) {
-				root := filepath.Join(tmpDir, name)
-				cache := filepath.Join(tmpDir, "cache")
-
-				cmd := exec.Command(
-					btool,
-					"-target",
-					"dep-0/dep-0.o",
-					"-root",
-					root,
-					"-cache",
-					cache,
-				)
-				cmd.Dir = wd
-				if output, err := cmd.CombinedOutput(); err != nil {
-					t.Fatal(err, ":", string(output))
-				}
-			})
+	for _, testCase := range testCases {
+		testCaseTmpDir := filepath.Join(tmpDir, testCase.name)
+		testCaseFixturesTmpDir := filepath.Join(testCaseTmpDir, "fixtures")
+		if err := exec.Command(
+			genfixture,
+			"-root",
+			testCaseFixturesTmpDir,
+		).Run(); err != nil {
+			t.Fatal(err)
 		}
-	})
 
-	t.Run("Executable", func(t *testing.T) {
-		names := []string{"BasicC", "BasicCC"}
-		for _, name := range names {
-			t.Run(name, func(t *testing.T) {
-				root := filepath.Join(tmpDir, name)
-				cache := filepath.Join(tmpDir, "cache")
+		t.Run(testCase.name, func(t *testing.T) {
+			fixtures := []string{"BasicC", "BasicCC"}
+			for _, fixture := range fixtures {
+				t.Run(fixture, func(t *testing.T) {
+					testCaseFixtureTmpDir := filepath.Join(testCaseTmpDir, fixture)
 
-				cmd := exec.Command(
-					btool,
-					"-target",
-					"main",
-					"-root",
-					root,
-					"-cache",
-					cache,
-				)
-				cmd.Dir = wd
-				if output, err := cmd.CombinedOutput(); err != nil {
-					t.Fatal(err, ":", string(output))
-				}
+					wd := filepath.Join(testCaseFixtureTmpDir, "wd")
+					if err := os.MkdirAll(wd, 0755); err != nil {
+						t.Fatal(err)
+					}
 
-				if err := exec.Command(
-					filepath.Join(cache, filepath.Base(root), "main"),
-				).Run(); err != nil {
-					t.Error(err)
-				}
-			})
-		}
-	})
+					testCase.testFunc(&config{
+						btool:   btool,
+						root:    filepath.Join(testCaseFixturesTmpDir, fixture),
+						cache:   filepath.Join(testCaseFixtureTmpDir, "cache"),
+						wd:      wd,
+						fixture: fixture,
+
+						t: t,
+					})
+				})
+			}
+		})
+	}
 }
 
 func build(path string) (string, error) {
