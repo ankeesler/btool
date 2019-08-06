@@ -69,29 +69,29 @@ func (r *resolve) resolve(
 		}
 	}
 
-	logrus.Debugf("really resolving %s", n.Name)
-
 	var t time.Time
-	if n.Resolver != nil {
-		exists := true
-		stat, err := r.fs.Stat(n.Name)
-		if err != nil {
-			if !os.IsNotExist(err) {
-				return time.Time{}, errors.Wrap(err, "stat "+n.Name)
-			} else {
-				exists = false
-			}
+	exists := true
+	stat, err := r.fs.Stat(n.Name)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return time.Time{}, errors.Wrap(err, "stat "+n.Name)
+		} else {
+			exists = false
+		}
+	} else {
+		t = stat.ModTime()
+	}
+
+	if n.Resolver != nil && (!exists || latestT.After(stat.ModTime())) {
+		logrus.Debugf("really resolving %s", n.Name)
+
+		dir := filepath.Dir(n.Name)
+		if err := r.fs.MkdirAll(dir, 0755); err != nil {
+			return time.Time{}, errors.Wrap(err, "mkdir "+dir)
 		}
 
-		if !exists || latestT.After(stat.ModTime()) {
-			dir := filepath.Dir(n.Name)
-			if err := r.fs.MkdirAll(dir, 0755); err != nil {
-				return time.Time{}, errors.Wrap(err, "mkdir "+dir)
-			}
-
-			if err := n.Resolver.Resolve(n); err != nil {
-				return time.Time{}, errors.Wrap(err, "really resolve "+n.Name)
-			}
+		if err := n.Resolver.Resolve(n); err != nil {
+			return time.Time{}, errors.Wrap(err, "really resolve "+n.Name)
 		}
 
 		stat, err = r.fs.Stat(n.Name)

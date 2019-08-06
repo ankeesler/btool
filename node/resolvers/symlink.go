@@ -6,7 +6,6 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type symlink struct {
@@ -29,7 +28,6 @@ func (s *symlink) Resolve(n *node.Node) error {
 	}
 
 	if _, err := os.Stat(n.Name); err != nil {
-		logrus.Infof("err = %s", err.Error())
 		if !os.IsNotExist(err) {
 			return errors.Wrap(err, "stat")
 		}
