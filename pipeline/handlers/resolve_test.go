@@ -21,6 +21,12 @@ func TestResolve(t *testing.T) {
 	// a -> b, c
 	// b -> c
 	// c
+	// d -> e
+	// e -> f
+	// f
+	nodeF := node.New("f")
+	nodeE := node.New("e").Dependency(nodeF)
+	nodeD := node.New("d").Dependency(nodeE)
 	nodeC := node.New("c")
 	nodeB := node.New("b").Dependency(nodeC)
 	nodeA := node.New("a").Dependency(nodeB, nodeC)
@@ -29,6 +35,9 @@ func TestResolve(t *testing.T) {
 		nodeA,
 		nodeB,
 		nodeC,
+		nodeD,
+		nodeE,
+		nodeF,
 	}
 
 	data := []struct {
@@ -72,6 +81,13 @@ func TestResolve(t *testing.T) {
 			target:     "a",
 			written:    []string{"b", "a"},
 			exResolved: []string{"c", "b", "a"},
+		},
+		{
+			name:       "TwoDeep",
+			nodes:      nodes,
+			target:     "d",
+			written:    []string{"d", "e"},
+			exResolved: []string{"f", "e", "d"},
 		},
 	}
 	for _, datum := range data {
