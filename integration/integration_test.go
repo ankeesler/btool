@@ -28,11 +28,11 @@ func TestBuild(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			name:     "object",
+			name:     "Object",
 			testFunc: object,
 		},
 		{
-			name:     "executable",
+			name:     "Executable",
 			testFunc: executable,
 		},
 	}

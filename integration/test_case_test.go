@@ -16,6 +16,8 @@ type config struct {
 }
 
 func (c *config) run(args ...string) {
+	c.t.Log("run", args)
+
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Dir = c.wd
 	if output, err := cmd.CombinedOutput(); err != nil {
