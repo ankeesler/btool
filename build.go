@@ -44,6 +44,7 @@ func Build(cfg *Cfg) error {
 		handlers.NewDepsLocal(fs),
 		handlers.NewObject(),
 		handlers.NewExecutable(),
+		handlers.NewSortAlpha(),
 		handlers.NewResolve(fs),
 	)
 	if err := p.Run(); err != nil {
