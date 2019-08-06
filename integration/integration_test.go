@@ -14,7 +14,7 @@ func TestBuild(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	build, err := build("github.com/ankeesler/btool/cmd/btool")
+	btool, err := build("github.com/ankeesler/btool/cmd/btool")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,9 +44,9 @@ func TestBuild(t *testing.T) {
 				cache := filepath.Join(tmpDir, "cache")
 
 				cmd := exec.Command(
-					build,
+					btool,
 					"-target",
-					"main.o",
+					"dep-0/dep-0.o",
 					"-root",
 					root,
 					"-cache",
@@ -68,7 +68,7 @@ func TestBuild(t *testing.T) {
 				cache := filepath.Join(tmpDir, "cache")
 
 				cmd := exec.Command(
-					build,
+					btool,
 					"-target",
 					"main",
 					"-root",
@@ -89,10 +89,6 @@ func TestBuild(t *testing.T) {
 			})
 		}
 	})
-}
-
-func testObject(t *testing.T) {
-
 }
 
 func build(path string) (string, error) {
