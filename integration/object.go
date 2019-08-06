@@ -1,4 +1,4 @@
-package integration_test
+package integration
 
 func object(c *config) {
 	c.run(
