@@ -15,6 +15,7 @@ const (
 
 	CtxCompilerC  = "pipeline.compiler.c"
 	CtxCompilerCC = "pipeline.compiler.cc"
+	CtxArchiver   = "pipeline.archiver"
 	CtxLinker     = "pipeline.linker"
 )
 
