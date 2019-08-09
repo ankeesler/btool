@@ -35,6 +35,7 @@ func TestObject(t *testing.T) {
 
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
+			project := "project"
 			root := "/root"
 			cache := "/cache"
 			target := "dep-1/dep-1.o"
@@ -44,6 +45,8 @@ func TestObject(t *testing.T) {
 			h := handlers.NewObject()
 			ctx := pipeline.NewCtxBuilder().Nodes(
 				datum.nodes,
+			).Project(
+				project,
 			).Root(
 				root,
 			).Cache(
@@ -71,7 +74,7 @@ func TestObject(t *testing.T) {
 			if sourceN == nil {
 				t.Fatal()
 			}
-			name := filepath.Join(cache, filepath.Base(root), target)
+			name := filepath.Join(cache, project, "object", target)
 			objectN := node.New(name).Dependency(sourceN)
 			objectN.Resolver = resolvers.NewCompile(root, compiler, []string{root})
 			exNodes := append(datum.nodes.Copy().Cast(), objectN)

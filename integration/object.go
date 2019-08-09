@@ -10,4 +10,8 @@ func object(c *config) {
 		"-cache",
 		c.cache,
 	)
+	c.run(
+		"ls",
+		"dep-0/dep-0.o",
+	)
 }

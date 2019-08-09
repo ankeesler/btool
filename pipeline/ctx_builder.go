@@ -20,6 +20,12 @@ func (cb *CtxBuilder) Nodes(nodes []*node.Node) *CtxBuilder {
 	return cb
 }
 
+// Project sets the root on the CtxBuilder's Ctx, and then returns the CtxBuilder.
+func (cb *CtxBuilder) Project(project string) *CtxBuilder {
+	cb.ctx.KV[CtxProject] = project
+	return cb
+}
+
 // Root sets the root on the CtxBuilder's Ctx, and then returns the CtxBuilder.
 func (cb *CtxBuilder) Root(root string) *CtxBuilder {
 	cb.ctx.KV[CtxRoot] = root

@@ -1,7 +1,5 @@
 package integration
 
-import "path/filepath"
-
 func executable(c *config) {
 	c.run(
 		c.btool,
@@ -13,6 +11,6 @@ func executable(c *config) {
 		c.cache,
 	)
 	c.run(
-		filepath.Join(c.cache, filepath.Base(c.root), "main"),
+		"./main",
 	)
 }

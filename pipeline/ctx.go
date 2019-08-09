@@ -9,9 +9,10 @@ import (
 // The following are core pieces of information that apply to every member of
 // the Pipeline.
 const (
-	CtxRoot   = "pipeline.root"
-	CtxCache  = "pipeline.cache"
-	CtxTarget = "pipeline.target"
+	CtxProject = "pipeline.project"
+	CtxRoot    = "pipeline.root"
+	CtxCache   = "pipeline.cache"
+	CtxTarget  = "pipeline.target"
 
 	CtxCompilerC  = "pipeline.compiler.c"
 	CtxCompilerCC = "pipeline.compiler.cc"

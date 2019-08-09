@@ -37,6 +37,7 @@ func TestExecutable(t *testing.T) {
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
+			project := "project"
 			root := "/root"
 			cache := "/cache"
 			target := "main"
@@ -47,6 +48,8 @@ func TestExecutable(t *testing.T) {
 			h := handlers.NewExecutable()
 			ctx := pipeline.NewCtxBuilder().Nodes(
 				datum.nodes,
+			).Project(
+				project,
 			).Root(
 				root,
 			).Cache(
@@ -72,7 +75,7 @@ func TestExecutable(t *testing.T) {
 				compiler = compilerC
 			}
 
-			name := filepath.Join(cache, filepath.Base(root), target)
+			name := filepath.Join(cache, project, "executable", target)
 			executableN := node.New(name)
 			executableN.Resolver = resolvers.NewLink(root, linker)
 
@@ -82,7 +85,7 @@ func TestExecutable(t *testing.T) {
 				if strings.HasSuffix(n.Name, ".o") {
 					executableN.Dependency(n)
 
-					n.Name = filepath.Join(cache, filepath.Base(root), n.Name)
+					n.Name = filepath.Join(cache, project, "object", n.Name)
 					n.Resolver = resolvers.NewCompile(root, compiler, []string{root})
 				}
 			}

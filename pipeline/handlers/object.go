@@ -61,7 +61,7 @@ func objectNFromSourceN(ctx *pipeline.Ctx, sourceN *node.Node) *node.Node {
 	compiler := getCompiler(ctx, sourceN)
 
 	ext := filepath.Ext(sourceN.Name)
-	object := makeCachePath(ctx, strings.ReplaceAll(sourceN.Name, ext, ".o"))
+	object := cacheObjectPath(ctx, strings.ReplaceAll(sourceN.Name, ext, ".o"))
 
 	logrus.Debugf(
 		"adding %s -> %s with compiler %s",
@@ -85,12 +85,4 @@ func getCompiler(ctx *pipeline.Ctx, n *node.Node) string {
 	default:
 		return ""
 	}
-}
-
-func makeCachePath(ctx *pipeline.Ctx, target string) string {
-	return filepath.Join(
-		ctx.KV[pipeline.CtxCache],
-		filepath.Base(ctx.KV[pipeline.CtxRoot]),
-		target,
-	)
 }

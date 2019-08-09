@@ -50,7 +50,7 @@ func (e *executable) Handle(ctx *pipeline.Ctx) {
 	objectNodes = collectObjects(ctx, dN, objectNodes)
 
 	linker := ctx.KV[pipeline.CtxLinker]
-	name := makeCachePath(ctx, target)
+	name := cacheExecutablePath(ctx, target)
 	targetN := node.New(name)
 	for _, objectN := range objectNodes {
 		ctx.Nodes = append(ctx.Nodes, objectN)
