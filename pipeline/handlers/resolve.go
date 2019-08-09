@@ -36,7 +36,7 @@ func (r *resolve) Handle(ctx *pipeline.Ctx) {
 	}
 
 	built := make(map[*node.Node]bool)
-	if _, err := r.resolve(ctx, n, built); err != nil {
+	if _, err := r.resolve(n, built); err != nil {
 		ctx.Err = errors.Wrap(err, "resolve")
 		return
 	}
@@ -45,7 +45,6 @@ func (r *resolve) Handle(ctx *pipeline.Ctx) {
 func (r *resolve) Name() string { return "resolve" }
 
 func (r *resolve) resolve(
-	ctx *pipeline.Ctx,
 	n *node.Node,
 	built map[*node.Node]bool,
 ) (time.Time, error) {
@@ -59,7 +58,7 @@ func (r *resolve) resolve(
 	for _, d := range n.Dependencies {
 		logrus.Debugf("resolving dependency %s", d.Name)
 
-		t, err := r.resolve(ctx, d, built)
+		t, err := r.resolve(d, built)
 		if err != nil {
 			return time.Time{}, errors.Wrap(err, "resolve "+d.Name)
 		}
