@@ -2,7 +2,6 @@ package resolvers
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -30,7 +29,7 @@ func (gc *generateC) Resolve(n *node.Node) error {
 
 	file := filepath.Join(gc.dir, n.Name)
 
-	if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
+	if err := fs.MkdirAll(filepath.Dir(file), 0755); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("mkdir (%s)", gc.dir))
 	}
 
