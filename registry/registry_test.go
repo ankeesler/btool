@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/registryapi/registry"
+	"github.com/ankeesler/btool/registry"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )

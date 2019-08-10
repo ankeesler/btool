@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ankeesler/btool/registryapi"
-	"github.com/ankeesler/btool/registryapi/registryapifakes"
+	"github.com/ankeesler/btool/registry/registryapi"
+	"github.com/ankeesler/btool/registry/registryapi/registryapifakes"
 )
 
 func TestRegistryAPI(t *testing.T) {

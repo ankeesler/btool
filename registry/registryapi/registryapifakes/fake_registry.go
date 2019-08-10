@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/ankeesler/btool/registryapi"
+	"github.com/ankeesler/btool/registry/registryapi"
 )
 
 type FakeRegistry struct {

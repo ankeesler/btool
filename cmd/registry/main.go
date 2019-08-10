@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/registryapi"
-	"github.com/ankeesler/btool/registryapi/registry"
+	"github.com/ankeesler/btool/registry"
+	"github.com/ankeesler/btool/registry/registryapi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
