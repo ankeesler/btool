@@ -1,4 +1,4 @@
-package encoding_test
+package registry_test
 
 import (
 	"errors"
@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/encoding"
-	"github.com/ankeesler/btool/node/encoding/encodingfakes"
 	"github.com/ankeesler/btool/node/nodefakes"
+	"github.com/ankeesler/btool/registry"
+	"github.com/ankeesler/btool/registry/registryfakes"
 	"github.com/go-test/deep"
 )
 
@@ -17,8 +17,8 @@ func TestDecoderDecode(t *testing.T) {
 	bResolver := &nodefakes.FakeResolver{}
 	cResolver := &nodefakes.FakeResolver{}
 
-	newResolverMapper := func() *encodingfakes.FakeResolverMapper {
-		resolverMapper := &encodingfakes.FakeResolverMapper{}
+	newResolverMapper := func() *registryfakes.FakeResolverMapper {
+		resolverMapper := &registryfakes.FakeResolverMapper{}
 		resolverMapper.MapStub = func(
 			name string,
 			config map[string]interface{},
@@ -43,8 +43,8 @@ func TestDecoderDecode(t *testing.T) {
 	nN := node.New("n").Dependency(aN, bN, cN)
 	nN.Resolver = aResolver
 
-	newNodeMapper := func() *encodingfakes.FakeNodeMapper {
-		nodeMapper := &encodingfakes.FakeNodeMapper{}
+	newNodeMapper := func() *registryfakes.FakeNodeMapper {
+		nodeMapper := &registryfakes.FakeNodeMapper{}
 		nodeMapper.MapStub = func(name string) (*node.Node, error) {
 			switch name {
 			case "a":
@@ -67,20 +67,20 @@ func TestDecoderDecode(t *testing.T) {
 
 	data := []struct {
 		name    string
-		n       *encoding.Node
+		n       *registry.Node
 		exN     *node.Node
 		exError string
 	}{
 		{
 			name: "Success",
-			n: &encoding.Node{
+			n: &registry.Node{
 				Name: "n",
 				Dependencies: []string{
 					"a",
 					"b",
 					"c",
 				},
-				Resolver: encoding.Resolver{
+				Resolver: registry.Resolver{
 					Name:   "a",
 					Config: config,
 				},
@@ -89,14 +89,14 @@ func TestDecoderDecode(t *testing.T) {
 		},
 		{
 			name: "UnknownNode",
-			n: &encoding.Node{
+			n: &registry.Node{
 				Name: "n",
 				Dependencies: []string{
 					"a",
 					"z",
 					"c",
 				},
-				Resolver: encoding.Resolver{
+				Resolver: registry.Resolver{
 					Name:   "a",
 					Config: config,
 				},
@@ -105,14 +105,14 @@ func TestDecoderDecode(t *testing.T) {
 		},
 		{
 			name: "UnknownResolver",
-			n: &encoding.Node{
+			n: &registry.Node{
 				Name: "n",
 				Dependencies: []string{
 					"a",
 					"b",
 					"c",
 				},
-				Resolver: encoding.Resolver{
+				Resolver: registry.Resolver{
 					Name:   "z",
 					Config: config,
 				},
@@ -125,7 +125,7 @@ func TestDecoderDecode(t *testing.T) {
 		t.Run(datum.name, func(t *testing.T) {
 			nodeMapper := newNodeMapper()
 			resolverMapper := newResolverMapper()
-			d := encoding.NewDecoder(nodeMapper, resolverMapper)
+			d := registry.NewDecoder(nodeMapper, resolverMapper)
 
 			acN, acErr := d.Decode(datum.n)
 			if acErr != nil {

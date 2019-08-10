@@ -1,4 +1,4 @@
-package encoding
+package registry
 
 import (
 	"github.com/ankeesler/btool/node"

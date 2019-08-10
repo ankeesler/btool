@@ -3,24 +3,18 @@ package registryapi
 
 import (
 	"fmt"
-	"io"
 	"net/http"
+
+	"github.com/ankeesler/btool/registry"
+	"gopkg.in/yaml.v2"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Registry
-
-// Registry returns io.Reader's for the files in a btool registry.
-type Registry interface {
-	Get(string) io.Reader
-}
-
 type registryApi struct {
-	r Registry
+	r registry.Registry
 }
 
-// New returns a new http.Handler that serves the btool registry from a given
-// directory of *_btool.yml files.
-func New(r Registry) http.Handler {
+// New returns a new http.Handler that serves a btool registry.Registry.
+func New(r registry.Registry) http.Handler {
 	return &registryApi{
 		r: r,
 	}
@@ -29,21 +23,33 @@ func New(r Registry) http.Handler {
 func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 
+	rsp.Header().Set("Content-Type", "application/x-yaml")
+
+	var object interface{}
+	var err error
 	if path == "/" {
-		path = "index.yml"
+		object, err = ra.r.Index()
+	} else {
+		object, err = ra.r.Nodes(path)
 	}
 
-	file := ra.r.Get(path)
-	if file == nil {
+	if err != nil {
+		rsp.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(rsp, "---\nerror: %s\n", err.Error())
+		return
+	}
+
+	if object == nil {
 		rsp.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	if _, err := io.Copy(rsp, file); err != nil {
+	e := yaml.NewEncoder(rsp)
+	defer e.Close()
+
+	if err := e.Encode(object); err != nil {
 		rsp.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(rsp, "error: %s\n", err.Error())
+		fmt.Fprintf(rsp, "---\nerror: %s\n", err.Error())
 		return
 	}
-
-	rsp.Header().Set("Content-Type", "application/x-yaml")
 }
