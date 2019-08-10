@@ -1,8 +1,8 @@
 package btool
 
 import (
-	"github.com/ankeesler/btool/pipeline"
-	"github.com/ankeesler/btool/pipeline/handlers"
+	"github.com/ankeesler/btool/node/pipeline"
+	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )

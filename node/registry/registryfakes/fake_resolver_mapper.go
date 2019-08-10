@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/registry"
+	"github.com/ankeesler/btool/node/registry"
 )
 
 type FakeResolverMapper struct {
