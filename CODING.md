@@ -17,4 +17,5 @@
   subdirectory of the highest possible abstraction
   - e.g., `handlers.NewObject()` depepds on `resolvers.NewCompile()` and `node.Node`,
     therefore it should be a subdirectory of `node`
-- TODO: this project should adhere to this structure!
+  - TODO: provide a `ResolverFactory` to the pipeline so we don't have the above
+    abstraction issue
