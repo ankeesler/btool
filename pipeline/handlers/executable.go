@@ -20,30 +20,28 @@ func NewExecutable() pipeline.Handler {
 	return &executable{}
 }
 
-func (e *executable) Handle(ctx *pipeline.Ctx) {
+func (e *executable) Handle(ctx *pipeline.Ctx) error {
 	target := ctx.KV[pipeline.CtxTarget]
 	if filepath.Ext(target) != "" {
-		return
+		return nil
 	}
 
 	var dN *node.Node
 	sourceCN := node.Find(target+".c", ctx.Nodes)
 	sourceCCN := node.Find(target+".cc", ctx.Nodes)
 	if sourceCN != nil && sourceCCN != nil {
-		ctx.Err = fmt.Errorf(
+		return fmt.Errorf(
 			"ambiguous executable %s (%s or %s)",
 			target,
 			sourceCN.Name,
 			sourceCCN.Name,
 		)
-		return
 	} else if sourceCN != nil {
 		dN = sourceCN
 	} else if sourceCCN != nil {
 		dN = sourceCCN
 	} else {
-		ctx.Err = fmt.Errorf("unknown source for executable %s", target)
-		return
+		return fmt.Errorf("unknown source for executable %s", target)
 	}
 
 	objectNodes := make([]*node.Node, 0)
@@ -62,6 +60,8 @@ func (e *executable) Handle(ctx *pipeline.Ctx) {
 	symlinkN := node.New(target).Dependency(targetN)
 	symlinkN.Resolver = resolvers.NewSymlink()
 	ctx.Nodes = append(ctx.Nodes, symlinkN)
+
+	return nil
 }
 
 func (e *executable) Name() string { return "executable" }

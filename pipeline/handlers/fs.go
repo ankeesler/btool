@@ -23,7 +23,7 @@ func NewFS(effess afero.Fs) pipeline.Handler {
 	}
 }
 
-func (fs *fs) Handle(ctx *pipeline.Ctx) {
+func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 	root := ctx.KV[pipeline.CtxRoot]
 
 	logrus.Debugf("scanning from root %s", root)
@@ -59,8 +59,10 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) {
 			return nil
 		},
 	); err != nil {
-		ctx.Err = errors.Wrap(err, "walk")
+		return errors.Wrap(err, "walk")
 	}
+
+	return nil
 }
 
 func (fs *fs) Name() string { return "fs" }

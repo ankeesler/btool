@@ -63,9 +63,8 @@ func TestExecutable(t *testing.T) {
 			).Linker(
 				linker,
 			).Build()
-			h.Handle(ctx)
-			if ctx.Err != nil {
-				t.Error(ctx.Err)
+			if err := h.Handle(ctx); err != nil {
+				t.Error(err)
 			}
 
 			var compiler string

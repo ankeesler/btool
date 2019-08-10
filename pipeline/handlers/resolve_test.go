@@ -125,9 +125,8 @@ func TestResolve(t *testing.T) {
 			).Target(
 				datum.target,
 			).Build()
-			h.Handle(ctx)
-			if ctx.Err != nil {
-				t.Fatal(ctx.Err)
+			if err := h.Handle(ctx); err != nil {
+				t.Fatal(err)
 			}
 
 			if diff := deep.Equal(datum.exResolved, acResolved); diff != nil {

@@ -37,9 +37,8 @@ func TestSortAlpha(t *testing.T) {
 	}
 
 	ctx := pipeline.NewCtxBuilder().Nodes(nodes).Build()
-	h.Handle(ctx)
-	if ctx.Err != nil {
-		t.Error(ctx.Err)
+	if err := h.Handle(ctx); err != nil {
+		t.Error(err)
 	}
 
 	ex := []*node.Node{

@@ -24,7 +24,7 @@ func NewDepsLocal(fs afero.Fs) pipeline.Handler {
 	}
 }
 
-func (dl *depsLocal) Handle(ctx *pipeline.Ctx) {
+func (dl *depsLocal) Handle(ctx *pipeline.Ctx) error {
 	nodeMap := make(map[string]*node.Node)
 	for _, n := range ctx.Nodes {
 		nodeMap[n.Name] = n
@@ -34,10 +34,11 @@ func (dl *depsLocal) Handle(ctx *pipeline.Ctx) {
 	for _, n := range ctx.Nodes {
 		logrus.Debugf("deps_local: handling node %s", n)
 		if err := dl.handleNode(n, nodeMap, root); err != nil {
-			ctx.Err = errors.Wrap(err, fmt.Sprintf("handle node %s", n.Name))
-			return
+			return errors.Wrap(err, fmt.Sprintf("handle node %s", n.Name))
 		}
 	}
+
+	return nil
 }
 
 func (dl *depsLocal) Name() string { return "local deps" }

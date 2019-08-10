@@ -16,18 +16,20 @@ func TestPipeline(t *testing.T) {
 	logrus.SetFormatter(formatter.New())
 
 	goodHandlerA := &pipelinefakes.FakeHandler{}
-	goodHandlerA.HandleStub = func(ctx *pipeline.Ctx) {
+	goodHandlerA.HandleStub = func(ctx *pipeline.Ctx) error {
 		ctx.KV["key"] = "value"
+		return nil
 	}
 	goodHandlerB := &pipelinefakes.FakeHandler{}
-	goodHandlerB.HandleStub = func(ctx *pipeline.Ctx) {
+	goodHandlerB.HandleStub = func(ctx *pipeline.Ctx) error {
 		if ctx.KV["key"] != "value" {
 			t.Error("expected kv entry")
 		}
+		return nil
 	}
 	badHandler := &pipelinefakes.FakeHandler{}
-	badHandler.HandleStub = func(ctx *pipeline.Ctx) {
-		ctx.Err = errors.New("some error")
+	badHandler.HandleStub = func(ctx *pipeline.Ctx) error {
+		return errors.New("some error")
 	}
 	badHandler.NameReturns("bad handler")
 

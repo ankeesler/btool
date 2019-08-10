@@ -18,7 +18,7 @@ func NewSortTopo() pipeline.Handler {
 	return &sortTopo{}
 }
 
-func (st *sortTopo) Handle(ctx *pipeline.Ctx) {
+func (st *sortTopo) Handle(ctx *pipeline.Ctx) error {
 	nodes := ctx.Nodes
 
 	logrus.Debugf("sorting %d nodes", len(nodes))
@@ -31,8 +31,7 @@ func (st *sortTopo) Handle(ctx *pipeline.Ctx) {
 		logrus.Debug("nodesWithoutDependencies:", nodesWithoutDependencies)
 
 		if len(nodesWithoutDependencies) == 0 {
-			ctx.Err = fmt.Errorf("cycle detected, cannot proceed past %v", sortedSet)
-			return
+			return fmt.Errorf("cycle detected, cannot proceed past %v", sortedSet)
 		}
 
 		sorted = append(sorted, nodesWithoutDependencies...)
@@ -42,6 +41,8 @@ func (st *sortTopo) Handle(ctx *pipeline.Ctx) {
 	}
 
 	ctx.Nodes = sorted
+
+	return nil
 }
 
 func (st *sortTopo) Name() string { return "topo sort" }

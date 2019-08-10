@@ -42,13 +42,13 @@ func TestFS(t *testing.T) {
 			h := handlers.NewFS(fs)
 
 			ctx := pipeline.NewCtxBuilder().Root(root).Build()
-			h.Handle(ctx)
+			err := h.Handle(ctx)
 			if datum.exSuccess {
-				if ctx.Err != nil {
-					t.Fatal(ctx.Err)
+				if err != nil {
+					t.Fatal(err)
 				}
 			} else {
-				if ctx.Err == nil {
+				if err == nil {
 					t.Fatal("expected failure")
 				}
 				return

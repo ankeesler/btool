@@ -20,30 +20,28 @@ func NewObject() pipeline.Handler {
 	return &object{}
 }
 
-func (o *object) Handle(ctx *pipeline.Ctx) {
+func (o *object) Handle(ctx *pipeline.Ctx) error {
 	target := ctx.KV[pipeline.CtxTarget]
 	if !strings.HasSuffix(target, ".o") {
-		return
+		return nil
 	}
 
 	var dN *node.Node
 	sourceCN := node.Find(strings.ReplaceAll(target, ".o", ".c"), ctx.Nodes)
 	sourceCCN := node.Find(strings.ReplaceAll(target, ".o", ".cc"), ctx.Nodes)
 	if sourceCN != nil && sourceCCN != nil {
-		ctx.Err = fmt.Errorf(
+		return fmt.Errorf(
 			"ambiguous object %s (%s or %s)",
 			target,
 			sourceCN.Name,
 			sourceCCN.Name,
 		)
-		return
 	} else if sourceCN != nil {
 		dN = sourceCN
 	} else if sourceCCN != nil {
 		dN = sourceCCN
 	} else {
-		ctx.Err = fmt.Errorf("unknown source for object %s", target)
-		return
+		return fmt.Errorf("unknown source for object %s", target)
 	}
 
 	objectN := objectNFromSourceN(ctx, dN)
@@ -52,6 +50,8 @@ func (o *object) Handle(ctx *pipeline.Ctx) {
 	symlinkN := node.New(target).Dependency(objectN)
 	symlinkN.Resolver = resolvers.NewSymlink()
 	ctx.Nodes = append(ctx.Nodes, symlinkN)
+
+	return nil
 }
 
 func (o *object) Name() string { return "object" }

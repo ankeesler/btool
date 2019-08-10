@@ -8,10 +8,16 @@ import (
 )
 
 type FakeHandler struct {
-	HandleStub        func(*pipeline.Ctx)
+	HandleStub        func(*pipeline.Ctx) error
 	handleMutex       sync.RWMutex
 	handleArgsForCall []struct {
 		arg1 *pipeline.Ctx
+	}
+	handleReturns struct {
+		result1 error
+	}
+	handleReturnsOnCall map[int]struct {
+		result1 error
 	}
 	NameStub        func() string
 	nameMutex       sync.RWMutex
@@ -27,16 +33,22 @@ type FakeHandler struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHandler) Handle(arg1 *pipeline.Ctx) {
+func (fake *FakeHandler) Handle(arg1 *pipeline.Ctx) error {
 	fake.handleMutex.Lock()
+	ret, specificReturn := fake.handleReturnsOnCall[len(fake.handleArgsForCall)]
 	fake.handleArgsForCall = append(fake.handleArgsForCall, struct {
 		arg1 *pipeline.Ctx
 	}{arg1})
 	fake.recordInvocation("Handle", []interface{}{arg1})
 	fake.handleMutex.Unlock()
 	if fake.HandleStub != nil {
-		fake.HandleStub(arg1)
+		return fake.HandleStub(arg1)
 	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.handleReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakeHandler) HandleCallCount() int {
@@ -45,7 +57,7 @@ func (fake *FakeHandler) HandleCallCount() int {
 	return len(fake.handleArgsForCall)
 }
 
-func (fake *FakeHandler) HandleCalls(stub func(*pipeline.Ctx)) {
+func (fake *FakeHandler) HandleCalls(stub func(*pipeline.Ctx) error) {
 	fake.handleMutex.Lock()
 	defer fake.handleMutex.Unlock()
 	fake.HandleStub = stub
@@ -56,6 +68,29 @@ func (fake *FakeHandler) HandleArgsForCall(i int) *pipeline.Ctx {
 	defer fake.handleMutex.RUnlock()
 	argsForCall := fake.handleArgsForCall[i]
 	return argsForCall.arg1
+}
+
+func (fake *FakeHandler) HandleReturns(result1 error) {
+	fake.handleMutex.Lock()
+	defer fake.handleMutex.Unlock()
+	fake.HandleStub = nil
+	fake.handleReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakeHandler) HandleReturnsOnCall(i int, result1 error) {
+	fake.handleMutex.Lock()
+	defer fake.handleMutex.Unlock()
+	fake.HandleStub = nil
+	if fake.handleReturnsOnCall == nil {
+		fake.handleReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.handleReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
 }
 
 func (fake *FakeHandler) Name() string {

@@ -39,9 +39,8 @@ func TestSortTopo(t *testing.T) {
 			dep1h,
 			dep0h,
 		}).Build()
-	h.Handle(ctx)
-	if ctx.Err != nil {
-		t.Error(ctx.Err)
+	if err := h.Handle(ctx); err != nil {
+		t.Error(err)
 	}
 
 	ex := []*node.Node{
@@ -55,8 +54,7 @@ func TestSortTopo(t *testing.T) {
 
 	// Sad.
 	dep0h.Dependencies = []*node.Node{mainc}
-	h.Handle(ctx)
-	if ctx.Err == nil {
+	if err := h.Handle(ctx); err == nil {
 		t.Error("expected failure")
 	}
 }

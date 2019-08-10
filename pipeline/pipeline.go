@@ -16,11 +16,11 @@ import (
 // Upon being called, a Handler should:
 //   - update the node.Node list field of the provided Ctx in order to propagate
 //     their updates to the node collection
-//   - set the err field of the provided Ctx if it runs into an error
 //   - get or set any keys on the Ctx to provide information to other Handler's
 //     in the Pipeline
+//   - return an error if something goes wrong, skrrrt
 type Handler interface {
-	Handle(*Ctx)
+	Handle(*Ctx) error
 
 	// Name returns an identifying name for this Handler. This helps with
 	// debugging.
@@ -47,9 +47,8 @@ func New(ctx *Ctx, handlers ...Handler) *Pipeline {
 func (p *Pipeline) Run() error {
 	for _, h := range p.handlers {
 		logrus.Debugf("pipeline: running %s", h.Name())
-		h.Handle(p.ctx)
-		if p.ctx.Err != nil {
-			return errors.Wrap(p.ctx.Err, fmt.Sprintf("handle (%s)", h.Name()))
+		if err := h.Handle(p.ctx); err != nil {
+			return errors.Wrap(err, fmt.Sprintf("handle (%s)", h.Name()))
 		}
 	}
 

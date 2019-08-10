@@ -19,9 +19,8 @@ func TestPrint(t *testing.T) {
 	).Root(
 		"/",
 	).Build()
-	h.Handle(ctx)
-	if ctx.Err != nil {
-		t.Error(ctx.Err)
+	if err := h.Handle(ctx); err != nil {
+		t.Error(err)
 	}
 
 	ex := `*** Nodes ***
@@ -36,8 +35,6 @@ dep-1/dep-1.h
 main.c
 > dep-1/dep-1.h
 > dep-0/dep-0.h
-*** Err ***
-<nil>
 *** KV ***
 map[pipeline.root:/]
 `

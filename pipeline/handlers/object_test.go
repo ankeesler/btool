@@ -83,9 +83,8 @@ func TestObject(t *testing.T) {
 			symlinkN.Resolver = resolvers.NewSymlink()
 			exNodes = append(exNodes, symlinkN)
 
-			h.Handle(ctx)
-			if ctx.Err != nil {
-				t.Error(ctx.Err)
+			if err := h.Handle(ctx); err != nil {
+				t.Error()
 			}
 
 			if diff := deep.Equal(exNodes, ctx.Nodes); diff != nil {

@@ -25,21 +25,21 @@ func NewResolve(fs afero.Fs) pipeline.Handler {
 	}
 }
 
-func (r *resolve) Handle(ctx *pipeline.Ctx) {
+func (r *resolve) Handle(ctx *pipeline.Ctx) error {
 	target := ctx.KV[pipeline.CtxTarget]
 	nodes := ctx.Nodes
 
 	n := node.Find(target, nodes)
 	if n == nil {
-		ctx.Err = fmt.Errorf("unknown target %s", target)
-		return
+		return fmt.Errorf("unknown target %s", target)
 	}
 
 	built := make(map[*node.Node]bool)
 	if _, err := r.resolve(n, built); err != nil {
-		ctx.Err = errors.Wrap(err, "resolve")
-		return
+		return errors.Wrap(err, "resolve")
 	}
+
+	return nil
 }
 
 func (r *resolve) Name() string { return "resolve" }

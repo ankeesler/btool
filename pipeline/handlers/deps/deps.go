@@ -13,14 +13,16 @@ type Deps struct {
 	Deps []Dep `yaml: "deps"`
 }
 
-func (d *Deps) Nodes(ctx *pipeline.Ctx) {
+func (d *Deps) Nodes(ctx *pipeline.Ctx) error {
 	rf := newResolverFactory(ctx)
 	for _, dep := range d.Deps {
-		ctx.Nodes, ctx.Err = dep.nodes(ctx.Nodes, rf)
-		if ctx.Err != nil {
-			break
+		var err error
+		ctx.Nodes, err = dep.nodes(ctx.Nodes, rf)
+		if err != nil {
+			return err
 		}
 	}
+	return nil
 }
 
 type Dep struct {

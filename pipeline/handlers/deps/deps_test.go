@@ -43,9 +43,8 @@ func TestDeps(t *testing.T) {
 	t.Log("d", d)
 
 	ctx := pipeline.NewCtxBuilder().Build()
-	d.Nodes(ctx)
-	if ctx.Err != nil {
-		t.Fatal(ctx.Err)
+	if err := d.Nodes(ctx); err != nil {
+		t.Fatal(err)
 	}
 	acNodes := ctx.Nodes
 

@@ -38,13 +38,13 @@ func TestDepsLocal(t *testing.T) {
 			h := handlers.NewDepsLocal(fs)
 
 			ctx := pipeline.NewCtxBuilder().Nodes(datum.nodes).Root(root).Build()
-			h.Handle(ctx)
+			err := h.Handle(ctx)
 			if datum.exSuccess {
-				if ctx.Err != nil {
-					t.Fatal(ctx.Err)
+				if err != nil {
+					t.Fatal(err)
 				}
 			} else {
-				if ctx.Err == nil {
+				if err == nil {
 					t.Fatal("expected failure")
 				}
 				return
