@@ -3,8 +3,8 @@ package registry_test
 import (
 	"testing"
 
-	"github.com/ankeesler/btool/registry"
-	"github.com/ankeesler/btool/registry/registryfakes"
+	"github.com/ankeesler/btool/node/registry"
+	"github.com/ankeesler/btool/node/registry/registryfakes"
 )
 
 func TestHTTPRegistry(t *testing.T) {

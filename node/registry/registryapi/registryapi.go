@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ankeesler/btool/registry"
+	"github.com/ankeesler/btool/node/registry"
 	"gopkg.in/yaml.v2"
 )
 

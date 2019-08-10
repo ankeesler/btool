@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/registry"
+	"github.com/ankeesler/btool/node/registry"
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"

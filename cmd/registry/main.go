@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/ankeesler/btool/formatter"
-	"github.com/ankeesler/btool/registry"
-	"github.com/ankeesler/btool/registry/registryapi"
+	"github.com/ankeesler/btool/node/registry"
+	"github.com/ankeesler/btool/node/registry/registryapi"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -48,7 +48,7 @@ func run() error {
 	}
 	logrus.SetLevel(level)
 
-	r, err := registry.Create(afero.NewOsFs(), *dir)
+	r, err := registry.CreateFSRegistry(afero.NewOsFs(), *dir)
 	if err != nil {
 		return errors.Wrap(err, "create registry")
 	}

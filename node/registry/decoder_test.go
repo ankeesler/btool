@@ -7,8 +7,8 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
-	"github.com/ankeesler/btool/registry"
-	"github.com/ankeesler/btool/registry/registryfakes"
+	"github.com/ankeesler/btool/node/registry"
+	"github.com/ankeesler/btool/node/registry/registryfakes"
 	"github.com/go-test/deep"
 )
 
