@@ -29,7 +29,7 @@ func (gc *generateC) Resolve(n *node.Node) error {
 
 	file := filepath.Join(gc.dir, n.Name)
 
-	if err := fs.MkdirAll(filepath.Dir(file), 0755); err != nil {
+	if err := gc.fs.MkdirAll(filepath.Dir(file), 0755); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("mkdir (%s)", gc.dir))
 	}
 

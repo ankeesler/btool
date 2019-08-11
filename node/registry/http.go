@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -64,6 +65,8 @@ func (hr *httpRegistry) get(url string, object interface{}) error {
 
 	if rsp.StatusCode == http.StatusNotFound {
 		return errNotFound
+	} else if rsp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", rsp.StatusCode)
 	}
 
 	if err := yaml.Unmarshal(data, object); err != nil {

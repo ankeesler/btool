@@ -19,3 +19,7 @@
     therefore it should be a subdirectory of `node`
   - TODO: provide a `ResolverFactory` to the pipeline so we don't have the above
     abstraction issue
+- The above type of abstraction should be avoided by declaring interfaces where
+  they are used
+  - e.g., `handlers.NewRegistry()` should take in an interface of a registry, and
+    `registry` should return a struct (or more) that follow the same interface
