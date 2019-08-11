@@ -7,6 +7,7 @@ import (
 
 	"github.com/ankeesler/btool"
 	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/toolchain"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -38,17 +39,22 @@ func run() error {
 	}
 	logrus.SetLevel(level)
 
+	tc, err := toolchain.Find()
+	if err != nil {
+		return errors.Wrap(err, "toolchain find")
+	}
+
 	cfg := btool.Cfg{
 		Root:   *root,
 		Cache:  *cache,
 		Target: *target,
 
-		CompilerC:  "clang",
-		CompilerCC: "clang++",
-		Linker:     "clang",
+		CompilerC:  tc.CompilerC,
+		CompilerCC: tc.CompilerCC,
+		Linker:     tc.Linker,
 	}
-	if err := btool.Build(&cfg); err != nil {
-		return errors.Wrap(err, "build")
+	if err := btool.Run(&cfg); err != nil {
+		return errors.Wrap(err, "run")
 	}
 
 	return nil
