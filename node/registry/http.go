@@ -16,22 +16,23 @@ type HTTPClient interface {
 	Get(url string) (*http.Response, error)
 }
 
-type httpRegistry struct {
+// HTTPRegistry retrieves Index()/Node() information from an HTTP URL.
+type HTTPRegistry struct {
 	url        string
 	httpClient HTTPClient
 }
 
 var errNotFound = errors.New("not found")
 
-// NewHTTPRegistry returns a Registry that gets information from a base URL.
-func NewHTTPRegistry(url string, httpClient HTTPClient) Registry {
-	return &httpRegistry{
+// NewHTTPRegistry returns a HTTPRegistry at some URL.
+func NewHTTPRegistry(url string, httpClient HTTPClient) *HTTPRegistry {
+	return &HTTPRegistry{
 		url:        url,
 		httpClient: httpClient,
 	}
 }
 
-func (hr *httpRegistry) Index() (*Index, error) {
+func (hr *HTTPRegistry) Index() (*Index, error) {
 	i := new(Index)
 	if err := hr.get(hr.url, i); err != nil {
 		return nil, errors.Wrap(err, "get")
@@ -39,7 +40,7 @@ func (hr *httpRegistry) Index() (*Index, error) {
 	return i, nil
 }
 
-func (hr *httpRegistry) Nodes(path string) ([]*Node, error) {
+func (hr *HTTPRegistry) Nodes(path string) ([]*Node, error) {
 	nodes := make([]*Node, 0)
 	if err := hr.get(hr.url+path, &nodes); err != nil {
 		if err == errNotFound {
@@ -51,7 +52,7 @@ func (hr *httpRegistry) Nodes(path string) ([]*Node, error) {
 	return nodes, nil
 }
 
-func (hr *httpRegistry) get(url string, object interface{}) error {
+func (hr *HTTPRegistry) get(url string, object interface{}) error {
 	rsp, err := hr.httpClient.Get(url)
 	if err != nil {
 		return errors.Wrap(err, "http get")

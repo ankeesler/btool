@@ -3,17 +3,6 @@
 // A registry is a place where one can get serialized node.Node's.
 package registry
 
-// Registry is how one accesses a registry. There is an Index with the
-// listing of Node's, and a list of Node's that can be accessed via Nodes().
-type Registry interface {
-	// Index returns an Index of the Node's in this registry.
-	Index() (*Index, error)
-	// Nodes returns the Node's in this registry. It returns nil if there are no
-	// know nodes with the provided name, and returns an error if there is any
-	// other error.
-	Nodes(string) ([]*Node, error)
-}
-
 // Index describes the files in the registry.
 type Index struct {
 	Files []IndexFile `yaml:"files"`

@@ -9,12 +9,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type registryApi struct {
-	r registry.Registry
+// Registry is an object that can retrieve registry.Node's.
+type Registry interface {
+	Index() (*registry.Index, error)
+	Nodes(string) ([]*registry.Node, error)
 }
 
-// New returns a new http.Handler that serves a btool registry.Registry.
-func New(r registry.Registry) http.Handler {
+type registryApi struct {
+	r Registry
+}
+
+// New returns a new http.Handler that serves a btool registry.
+func New(r Registry) http.Handler {
 	return &registryApi{
 		r: r,
 	}

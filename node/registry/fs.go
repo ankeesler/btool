@@ -13,22 +13,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// fsRegistry holds files in memory to be read by a client.
-type fsRegistry struct {
+// FSRegistry holds Index()/Node() data in memory to be read by a client.
+type FSRegistry struct {
 	index *Index
 	files map[string][]*Node
 }
 
-func newFSRegistry(index *Index, files map[string][]*Node) *fsRegistry {
-	return &fsRegistry{
+func newFSRegistry(index *Index, files map[string][]*Node) *FSRegistry {
+	return &FSRegistry{
 		index: index,
 		files: files,
 	}
 }
 
-// Create creates an Registry from a directory. It will read files from a
-// directory into memory. It returns an error if the Registry cannot be created.
-func CreateFSRegistry(fs afero.Fs, dir string) (Registry, error) {
+// Create creates an FSRegistry from a directory. It will read files from a
+// directory into memory. It returns an error if the FSRegistry cannot be created.
+func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 	i := newIndex()
 	files := make(map[string][]*Node)
 	if err := afero.Walk(
@@ -75,11 +75,11 @@ func CreateFSRegistry(fs afero.Fs, dir string) (Registry, error) {
 	return newFSRegistry(i, files), nil
 }
 
-func (fsr *fsRegistry) Index() (*Index, error) {
+func (fsr *FSRegistry) Index() (*Index, error) {
 	return fsr.index, nil
 }
 
-func (fsr *fsRegistry) Nodes(name string) ([]*Node, error) {
+func (fsr *FSRegistry) Nodes(name string) ([]*Node, error) {
 	return fsr.files[name], nil
 }
 
