@@ -1,0 +1,5 @@
+---
+- name: tuna
+- name: fish
+  dependencies:
+    - tuna
