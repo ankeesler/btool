@@ -8,7 +8,7 @@ import (
 
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node/registry"
-	"github.com/ankeesler/btool/node/registry/registryapi"
+	"github.com/ankeesler/btool/node/registry/api"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -54,7 +54,7 @@ func run() error {
 	}
 
 	logrus.Infof("listening on %s", *address)
-	api := registryapi.New(r)
+	api := api.New(r)
 	if err := http.ListenAndServe(*address, api); err != nil {
 		return errors.Wrap(err, "listen and serve")
 	}
