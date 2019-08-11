@@ -29,7 +29,7 @@ func run() error {
 	registries := flag.String(
 		"registries",
 		"https://btoolregistry.cfapps.io",
-		"List of registries (e.g., https://a.io,file://path/to/reg/dir",
+		"List of registries (e.g., https://a.io,file://path/to/reg/dir)",
 	)
 	help := flag.Bool("help", false, "Show this help message")
 

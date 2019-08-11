@@ -8,6 +8,13 @@ $ /tmp/BasicC/main
 hey! i am running!
 ```
 
+### To try out `btool`...
+
+```
+$ docker run -it ankeesler/btool
+$ btool -help
+```
+
 ### To build `btool`...
 
 ```
