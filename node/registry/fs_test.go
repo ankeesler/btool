@@ -19,22 +19,20 @@ func TestFSRegistry(t *testing.T) {
 
 	fs := afero.NewMemMapFs()
 
-	exNodes := testutil.Nodes()
-
 	root := "/some/path/to/root"
-	files := []string{
-		"file_btool.yml",
-		"some/path/to/file_btool.yml",
-		"whatever.yml",
+	files := map[string][]*registry.Node{
+		"file_a_btool.yml":              testutil.FileANodes(),
+		"some/path/to/file_b_btool.yml": testutil.FileBNodes(),
+		"whatever.yml":                  nil,
 	}
-	for _, file := range files {
+	for file, nodes := range files {
 		file = filepath.Join(root, file)
 		dir := filepath.Dir(file)
 		if err := fs.MkdirAll(dir, 0755); err != nil {
 			t.Fatal(err)
 		}
 
-		data, err := yaml.Marshal(exNodes)
+		data, err := yaml.Marshal(nodes)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -59,14 +57,17 @@ func TestFSRegistry(t *testing.T) {
 
 	data := []struct {
 		name   string
+		nodes  []*registry.Node
 		exists bool
 	}{
 		{
-			name:   "file_btool.yml",
+			name:   "file_a_btool.yml",
+			nodes:  testutil.FileANodes(),
 			exists: true,
 		},
 		{
-			name:   "some/path/to/file_btool.yml",
+			name:   "some/path/to/file_b_btool.yml",
+			nodes:  testutil.FileBNodes(),
 			exists: true,
 		},
 		{
@@ -96,7 +97,7 @@ func TestFSRegistry(t *testing.T) {
 				return
 			}
 
-			if diff := deep.Equal(exNodes, acNodes); diff != nil {
+			if diff := deep.Equal(datum.nodes, acNodes); diff != nil {
 				t.Error(diff)
 			}
 		})

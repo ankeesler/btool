@@ -1,6 +1,8 @@
 // Package registryapi returns a http.Handler that will serve the btool registry.
 package registryapi
 
+// TODO: change my package to API!
+
 import (
 	"fmt"
 	"net/http"

@@ -6,6 +6,10 @@ import (
 	"github.com/ankeesler/btool/node/pipeline"
 )
 
+func cacheDownloadPath(ctx *pipeline.Ctx, name string) string {
+	return cachePath(ctx, "download", name)
+}
+
 func cacheObjectPath(ctx *pipeline.Ctx, name string) string {
 	return cachePath(ctx, "object", name)
 }

@@ -100,7 +100,7 @@ func TestHTTPRegistryIndex(t *testing.T) {
 }
 
 func andTestHTTPRegistryNodes(t *testing.T) {
-	exNodes := testutil.Nodes()
+	exNodes := testutil.FileANodes()
 
 	buf200 := bytes.NewBuffer([]byte{})
 	e := yaml.NewEncoder(buf200)
