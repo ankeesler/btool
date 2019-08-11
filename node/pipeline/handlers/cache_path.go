@@ -6,22 +6,22 @@ import (
 	"github.com/ankeesler/btool/node/pipeline"
 )
 
-func cacheDownloadPath(ctx *pipeline.Ctx, name string) string {
-	return cachePath(ctx, "download", name)
+func cacheDownloadPath(ctx *pipeline.Ctx, project, name string) string {
+	return cachePath(ctx, project, "download", name)
 }
 
 func cacheObjectPath(ctx *pipeline.Ctx, name string) string {
-	return cachePath(ctx, "object", name)
+	return cachePath(ctx, ctx.KV[pipeline.CtxProject], "object", name)
 }
 
 func cacheExecutablePath(ctx *pipeline.Ctx, name string) string {
-	return cachePath(ctx, "executable", name)
+	return cachePath(ctx, ctx.KV[pipeline.CtxProject], "executable", name)
 }
 
-func cachePath(ctx *pipeline.Ctx, resource, name string) string {
+func cachePath(ctx *pipeline.Ctx, project, resource, name string) string {
 	return filepath.Join(
 		ctx.KV[pipeline.CtxCache],
-		ctx.KV[pipeline.CtxProject],
+		project,
 		resource,
 		name,
 	)

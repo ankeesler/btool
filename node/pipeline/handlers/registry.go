@@ -48,7 +48,8 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 	}
 
 	for _, file := range i.Files {
-		path := cacheDownloadPath(ctx, file.SHA256)
+		project := getProject(file.Path)
+		path := cacheDownloadPath(ctx, project, file.SHA256)
 		logrus.Debugf("considering %s", path)
 
 		var nodes []*registrypkg.Node

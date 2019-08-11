@@ -30,7 +30,6 @@ func TestRegistry(t *testing.T) {
 	marlinN := node.New("marlin")
 	baconN := node.New("bacon")
 
-	project := "project"
 	cache := "/cache"
 	data, err := yaml.Marshal(registryFileBNodes)
 	assert.Nil(t, err)
@@ -38,7 +37,7 @@ func TestRegistry(t *testing.T) {
 		fs,
 		filepath.Join(
 			cache,
-			project,
+			"some/path/to/file_b",
 			"download",
 			index.Files[1].SHA256,
 		),
@@ -56,7 +55,7 @@ func TestRegistry(t *testing.T) {
 	d.DecodeReturnsOnCall(3, baconN, nil)
 
 	h := handlers.NewRegistry(fs, r, d)
-	ctx := pipeline.NewCtxBuilder().Project(project).Cache(cache).Build()
+	ctx := pipeline.NewCtxBuilder().Cache(cache).Build()
 	assert.Nil(t, h.Handle(ctx))
 
 	assert.Equal(t, 1, r.IndexCallCount())
