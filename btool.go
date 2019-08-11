@@ -20,6 +20,8 @@ type Cfg struct {
 	CompilerC  string
 	CompilerCC string
 	Linker     string
+
+	Registries []string
 }
 
 // Run will run a btool build and produce a target.

@@ -4,6 +4,7 @@ package main
 import (
 	"flag"
 	"os"
+	"strings"
 
 	"github.com/ankeesler/btool"
 	"github.com/ankeesler/btool/formatter"
@@ -25,6 +26,11 @@ func run() error {
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", ".btool", "Cache directory")
 	target := flag.String("target", "main", "Target to build")
+	registries := flag.String(
+		"registries",
+		"https://btoolregistry.cfapps.io",
+		"List of registries (e.g., https://a.io,file://path/to/reg/dir",
+	)
 	help := flag.Bool("help", false, "Show this help message")
 
 	flag.Parse()
@@ -52,6 +58,8 @@ func run() error {
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,
 		Linker:     tc.Linker,
+
+		Registries: strings.Split(*registries, ","),
 	}
 	if err := btool.Run(&cfg); err != nil {
 		return errors.Wrap(err, "run")
