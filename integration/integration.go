@@ -47,6 +47,14 @@ func Run(t *testing.T) {
 			name:     "Executable",
 			testFunc: executable,
 		},
+		{
+			name:     "ExecutableLocalRegistry",
+			testFunc: executableLocalRegistry,
+		},
+		{
+			name:     "Googletest",
+			testFunc: googletest,
+		},
 	}
 
 	for _, testCase := range testCases {

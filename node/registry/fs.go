@@ -72,6 +72,7 @@ func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 		return nil, errors.Wrap(err, "walk")
 	}
 
+	logrus.Debugf("creating FSRegistry with %s/%s", i, files)
 	return newFSRegistry(i, files), nil
 }
 

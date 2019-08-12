@@ -61,6 +61,8 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			nodes, err = r.r.Nodes(file.Path)
 			if err != nil {
 				return errors.Wrap(err, "nodes")
+			} else if nodes == nil {
+				return errors.New("unknown nodes at path: " + file.Path)
 			}
 		} else {
 			logrus.Debugf("in cache")
@@ -81,6 +83,8 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			if err != nil {
 				return errors.Wrap(err, "decode")
 			}
+
+			logrus.Debugf("decoded %s to %s", n, n)
 			ctx.Nodes = append(ctx.Nodes, nN)
 		}
 	}

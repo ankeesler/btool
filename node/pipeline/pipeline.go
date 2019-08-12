@@ -42,6 +42,14 @@ func New(ctx *Ctx, handlers ...Handler) *Pipeline {
 	}
 }
 
+// Handler is a builder method that allows a caller to add a Handler to the
+// Pipeline. It returns the Pipeline so that the calls can be strung together.
+//   p := New(handlerA, handlerB).Handler(handlerC).Handler(handlerD)
+func (p *Pipeline) Handler(handler Handler) *Pipeline {
+	p.handlers = append(p.handlers, handler)
+	return p
+}
+
 // Run kicks off the pipeline. It will return an error if any of the Handler's
 // fail in their operation. It exits as soon as any Handler fails.
 func (p *Pipeline) Run() error {

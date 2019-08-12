@@ -47,6 +47,7 @@ func run() error {
 		return errors.Wrap(err, "parse log level")
 	}
 	logrus.SetLevel(level)
+	logrus.Debugf("log level set to %s", level)
 
 	r, err := registry.CreateFSRegistry(afero.NewOsFs(), *dir)
 	if err != nil {

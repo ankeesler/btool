@@ -6,8 +6,11 @@ import (
 	"net/http"
 
 	"github.com/ankeesler/btool/node/registry"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Registry
 
 // Registry is an object that can retrieve registry.Node's.
 type Registry interface {
@@ -28,12 +31,17 @@ func New(r Registry) http.Handler {
 
 func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
+	if path[0] == '/' {
+		path = path[1:]
+	}
+
+	logrus.Debugf("handling %s %s", req.Method, path)
 
 	rsp.Header().Set("Content-Type", "application/x-yaml")
 
 	var object interface{}
 	var err error
-	if path == "/" {
+	if path == "" {
 		object, err = ra.r.Index()
 	} else {
 		object, err = ra.r.Nodes(path)
@@ -53,6 +61,7 @@ func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 	e := yaml.NewEncoder(rsp)
 	defer e.Close()
 
+	logrus.Debugf("encoding object %s", object)
 	if err := e.Encode(object); err != nil {
 		rsp.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(rsp, "---\nerror: %s\n", err.Error())

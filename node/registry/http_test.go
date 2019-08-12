@@ -99,7 +99,7 @@ func TestHTTPRegistryIndex(t *testing.T) {
 	}
 }
 
-func andTestHTTPRegistryNodes(t *testing.T) {
+func TestHTTPRegistryNodes(t *testing.T) {
 	exNodes := testutil.FileANodes()
 
 	buf200 := bytes.NewBuffer([]byte{})
@@ -128,7 +128,7 @@ func andTestHTTPRegistryNodes(t *testing.T) {
 	c.GetReturnsOnCall(2, &rsp500, nil)
 	c.GetReturnsOnCall(3, nil, errors.New("some error"))
 
-	r := registry.NewHTTPRegistry("some url", c)
+	r := registry.NewHTTPRegistry("https://some.url", c)
 
 	// 200
 	acNodes, err := r.Nodes("some/nodes")
@@ -168,7 +168,7 @@ func andTestHTTPRegistryNodes(t *testing.T) {
 
 	for i := 0; i < c.GetCallCount(); i++ {
 		url := c.GetArgsForCall(i)
-		if ex, ac := "some url/some/nodes", url; ex != ac {
+		if ex, ac := "https://some.url/some/nodes", url; ex != ac {
 			t.Error(i, "->", ex, "!=", ac)
 		}
 	}

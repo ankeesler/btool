@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -37,18 +38,20 @@ func (hr *HTTPRegistry) Index() (*Index, error) {
 	if err := hr.get(hr.url, i); err != nil {
 		return nil, errors.Wrap(err, "get")
 	}
+	logrus.Debugf("index -> %s", i)
 	return i, nil
 }
 
 func (hr *HTTPRegistry) Nodes(path string) ([]*Node, error) {
 	nodes := make([]*Node, 0)
-	if err := hr.get(hr.url+path, &nodes); err != nil {
+	if err := hr.get(hr.url+"/"+path, &nodes); err != nil {
 		if err == errNotFound {
 			return nil, nil
 		} else {
 			return nil, errors.Wrap(err, "get")
 		}
 	}
+	logrus.Debugf("nodes(%s) -> %s", path, nodes)
 	return nodes, nil
 }
 
@@ -63,6 +66,7 @@ func (hr *HTTPRegistry) get(url string, object interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "read body")
 	}
+	logrus.Debugf("get returned %d/%s", rsp.StatusCode, string(data))
 
 	if rsp.StatusCode == http.StatusNotFound {
 		return errNotFound

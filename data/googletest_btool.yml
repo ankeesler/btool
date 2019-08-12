@@ -1,5 +1,46 @@
 ---
-- name: tuna
-- name: fish
+# Archives
+- name: googletest-release-1.8.1.zip
+  dependencies: []
+  resolver:
+    name: download
+    config:
+      url: https://github.com/google/googletest/archive/release-1.8.1.zip
+      sha256: 927827c183d01734cc5cfef85e0ff3f5a92ffe6188e0d18e909c5efebf28a0c7
+
+# Sources
+- name: googletest-release-1.8.1/googletest/src/gtest-all.c
   dependencies:
-    - tuna
+    - googletest-release-1.8.1.zip
+  resolver:
+    name: unzip
+- name: googletest-release-1.8.1/googletest/src/gtest_main.c
+  dependencies:
+    - googletest-release-1.8.1.zip
+  resolver:
+    name: unzip
+
+# Objects
+- name: googletest-release-1.8.1/googletest/src/gtest-all.o
+  dependencies:
+    - googletest-release-1.8.1/googletest/src/gtest-all.cc
+  resolver:
+    name: compile
+- name: googletest-release-1.8.1/googletest/src/gtest_main.o
+  dependencies:
+    - googletest-release-1.8.1/googletest/src/gtest_main.cc
+  resolver:
+    name: compile
+
+# Libraries
+- name: gtest.a
+  dependencies:
+    - googletest-release-1.8.1/googletest/src/gtest-all.o
+  resolver:
+    name: archive
+- name: gtest_main.a
+  dependencies:
+    - googletest-release-1.8.1/googletest/src/gtest-all.o
+    - googletest-release-1.8.1/googletest/src/gtest_main.o
+  resolver:
+    name: archive

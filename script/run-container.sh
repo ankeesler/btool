@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eou pipefail
+set -eo pipefail
 
 image="$1"
 if [[ -z "$image" ]]; then
