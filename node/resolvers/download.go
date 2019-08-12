@@ -1,0 +1,54 @@
+package resolvers
+
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/ankeesler/btool/node"
+	"github.com/pkg/errors"
+)
+
+type download struct {
+	c          *http.Client
+	url        string
+	sha256     string
+	outputFile string
+}
+
+// NewDownload returns a node.Resolver that downloads a node.Node from an
+// HTTP/HTTPS URL.
+func NewDownload(
+	c *http.Client,
+	url string,
+	sha256 string,
+	outputFile string,
+) node.Resolver {
+	return &download{
+		c:          c,
+		url:        url,
+		sha256:     sha256,
+		outputFile: outputFile,
+	}
+}
+
+func (d *download) Resolve(n *node.Node) error {
+	rsp, err := d.c.Get(d.url)
+	if err != nil {
+		return errors.Wrap(err, "http get")
+	} else if rsp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad http status: %d", rsp.StatusCode)
+	}
+	defer rsp.Body.Close()
+
+	data, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return errors.Wrap(err, "read body")
+	}
+
+	if err := ioutil.WriteFile(d.outputFile, data, 0644); err != nil {
+		return errors.Wrap(err, "write file")
+	}
+
+	return nil
+}
