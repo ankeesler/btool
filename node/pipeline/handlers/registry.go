@@ -18,8 +18,9 @@ type Registry interface {
 	// Registry. If any error occurs, an error should be returned.
 	Index() (*registrypkg.Index, error)
 	// Nodes should return the registrypkg.Node's associated with the provided
-	// registrypkg.IndexFile.Path. If no such object exists, nil should be returned.
-	// If there is an error, an error should be returned.
+	// registry.IndexFile.Path. If any error occurs, an error should be returned.
+	// If no registrypkg.Node's exist for the provided string, then an empty
+	// slice should be returned.
 	Nodes(string) ([]*registrypkg.Node, error)
 }
 

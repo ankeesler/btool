@@ -26,7 +26,7 @@ func newFSRegistry(index *Index, files map[string][]*Node) *FSRegistry {
 	}
 }
 
-// Create creates an FSRegistry from a directory. It will read files from a
+// CreateFSRegistry creates an FSRegistry from a directory. It will read files from a
 // directory into memory. It returns an error if the FSRegistry cannot be created.
 func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 	i := newIndex()

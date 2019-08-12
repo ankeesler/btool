@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/node/registry"
 	"github.com/ankeesler/btool/node/registry/api"
 	"github.com/ankeesler/btool/node/registry/api/apifakes"
 	"github.com/ankeesler/btool/node/registry/testutil"
@@ -30,6 +31,7 @@ func TestAPI(t *testing.T) {
 	r := &apifakes.FakeRegistry{}
 	r.IndexReturnsOnCall(0, i, nil)
 	r.NodesReturnsOnCall(0, nodes, nil)
+	r.NodesReturnsOnCall(1, []*registry.Node{}, nil)
 
 	a := api.New(r)
 	s := httptest.NewServer(a)
@@ -39,8 +41,8 @@ func TestAPI(t *testing.T) {
 
 	// Index.
 	iRsp, err := c.Get(s.URL)
-	defer iRsp.Body.Close()
 	require.Nil(t, err)
+	defer iRsp.Body.Close()
 
 	iData, err := ioutil.ReadAll(iRsp.Body)
 	require.Nil(t, err)
@@ -52,8 +54,8 @@ func TestAPI(t *testing.T) {
 
 	// Nodes.
 	nodesRsp, err := c.Get(s.URL + "/" + "file_a_btool.yml")
-	defer nodesRsp.Body.Close()
 	require.Nil(t, err)
+	defer nodesRsp.Body.Close()
 
 	nodesData, err := ioutil.ReadAll(nodesRsp.Body)
 	require.Nil(t, err)
@@ -63,4 +65,13 @@ func TestAPI(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, nodesRsp.StatusCode)
 	assert.Equal(t, nodesBytes, nodesData)
+
+	rsp, err := c.Get(s.URL + "/" + "does not exist")
+	require.Nil(t, err)
+	defer rsp.Body.Close()
+
+	assert.Equal(t, 2, r.NodesCallCount())
+	assert.Equal(t, "does not exist", r.NodesArgsForCall(1))
+
+	assert.Equal(t, http.StatusNotFound, rsp.StatusCode)
 }

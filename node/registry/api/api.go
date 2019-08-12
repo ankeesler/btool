@@ -17,9 +17,10 @@ type Registry interface {
 	// Index should return the registry.Index associated with this particular
 	// Registry. If any error occurs, an error should be returned.
 	Index() (*registry.Index, error)
-	// Nodes should return the registrypkg.Node's associated with the provided
-	// registry.IndexFile.Path. If no such object exists, nil should be returned.
-	// If there is an error, an error should be returned.
+	// Nodes should return the registry.Node's associated with the provided
+	// registry.IndexFile.Path. If any error occurs, an error should be returned.
+	// If no registry.Node's exist for the provided string, then an empty
+	// slice should be returned.
 	Nodes(string) ([]*registry.Node, error)
 }
 
@@ -49,8 +50,15 @@ func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 	if path == "" {
 		object, err = ra.r.Index()
 	} else {
-		object, err = ra.r.Nodes(path)
+		var nodes []*registry.Node
+		nodes, err = ra.r.Nodes(path)
+		logrus.Debugf("nodes returned %s", nodes)
+
+		if len(nodes) != 0 {
+			object = nodes
+		}
 	}
+	logrus.Debug("response object: ", object)
 
 	if err != nil {
 		rsp.WriteHeader(http.StatusInternalServerError)
