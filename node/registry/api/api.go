@@ -14,7 +14,12 @@ import (
 
 // Registry is an object that can retrieve registry.Node's.
 type Registry interface {
+	// Index should return the registry.Index associated with this particular
+	// Registry. If any error occurs, an error should be returned.
 	Index() (*registry.Index, error)
+	// Nodes should return the registrypkg.Node's associated with the provided
+	// registry.IndexFile.Path. If no such object exists, nil should be returned.
+	// If there is an error, an error should be returned.
 	Nodes(string) ([]*registry.Node, error)
 }
 
