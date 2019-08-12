@@ -18,7 +18,7 @@ type Registry interface {
 	// Registry. If any error occurs, an error should be returned.
 	Index() (*registrypkg.Index, error)
 	// Nodes should return the registrypkg.Node's associated with the provided
-	// registry.IndexFile.Path. If any error occurs, an error should be returned.
+	// registrypkg.IndexFile.Path. If any error occurs, an error should be returned.
 	// If no registrypkg.Node's exist for the provided string, then an empty
 	// slice should be returned.
 	Nodes(string) ([]*registrypkg.Node, error)
@@ -87,7 +87,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 		for _, n := range nodes {
 			nN, err := r.d.Decode(n)
 			if err != nil {
-				return errors.Wrap(err, "decode")
+				return errors.Wrap(err, "decode "+n.Name)
 			}
 
 			logrus.Debugf("decoded %s to %s", n, n)
