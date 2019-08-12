@@ -3,7 +3,6 @@ package resolvers
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -35,7 +34,7 @@ func (gh *generateH) Resolve(n *node.Node) error {
 	)
 
 	file := filepath.Join(gh.dir, n.Name)
-	if err := os.MkdirAll(filepath.Dir(file), 0755); err != nil {
+	if err := gh.fs.MkdirAll(filepath.Dir(file), 0755); err != nil {
 		return errors.Wrap(err, fmt.Sprintf("mkdir (%s)", gh.dir))
 	}
 
