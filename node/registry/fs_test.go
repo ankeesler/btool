@@ -20,19 +20,19 @@ func TestFSRegistry(t *testing.T) {
 	fs := afero.NewMemMapFs()
 
 	root := "/some/path/to/root"
-	files := map[string][]*registry.Node{
-		"file_a_btool.yml":              testutil.FileANodes(),
-		"some/path/to/file_b_btool.yml": testutil.FileBNodes(),
+	files := map[string]*registry.Gaggle{
+		"file_a_btool.yml":              testutil.FileAGaggle(),
+		"some/path/to/file_b_btool.yml": testutil.FileBGaggle(),
 		"whatever.yml":                  nil,
 	}
-	for file, nodes := range files {
+	for file, gaggle := range files {
 		file = filepath.Join(root, file)
 		dir := filepath.Dir(file)
 		if err := fs.MkdirAll(dir, 0755); err != nil {
 			t.Fatal(err)
 		}
 
-		data, err := yaml.Marshal(nodes)
+		data, err := yaml.Marshal(gaggle)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -57,17 +57,17 @@ func TestFSRegistry(t *testing.T) {
 
 	data := []struct {
 		name   string
-		nodes  []*registry.Node
+		gaggle *registry.Gaggle
 		exists bool
 	}{
 		{
 			name:   "file_a_btool.yml",
-			nodes:  testutil.FileANodes(),
+			gaggle: testutil.FileAGaggle(),
 			exists: true,
 		},
 		{
 			name:   "some/path/to/file_b_btool.yml",
-			nodes:  testutil.FileBNodes(),
+			gaggle: testutil.FileBGaggle(),
 			exists: true,
 		},
 		{
@@ -81,23 +81,23 @@ func TestFSRegistry(t *testing.T) {
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
-			acNodes, err := r.Nodes(datum.name)
+			acGaggle, err := r.Gaggle(datum.name)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			if datum.exists {
-				if acNodes == nil {
-					t.Fatal("expected nodes to exist")
+				if acGaggle == nil {
+					t.Fatal("expected gaggle to exist")
 				}
 			} else {
-				if acNodes != nil {
-					t.Fatal("expected nodes not to exist")
+				if acGaggle != nil {
+					t.Fatal("expected gaggle not to exist")
 				}
 				return
 			}
 
-			if diff := deep.Equal(datum.nodes, acNodes); diff != nil {
+			if diff := deep.Equal(datum.gaggle, acGaggle); diff != nil {
 				t.Error(diff)
 			}
 		})

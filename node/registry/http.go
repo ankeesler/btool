@@ -17,7 +17,7 @@ type HTTPClient interface {
 	Get(url string) (*http.Response, error)
 }
 
-// HTTPRegistry retrieves Index()/Node() information from an HTTP URL.
+// HTTPRegistry retrieves Index/Gaggle from an HTTP/HTTPS URL.
 type HTTPRegistry struct {
 	url        string
 	httpClient HTTPClient
@@ -42,17 +42,17 @@ func (hr *HTTPRegistry) Index() (*Index, error) {
 	return i, nil
 }
 
-func (hr *HTTPRegistry) Nodes(path string) ([]*Node, error) {
-	nodes := make([]*Node, 0)
-	if err := hr.get(hr.url+"/"+path, &nodes); err != nil {
+func (hr *HTTPRegistry) Gaggle(path string) (*Gaggle, error) {
+	gaggle := new(Gaggle)
+	if err := hr.get(hr.url+"/"+path, gaggle); err != nil {
 		if err == errNotFound {
 			return nil, nil
 		} else {
 			return nil, errors.Wrap(err, "get")
 		}
 	}
-	logrus.Debugf("nodes(%s) -> %s", path, nodes)
-	return nodes, nil
+	logrus.Debugf("Gaggle(%s) -> %s", path, gaggle)
+	return gaggle, nil
 }
 
 func (hr *HTTPRegistry) get(url string, object interface{}) error {

@@ -13,13 +13,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// FSRegistry holds Index()/Node() data in memory to be read by a client.
+// FSRegistry holds Index/Gaggle data in memory to be read by a client.
 type FSRegistry struct {
 	index *Index
-	files map[string][]*Node
+	files map[string]*Gaggle
 }
 
-func newFSRegistry(index *Index, files map[string][]*Node) *FSRegistry {
+func newFSRegistry(index *Index, files map[string]*Gaggle) *FSRegistry {
 	return &FSRegistry{
 		index: index,
 		files: files,
@@ -30,7 +30,7 @@ func newFSRegistry(index *Index, files map[string][]*Node) *FSRegistry {
 // directory into memory. It returns an error if the FSRegistry cannot be created.
 func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 	i := newIndex()
-	files := make(map[string][]*Node)
+	files := make(map[string]*Gaggle)
 	if err := afero.Walk(
 		fs,
 		dir,
@@ -49,8 +49,8 @@ func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 				return errors.Wrap(err, "read file")
 			}
 
-			nodes := make([]*Node, 0)
-			if err := yaml.Unmarshal(data, &nodes); err != nil {
+			gaggle := new(Gaggle)
+			if err := yaml.Unmarshal(data, gaggle); err != nil {
 				return errors.Wrap(err, "unmarshal")
 			}
 
@@ -59,12 +59,12 @@ func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 				return errors.Wrap(err, "rel")
 			}
 
-			logrus.Debugf("adding file %s: %s", pathRel, nodes)
+			logrus.Debugf("adding file %s: %s", pathRel, gaggle)
 			i.Files = append(i.Files, IndexFile{
 				Path:   pathRel,
 				SHA256: sha256String(data),
 			})
-			files[pathRel] = nodes
+			files[pathRel] = gaggle
 
 			return nil
 		},
@@ -72,7 +72,7 @@ func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
 		return nil, errors.Wrap(err, "walk")
 	}
 
-	logrus.Debugf("creating FSRegistry with %s/%s", i, files)
+	logrus.Debugf("creating FSRegistry with %s/%v", i, files)
 	return newFSRegistry(i, files), nil
 }
 
@@ -80,7 +80,7 @@ func (fsr *FSRegistry) Index() (*Index, error) {
 	return fsr.index, nil
 }
 
-func (fsr *FSRegistry) Nodes(name string) ([]*Node, error) {
+func (fsr *FSRegistry) Gaggle(name string) (*Gaggle, error) {
 	return fsr.files[name], nil
 }
 

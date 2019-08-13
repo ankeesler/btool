@@ -20,6 +20,12 @@ type IndexFile struct {
 	SHA256 string `yaml:"sha256"`
 }
 
+// Gaggle is a group of Node's with some Metadata.
+type Gaggle struct {
+	Metadata map[string]interface{} `yaml:"metadata"`
+	Nodes    []*Node                `yaml:"nodes"`
+}
+
 // Node is a serialized form of a node.Node.
 type Node struct {
 	Name         string   `yaml:"name"`

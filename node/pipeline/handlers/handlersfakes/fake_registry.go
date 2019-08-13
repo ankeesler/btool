@@ -9,6 +9,19 @@ import (
 )
 
 type FakeRegistry struct {
+	GaggleStub        func(string) (*registry.Gaggle, error)
+	gaggleMutex       sync.RWMutex
+	gaggleArgsForCall []struct {
+		arg1 string
+	}
+	gaggleReturns struct {
+		result1 *registry.Gaggle
+		result2 error
+	}
+	gaggleReturnsOnCall map[int]struct {
+		result1 *registry.Gaggle
+		result2 error
+	}
 	IndexStub        func() (*registry.Index, error)
 	indexMutex       sync.RWMutex
 	indexArgsForCall []struct {
@@ -21,21 +34,71 @@ type FakeRegistry struct {
 		result1 *registry.Index
 		result2 error
 	}
-	NodesStub        func(string) ([]*registry.Node, error)
-	nodesMutex       sync.RWMutex
-	nodesArgsForCall []struct {
-		arg1 string
-	}
-	nodesReturns struct {
-		result1 []*registry.Node
-		result2 error
-	}
-	nodesReturnsOnCall map[int]struct {
-		result1 []*registry.Node
-		result2 error
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeRegistry) Gaggle(arg1 string) (*registry.Gaggle, error) {
+	fake.gaggleMutex.Lock()
+	ret, specificReturn := fake.gaggleReturnsOnCall[len(fake.gaggleArgsForCall)]
+	fake.gaggleArgsForCall = append(fake.gaggleArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("Gaggle", []interface{}{arg1})
+	fake.gaggleMutex.Unlock()
+	if fake.GaggleStub != nil {
+		return fake.GaggleStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	fakeReturns := fake.gaggleReturns
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeRegistry) GaggleCallCount() int {
+	fake.gaggleMutex.RLock()
+	defer fake.gaggleMutex.RUnlock()
+	return len(fake.gaggleArgsForCall)
+}
+
+func (fake *FakeRegistry) GaggleCalls(stub func(string) (*registry.Gaggle, error)) {
+	fake.gaggleMutex.Lock()
+	defer fake.gaggleMutex.Unlock()
+	fake.GaggleStub = stub
+}
+
+func (fake *FakeRegistry) GaggleArgsForCall(i int) string {
+	fake.gaggleMutex.RLock()
+	defer fake.gaggleMutex.RUnlock()
+	argsForCall := fake.gaggleArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeRegistry) GaggleReturns(result1 *registry.Gaggle, result2 error) {
+	fake.gaggleMutex.Lock()
+	defer fake.gaggleMutex.Unlock()
+	fake.GaggleStub = nil
+	fake.gaggleReturns = struct {
+		result1 *registry.Gaggle
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeRegistry) GaggleReturnsOnCall(i int, result1 *registry.Gaggle, result2 error) {
+	fake.gaggleMutex.Lock()
+	defer fake.gaggleMutex.Unlock()
+	fake.GaggleStub = nil
+	if fake.gaggleReturnsOnCall == nil {
+		fake.gaggleReturnsOnCall = make(map[int]struct {
+			result1 *registry.Gaggle
+			result2 error
+		})
+	}
+	fake.gaggleReturnsOnCall[i] = struct {
+		result1 *registry.Gaggle
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeRegistry) Index() (*registry.Index, error) {
@@ -93,76 +156,13 @@ func (fake *FakeRegistry) IndexReturnsOnCall(i int, result1 *registry.Index, res
 	}{result1, result2}
 }
 
-func (fake *FakeRegistry) Nodes(arg1 string) ([]*registry.Node, error) {
-	fake.nodesMutex.Lock()
-	ret, specificReturn := fake.nodesReturnsOnCall[len(fake.nodesArgsForCall)]
-	fake.nodesArgsForCall = append(fake.nodesArgsForCall, struct {
-		arg1 string
-	}{arg1})
-	fake.recordInvocation("Nodes", []interface{}{arg1})
-	fake.nodesMutex.Unlock()
-	if fake.NodesStub != nil {
-		return fake.NodesStub(arg1)
-	}
-	if specificReturn {
-		return ret.result1, ret.result2
-	}
-	fakeReturns := fake.nodesReturns
-	return fakeReturns.result1, fakeReturns.result2
-}
-
-func (fake *FakeRegistry) NodesCallCount() int {
-	fake.nodesMutex.RLock()
-	defer fake.nodesMutex.RUnlock()
-	return len(fake.nodesArgsForCall)
-}
-
-func (fake *FakeRegistry) NodesCalls(stub func(string) ([]*registry.Node, error)) {
-	fake.nodesMutex.Lock()
-	defer fake.nodesMutex.Unlock()
-	fake.NodesStub = stub
-}
-
-func (fake *FakeRegistry) NodesArgsForCall(i int) string {
-	fake.nodesMutex.RLock()
-	defer fake.nodesMutex.RUnlock()
-	argsForCall := fake.nodesArgsForCall[i]
-	return argsForCall.arg1
-}
-
-func (fake *FakeRegistry) NodesReturns(result1 []*registry.Node, result2 error) {
-	fake.nodesMutex.Lock()
-	defer fake.nodesMutex.Unlock()
-	fake.NodesStub = nil
-	fake.nodesReturns = struct {
-		result1 []*registry.Node
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *FakeRegistry) NodesReturnsOnCall(i int, result1 []*registry.Node, result2 error) {
-	fake.nodesMutex.Lock()
-	defer fake.nodesMutex.Unlock()
-	fake.NodesStub = nil
-	if fake.nodesReturnsOnCall == nil {
-		fake.nodesReturnsOnCall = make(map[int]struct {
-			result1 []*registry.Node
-			result2 error
-		})
-	}
-	fake.nodesReturnsOnCall[i] = struct {
-		result1 []*registry.Node
-		result2 error
-	}{result1, result2}
-}
-
 func (fake *FakeRegistry) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.gaggleMutex.RLock()
+	defer fake.gaggleMutex.RUnlock()
 	fake.indexMutex.RLock()
 	defer fake.indexMutex.RUnlock()
-	fake.nodesMutex.RLock()
-	defer fake.nodesMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

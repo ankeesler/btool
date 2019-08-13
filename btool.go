@@ -6,10 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
-	"github.com/ankeesler/btool/node/pipeline/resolvermapper"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -50,10 +48,7 @@ func Run(cfg *Cfg) error {
 
 	p := pipeline.New(ctx)
 
-	nm := node.NewMapper(&ctx.Nodes)
-	rm := resolvermapper.New(ctx)
-	d := registrypkg.NewDecoder(nm, rm)
-	if err := addRegistryHandlers(p, fs, cfg.Registries, d); err != nil {
+	if err := addRegistryHandlers(p, fs, cfg.Registries); err != nil {
 		return errors.Wrap(err, "add registry handlers")
 	}
 
@@ -82,7 +77,6 @@ func addRegistryHandlers(
 	p *pipeline.Pipeline,
 	fs afero.Fs,
 	registries []string,
-	d *registrypkg.Decoder,
 ) error {
 	for _, registry := range registries {
 		url, err := url.Parse(registry)
@@ -101,7 +95,7 @@ func addRegistryHandlers(
 			r, err = registrypkg.CreateFSRegistry(fs, registry)
 		}
 
-		h := handlers.NewRegistry(fs, r, d)
+		h := handlers.NewRegistry(fs, r)
 		p.Handler(h)
 	}
 	return nil

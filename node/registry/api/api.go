@@ -12,16 +12,16 @@ import (
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Registry
 
-// Registry is an object that can retrieve registry.Node's.
+// Registry is an object that can retrieve registry.Gaggle's.
 type Registry interface {
 	// Index should return the registry.Index associated with this particular
 	// Registry. If any error occurs, an error should be returned.
 	Index() (*registry.Index, error)
-	// Nodes should return the registry.Node's associated with the provided
+	// Gaggle should return the registry.Gaggle associated with the provided
 	// registry.IndexFile.Path. If any error occurs, an error should be returned.
-	// If no registry.Node's exist for the provided string, then an empty
-	// slice should be returned.
-	Nodes(string) ([]*registry.Node, error)
+	// If no registry.Gaggle exists for the provided string, then nil, nil should
+	// be returned.
+	Gaggle(string) (*registry.Gaggle, error)
 }
 
 type registryApi struct {
@@ -50,12 +50,10 @@ func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 	if path == "" {
 		object, err = ra.r.Index()
 	} else {
-		var nodes []*registry.Node
-		nodes, err = ra.r.Nodes(path)
-		logrus.Debugf("nodes returned %s", nodes)
-
-		if len(nodes) != 0 {
-			object = nodes
+		var gaggle *registry.Gaggle
+		gaggle, err = ra.r.Gaggle(path)
+		if gaggle != nil {
+			object = gaggle
 		}
 	}
 	logrus.Debug("response object: ", object)

@@ -99,13 +99,13 @@ func TestHTTPRegistryIndex(t *testing.T) {
 	}
 }
 
-func TestHTTPRegistryNodes(t *testing.T) {
-	exNodes := testutil.FileANodes()
+func TestHTTPRegistryGaggle(t *testing.T) {
+	exGaggle := testutil.FileAGaggle()
 
 	buf200 := bytes.NewBuffer([]byte{})
 	e := yaml.NewEncoder(buf200)
 	defer e.Close()
-	if err := e.Encode(exNodes); err != nil {
+	if err := e.Encode(exGaggle); err != nil {
 		t.Fatal(err)
 	}
 
@@ -131,31 +131,31 @@ func TestHTTPRegistryNodes(t *testing.T) {
 	r := registry.NewHTTPRegistry("https://some.url", c)
 
 	// 200
-	acNodes, err := r.Nodes("some/nodes")
+	acGaggle, err := r.Gaggle("some/gaggle")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if diff := deep.Equal(exNodes, acNodes); diff != nil {
-		t.Error(exNodes, "!=", acNodes)
+	if diff := deep.Equal(exGaggle, acGaggle); diff != nil {
+		t.Error(exGaggle, "!=", acGaggle)
 	}
 
 	// 404
-	acNodes, err = r.Nodes("some/nodes")
+	acGaggle, err = r.Gaggle("some/gaggle")
 	if err != nil {
 		t.Error(err)
-	} else if acNodes != nil {
-		t.Error("expected nil nodes")
+	} else if acGaggle != nil {
+		t.Error("expected nil gaggle")
 	}
 
 	// 500
-	_, err = r.Nodes("some/nodes")
+	_, err = r.Gaggle("some/gaggle")
 	if err == nil {
 		t.Error("expected error")
 	}
 
 	// error
-	_, err = r.Nodes("some/nodes")
+	_, err = r.Gaggle("some/gaggle")
 	if err == nil {
 		t.Error("expected error")
 	} else if !strings.Contains(err.Error(), "some error") {
@@ -168,7 +168,7 @@ func TestHTTPRegistryNodes(t *testing.T) {
 
 	for i := 0; i < c.GetCallCount(); i++ {
 		url := c.GetArgsForCall(i)
-		if ex, ac := "https://some.url/some/nodes", url; ex != ac {
+		if ex, ac := "https://some.url/some/gaggle", url; ex != ac {
 			t.Error(i, "->", ex, "!=", ac)
 		}
 	}

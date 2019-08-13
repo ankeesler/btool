@@ -24,14 +24,19 @@ func TestAPI(t *testing.T) {
 	i := testutil.Index()
 	iBytes, err := yaml.Marshal(i)
 	require.Nil(t, err)
-	nodes := testutil.FileANodes()
-	nodesBytes, err := yaml.Marshal(nodes)
+	gaggle := testutil.FileAGaggle()
+	gaggleBytes, err := yaml.Marshal(gaggle)
 	require.Nil(t, err)
 
 	r := &apifakes.FakeRegistry{}
 	r.IndexReturnsOnCall(0, i, nil)
-	r.NodesReturnsOnCall(0, nodes, nil)
-	r.NodesReturnsOnCall(1, []*registry.Node{}, nil)
+	r.GaggleStub = func(name string) (*registry.Gaggle, error) {
+		if r.GaggleCallCount() == 1 {
+			return gaggle, nil
+		} else {
+			return nil, nil
+		}
+	}
 
 	a := api.New(r)
 	s := httptest.NewServer(a)
@@ -52,26 +57,26 @@ func TestAPI(t *testing.T) {
 	assert.Equal(t, http.StatusOK, iRsp.StatusCode)
 	assert.Equal(t, iBytes, iData)
 
-	// Nodes.
-	nodesRsp, err := c.Get(s.URL + "/" + "file_a_btool.yml")
+	// Gaggle.
+	gaggleRsp, err := c.Get(s.URL + "/" + "file_a_btool.yml")
 	require.Nil(t, err)
-	defer nodesRsp.Body.Close()
+	defer gaggleRsp.Body.Close()
 
-	nodesData, err := ioutil.ReadAll(nodesRsp.Body)
+	gaggleData, err := ioutil.ReadAll(gaggleRsp.Body)
 	require.Nil(t, err)
 
-	assert.Equal(t, 1, r.NodesCallCount())
-	assert.Equal(t, "file_a_btool.yml", r.NodesArgsForCall(0))
+	assert.Equal(t, 1, r.GaggleCallCount())
+	assert.Equal(t, "file_a_btool.yml", r.GaggleArgsForCall(0))
 
-	assert.Equal(t, http.StatusOK, nodesRsp.StatusCode)
-	assert.Equal(t, nodesBytes, nodesData)
+	assert.Equal(t, http.StatusOK, gaggleRsp.StatusCode)
+	assert.Equal(t, gaggleBytes, gaggleData)
 
 	rsp, err := c.Get(s.URL + "/" + "does not exist")
 	require.Nil(t, err)
 	defer rsp.Body.Close()
 
-	assert.Equal(t, 2, r.NodesCallCount())
-	assert.Equal(t, "does not exist", r.NodesArgsForCall(1))
+	assert.Equal(t, 2, r.GaggleCallCount())
+	assert.Equal(t, "does not exist", r.GaggleArgsForCall(1))
 
 	assert.Equal(t, http.StatusNotFound, rsp.StatusCode)
 }
