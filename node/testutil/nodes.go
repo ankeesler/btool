@@ -13,13 +13,6 @@ import (
 
 type Nodes []*node.Node
 
-func (nodes Nodes) WithoutDependencies() Nodes {
-	for _, n := range nodes {
-		n.Dependencies = make([]*node.Node, 0)
-	}
-	return nodes
-}
-
 // Copy performs a deep copy.
 func (nodes Nodes) Copy() Nodes {
 	oldNew := make(map[*node.Node]*node.Node)
