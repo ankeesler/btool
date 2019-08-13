@@ -23,12 +23,12 @@ func TestFS(t *testing.T) {
 	}{
 		{
 			name:      "BasicC",
-			exNodes:   testutil.BasicNodesC.Copy().WithoutDependencies(),
+			exNodes:   testutil.BasicNodesC.Copy(),
 			exSuccess: true,
 		},
 		{
 			name:      "BasicCC",
-			exNodes:   testutil.BasicNodesCC.Copy().WithoutDependencies(),
+			exNodes:   testutil.BasicNodesCC.Copy(),
 			exSuccess: true,
 		},
 	}
