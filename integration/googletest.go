@@ -19,6 +19,8 @@ func googletest(c *config) {
 		c.cache,
 		"-loglevel",
 		"debug",
+		"-registries",
+		"http://127.0.0.1:8080",
 	)
 	c.run(
 		"ls",

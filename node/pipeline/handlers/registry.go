@@ -1,8 +1,12 @@
 package handlers
 
 import (
+	"fmt"
+	"path/filepath"
+
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
+	"github.com/ankeesler/btool/node/pipeline/resolvermapper"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -54,12 +58,12 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 	}
 
 	for _, file := range i.Files {
-		project := getProject(file.Path)
-		path := cacheDownloadPath(ctx, project, file.SHA256)
-		logrus.Debugf("considering %s", path)
+		cachePath := filepath.Join(ctx.KV[pipeline.CtxCache], file.SHA256)
 
-		var nodes []*registrypkg.Node
-		if exists, err := afero.Exists(r.fs, path); err != nil {
+		nodesFile := filepath.Join(cachePath, "nodes.yml")
+		nodes := make([]*registrypkg.Node, 0)
+		logrus.Debugf("considering %s", nodesFile)
+		if exists, err := afero.Exists(r.fs, nodesFile); err != nil {
 			return errors.Wrap(err, "exists")
 		} else if !exists {
 			logrus.Debugf("does not exist")
@@ -70,27 +74,47 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			} else if nodes == nil {
 				return errors.New("unknown nodes at path: " + file.Path)
 			}
-		} else {
-			logrus.Debugf("in cache")
 
-			data, err := afero.ReadFile(r.fs, path)
+			nodesData, err := yaml.Marshal(nodes)
+			if err != nil {
+				return errors.Wrap(err, "marshal")
+			}
+
+			if err := r.fs.MkdirAll(filepath.Dir(nodesFile), 0755); err != nil {
+				return errors.Wrap(err, "mkdir all")
+			}
+
+			if err := afero.WriteFile(r.fs, nodesFile, nodesData, 0644); err != nil {
+				return errors.Wrap(err, "write file")
+			}
+		} else {
+			data, err := afero.ReadFile(r.fs, nodesFile)
 			if err != nil {
 				return errors.Wrap(err, "read file")
 			}
 
-			nodes = make([]*registrypkg.Node, 0)
 			if err := yaml.Unmarshal(data, &nodes); err != nil {
 				return errors.Wrap(err, "unmarshal")
 			}
 		}
 
+		nodesDir := filepath.Join(cachePath, "nodes")
 		for _, n := range nodes {
-			nN, err := r.d.Decode(n)
+			nN := node.New(filepath.Join(nodesDir, n.Name))
+			for _, d := range n.Dependencies {
+				dName := filepath.Join(nodesDir, d)
+				dN := node.Find(dName, ctx.Nodes)
+				if dN == nil {
+					return fmt.Errorf("cannot find dependency %s/%s of %s", d, dName, n)
+				}
+			}
+			rm := resolvermapper.New(ctx)
+			nN.Resolver, err = rm.Map(n.Resolver.Name, n.Resolver.Config)
 			if err != nil {
-				return errors.Wrap(err, "decode "+n.Name)
+				return errors.Wrap(err, "map")
 			}
 
-			logrus.Debugf("decoded %s to %s", n, n)
+			logrus.Debugf("decoded %s to %s", n, nN)
 			ctx.Nodes = append(ctx.Nodes, nN)
 		}
 	}
