@@ -42,11 +42,13 @@ func New(ctx *Ctx, handlers ...Handler) *Pipeline {
 	}
 }
 
-// Handler is a builder method that allows a caller to add a Handler to the
+// Handlers is a builder method that allows a caller to add a Handler to the
 // Pipeline. It returns the Pipeline so that the calls can be strung together.
 //   p := New(handlerA, handlerB).Handler(handlerC).Handler(handlerD)
-func (p *Pipeline) Handler(handler Handler) *Pipeline {
-	p.handlers = append(p.handlers, handler)
+func (p *Pipeline) Handlers(handlers ...Handler) *Pipeline {
+	for _, h := range handlers {
+		p.handlers = append(p.handlers, h)
+	}
 	return p
 }
 

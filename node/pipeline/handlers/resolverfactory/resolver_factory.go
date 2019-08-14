@@ -21,7 +21,7 @@ const (
 // to ResolverFactory.NewResolver() in the config. They should be self
 // explanatory. :)
 const (
-	configCompileIncludePaths = NameCompile + ".includePaths"
+	configCompileIncludePaths = nameCompile + ".includePaths"
 )
 
 // ResolverFactory is a factory type that can create node.Resolver's.
@@ -55,9 +55,9 @@ func (rf *ResolverFactory) NewResolver(
 	}
 
 	if err != nil {
-		return errors.Wrap(err, "create "+name)
+		return nil, errors.Wrap(err, "create "+name)
 	} else if r == nil {
-		return errors.New("unknown resolver: " + name)
+		return nil, errors.New("unknown resolver: " + name)
 	}
 
 	return r, nil

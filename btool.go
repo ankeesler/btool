@@ -67,19 +67,13 @@ func Run(cfg *Cfg) error {
 	if err != nil {
 		return errors.Wrap(err, "create registry handlers")
 	}
-	for _, rh := range rhs {
-		p.Handler(rh)
-	}
+	p.Handlers(rhs...)
 
-	p.Handler(
+	p.Handlers(
 		handlers.NewFS(fs),
-	).Handler(
 		handlers.NewObject(s),
-	).Handler(
 		handlers.NewExecutable(),
-	).Handler(
 		handlers.NewSortAlpha(),
-	).Handler(
 		handlers.NewResolve(fs),
 	)
 
