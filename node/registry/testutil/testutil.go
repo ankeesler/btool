@@ -5,14 +5,15 @@ import "github.com/ankeesler/btool/node/registry"
 
 func Index() *registry.Index {
 	return &registry.Index{
+		Name: "some-index",
 		Files: []registry.IndexFile{
 			registry.IndexFile{
 				Path:   "file_a_btool.yml",
-				SHA256: "e3b5fa05ab6b80f6004e3e7bd88fae76e3b4dbaa21b696ecc619a532a1ac0875",
+				SHA256: "3f67ca5a3aa3f9673a8e76cca937b4b9e1de527ed23d6d12f986c4d63b2c88a2",
 			},
 			registry.IndexFile{
 				Path:   "some/path/to/file_b_btool.yml",
-				SHA256: "1d77c3b1aa9874e57e3ef410f584333ebc3f2a019727f8e29ad96deda8d8c8b5",
+				SHA256: "f31d694f3ee869d87126a7e472c0815ad81b5994a86bd9b19a31d32c5a83c485",
 			},
 		},
 	}
@@ -21,7 +22,8 @@ func Index() *registry.Index {
 func FileAGaggle() *registry.Gaggle {
 	return &registry.Gaggle{
 		Metadata: map[string]interface{}{
-			"foo": "bar",
+			"foo":     "bar",
+			"project": "some-project",
 		},
 		Nodes: []*registry.Node{
 			&registry.Node{
@@ -47,7 +49,8 @@ func FileAGaggle() *registry.Gaggle {
 func FileBGaggle() *registry.Gaggle {
 	return &registry.Gaggle{
 		Metadata: map[string]interface{}{
-			"bat": "mayonnaise",
+			"bat":     "mayonnaise",
+			"project": "some-other-project",
 		},
 		Nodes: []*registry.Node{
 			&registry.Node{

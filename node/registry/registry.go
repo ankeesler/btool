@@ -5,11 +5,13 @@ package registry
 
 // Index describes the files in the registry.
 type Index struct {
+	Name  string      `yaml:"name"`
 	Files []IndexFile `yaml:"files"`
 }
 
-func newIndex() *Index {
+func newIndex(name string) *Index {
 	return &Index{
+		Name:  name,
 		Files: make([]IndexFile, 0),
 	}
 }

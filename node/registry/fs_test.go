@@ -42,7 +42,7 @@ func TestFSRegistry(t *testing.T) {
 		}
 	}
 
-	r, err := registry.CreateFSRegistry(fs, root)
+	r, err := registry.CreateFSRegistry(fs, root, "some-index")
 	if err != nil {
 		t.Fatal(err)
 	}

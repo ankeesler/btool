@@ -10,6 +10,7 @@ import (
 
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
+	"github.com/ankeesler/btool/node/pipeline/handlers/store"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -34,6 +35,7 @@ type Cfg struct {
 // Run will run a btool build and produce a target.
 func Run(cfg *Cfg) error {
 	fs := afero.NewOsFs()
+	s := store.New(cfg.Cache)
 
 	ctx := pipeline.NewCtxBuilder().Root(
 		cfg.Root,
@@ -53,8 +55,12 @@ func Run(cfg *Cfg) error {
 
 	p := pipeline.New(ctx)
 
-	if err := addRegistryHandlers(cfg.Cache, p, fs, cfg.Registries); err != nil {
-		return errors.Wrap(err, "add registry handlers")
+	rhs, err := createRegistryHandlers(fs, s, cfg.Registries)
+	if err != nil {
+		return errors.Wrap(err, "create registry handlers")
+	}
+	for _, rh := range rhs {
+		p.Handler(rh)
 	}
 
 	p.Handler(
@@ -76,16 +82,17 @@ func Run(cfg *Cfg) error {
 	return nil
 }
 
-func addRegistryHandlers(
-	cache string,
-	p *pipeline.Pipeline,
+func createRegistryHandlers(
 	fs afero.Fs,
+	s handlers.Store,
 	registries []string,
-) error {
+) ([]pipeline.Handler, error) {
+	hs := make([]pipeline.Handler, 0)
+
 	for _, registry := range registries {
 		url, err := url.Parse(registry)
 		if err != nil {
-			return errors.Wrap(err, "url parse")
+			return nil, errors.Wrap(err, "url parse")
 		}
 
 		var r handlers.Registry
@@ -94,17 +101,15 @@ func addRegistryHandlers(
 			c := &http.Client{}
 			r = registrypkg.NewHTTPRegistry(registry, c)
 		case "file":
-			r, err = registrypkg.CreateFSRegistry(fs, url.Path)
+			r, err = registrypkg.CreateFSRegistry(fs, url.Path, registry)
 		default:
-			r, err = registrypkg.CreateFSRegistry(fs, registry)
+			r, err = registrypkg.CreateFSRegistry(fs, registry, registry)
 		}
 
-		registryStorePath := makeRegistryStorePath(cache, registry)
-		projectsStorePath := makeProjectsStorePath(cache)
-		h := handlers.NewRegistry(fs, r, registryStorePath, projectsStorePath)
-		p.Handler(h)
+		hs = append(hs, handlers.NewRegistry(fs, s, r))
 	}
-	return nil
+
+	return hs, nil
 }
 
 func makeRegistryStorePath(cache, registry string) string {

@@ -20,7 +20,7 @@ func googletest(c *config) {
 		"-loglevel",
 		"debug",
 		"-registries",
-		"http://127.0.0.1:8080",
+		"/Users/ankeesler/workspace/btool/data",
 	)
 	c.run(
 		"ls",

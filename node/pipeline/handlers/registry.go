@@ -32,26 +32,21 @@ type Registry interface {
 
 type registry struct {
 	fs afero.Fs
+	s  Store
 	r  Registry
-
-	// TODO: gross! This is weird! Make this common for all of these handlers!
-	registryStorePath string
-	projectsStorePath string
 }
 
 // NewRegistry returns a pipeline.Handler that retrieves node.Node's from a
 // Registry.
 func NewRegistry(
 	fs afero.Fs,
+	s Store,
 	r Registry,
-	registryStorePath string,
-	projectsStorePath string,
 ) pipeline.Handler {
 	return &registry{
-		fs:                fs,
-		r:                 r,
-		registryStorePath: registryStorePath,
-		projectsStorePath: projectsStorePath,
+		fs: fs,
+		s:  s,
+		r:  r,
 	}
 }
 
@@ -61,8 +56,14 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 		return errors.Wrap(err, "index")
 	}
 
+	registryDir, err := r.s.RegistryDir(i.Name)
+	if err != nil {
+		return errors.Wrap(err, "registry dir")
+	}
+
 	for _, file := range i.Files {
-		gaggleFile := filepath.Join(r.registryStorePath, file.SHA256, "gaggle.yml")
+
+		gaggleFile := filepath.Join(registryDir, file.SHA256+".yml")
 		gaggle := new(registrypkg.Gaggle)
 		logrus.Debugf("considering %s", gaggleFile)
 		if exists, err := afero.Exists(r.fs, gaggleFile); err != nil {
@@ -107,12 +108,23 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			return errors.Wrap(err, "decode")
 		}
 
-		projectStorePath := filepath.Join(r.projectsStorePath, metadata.Project)
+		projectDir, err := r.s.ProjectDir(metadata.Project)
+		if err != nil {
+			return errors.Wrap(err, "project dir")
+		}
+
 		for _, n := range gaggle.Nodes {
-			nN := node.New(filepath.Join(projectStorePath, n.Name))
+			nN := node.New(filepath.Join(projectDir, n.Name))
 			for _, d := range n.Dependencies {
-				dName := filepath.Join(projectStorePath, d)
-				dN := node.Find(dName, ctx.Nodes)
+				dName := filepath.Join(projectDir, d)
+
+				var dN *node.Node
+				if d == "$this" {
+					dN = node.New(gaggleFile)
+				} else {
+					dN = node.Find(dName, ctx.Nodes)
+				}
+
 				if dN == nil {
 					return fmt.Errorf("cannot find dependency %s/%s of %s", d, dName, n)
 				}
@@ -121,7 +133,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 
 			if err := setResolver(
 				ctx,
-				projectStorePath,
+				projectDir,
 				nN,
 				n.Resolver.Name,
 				n.Resolver.Config,
@@ -141,7 +153,7 @@ func (r *registry) Name() string { return "registry" }
 
 func setResolver(
 	ctx *pipeline.Ctx,
-	projectStorePath string,
+	projectDir string,
 	n *node.Node,
 	name string,
 	config map[string]interface{},
@@ -164,12 +176,14 @@ func setResolver(
 	case "link":
 		r = resolvers.NewLink(root, linker)
 	case "unzip":
-		r = resolvers.NewUnzip(projectStorePath)
+		r = resolvers.NewUnzip(projectDir)
 	case "download":
 		r, err = createDownload(config)
 		if err != nil {
 			err = errors.Wrap(err, "create download")
 		}
+	case "":
+		r = nil
 	default:
 		err = fmt.Errorf("unknown resolver: %s", name)
 	}

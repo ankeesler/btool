@@ -28,8 +28,8 @@ func newFSRegistry(index *Index, files map[string]*Gaggle) *FSRegistry {
 
 // CreateFSRegistry creates an FSRegistry from a directory. It will read files from a
 // directory into memory. It returns an error if the FSRegistry cannot be created.
-func CreateFSRegistry(fs afero.Fs, dir string) (*FSRegistry, error) {
-	i := newIndex()
+func CreateFSRegistry(fs afero.Fs, dir, name string) (*FSRegistry, error) {
+	i := newIndex(name)
 	files := make(map[string]*Gaggle)
 	if err := afero.Walk(
 		fs,

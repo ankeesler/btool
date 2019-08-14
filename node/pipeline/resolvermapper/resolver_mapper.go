@@ -5,7 +5,6 @@ package resolvermapper
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
@@ -30,52 +29,53 @@ func New(ctx *pipeline.Ctx) *ResolverMapper {
 // Resolver can be created from the name and the config map, an error should
 // be returned.
 func (rm *ResolverMapper) Map(
+	ctx *pipeline.Ctx,
+	projectDir string,
+	n *node.Node,
 	name string,
 	config map[string]interface{},
-) (node.Resolver, error) {
-	root := rm.ctx.KV[pipeline.CtxRoot]
-	cache := rm.ctx.KV[pipeline.CtxCache]
-	compilerC := rm.ctx.KV[pipeline.CtxCompilerC]
-	compilerCC := rm.ctx.KV[pipeline.CtxCompilerCC]
-	archiver := rm.ctx.KV[pipeline.CtxArchiver]
-	linker := rm.ctx.KV[pipeline.CtxLinker]
+) error {
+	root := ctx.KV[pipeline.CtxRoot]
+	compilerC := ctx.KV[pipeline.CtxCompilerC]
+	compilerCC := ctx.KV[pipeline.CtxCompilerCC]
+	archiver := ctx.KV[pipeline.CtxArchiver]
+	linker := ctx.KV[pipeline.CtxLinker]
+
+	var r node.Resolver
+	var err error
 	switch name {
 	case "compileC":
-		return resolvers.NewCompile(root, compilerC, []string{root}), nil
+		r = resolvers.NewCompile(root, compilerC, []string{root})
 	case "compileCC":
-		return resolvers.NewCompile(root, compilerCC, []string{root}), nil
+		r = resolvers.NewCompile(root, compilerCC, []string{root})
 	case "archive":
-		return resolvers.NewArchive(root, archiver), nil
+		r = resolvers.NewArchive(root, archiver)
 	case "link":
-		return resolvers.NewLink(root, linker), nil
+		r = resolvers.NewLink(root, linker)
 	case "unzip":
-		r, err := createUnzip(config, cache)
-		if err != nil {
-			return nil, errors.Wrap(err, "create download")
-		}
-		return r, nil
+		r = resolvers.NewUnzip(projectDir)
 	case "download":
-		r, err := createDownload(config, cache)
+		r, err = createDownload(config)
 		if err != nil {
-			return nil, errors.Wrap(err, "create download")
+			err = errors.Wrap(err, "create download")
 		}
-		return r, nil
+	case "":
+		r = nil
 	default:
-		return nil, fmt.Errorf("unknown resolver: %s", name)
+		err = fmt.Errorf("unknown resolver: %s", name)
 	}
-}
 
-func createUnzip(
-	config map[string]interface{},
-	cache string,
-) (node.Resolver, error) {
-	outputDir := filepath.Join(cache, "unzip")
-	return resolvers.NewUnzip(outputDir), nil
+	if err != nil {
+		return err
+	}
+
+	n.Resolver = r
+
+	return nil
 }
 
 func createDownload(
 	config map[string]interface{},
-	cache string,
 ) (node.Resolver, error) {
 	c := &http.Client{}
 
@@ -87,7 +87,5 @@ func createDownload(
 		return nil, errors.Wrap(err, "decode")
 	}
 
-	outputFile := filepath.Join(cache, "download", cfg.SHA256)
-
-	return resolvers.NewDownload(c, cfg.URL, cfg.SHA256, outputFile), nil
+	return resolvers.NewDownload(c, cfg.URL, cfg.SHA256), nil
 }
