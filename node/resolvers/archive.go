@@ -23,6 +23,8 @@ func NewArchive(dir, archiver string) node.Resolver {
 }
 
 func (a *archive) Resolve(n *node.Node) error {
+	logrus.Debugf("archiver: resolve %s/%s", n, n.Dependencies)
+
 	cmd := exec.Command(
 		a.archiver,
 		"rcs",

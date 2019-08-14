@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
 
 type download struct {
-	c          *http.Client
-	url        string
-	sha256     string
-	outputFile string
+	c      *http.Client
+	url    string
+	sha256 string
 }
 
 // NewDownload returns a node.Resolver that downloads a node.Node from an
@@ -22,13 +23,11 @@ func NewDownload(
 	c *http.Client,
 	url string,
 	sha256 string,
-	outputFile string,
 ) node.Resolver {
 	return &download{
-		c:          c,
-		url:        url,
-		sha256:     sha256,
-		outputFile: outputFile,
+		c:      c,
+		url:    url,
+		sha256: sha256,
 	}
 }
 
@@ -46,7 +45,13 @@ func (d *download) Resolve(n *node.Node) error {
 		return errors.Wrap(err, "read body")
 	}
 
-	if err := ioutil.WriteFile(d.outputFile, data, 0644); err != nil {
+	outputFile := n.Name
+
+	if err := os.MkdirAll(filepath.Dir(outputFile), 0755); err != nil {
+		return errors.Wrap(err, "mkdir all")
+	}
+
+	if err := ioutil.WriteFile(outputFile, data, 0644); err != nil {
 		return errors.Wrap(err, "write file")
 	}
 

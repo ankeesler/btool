@@ -5,8 +5,8 @@ import "path/filepath"
 func googletest(c *config) {
 	gtesta := filepath.Join(
 		c.cache,
+		"projects",
 		"googletest",
-		"library",
 		"gtest.a",
 	)
 	c.run(

@@ -3,8 +3,10 @@
 package btool
 
 import (
+	"encoding/base64"
 	"net/http"
 	"net/url"
+	"path/filepath"
 
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
@@ -23,6 +25,7 @@ type Cfg struct {
 
 	CompilerC  string
 	CompilerCC string
+	Archiver   string
 	Linker     string
 
 	Registries []string
@@ -42,13 +45,15 @@ func Run(cfg *Cfg) error {
 		cfg.CompilerC,
 	).CompilerCC(
 		cfg.CompilerCC,
+	).Archiver(
+		cfg.Archiver,
 	).Linker(
 		cfg.Linker,
 	).Build()
 
 	p := pipeline.New(ctx)
 
-	if err := addRegistryHandlers(p, fs, cfg.Registries); err != nil {
+	if err := addRegistryHandlers(cfg.Cache, p, fs, cfg.Registries); err != nil {
 		return errors.Wrap(err, "add registry handlers")
 	}
 
@@ -72,6 +77,7 @@ func Run(cfg *Cfg) error {
 }
 
 func addRegistryHandlers(
+	cache string,
 	p *pipeline.Pipeline,
 	fs afero.Fs,
 	registries []string,
@@ -93,8 +99,19 @@ func addRegistryHandlers(
 			r, err = registrypkg.CreateFSRegistry(fs, registry)
 		}
 
-		h := handlers.NewRegistry(fs, r)
+		registryStorePath := makeRegistryStorePath(cache, registry)
+		projectsStorePath := makeProjectsStorePath(cache)
+		h := handlers.NewRegistry(fs, r, registryStorePath, projectsStorePath)
 		p.Handler(h)
 	}
 	return nil
+}
+
+func makeRegistryStorePath(cache, registry string) string {
+	r := base64.StdEncoding.EncodeToString([]byte(registry))
+	return filepath.Join(cache, "registries", r)
+}
+
+func makeProjectsStorePath(cache string) string {
+	return filepath.Join(cache, "projects")
 }

@@ -33,14 +33,25 @@ type Registry interface {
 type registry struct {
 	fs afero.Fs
 	r  Registry
+
+	// TODO: gross! This is weird! Make this common for all of these handlers!
+	registryStorePath string
+	projectsStorePath string
 }
 
 // NewRegistry returns a pipeline.Handler that retrieves node.Node's from a
 // Registry.
-func NewRegistry(fs afero.Fs, r Registry) pipeline.Handler {
+func NewRegistry(
+	fs afero.Fs,
+	r Registry,
+	registryStorePath string,
+	projectsStorePath string,
+) pipeline.Handler {
 	return &registry{
-		fs: fs,
-		r:  r,
+		fs:                fs,
+		r:                 r,
+		registryStorePath: registryStorePath,
+		projectsStorePath: projectsStorePath,
 	}
 }
 
@@ -51,9 +62,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 	}
 
 	for _, file := range i.Files {
-		cachePath := filepath.Join(ctx.KV[pipeline.CtxCache], file.SHA256)
-
-		gaggleFile := filepath.Join(cachePath, "gaggle.yml")
+		gaggleFile := filepath.Join(r.registryStorePath, file.SHA256, "gaggle.yml")
 		gaggle := new(registrypkg.Gaggle)
 		logrus.Debugf("considering %s", gaggleFile)
 		if exists, err := afero.Exists(r.fs, gaggleFile); err != nil {
@@ -91,18 +100,32 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			}
 		}
 
-		gaggleDir := filepath.Join(cachePath, "gaggle")
+		metadata := struct {
+			Project string
+		}{}
+		if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
+			return errors.Wrap(err, "decode")
+		}
+
+		projectStorePath := filepath.Join(r.projectsStorePath, metadata.Project)
 		for _, n := range gaggle.Nodes {
-			nN := node.New(filepath.Join(gaggleDir, n.Name))
+			nN := node.New(filepath.Join(projectStorePath, n.Name))
 			for _, d := range n.Dependencies {
-				dName := filepath.Join(gaggleDir, d)
+				dName := filepath.Join(projectStorePath, d)
 				dN := node.Find(dName, ctx.Nodes)
 				if dN == nil {
 					return fmt.Errorf("cannot find dependency %s/%s of %s", d, dName, n)
 				}
+				nN.Dependency(dN)
 			}
 
-			if err := setResolver(ctx, nN, n.Resolver.Name, n.Resolver.Config); err != nil {
+			if err := setResolver(
+				ctx,
+				projectStorePath,
+				nN,
+				n.Resolver.Name,
+				n.Resolver.Config,
+			); err != nil {
 				return errors.Wrap(err, "map")
 			}
 
@@ -118,12 +141,12 @@ func (r *registry) Name() string { return "registry" }
 
 func setResolver(
 	ctx *pipeline.Ctx,
+	projectStorePath string,
 	n *node.Node,
 	name string,
 	config map[string]interface{},
 ) error {
 	root := ctx.KV[pipeline.CtxRoot]
-	cache := ctx.KV[pipeline.CtxCache]
 	compilerC := ctx.KV[pipeline.CtxCompilerC]
 	compilerCC := ctx.KV[pipeline.CtxCompilerCC]
 	archiver := ctx.KV[pipeline.CtxArchiver]
@@ -141,14 +164,9 @@ func setResolver(
 	case "link":
 		r = resolvers.NewLink(root, linker)
 	case "unzip":
-		var err error
-		r, err = createUnzip(config, cache)
-		if err != nil {
-			err = errors.Wrap(err, "create download")
-		}
+		r = resolvers.NewUnzip(projectStorePath)
 	case "download":
-		var err error
-		r, err = createDownload(config, cache)
+		r, err = createDownload(config)
 		if err != nil {
 			err = errors.Wrap(err, "create download")
 		}
@@ -165,17 +183,8 @@ func setResolver(
 	return nil
 }
 
-func createUnzip(
-	config map[string]interface{},
-	cache string,
-) (node.Resolver, error) {
-	outputDir := filepath.Join(cache, "unzip")
-	return resolvers.NewUnzip(outputDir), nil
-}
-
 func createDownload(
 	config map[string]interface{},
-	cache string,
 ) (node.Resolver, error) {
 	c := &http.Client{}
 
@@ -187,7 +196,5 @@ func createDownload(
 		return nil, errors.Wrap(err, "decode")
 	}
 
-	outputFile := filepath.Join(cache, "download", cfg.SHA256)
-
-	return resolvers.NewDownload(c, cfg.URL, cfg.SHA256, outputFile), nil
+	return resolvers.NewDownload(c, cfg.URL, cfg.SHA256), nil
 }

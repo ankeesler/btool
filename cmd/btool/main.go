@@ -57,6 +57,7 @@ func run() error {
 
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,
+		Archiver:   tc.Archiver,
 		Linker:     tc.Linker,
 
 		Registries: strings.Split(*registries, ","),

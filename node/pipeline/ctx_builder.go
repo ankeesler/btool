@@ -58,6 +58,12 @@ func (cb *CtxBuilder) CompilerCC(compiler string) *CtxBuilder {
 	return cb
 }
 
+// Archiver sets the archiver on the CtxBuilder's Ctx, and then returns the CtxBuilder.
+func (cb *CtxBuilder) Archiver(archiver string) *CtxBuilder {
+	cb.ctx.KV[CtxArchiver] = archiver
+	return cb
+}
+
 // Linker sets the linker on the CtxBuilder's Ctx, and then returns the CtxBuilder.
 func (cb *CtxBuilder) Linker(linker string) *CtxBuilder {
 	cb.ctx.KV[CtxLinker] = linker
