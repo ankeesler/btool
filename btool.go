@@ -10,6 +10,7 @@ import (
 
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
+	"github.com/ankeesler/btool/node/pipeline/handlers/resolverfactory"
 	"github.com/ankeesler/btool/node/pipeline/handlers/store"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/pkg/errors"
@@ -55,7 +56,14 @@ func Run(cfg *Cfg) error {
 
 	p := pipeline.New(ctx)
 
-	rhs, err := createRegistryHandlers(fs, s, cfg.Registries)
+	rf := resolverfactory.New(
+		cfg.CompilerC,
+		cfg.CompilerCC,
+		cfg.Archiver,
+		cfg.Linker,
+	)
+
+	rhs, err := createRegistryHandlers(fs, s, rf, cfg.Registries)
 	if err != nil {
 		return errors.Wrap(err, "create registry handlers")
 	}
@@ -85,6 +93,7 @@ func Run(cfg *Cfg) error {
 func createRegistryHandlers(
 	fs afero.Fs,
 	s handlers.Store,
+	rf handlers.ResolverFactory,
 	registries []string,
 ) ([]pipeline.Handler, error) {
 	hs := make([]pipeline.Handler, 0)
@@ -106,7 +115,7 @@ func createRegistryHandlers(
 			r, err = registrypkg.CreateFSRegistry(fs, registry, registry)
 		}
 
-		hs = append(hs, handlers.NewRegistry(fs, s, r))
+		hs = append(hs, handlers.NewRegistry(fs, s, rf, r))
 	}
 
 	return hs, nil

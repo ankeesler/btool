@@ -6,6 +6,7 @@ import (
 
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
@@ -27,6 +28,11 @@ func TestRegistry(t *testing.T) {
 	s.RegistryDirReturns("/some-registry-path")
 	s.ProjectDirReturns("/some-project-path")
 
+	resolver := &nodefakes.FakeResolver{}
+
+	rf := &handlersfakes.FakeResolverFactory{}
+	rf.NewResolverReturns(resolver, nil)
+
 	r := &handlersfakes.FakeRegistry{}
 	index := testutil.Index()
 	registryFileAGaggle := testutil.FileAGaggle()
@@ -47,11 +53,15 @@ func TestRegistry(t *testing.T) {
 	))
 
 	tunaN := node.New("/some-project-path/tuna")
+	tunaN.Resolver = resolver
 	fishN := node.New("/some-project-path/fish").Dependency(tunaN)
+	fishN.Resolver = resolver
 	marlinN := node.New("/some-project-path/marlin")
+	marlinN.Resolver = resolver
 	baconN := node.New("/some-project-path/bacon").Dependency(marlinN)
+	baconN.Resolver = resolver
 
-	h := handlers.NewRegistry(fs, s, r)
+	h := handlers.NewRegistry(fs, s, rf, r)
 	ctx := pipeline.NewCtxBuilder().Build()
 	assert.Nil(t, h.Handle(ctx))
 
@@ -68,6 +78,20 @@ func TestRegistry(t *testing.T) {
 		registryFileBGaggle.Metadata["project"],
 		s.ProjectDirArgsForCall(1),
 	)
+
+	assert.Equal(t, 4, rf.NewResolverCallCount())
+	name, config := rf.NewResolverArgsForCall(0)
+	assert.Equal(t, registryFileAGaggle.Nodes[0].Resolver.Name, name)
+	assert.Equal(t, registryFileAGaggle.Nodes[0].Resolver.Config, config)
+	name, config = rf.NewResolverArgsForCall(1)
+	assert.Equal(t, registryFileAGaggle.Nodes[1].Resolver.Name, name)
+	assert.Equal(t, registryFileAGaggle.Nodes[1].Resolver.Config, config)
+	name, config = rf.NewResolverArgsForCall(2)
+	assert.Equal(t, registryFileBGaggle.Nodes[0].Resolver.Name, name)
+	assert.Equal(t, registryFileBGaggle.Nodes[0].Resolver.Config, config)
+	name, config = rf.NewResolverArgsForCall(3)
+	assert.Equal(t, registryFileBGaggle.Nodes[1].Resolver.Name, name)
+	assert.Equal(t, registryFileBGaggle.Nodes[1].Resolver.Config, config)
 
 	assert.Equal(t, 1, r.IndexCallCount())
 	assert.Equal(t, 1, r.GaggleCallCount())

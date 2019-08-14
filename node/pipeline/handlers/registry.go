@@ -2,13 +2,11 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
 	"path/filepath"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	registrypkg "github.com/ankeesler/btool/node/registry"
-	"github.com/ankeesler/btool/node/resolvers"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -33,6 +31,7 @@ type Registry interface {
 type registry struct {
 	fs afero.Fs
 	s  Store
+	rf ResolverFactory
 	r  Registry
 }
 
@@ -41,11 +40,13 @@ type registry struct {
 func NewRegistry(
 	fs afero.Fs,
 	s Store,
+	rf ResolverFactory,
 	r Registry,
 ) pipeline.Handler {
 	return &registry{
 		fs: fs,
 		s:  s,
+		rf: rf,
 		r:  r,
 	}
 }
@@ -125,15 +126,11 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 				nN.Dependency(dN)
 			}
 
-			if err := setResolver(
-				ctx,
-				projectDir,
-				nN,
-				n.Resolver.Name,
-				n.Resolver.Config,
-			); err != nil {
-				return errors.Wrap(err, "map")
+			r, err := r.rf.NewResolver(n.Resolver.Name, n.Resolver.Config)
+			if err != nil {
+				return errors.Wrap(err, "new resolver")
 			}
+			nN.Resolver = r
 
 			logrus.Debugf("decoded %s to %s", n, nN)
 			ctx.Nodes = append(ctx.Nodes, nN)
@@ -144,65 +141,3 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 }
 
 func (r *registry) Name() string { return "registry" }
-
-func setResolver(
-	ctx *pipeline.Ctx,
-	projectDir string,
-	n *node.Node,
-	name string,
-	config map[string]interface{},
-) error {
-	root := ctx.KV[pipeline.CtxRoot]
-	compilerC := ctx.KV[pipeline.CtxCompilerC]
-	compilerCC := ctx.KV[pipeline.CtxCompilerCC]
-	archiver := ctx.KV[pipeline.CtxArchiver]
-	linker := ctx.KV[pipeline.CtxLinker]
-
-	var r node.Resolver
-	var err error
-	switch name {
-	case "compileC":
-		r = resolvers.NewCompile(root, compilerC, []string{root})
-	case "compileCC":
-		r = resolvers.NewCompile(root, compilerCC, []string{root})
-	case "archive":
-		r = resolvers.NewArchive(root, archiver)
-	case "link":
-		r = resolvers.NewLink(root, linker)
-	case "unzip":
-		r = resolvers.NewUnzip(projectDir)
-	case "download":
-		r, err = createDownload(config)
-		if err != nil {
-			err = errors.Wrap(err, "create download")
-		}
-	case "":
-		r = nil
-	default:
-		err = fmt.Errorf("unknown resolver: %s", name)
-	}
-
-	if err != nil {
-		return err
-	}
-
-	n.Resolver = r
-
-	return nil
-}
-
-func createDownload(
-	config map[string]interface{},
-) (node.Resolver, error) {
-	c := &http.Client{}
-
-	cfg := struct {
-		URL    string
-		SHA256 string
-	}{}
-	if err := mapstructure.Decode(config, &cfg); err != nil {
-		return nil, errors.Wrap(err, "decode")
-	}
-
-	return resolvers.NewDownload(c, cfg.URL, cfg.SHA256), nil
-}

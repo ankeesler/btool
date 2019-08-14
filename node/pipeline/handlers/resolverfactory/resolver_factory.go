@@ -9,19 +9,19 @@ import (
 // These are the known node.Resolver name's that can be provided to
 // ResolverFactory.NewResolver(). They should be self explanatory. :)
 const (
-	NameCompile = "compile"
-	NameArchive = "archive"
-	NameLink    = "link"
+	nameCompile = "compile"
+	nameArchive = "archive"
+	nameLink    = "link"
 
-	NameDownload = "download"
-	NameUnzip    = "unzip"
+	nameDownload = "download"
+	nameUnzip    = "unzip"
 )
 
 // These are the known config options for each node.Resolver that can be provided
 // to ResolverFactory.NewResolver() in the config. They should be self
 // explanatory. :)
 const (
-	ConfigCompileIncludePaths = NameCompile + ".includePaths"
+	configCompileIncludePaths = NameCompile + ".includePaths"
 )
 
 // ResolverFactory is a factory type that can create node.Resolver's.
@@ -29,8 +29,8 @@ type ResolverFactory struct {
 	compilerC, compilerCC, archiver, linker string
 }
 
-// NewResolverFactory creates a new ResolverFactory.
-func NewResolverFactory(
+// New creates a new ResolverFactory.
+func New(
 	compilerC, compilerCC, archiver, linker string,
 ) *ResolverFactory {
 	return &ResolverFactory{
@@ -42,9 +42,6 @@ func NewResolverFactory(
 }
 
 // NewResolver creates a new node.Resolver from the provided name and config.
-// The provided name should be one of the Name* constants defined in this
-// package. The provided config should contains key that are one of the Config*
-// constants provided in this package.
 //
 // NewResolver will return an error if it cannot create a node.Resolver for the
 // provided name and config.
