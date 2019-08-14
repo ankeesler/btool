@@ -9,6 +9,7 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type download struct {
@@ -46,6 +47,12 @@ func (d *download) Resolve(n *node.Node) error {
 	}
 
 	outputFile := n.Name
+	logrus.Debugf(
+		"got %d bytes from %s, writing to %s",
+		len(data),
+		d.url,
+		outputFile,
+	)
 
 	if err := os.MkdirAll(filepath.Dir(outputFile), 0755); err != nil {
 		return errors.Wrap(err, "mkdir all")
