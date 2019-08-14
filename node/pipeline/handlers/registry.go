@@ -56,10 +56,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 		return errors.Wrap(err, "index")
 	}
 
-	registryDir, err := r.s.RegistryDir(i.Name)
-	if err != nil {
-		return errors.Wrap(err, "registry dir")
-	}
+	registryDir := r.s.RegistryDir(i.Name)
 
 	for _, file := range i.Files {
 
@@ -108,10 +105,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			return errors.Wrap(err, "decode")
 		}
 
-		projectDir, err := r.s.ProjectDir(metadata.Project)
-		if err != nil {
-			return errors.Wrap(err, "project dir")
-		}
+		projectDir := r.s.ProjectDir(metadata.Project)
 
 		for _, n := range gaggle.Nodes {
 			nN := node.New(filepath.Join(projectDir, n.Name))

@@ -9,6 +9,7 @@ import (
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
+	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
 	"github.com/ankeesler/btool/node/resolvers"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
@@ -42,7 +43,7 @@ func TestObject(t *testing.T) {
 			compilerC := "cc"
 			compilerCC := "c++"
 
-			h := handlers.NewObject()
+			h := handlers.NewObject(&handlersfakes.FakeStore{})
 			ctx := pipeline.NewCtxBuilder().Nodes(
 				datum.nodes,
 			).Project(

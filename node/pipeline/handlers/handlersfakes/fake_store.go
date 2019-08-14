@@ -8,37 +8,33 @@ import (
 )
 
 type FakeStore struct {
-	ProjectDirStub        func(string) (string, error)
+	ProjectDirStub        func(string) string
 	projectDirMutex       sync.RWMutex
 	projectDirArgsForCall []struct {
 		arg1 string
 	}
 	projectDirReturns struct {
 		result1 string
-		result2 error
 	}
 	projectDirReturnsOnCall map[int]struct {
 		result1 string
-		result2 error
 	}
-	RegistryDirStub        func(string) (string, error)
+	RegistryDirStub        func(string) string
 	registryDirMutex       sync.RWMutex
 	registryDirArgsForCall []struct {
 		arg1 string
 	}
 	registryDirReturns struct {
 		result1 string
-		result2 error
 	}
 	registryDirReturnsOnCall map[int]struct {
 		result1 string
-		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeStore) ProjectDir(arg1 string) (string, error) {
+func (fake *FakeStore) ProjectDir(arg1 string) string {
 	fake.projectDirMutex.Lock()
 	ret, specificReturn := fake.projectDirReturnsOnCall[len(fake.projectDirArgsForCall)]
 	fake.projectDirArgsForCall = append(fake.projectDirArgsForCall, struct {
@@ -50,10 +46,10 @@ func (fake *FakeStore) ProjectDir(arg1 string) (string, error) {
 		return fake.ProjectDirStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
 	fakeReturns := fake.projectDirReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *FakeStore) ProjectDirCallCount() int {
@@ -62,7 +58,7 @@ func (fake *FakeStore) ProjectDirCallCount() int {
 	return len(fake.projectDirArgsForCall)
 }
 
-func (fake *FakeStore) ProjectDirCalls(stub func(string) (string, error)) {
+func (fake *FakeStore) ProjectDirCalls(stub func(string) string) {
 	fake.projectDirMutex.Lock()
 	defer fake.projectDirMutex.Unlock()
 	fake.ProjectDirStub = stub
@@ -75,33 +71,30 @@ func (fake *FakeStore) ProjectDirArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeStore) ProjectDirReturns(result1 string, result2 error) {
+func (fake *FakeStore) ProjectDirReturns(result1 string) {
 	fake.projectDirMutex.Lock()
 	defer fake.projectDirMutex.Unlock()
 	fake.ProjectDirStub = nil
 	fake.projectDirReturns = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
-func (fake *FakeStore) ProjectDirReturnsOnCall(i int, result1 string, result2 error) {
+func (fake *FakeStore) ProjectDirReturnsOnCall(i int, result1 string) {
 	fake.projectDirMutex.Lock()
 	defer fake.projectDirMutex.Unlock()
 	fake.ProjectDirStub = nil
 	if fake.projectDirReturnsOnCall == nil {
 		fake.projectDirReturnsOnCall = make(map[int]struct {
 			result1 string
-			result2 error
 		})
 	}
 	fake.projectDirReturnsOnCall[i] = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
-func (fake *FakeStore) RegistryDir(arg1 string) (string, error) {
+func (fake *FakeStore) RegistryDir(arg1 string) string {
 	fake.registryDirMutex.Lock()
 	ret, specificReturn := fake.registryDirReturnsOnCall[len(fake.registryDirArgsForCall)]
 	fake.registryDirArgsForCall = append(fake.registryDirArgsForCall, struct {
@@ -113,10 +106,10 @@ func (fake *FakeStore) RegistryDir(arg1 string) (string, error) {
 		return fake.RegistryDirStub(arg1)
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
 	fakeReturns := fake.registryDirReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *FakeStore) RegistryDirCallCount() int {
@@ -125,7 +118,7 @@ func (fake *FakeStore) RegistryDirCallCount() int {
 	return len(fake.registryDirArgsForCall)
 }
 
-func (fake *FakeStore) RegistryDirCalls(stub func(string) (string, error)) {
+func (fake *FakeStore) RegistryDirCalls(stub func(string) string) {
 	fake.registryDirMutex.Lock()
 	defer fake.registryDirMutex.Unlock()
 	fake.RegistryDirStub = stub
@@ -138,30 +131,27 @@ func (fake *FakeStore) RegistryDirArgsForCall(i int) string {
 	return argsForCall.arg1
 }
 
-func (fake *FakeStore) RegistryDirReturns(result1 string, result2 error) {
+func (fake *FakeStore) RegistryDirReturns(result1 string) {
 	fake.registryDirMutex.Lock()
 	defer fake.registryDirMutex.Unlock()
 	fake.RegistryDirStub = nil
 	fake.registryDirReturns = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
-func (fake *FakeStore) RegistryDirReturnsOnCall(i int, result1 string, result2 error) {
+func (fake *FakeStore) RegistryDirReturnsOnCall(i int, result1 string) {
 	fake.registryDirMutex.Lock()
 	defer fake.registryDirMutex.Unlock()
 	fake.RegistryDirStub = nil
 	if fake.registryDirReturnsOnCall == nil {
 		fake.registryDirReturnsOnCall = make(map[int]struct {
 			result1 string
-			result2 error
 		})
 	}
 	fake.registryDirReturnsOnCall[i] = struct {
 		result1 string
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
 func (fake *FakeStore) Invocations() map[string][][]interface{} {

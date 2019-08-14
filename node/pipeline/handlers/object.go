@@ -12,12 +12,15 @@ import (
 )
 
 type object struct {
+	s Store
 }
 
 // NewObject creates a pipeline.Handler that will add object file node.Node's to
 // the node.Node list based on an object target.
-func NewObject() pipeline.Handler {
-	return &object{}
+func NewObject(s Store) pipeline.Handler {
+	return &object{
+		s: s,
+	}
 }
 
 func (o *object) Handle(ctx *pipeline.Ctx) error {

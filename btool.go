@@ -66,7 +66,7 @@ func Run(cfg *Cfg) error {
 	p.Handler(
 		handlers.NewFS(fs),
 	).Handler(
-		handlers.NewObject(),
+		handlers.NewObject(s),
 	).Handler(
 		handlers.NewExecutable(),
 	).Handler(

@@ -17,10 +17,10 @@ func New(cache string) *Store {
 	}
 }
 
-func (s *Store) RegistryDir(registry string) (string, error) {
-	return filepath.Join(s.cache, "registries", registry), nil
+func (s *Store) RegistryDir(registry string) string {
+	return filepath.Join(s.cache, "registries", registry)
 }
 
-func (s *Store) ProjectDir(project string) (string, error) {
-	return filepath.Join(s.cache, "projects", project), nil
+func (s *Store) ProjectDir(project string) string {
+	return filepath.Join(s.cache, "projects", project)
 }

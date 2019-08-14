@@ -24,8 +24,8 @@ func TestRegistry(t *testing.T) {
 	fs := afero.NewMemMapFs()
 
 	s := &handlersfakes.FakeStore{}
-	s.RegistryDirReturns("/some-registry-path", nil)
-	s.ProjectDirReturns("/some-project-path", nil)
+	s.RegistryDirReturns("/some-registry-path")
+	s.ProjectDirReturns("/some-project-path")
 
 	r := &handlersfakes.FakeRegistry{}
 	index := testutil.Index()
