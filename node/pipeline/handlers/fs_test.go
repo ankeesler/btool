@@ -10,6 +10,8 @@ import (
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestFS(t *testing.T) {
@@ -34,29 +36,21 @@ func TestFS(t *testing.T) {
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
-			root := "/"
-
 			fs := afero.NewMemMapFs()
-			datum.exNodes.PopulateFS(root, fs)
+			datum.exNodes.PopulateFS("/", fs)
 
-			h := handlers.NewFS(fs)
+			h := handlers.NewFS(fs, "/")
 
-			ctx := pipeline.NewCtxBuilder().Root(root).Build()
+			ctx := pipeline.NewCtx()
 			err := h.Handle(ctx)
 			if datum.exSuccess {
-				if err != nil {
-					t.Fatal(err)
-				}
+				require.Nil(t, err)
 			} else {
-				if err == nil {
-					t.Fatal("expected failure")
-				}
+				require.NotNil(t, err, "expected error to have occurred")
 				return
 			}
 
-			if diff := deep.Equal(datum.exNodes.Cast(), ctx.Nodes); diff != nil {
-				t.Error(diff)
-			}
+			assert.Nil(t, deep.Equal(datum.exNodes.Cast(), ctx.Nodes))
 		})
 	}
 }

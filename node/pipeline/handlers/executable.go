@@ -7,7 +7,6 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,29 +57,17 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 	}
 
 	objectNodes := make([]*node.Node, 0)
-	var err error
-	objectNodes, err = e.collectObjects(ctx, dN, objectNodes)
-	if err != nil {
-		return errors.Wrap(err, "collect objects")
-	}
+	objectNodes = e.collectObjects(ctx, dN, objectNodes)
 
 	targetN := node.New(e.target)
 	for _, objectN := range objectNodes {
 		ctx.Nodes = append(ctx.Nodes, objectN)
 		targetN.Dependency(objectN)
 	}
-	name := "link"
-	config := make(map[string]interface{})
-	targetN.Resolver, err = e.rf.NewResolver(name, config)
-	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("new %s resolver", name))
-	}
+	targetN.Resolver = e.rf.NewLink()
 	ctx.Nodes = append(ctx.Nodes, targetN)
 
-	symlinkN, err := symlinkNFromN(e.rf, targetN, e.target)
-	if err != nil {
-		return errors.Wrap(err, "symlink from n")
-	}
+	symlinkN := symlinkNFromN(e.rf, targetN, e.target)
 	ctx.Nodes = append(ctx.Nodes, symlinkN)
 
 	return nil
@@ -92,16 +79,12 @@ func (e *executable) collectObjects(
 	ctx *pipeline.Ctx,
 	sourceN *node.Node,
 	objectNodes []*node.Node,
-) ([]*node.Node, error) {
+) []*node.Node {
 	logrus.Debugf("collect objects from %s", sourceN.Name)
 
-	objectN, err := objectNFromSourceN(e.s, e.rf, e.project, sourceN)
-	if err != nil {
-		return nil, errors.Wrap(err, "object from source")
-	}
-
+	objectN := objectNFromSourceN(e.s, e.rf, e.project, sourceN)
 	if node.Find(objectN.Name, objectNodes) != nil {
-		return objectNodes, nil
+		return objectNodes
 	}
 	objectNodes = append(objectNodes, objectN)
 
@@ -115,12 +98,9 @@ func (e *executable) collectObjects(
 		sourceN := node.Find(source, ctx.Nodes)
 		logrus.Debugf("dependency %s, source %s, found %s", dN, source, sourceN)
 		if sourceN != nil {
-			objectNodes, err = e.collectObjects(ctx, sourceN, objectNodes)
-			if err != nil {
-				return nil, err
-			}
+			objectNodes = e.collectObjects(ctx, sourceN, objectNodes)
 		}
 	}
 
-	return objectNodes, nil
+	return objectNodes
 }

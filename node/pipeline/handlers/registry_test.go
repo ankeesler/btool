@@ -25,18 +25,30 @@ func TestRegistry(t *testing.T) {
 	fs := afero.NewMemMapFs()
 
 	s := &handlersfakes.FakeStore{}
-	s.RegistryDirReturns("/some-registry-path")
-	s.ProjectDirReturns("/some-project-path")
+	s.RegistryDirReturns("/some-registry-dir")
+	s.ProjectDirReturns("/some-project-dir")
 
-	resolver := &nodefakes.FakeResolver{}
+	compileCR := &nodefakes.FakeResolver{}
+	compileCCR := &nodefakes.FakeResolver{}
+	unzipR := &nodefakes.FakeResolver{}
+	downloadR := &nodefakes.FakeResolver{}
 
 	rf := &handlersfakes.FakeResolverFactory{}
-	rf.NewResolverReturns(resolver, nil)
+	rf.NewCompileCReturnsOnCall(0, compileCR)
+	rf.NewCompileCCReturnsOnCall(0, compileCCR)
+	rf.NewUnzipReturnsOnCall(0, unzipR)
+	rf.NewDownloadReturnsOnCall(0, downloadR)
 
 	r := &handlersfakes.FakeRegistry{}
 	index := testutil.Index()
 	registryFileAGaggle := testutil.FileAGaggle()
+	registryFileAGaggle.Nodes[0].Resolver.Name = "compileC"
+	registryFileAGaggle.Nodes[1].Resolver.Name = "compileCC"
 	registryFileBGaggle := testutil.FileBGaggle()
+	registryFileBGaggle.Nodes[0].Resolver.Name = "unzip"
+	registryFileBGaggle.Nodes[1].Resolver.Name = "download"
+	registryFileBGaggle.Nodes[1].Resolver.Config["url"] = "some url"
+	registryFileBGaggle.Nodes[1].Resolver.Config["sha256"] = "some sha"
 	r.IndexReturns(index, nil)
 	r.GaggleReturnsOnCall(0, registryFileAGaggle, nil)
 
@@ -45,24 +57,24 @@ func TestRegistry(t *testing.T) {
 	assert.Nil(t, afero.WriteFile(
 		fs,
 		filepath.Join(
-			"/some-registry-path",
+			"/some-registry-dir",
 			index.Files[1].SHA256+".yml",
 		),
 		data,
 		0644,
 	))
 
-	tunaN := node.New("/some-project-path/tuna")
-	tunaN.Resolver = resolver
-	fishN := node.New("/some-project-path/fish").Dependency(tunaN)
-	fishN.Resolver = resolver
-	marlinN := node.New("/some-project-path/marlin")
-	marlinN.Resolver = resolver
-	baconN := node.New("/some-project-path/bacon").Dependency(marlinN)
-	baconN.Resolver = resolver
+	tunaN := node.New("/some-project-dir/tuna")
+	tunaN.Resolver = compileCR
+	fishN := node.New("/some-project-dir/fish").Dependency(tunaN)
+	fishN.Resolver = compileCCR
+	marlinN := node.New("/some-project-dir/marlin")
+	marlinN.Resolver = unzipR
+	baconN := node.New("/some-project-dir/bacon").Dependency(marlinN)
+	baconN.Resolver = downloadR
 
 	h := handlers.NewRegistry(fs, s, rf, r)
-	ctx := pipeline.NewCtxBuilder().Build()
+	ctx := pipeline.NewCtx()
 	assert.Nil(t, h.Handle(ctx))
 
 	assert.Equal(t, 1, s.RegistryDirCallCount())
@@ -79,19 +91,16 @@ func TestRegistry(t *testing.T) {
 		s.ProjectDirArgsForCall(1),
 	)
 
-	assert.Equal(t, 4, rf.NewResolverCallCount())
-	name, config := rf.NewResolverArgsForCall(0)
-	assert.Equal(t, registryFileAGaggle.Nodes[0].Resolver.Name, name)
-	assert.Equal(t, registryFileAGaggle.Nodes[0].Resolver.Config, config)
-	name, config = rf.NewResolverArgsForCall(1)
-	assert.Equal(t, registryFileAGaggle.Nodes[1].Resolver.Name, name)
-	assert.Equal(t, registryFileAGaggle.Nodes[1].Resolver.Config, config)
-	name, config = rf.NewResolverArgsForCall(2)
-	assert.Equal(t, registryFileBGaggle.Nodes[0].Resolver.Name, name)
-	assert.Equal(t, registryFileBGaggle.Nodes[0].Resolver.Config, config)
-	name, config = rf.NewResolverArgsForCall(3)
-	assert.Equal(t, registryFileBGaggle.Nodes[1].Resolver.Name, name)
-	assert.Equal(t, registryFileBGaggle.Nodes[1].Resolver.Config, config)
+	assert.Equal(t, 1, rf.NewCompileCCallCount())
+	assert.Equal(t, []string{"/some-project-dir"}, rf.NewCompileCArgsForCall(0))
+	assert.Equal(t, 1, rf.NewCompileCCCallCount())
+	assert.Equal(t, []string{"/some-project-dir"}, rf.NewCompileCCArgsForCall(0))
+	assert.Equal(t, 1, rf.NewUnzipCallCount())
+	assert.Equal(t, "/some-project-dir", rf.NewUnzipArgsForCall(0))
+	assert.Equal(t, 1, rf.NewDownloadCallCount())
+	url, sha256 := rf.NewDownloadArgsForCall(0)
+	assert.Equal(t, "some url", url)
+	assert.Equal(t, "some sha", sha256)
 
 	assert.Equal(t, 1, r.IndexCallCount())
 	assert.Equal(t, 1, r.GaggleCallCount())

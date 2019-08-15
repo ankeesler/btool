@@ -36,7 +36,8 @@ func TestSortAlpha(t *testing.T) {
 		nodeCCpy.Dependency(node3).Dependency(node2).Dependency(node1),
 	}
 
-	ctx := pipeline.NewCtxBuilder().Nodes(nodes).Build()
+	ctx := pipeline.NewCtx()
+	ctx.Nodes = nodes
 	if err := h.Handle(ctx); err != nil {
 		t.Error(err)
 	}

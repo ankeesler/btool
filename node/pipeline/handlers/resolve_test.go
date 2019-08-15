@@ -12,6 +12,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/require"
 )
 
 func TestResolve(t *testing.T) {
@@ -119,19 +120,11 @@ func TestResolve(t *testing.T) {
 				}
 			}
 
-			h := handlers.NewResolve(fs)
-			ctx := pipeline.NewCtxBuilder().Nodes(
-				datum.nodes,
-			).Target(
-				datum.target,
-			).Build()
-			if err := h.Handle(ctx); err != nil {
-				t.Fatal(err)
-			}
-
-			if diff := deep.Equal(datum.exResolved, acResolved); diff != nil {
-				t.Fatal(diff)
-			}
+			h := handlers.NewResolve(fs, datum.target)
+			ctx := pipeline.NewCtx()
+			ctx.Nodes = datum.nodes
+			require.Nil(t, h.Handle(ctx))
+			require.Nil(t, deep.Equal(datum.exResolved, acResolved))
 		})
 	}
 }

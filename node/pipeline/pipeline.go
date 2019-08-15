@@ -22,6 +22,7 @@ import (
 type Handler interface {
 	Handle(*Ctx) error
 
+	// TODO: change me to String()! And get rid of me!
 	// Name returns an identifying name for this Handler. This helps with
 	// debugging.
 	Name() string

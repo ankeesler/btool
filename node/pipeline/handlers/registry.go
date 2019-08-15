@@ -127,12 +127,11 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 				nN.Dependency(dN)
 			}
 
-			n.Resolver.Config["outputDir"] = projectDir
-			r, err := r.rf.NewResolver(n.Resolver.Name, n.Resolver.Config)
+			nodeR, err := r.newResolver(n.Resolver, projectDir)
 			if err != nil {
 				return errors.Wrap(err, "new resolver")
 			}
-			nN.Resolver = r
+			nN.Resolver = nodeR
 
 			logrus.Debugf("decoded %s to %s", n, nN)
 			ctx.Nodes = append(ctx.Nodes, nN)
@@ -143,3 +142,51 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 }
 
 func (r *registry) Name() string { return "registry" }
+
+func (r *registry) newResolver(
+	registryR registrypkg.Resolver,
+	projectDir string,
+) (node.Resolver, error) {
+	name := registryR.Name
+	config := registryR.Config
+
+	var nodeR node.Resolver
+	var err error
+	switch name {
+	case "compileC":
+		nodeR = r.rf.NewCompileC([]string{projectDir})
+	case "compileCC":
+		nodeR = r.rf.NewCompileCC([]string{projectDir})
+	case "archive":
+		nodeR = r.rf.NewArchive()
+	case "link":
+		nodeR = r.rf.NewLink()
+	case "symlink":
+		nodeR = r.rf.NewSymlink()
+	case "unzip":
+		nodeR = r.rf.NewUnzip(projectDir)
+	case "download":
+		nodeR, err = r.createDownload(config)
+		if err != nil {
+			err = errors.Wrap(err, "create download")
+		}
+	default:
+		err = fmt.Errorf("unknown resolver: %s", name)
+	}
+
+	return nodeR, err
+}
+
+func (r *registry) createDownload(
+	config map[string]interface{},
+) (node.Resolver, error) {
+	cfg := struct {
+		URL    string
+		SHA256 string
+	}{}
+	if err := mapstructure.Decode(config, &cfg); err != nil {
+		return nil, errors.Wrap(err, "decode")
+	}
+
+	return r.rf.NewDownload(cfg.URL, cfg.SHA256), nil
+}

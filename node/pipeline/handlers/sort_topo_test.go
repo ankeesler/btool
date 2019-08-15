@@ -33,12 +33,12 @@ func TestSortTopo(t *testing.T) {
 	}
 
 	// Happy.
-	ctx := pipeline.NewCtxBuilder().Nodes(
-		[]*node.Node{
-			mainc,
-			dep1h,
-			dep0h,
-		}).Build()
+	ctx := pipeline.NewCtx()
+	ctx.Nodes = []*node.Node{
+		mainc,
+		dep1h,
+		dep0h,
+	}
 	if err := h.Handle(ctx); err != nil {
 		t.Error(err)
 	}

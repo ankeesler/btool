@@ -1,19 +1,20 @@
 package handlers_test
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
-	"github.com/ankeesler/btool/node/resolvers"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestObject(t *testing.T) {
@@ -36,61 +37,48 @@ func TestObject(t *testing.T) {
 
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
-			project := "project"
-			root := "/root"
-			cache := "/cache"
-			target := "dep-1/dep-1.o"
-			compilerC := "cc"
-			compilerCC := "c++"
+			s := &handlersfakes.FakeStore{}
+			s.ProjectDirReturns("/some-project-dir")
 
-			h := handlers.NewObject(&handlersfakes.FakeStore{})
-			ctx := pipeline.NewCtxBuilder().Nodes(
-				datum.nodes,
-			).Project(
-				project,
-			).Root(
-				root,
-			).Cache(
-				cache,
-			).Target(
-				target,
-			).CompilerC(
-				compilerC,
-			).CompilerCC(
-				compilerCC,
-			).Build()
+			compileCR := &nodefakes.FakeResolver{}
+			compileCCR := &nodefakes.FakeResolver{}
+			symlinkR := &nodefakes.FakeResolver{}
 
-			var compiler string
+			rf := &handlersfakes.FakeResolverFactory{}
+			rf.NewCompileCReturnsOnCall(0, compileCR)
+			rf.NewCompileCCReturnsOnCall(0, compileCCR)
+			rf.NewSymlinkReturnsOnCall(0, symlinkR)
+
+			h := handlers.NewObject(s, rf, "some-project", "dep-1/dep-1.o")
+			ctx := pipeline.NewCtx()
+			ctx.Nodes = datum.nodes
+
 			var ext string
 			if strings.HasSuffix(datum.name, "CC") {
-				compiler = compilerCC
 				ext = ".cc"
 			} else {
-				compiler = compilerC
 				ext = ".c"
 			}
 
 			source := "dep-1/dep-1" + ext
 			sourceN := node.Find(source, ctx.Nodes)
-			if sourceN == nil {
-				t.Fatal()
-			}
-			name := filepath.Join(cache, project, "object", target)
+			require.NotNil(t, sourceN)
+
+			name := "dep-1/dep-1.o"
 			objectN := node.New(name).Dependency(sourceN)
-			objectN.Resolver = resolvers.NewCompile(root, compiler, []string{root})
+			if strings.HasSuffix(datum.name, "CC") {
+				objectN.Resolver = compileCCR
+			} else {
+				objectN.Resolver = compileCR
+			}
 			exNodes := append(datum.nodes.Copy().Cast(), objectN)
 
-			symlinkN := node.New(target).Dependency(objectN)
-			symlinkN.Resolver = resolvers.NewSymlink()
+			symlinkN := node.New("dep-1/dep-1.o").Dependency(objectN)
+			symlinkN.Resolver = symlinkR
 			exNodes = append(exNodes, symlinkN)
 
-			if err := h.Handle(ctx); err != nil {
-				t.Error()
-			}
-
-			if diff := deep.Equal(exNodes, ctx.Nodes); diff != nil {
-				t.Error(diff)
-			}
+			assert.Nil(t, h.Handle(ctx))
+			assert.Nil(t, deep.Equal(exNodes, ctx.Nodes))
 		})
 	}
 }

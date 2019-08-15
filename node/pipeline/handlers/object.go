@@ -7,7 +7,6 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -57,16 +56,10 @@ func (o *object) Handle(ctx *pipeline.Ctx) error {
 		return fmt.Errorf("unknown source for object %s", o.target)
 	}
 
-	objectN, err := objectNFromSourceN(o.s, o.rf, o.project, dN)
-	if err != nil {
-		return errors.Wrap(err, "object from source")
-	}
+	objectN := objectNFromSourceN(o.s, o.rf, o.project, dN)
 	ctx.Nodes = append(ctx.Nodes, objectN)
 
-	symlinkN, err := symlinkNFromN(o.rf, objectN, o.target)
-	if err != nil {
-		return errors.Wrap(err, "symlink from n")
-	}
+	symlinkN := symlinkNFromN(o.rf, objectN, o.target)
 	ctx.Nodes = append(ctx.Nodes, symlinkN)
 
 	return nil
@@ -79,16 +72,15 @@ func objectNFromSourceN(
 	rf ResolverFactory,
 	project string,
 	sourceN *node.Node,
-) (*node.Node, error) {
+) *node.Node {
 	ext := filepath.Ext(sourceN.Name)
 
-	name := "compile" + ext
-	config := map[string]interface{}{
-		"includePaths": []string{s.ProjectDir(project)},
-	}
-	r, err := rf.NewResolver(name, config)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("new %s resolver", name))
+	includeDirs := []string{s.ProjectDir(project)}
+	var r node.Resolver
+	if ext == ".cc" {
+		r = rf.NewCompileCC(includeDirs)
+	} else {
+		r = rf.NewCompileC(includeDirs)
 	}
 
 	object := strings.ReplaceAll(sourceN.Name, ext, ".o")
@@ -99,23 +91,15 @@ func objectNFromSourceN(
 	)
 	objectN := node.New(object).Dependency(sourceN)
 	objectN.Resolver = r
-	return objectN, nil
+	return objectN
 }
 
 func symlinkNFromN(
 	rf ResolverFactory,
 	n *node.Node,
 	target string,
-) (*node.Node, error) {
-	name := "symlink"
-	config := make(map[string]interface{})
-	r, err := rf.NewResolver("symlink", config)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("new %s resolver", name))
-	}
-
+) *node.Node {
 	symlinkN := node.New(target).Dependency(n)
-	symlinkN.Resolver = r
-
-	return symlinkN, nil
+	symlinkN.Resolver = rf.NewSymlink()
+	return symlinkN
 }
