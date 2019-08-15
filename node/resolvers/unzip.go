@@ -59,31 +59,42 @@ func (u *unzip) unzip(
 	}
 
 	for _, file := range zipR.File {
-		logrus.Debugf("unzip: examining file %s", file.Name)
-
-		fileR, err := file.Open()
-		if err != nil {
-			return errors.Wrap(err, "open file")
+		logrus.Debugf("unzip file %s", file.Name)
+		if err := u.unzipFile(fs, destDir, file); err != nil {
+			return errors.Wrap(err, "unzip file")
 		}
-		defer fileR.Close()
+	}
 
-		path := filepath.Join(destDir, file.Name)
-		if file.FileInfo().IsDir() {
-			logrus.Debugf("unzip: mkdir %s", path)
-			if err := fs.Mkdir(path, 0755); err != nil {
-				return errors.Wrap(err, "mkdir")
-			}
-		} else {
-			logrus.Debugf("unzip: create %s", path)
-			w, err := fs.Create(path)
-			if err != nil {
-				return errors.Wrap(err, "create file")
-			}
-			defer w.Close()
+	return nil
+}
 
-			if _, err := io.Copy(w, fileR); err != nil {
-				return errors.Wrap(err, "copy")
-			}
+func (u *unzip) unzipFile(
+	fs afero.Fs,
+	destDir string,
+	file *zip.File,
+) error {
+	fileR, err := file.Open()
+	if err != nil {
+		return errors.Wrap(err, "open")
+	}
+	defer fileR.Close()
+
+	path := filepath.Join(destDir, file.Name)
+	if file.FileInfo().IsDir() {
+		logrus.Debugf("unzip: mkdir %s", path)
+		if err := fs.Mkdir(path, 0755); err != nil {
+			return errors.Wrap(err, "mkdir")
+		}
+	} else {
+		logrus.Debugf("unzip: create %s", path)
+		w, err := fs.Create(path)
+		if err != nil {
+			return errors.Wrap(err, "create")
+		}
+		defer w.Close()
+
+		if _, err := io.Copy(w, fileR); err != nil {
+			return errors.Wrap(err, "copy")
 		}
 	}
 

@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/ankeesler/btool/node"
@@ -84,11 +83,6 @@ func (r *resolve) resolve(
 
 	if n.Resolver != nil && (!exists || latestT.After(stat.ModTime())) {
 		logrus.Debugf("really resolving %s", n.Name)
-
-		dir := filepath.Dir(n.Name)
-		if err := r.fs.MkdirAll(dir, 0755); err != nil {
-			return time.Time{}, errors.Wrap(err, "mkdir "+dir)
-		}
 
 		if err := n.Resolver.Resolve(n); err != nil {
 			return time.Time{}, errors.Wrap(err, "really resolve "+n.Name)
