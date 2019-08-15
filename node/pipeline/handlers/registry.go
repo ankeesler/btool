@@ -115,6 +115,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 
 				var dN *node.Node
 				if d == "$this" {
+					// TODO: test me.
 					dN = node.New(gaggleFile)
 				} else {
 					dN = node.Find(dName, ctx.Nodes)
@@ -126,6 +127,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 				nN.Dependency(dN)
 			}
 
+			n.Resolver.Config["outputDir"] = projectDir
 			r, err := r.rf.NewResolver(n.Resolver.Name, n.Resolver.Config)
 			if err != nil {
 				return errors.Wrap(err, "new resolver")

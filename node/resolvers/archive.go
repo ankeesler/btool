@@ -9,15 +9,13 @@ import (
 )
 
 type archive struct {
-	dir      string
 	archiver string
 }
 
 // NewArchive returns a node.Resolver that runs the archiver in order to generate
 // a static library.
-func NewArchive(dir, archiver string) node.Resolver {
+func NewArchive(archiver string) node.Resolver {
 	return &archive{
-		dir:      dir,
 		archiver: archiver,
 	}
 }
@@ -33,7 +31,6 @@ func (a *archive) Resolve(n *node.Node) error {
 	for _, dN := range n.Dependencies {
 		cmd.Args = append(cmd.Args, dN.Name)
 	}
-	cmd.Dir = a.dir
 
 	logrus.Debugf("archiver: running %s from %s", cmd.Args, cmd.Dir)
 	o, err := cmd.CombinedOutput()

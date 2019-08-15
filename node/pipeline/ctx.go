@@ -6,20 +6,6 @@ import (
 	"github.com/ankeesler/btool/node"
 )
 
-// The following are core pieces of information that apply to every member of
-// the Pipeline.
-const (
-	CtxProject = "pipeline.project"
-	CtxRoot    = "pipeline.root"
-	CtxCache   = "pipeline.cache"
-	CtxTarget  = "pipeline.target"
-
-	CtxCompilerC  = "pipeline.compiler.c"
-	CtxCompilerCC = "pipeline.compiler.cc"
-	CtxArchiver   = "pipeline.archiver"
-	CtxLinker     = "pipeline.linker"
-)
-
 // Ctx provides 2 things:
 //   - the node.Node list on which this Pipeline is operating
 //   - a key-value store of information about a particular Pipeline

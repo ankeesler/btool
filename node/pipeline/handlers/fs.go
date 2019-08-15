@@ -15,31 +15,31 @@ import (
 
 type fs struct {
 	effess afero.Fs
+	root   string
 }
 
 // NewFile creates pipeline.Handler that walks a file tree from a root and
 // collects .c/.cc and .h files.
-func NewFS(effess afero.Fs) pipeline.Handler {
+func NewFS(effess afero.Fs, root string) pipeline.Handler {
 	return &fs{
 		effess: effess,
+		root:   root,
 	}
 }
 
 func (fs *fs) Handle(ctx *pipeline.Ctx) error {
-	root := ctx.KV[pipeline.CtxRoot]
-
-	logrus.Debugf("scanning from root %s", root)
+	logrus.Debugf("scanning from root %s", fs.root)
 
 	nodeMap := make(map[string]*node.Node)
 	if err := afero.Walk(
 		fs.effess,
-		root,
+		fs.root,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return errors.Wrap(err, "walk")
 			}
 
-			rootRelPath, err := filepath.Rel(root, path)
+			rootRelPath, err := filepath.Rel(fs.root, path)
 			if err != nil {
 				return errors.Wrap(err, "rel")
 			}
@@ -69,7 +69,7 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 
 	for _, n := range nodeMap {
 		logrus.Debugf("deps_local: handling node %s", n)
-		if err := fs.handleNode(n, nodeMap, root); err != nil {
+		if err := fs.handleNode(n, nodeMap, fs.root); err != nil {
 			return errors.Wrap(err, fmt.Sprintf("handle node %s", n.Name))
 		}
 	}

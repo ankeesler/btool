@@ -10,16 +10,14 @@ import (
 )
 
 type compile struct {
-	dir      string
 	compiler string
 	includes []string
 }
 
 // NewCompile returns a node.Resolver that runs a compiler in order to generate
 // an object file.
-func NewCompile(dir, compiler string, includes []string) node.Resolver {
+func NewCompile(compiler string, includes []string) node.Resolver {
 	return &compile{
-		dir:      dir,
 		compiler: compiler,
 		includes: includes,
 	}
@@ -44,7 +42,6 @@ func (c *compile) Resolve(n *node.Node) error {
 	for _, include := range c.includes {
 		cmd.Args = append(cmd.Args, "-I"+include)
 	}
-	cmd.Dir = c.dir
 
 	logrus.Debugf("compiler: running %s from %s", cmd.Args, cmd.Dir)
 	o, err := cmd.CombinedOutput()

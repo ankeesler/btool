@@ -3,7 +3,6 @@
 package btool
 
 import (
-	"encoding/base64"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -38,22 +37,7 @@ func Run(cfg *Cfg) error {
 	fs := afero.NewOsFs()
 	s := store.New(cfg.Cache)
 
-	ctx := pipeline.NewCtxBuilder().Root(
-		cfg.Root,
-	).Cache(
-		cfg.Cache,
-	).Target(
-		cfg.Target,
-	).CompilerC(
-		cfg.CompilerC,
-	).CompilerCC(
-		cfg.CompilerCC,
-	).Archiver(
-		cfg.Archiver,
-	).Linker(
-		cfg.Linker,
-	).Build()
-
+	ctx := pipeline.NewCtx()
 	p := pipeline.New(ctx)
 
 	rf := resolverfactory.New(
@@ -69,12 +53,18 @@ func Run(cfg *Cfg) error {
 	}
 	p.Handlers(rhs...)
 
+	rootAbs, err := filepath.Abs(cfg.Root)
+	if err != nil {
+		return errors.Wrap(err, "abs")
+	}
+	project := filepath.Dir(rootAbs)
+
 	p.Handlers(
-		handlers.NewFS(fs),
-		handlers.NewObject(s),
-		handlers.NewExecutable(),
+		handlers.NewFS(fs, cfg.Root),
+		handlers.NewObject(s, rf, project, cfg.Target),
+		handlers.NewExecutable(s, rf, project, cfg.Target),
 		handlers.NewSortAlpha(),
-		handlers.NewResolve(fs),
+		handlers.NewResolve(fs, cfg.Target),
 	)
 
 	if err := p.Run(); err != nil {
@@ -113,13 +103,4 @@ func createRegistryHandlers(
 	}
 
 	return hs, nil
-}
-
-func makeRegistryStorePath(cache, registry string) string {
-	r := base64.StdEncoding.EncodeToString([]byte(registry))
-	return filepath.Join(cache, "registries", r)
-}
-
-func makeProjectsStorePath(cache string) string {
-	return filepath.Join(cache, "projects")
 }

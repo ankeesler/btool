@@ -7,35 +7,45 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/ankeesler/btool/node/resolvers"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type object struct {
-	s Store
+	s       Store
+	rf      ResolverFactory
+	project string
+	target  string
 }
 
 // NewObject creates a pipeline.Handler that will add object file node.Node's to
 // the node.Node list based on an object target.
-func NewObject(s Store) pipeline.Handler {
+func NewObject(
+	s Store,
+	rf ResolverFactory,
+	project string,
+	target string,
+) pipeline.Handler {
 	return &object{
-		s: s,
+		s:       s,
+		rf:      rf,
+		project: project,
+		target:  target,
 	}
 }
 
 func (o *object) Handle(ctx *pipeline.Ctx) error {
-	target := ctx.KV[pipeline.CtxTarget]
-	if !strings.HasSuffix(target, ".o") {
+	if !strings.HasSuffix(o.target, ".o") {
 		return nil
 	}
 
 	var dN *node.Node
-	sourceCN := node.Find(strings.ReplaceAll(target, ".o", ".c"), ctx.Nodes)
-	sourceCCN := node.Find(strings.ReplaceAll(target, ".o", ".cc"), ctx.Nodes)
+	sourceCN := node.Find(strings.ReplaceAll(o.target, ".o", ".c"), ctx.Nodes)
+	sourceCCN := node.Find(strings.ReplaceAll(o.target, ".o", ".cc"), ctx.Nodes)
 	if sourceCN != nil && sourceCCN != nil {
 		return fmt.Errorf(
 			"ambiguous object %s (%s or %s)",
-			target,
+			o.target,
 			sourceCN.Name,
 			sourceCCN.Name,
 		)
@@ -44,14 +54,19 @@ func (o *object) Handle(ctx *pipeline.Ctx) error {
 	} else if sourceCCN != nil {
 		dN = sourceCCN
 	} else {
-		return fmt.Errorf("unknown source for object %s", target)
+		return fmt.Errorf("unknown source for object %s", o.target)
 	}
 
-	objectN := objectNFromSourceN(ctx, dN)
+	objectN, err := objectNFromSourceN(o.s, o.rf, o.project, dN)
+	if err != nil {
+		return errors.Wrap(err, "object from source")
+	}
 	ctx.Nodes = append(ctx.Nodes, objectN)
 
-	symlinkN := node.New(target).Dependency(objectN)
-	symlinkN.Resolver = resolvers.NewSymlink()
+	symlinkN, err := symlinkNFromN(o.rf, objectN, o.target)
+	if err != nil {
+		return errors.Wrap(err, "symlink from n")
+	}
 	ctx.Nodes = append(ctx.Nodes, symlinkN)
 
 	return nil
@@ -59,33 +74,48 @@ func (o *object) Handle(ctx *pipeline.Ctx) error {
 
 func (o *object) Name() string { return "object" }
 
-func objectNFromSourceN(ctx *pipeline.Ctx, sourceN *node.Node) *node.Node {
-	root := ctx.KV[pipeline.CtxRoot]
-	compiler := getCompiler(ctx, sourceN)
-
+func objectNFromSourceN(
+	s Store,
+	rf ResolverFactory,
+	project string,
+	sourceN *node.Node,
+) (*node.Node, error) {
 	ext := filepath.Ext(sourceN.Name)
-	object := cacheObjectPath(ctx, strings.ReplaceAll(sourceN.Name, ext, ".o"))
 
+	name := "compile" + ext
+	config := map[string]interface{}{
+		"includePaths": []string{s.ProjectDir(project)},
+	}
+	r, err := rf.NewResolver(name, config)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("new %s resolver", name))
+	}
+
+	object := strings.ReplaceAll(sourceN.Name, ext, ".o")
 	logrus.Debugf(
-		"adding %s -> %s with compiler %s",
+		"adding %s -> %s",
 		object,
 		sourceN.Name,
-		compiler,
 	)
 	objectN := node.New(object).Dependency(sourceN)
-	objectN.Resolver = resolvers.NewCompile(root, compiler, []string{root})
-
-	return objectN
+	objectN.Resolver = r
+	return objectN, nil
 }
 
-func getCompiler(ctx *pipeline.Ctx, n *node.Node) string {
-	ext := filepath.Ext(n.Name)
-	switch ext {
-	case ".c":
-		return ctx.KV[pipeline.CtxCompilerC]
-	case ".cc":
-		return ctx.KV[pipeline.CtxCompilerCC]
-	default:
-		return ""
+func symlinkNFromN(
+	rf ResolverFactory,
+	n *node.Node,
+	target string,
+) (*node.Node, error) {
+	name := "symlink"
+	config := make(map[string]interface{})
+	r, err := rf.NewResolver("symlink", config)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("new %s resolver", name))
 	}
+
+	symlinkN := node.New(target).Dependency(n)
+	symlinkN.Resolver = r
+
+	return symlinkN, nil
 }

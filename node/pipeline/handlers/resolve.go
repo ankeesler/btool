@@ -14,24 +14,25 @@ import (
 )
 
 type resolve struct {
-	fs afero.Fs
+	fs     afero.Fs
+	target string
 }
 
 // NewResolve returns a pipeline.Handler that runs all of the node.Resolver graph
 // for a particular target.
-func NewResolve(fs afero.Fs) pipeline.Handler {
+func NewResolve(fs afero.Fs, target string) pipeline.Handler {
 	return &resolve{
-		fs: fs,
+		fs:     fs,
+		target: target,
 	}
 }
 
 func (r *resolve) Handle(ctx *pipeline.Ctx) error {
-	target := ctx.KV[pipeline.CtxTarget]
 	nodes := ctx.Nodes
 
-	n := node.Find(target, nodes)
+	n := node.Find(r.target, nodes)
 	if n == nil {
-		return fmt.Errorf("unknown target %s", target)
+		return fmt.Errorf("unknown target %s", r.target)
 	}
 
 	built := make(map[*node.Node]bool)

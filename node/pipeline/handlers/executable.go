@@ -7,32 +7,45 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/ankeesler/btool/node/resolvers"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
 type executable struct {
+	s       Store
+	rf      ResolverFactory
+	project string
+	target  string
 }
 
 // NewExecutable creates a pipeline.Handler that will add object file node.Node's
 // to the node.Node list based on an executable target.
-func NewExecutable() pipeline.Handler {
-	return &executable{}
+func NewExecutable(
+	s Store,
+	rf ResolverFactory,
+	project string,
+	target string,
+) pipeline.Handler {
+	return &executable{
+		s:       s,
+		rf:      rf,
+		project: project,
+		target:  target,
+	}
 }
 
 func (e *executable) Handle(ctx *pipeline.Ctx) error {
-	target := ctx.KV[pipeline.CtxTarget]
-	if filepath.Ext(target) != "" {
+	if filepath.Ext(e.target) != "" {
 		return nil
 	}
 
 	var dN *node.Node
-	sourceCN := node.Find(target+".c", ctx.Nodes)
-	sourceCCN := node.Find(target+".cc", ctx.Nodes)
+	sourceCN := node.Find(e.target+".c", ctx.Nodes)
+	sourceCCN := node.Find(e.target+".cc", ctx.Nodes)
 	if sourceCN != nil && sourceCCN != nil {
 		return fmt.Errorf(
 			"ambiguous executable %s (%s or %s)",
-			target,
+			e.target,
 			sourceCN.Name,
 			sourceCCN.Name,
 		)
@@ -41,24 +54,33 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 	} else if sourceCCN != nil {
 		dN = sourceCCN
 	} else {
-		return fmt.Errorf("unknown source for executable %s", target)
+		return fmt.Errorf("unknown source for executable %s", e.target)
 	}
 
 	objectNodes := make([]*node.Node, 0)
-	objectNodes = collectObjects(ctx, dN, objectNodes)
+	var err error
+	objectNodes, err = e.collectObjects(ctx, dN, objectNodes)
+	if err != nil {
+		return errors.Wrap(err, "collect objects")
+	}
 
-	linker := ctx.KV[pipeline.CtxLinker]
-	name := cacheExecutablePath(ctx, target)
-	targetN := node.New(name)
+	targetN := node.New(e.target)
 	for _, objectN := range objectNodes {
 		ctx.Nodes = append(ctx.Nodes, objectN)
 		targetN.Dependency(objectN)
 	}
-	targetN.Resolver = resolvers.NewLink(ctx.KV[pipeline.CtxRoot], linker)
+	name := "link"
+	config := make(map[string]interface{})
+	targetN.Resolver, err = e.rf.NewResolver(name, config)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("new %s resolver", name))
+	}
 	ctx.Nodes = append(ctx.Nodes, targetN)
 
-	symlinkN := node.New(target).Dependency(targetN)
-	symlinkN.Resolver = resolvers.NewSymlink()
+	symlinkN, err := symlinkNFromN(e.rf, targetN, e.target)
+	if err != nil {
+		return errors.Wrap(err, "symlink from n")
+	}
 	ctx.Nodes = append(ctx.Nodes, symlinkN)
 
 	return nil
@@ -66,16 +88,20 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 
 func (e *executable) Name() string { return "executable" }
 
-func collectObjects(
+func (e *executable) collectObjects(
 	ctx *pipeline.Ctx,
 	sourceN *node.Node,
 	objectNodes []*node.Node,
-) []*node.Node {
+) ([]*node.Node, error) {
 	logrus.Debugf("collect objects from %s", sourceN.Name)
 
-	objectN := objectNFromSourceN(ctx, sourceN)
+	objectN, err := objectNFromSourceN(e.s, e.rf, e.project, sourceN)
+	if err != nil {
+		return nil, errors.Wrap(err, "object from source")
+	}
+
 	if node.Find(objectN.Name, objectNodes) != nil {
-		return objectNodes
+		return objectNodes, nil
 	}
 	objectNodes = append(objectNodes, objectN)
 
@@ -89,9 +115,12 @@ func collectObjects(
 		sourceN := node.Find(source, ctx.Nodes)
 		logrus.Debugf("dependency %s, source %s, found %s", dN, source, sourceN)
 		if sourceN != nil {
-			objectNodes = collectObjects(ctx, sourceN, objectNodes)
+			objectNodes, err = e.collectObjects(ctx, sourceN, objectNodes)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return objectNodes
+	return objectNodes, nil
 }
