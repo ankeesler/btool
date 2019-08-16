@@ -100,13 +100,16 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 		}
 
 		metadata := struct {
-			Project string
+			Project     string   `mapstructure:"project"`
+			IncludeDirs []string `mapstructure:"includeDirs"`
 		}{}
 		if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
 			return errors.Wrap(err, "decode")
 		}
+		logrus.Debugf("metadata: %+v", metadata)
 
 		projectDir := r.s.ProjectDir(metadata.Project)
+		includeDirs := prependDir(metadata.IncludeDirs, projectDir)
 
 		for _, n := range gaggle.Nodes {
 			nN := node.New(filepath.Join(projectDir, n.Name))
@@ -127,7 +130,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 				nN.Dependency(dN)
 			}
 
-			nodeR, err := r.newResolver(n.Resolver, projectDir)
+			nodeR, err := r.newResolver(n.Resolver, includeDirs, projectDir)
 			if err != nil {
 				return errors.Wrap(err, "new resolver")
 			}
@@ -145,6 +148,7 @@ func (r *registry) Name() string { return "registry" }
 
 func (r *registry) newResolver(
 	registryR registrypkg.Resolver,
+	includeDirs []string,
 	projectDir string,
 ) (node.Resolver, error) {
 	name := registryR.Name
@@ -154,9 +158,9 @@ func (r *registry) newResolver(
 	var err error
 	switch name {
 	case "compileC":
-		nodeR = r.rf.NewCompileC([]string{projectDir})
+		nodeR = r.rf.NewCompileC(includeDirs)
 	case "compileCC":
-		nodeR = r.rf.NewCompileCC([]string{projectDir})
+		nodeR = r.rf.NewCompileCC(includeDirs)
 	case "archive":
 		nodeR = r.rf.NewArchive()
 	case "link":
@@ -189,4 +193,11 @@ func (r *registry) createDownload(
 	}
 
 	return r.rf.NewDownload(cfg.URL, cfg.SHA256), nil
+}
+
+func prependDir(dirs []string, dir string) []string {
+	for i := range dirs {
+		dirs[i] = filepath.Join(dir, dirs[i])
+	}
+	return dirs
 }

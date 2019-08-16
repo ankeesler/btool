@@ -5,6 +5,7 @@ package btool
 import (
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 
 	"github.com/ankeesler/btool/node/pipeline"
@@ -13,6 +14,7 @@ import (
 	"github.com/ankeesler/btool/node/pipeline/handlers/store"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -37,6 +39,25 @@ func Run(cfg *Cfg) error {
 	fs := afero.NewOsFs()
 	s := store.New(cfg.Cache)
 
+	rootAbs, err := filepath.Abs(cfg.Root)
+	if err != nil {
+		return errors.Wrap(err, "abs")
+	}
+	project := filepath.Base(rootAbs)
+	projectDir := s.ProjectDir(project)
+
+	logrus.Debugf("root: %s, project: %s", rootAbs, project)
+
+	if err := os.MkdirAll(filepath.Dir(projectDir), 0755); err != nil {
+		return errors.Wrap(err, "mkdir all")
+	}
+
+	if err := os.Symlink(rootAbs, projectDir); err != nil {
+		return errors.Wrap(err, "symlink")
+	}
+
+	target := filepath.Join(projectDir, cfg.Target)
+
 	ctx := pipeline.NewCtx()
 	p := pipeline.New(ctx)
 
@@ -53,18 +74,13 @@ func Run(cfg *Cfg) error {
 	}
 	p.Handlers(rhs...)
 
-	rootAbs, err := filepath.Abs(cfg.Root)
-	if err != nil {
-		return errors.Wrap(err, "abs")
-	}
-	project := filepath.Dir(rootAbs)
-
 	p.Handlers(
-		handlers.NewFS(fs, cfg.Root),
-		handlers.NewObject(s, rf, project, cfg.Target),
-		handlers.NewExecutable(s, rf, project, cfg.Target),
+		handlers.NewFS(fs, projectDir),
+		handlers.NewPrint(os.Stdout),
+		handlers.NewObject(s, rf, project, target),
+		handlers.NewExecutable(s, rf, project, target),
 		handlers.NewSortAlpha(),
-		handlers.NewResolve(fs, cfg.Target),
+		handlers.NewResolve(fs, target),
 	)
 
 	if err := p.Run(); err != nil {

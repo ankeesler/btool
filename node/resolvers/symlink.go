@@ -9,17 +9,12 @@ import (
 )
 
 type symlink struct {
-	// Note! afero does not contain support for symlinking currently.
-	// See https://github.com/spf13/afero/pull/212/files.
-	//fs afero.Fs
 }
 
 // NewSymlink returns a node.Resolver that symlinks a node.Node to its
 // dependency.
-func NewSymlink( /*fs afero.Fs*/ ) node.Resolver {
-	return &symlink{
-		//fs: fs,
-	}
+func NewSymlink() node.Resolver {
+	return &symlink{}
 }
 
 func (s *symlink) Resolve(n *node.Node) error {

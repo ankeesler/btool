@@ -42,6 +42,9 @@ func TestRegistry(t *testing.T) {
 	r := &handlersfakes.FakeRegistry{}
 	index := testutil.Index()
 	registryFileAGaggle := testutil.FileAGaggle()
+	registryFileAGaggle.Metadata["includeDirs"] = []string{
+		"some-include-dir",
+	}
 	registryFileAGaggle.Nodes[0].Resolver.Name = "compileC"
 	registryFileAGaggle.Nodes[1].Resolver.Name = "compileCC"
 	registryFileBGaggle := testutil.FileBGaggle()
@@ -92,9 +95,9 @@ func TestRegistry(t *testing.T) {
 	)
 
 	assert.Equal(t, 1, rf.NewCompileCCallCount())
-	assert.Equal(t, []string{"/some-project-dir"}, rf.NewCompileCArgsForCall(0))
+	assert.Equal(t, []string{"/some-project-dir/some-include-dir"}, rf.NewCompileCArgsForCall(0))
 	assert.Equal(t, 1, rf.NewCompileCCCallCount())
-	assert.Equal(t, []string{"/some-project-dir"}, rf.NewCompileCCArgsForCall(0))
+	assert.Equal(t, []string{"/some-project-dir/some-include-dir"}, rf.NewCompileCCArgsForCall(0))
 	assert.Equal(t, 1, rf.NewUnzipCallCount())
 	assert.Equal(t, "/some-project-dir", rf.NewUnzipArgsForCall(0))
 	assert.Equal(t, 1, rf.NewDownloadCallCount())
