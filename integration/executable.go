@@ -16,6 +16,8 @@ func executable(c *config) {
 		c.root,
 		"-cache",
 		c.cache,
+		"-output",
+		"main",
 	)
 	c.run(
 		"./main",
@@ -37,6 +39,8 @@ func executableLocalRegistry(c *config) {
 		c.cache,
 		"-registries",
 		registryData,
+		"-output",
+		"main",
 	)
 	c.run(
 		"./main",

@@ -42,12 +42,10 @@ func TestObject(t *testing.T) {
 
 			compileCR := &nodefakes.FakeResolver{}
 			compileCCR := &nodefakes.FakeResolver{}
-			symlinkR := &nodefakes.FakeResolver{}
 
 			rf := &handlersfakes.FakeResolverFactory{}
 			rf.NewCompileCReturnsOnCall(0, compileCR)
 			rf.NewCompileCCReturnsOnCall(0, compileCCR)
-			rf.NewSymlinkReturnsOnCall(0, symlinkR)
 
 			h := handlers.NewObject(s, rf, "some-project", "dep-1/dep-1.o")
 			ctx := pipeline.NewCtx()
@@ -72,10 +70,6 @@ func TestObject(t *testing.T) {
 				objectN.Resolver = compileCR
 			}
 			exNodes := append(datum.nodes.Copy().Cast(), objectN)
-
-			symlinkN := node.New("dep-1/dep-1.o").Dependency(objectN)
-			symlinkN.Resolver = symlinkR
-			exNodes = append(exNodes, symlinkN)
 
 			assert.Nil(t, h.Handle(ctx))
 			assert.Nil(t, deep.Equal(exNodes, ctx.Nodes))

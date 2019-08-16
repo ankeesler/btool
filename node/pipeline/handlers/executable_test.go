@@ -45,13 +45,11 @@ func TestExecutable(t *testing.T) {
 			compileCR := &nodefakes.FakeResolver{}
 			compileCCR := &nodefakes.FakeResolver{}
 			linkR := &nodefakes.FakeResolver{}
-			symlinkR := &nodefakes.FakeResolver{}
 
 			rf := &handlersfakes.FakeResolverFactory{}
 			rf.NewCompileCReturns(compileCR)
 			rf.NewCompileCCReturns(compileCCR)
 			rf.NewLinkReturnsOnCall(0, linkR)
-			rf.NewSymlinkReturnsOnCall(0, symlinkR)
 
 			h := handlers.NewExecutable(s, rf, "some-project", "main")
 			ctx := pipeline.NewCtx()
@@ -74,10 +72,6 @@ func TestExecutable(t *testing.T) {
 					}
 				}
 			}
-
-			symlinkN := node.New("main").Dependency(executableN)
-			symlinkN.Resolver = symlinkR
-			exNodes = append(exNodes, symlinkN)
 
 			node.SortAlpha(ctx.Nodes)
 			node.SortAlpha(exNodes)

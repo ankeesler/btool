@@ -11,6 +11,8 @@ func object(c *config) {
 		c.cache,
 		"-loglevel",
 		"debug",
+		"-output",
+		"dep-0/dep-0.o",
 	)
 	c.run(
 		"ls",

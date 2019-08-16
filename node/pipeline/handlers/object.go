@@ -59,9 +59,6 @@ func (o *object) Handle(ctx *pipeline.Ctx) error {
 	objectN := objectNFromSourceN(o.s, o.rf, o.project, dN)
 	ctx.Nodes = append(ctx.Nodes, objectN)
 
-	symlinkN := symlinkNFromN(o.rf, objectN, o.target)
-	ctx.Nodes = append(ctx.Nodes, symlinkN)
-
 	return nil
 }
 
@@ -92,14 +89,4 @@ func objectNFromSourceN(
 	objectN := node.New(object).Dependency(sourceN)
 	objectN.Resolver = r
 	return objectN
-}
-
-func symlinkNFromN(
-	rf ResolverFactory,
-	n *node.Node,
-	target string,
-) *node.Node {
-	symlinkN := node.New(target).Dependency(n)
-	symlinkN.Resolver = rf.NewSymlink()
-	return symlinkN
 }

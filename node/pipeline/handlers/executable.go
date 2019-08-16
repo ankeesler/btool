@@ -67,9 +67,6 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 	targetN.Resolver = e.rf.NewLink()
 	ctx.Nodes = append(ctx.Nodes, targetN)
 
-	symlinkN := symlinkNFromN(e.rf, targetN, e.target)
-	ctx.Nodes = append(ctx.Nodes, symlinkN)
-
 	return nil
 }
 
