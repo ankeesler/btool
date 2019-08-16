@@ -1,0 +1,30 @@
+package btool
+
+type Stager interface {
+  Stage() error
+}
+
+type Collector interface {
+  Collector() ([]*node.Node, error)
+}
+
+type Builder interface {
+  Build(*node.Node) error
+}
+
+type Btool struct {
+  s Stager
+  c Collector
+  b Builder
+}
+
+func New(s Stager, c Collector, b Builder) *Btool {
+  return &Btool{
+    s: s,
+    c: c,
+    b: b,
+  }
+}
+
+func (b *Btool) Run() error {
+}
