@@ -26,10 +26,11 @@ func run() error {
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", ".btool", "Cache directory")
 	target := flag.String("target", "main", "Target to build")
+	output := flag.String("output", *target, "Output file")
 	registries := flag.String(
 		"registries",
 		"https://btoolregistry.cfapps.io",
-		"List of registries (e.g., https://a.io,file://path/to/reg/dir)",
+		"List of registries, e.g., https://a.io,file://path/to/reg/dir",
 	)
 	help := flag.Bool("help", false, "Show this help message")
 
@@ -54,6 +55,7 @@ func run() error {
 		Root:   *root,
 		Cache:  *cache,
 		Target: *target,
+		Output: *output,
 
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,

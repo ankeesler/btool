@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers/includes"
+	"github.com/ankeesler/btool/node/pipeline/handlers/walk"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
@@ -31,33 +31,13 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 	logrus.Debugf("scanning from root %s", fs.root)
 
 	nodeMap := make(map[string]*node.Node)
-	if err := afero.Walk(
+	if err := walk.Walk(
 		fs.effess,
 		fs.root,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return errors.Wrap(err, "walk")
-			}
-
-			rootRelPath, err := filepath.Rel(fs.root, path)
-			if err != nil {
-				return errors.Wrap(err, "rel")
-			}
-
-			if info.IsDir() {
-				logrus.Debugf("skipping directory %s", rootRelPath)
-				return nil
-			} else {
-				logrus.Debugf("looking at file %s", rootRelPath)
-			}
-
-			ext := filepath.Ext(rootRelPath)
-			if ext != ".c" && ext != ".cc" && ext != ".h" {
-				return nil
-			}
-
-			logrus.Debugf("adding node %s", rootRelPath)
-			n := node.New(rootRelPath)
+		[]string{".c", ".cc", ".h"},
+		func(file string) error {
+			logrus.Debugf("adding node %s", file)
+			n := node.New(file)
 			ctx.Nodes = append(ctx.Nodes, n)
 			nodeMap[n.Name] = n
 
@@ -84,7 +64,7 @@ func (fs *fs) handleNode(
 	nodeMap map[string]*node.Node,
 	root string,
 ) error {
-	path := filepath.Join(root, n.Name)
+	path := n.Name
 	data, err := afero.ReadFile(fs.effess, path)
 	if err != nil {
 		return errors.Wrap(err, "read file "+path)
@@ -121,18 +101,17 @@ func (fs *fs) resolveInclude(include, dir, root string) (string, error) {
 	if exists, err := afero.Exists(fs.effess, rootRelJoin); err != nil {
 		return "", errors.Wrap(err, "exists")
 	} else if exists {
-		return include, nil
+		return rootRelJoin, nil
 	}
 
 	dirRelJoin := filepath.Join(dir, include)
 	if exists, err := afero.Exists(fs.effess, dirRelJoin); err != nil {
 		return "", errors.Wrap(err, "exists")
 	} else if exists {
-		rootRelJoin, err := filepath.Rel(root, dirRelJoin)
 		if err != nil {
 			return "", errors.New("rel")
 		} else {
-			return rootRelJoin, nil
+			return dirRelJoin, nil
 		}
 	}
 

@@ -25,6 +25,7 @@ type Cfg struct {
 	Root   string
 	Cache  string
 	Target string
+	Output string
 
 	CompilerC  string
 	CompilerCC string
@@ -76,7 +77,6 @@ func Run(cfg *Cfg) error {
 
 	p.Handlers(
 		handlers.NewFS(fs, projectDir),
-		handlers.NewPrint(os.Stdout),
 		handlers.NewObject(s, rf, project, target),
 		handlers.NewExecutable(s, rf, project, target),
 		handlers.NewSortAlpha(),
