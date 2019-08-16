@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/ankeesler/btool/formatter"
@@ -48,6 +49,11 @@ func TestFS(t *testing.T) {
 			} else {
 				require.NotNil(t, err, "expected error to have occurred")
 				return
+			}
+
+			exNodes := datum.exNodes
+			for _, exN := range exNodes {
+				exN.Name = filepath.Join("/", exN.Name)
 			}
 
 			assert.Nil(t, deep.Equal(datum.exNodes.Cast(), ctx.Nodes))

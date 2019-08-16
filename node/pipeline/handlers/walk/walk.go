@@ -18,7 +18,7 @@ import (
 // Walk will walk a filesystem from the provided root. It has opinionated
 // specifics (for btool):
 //   1. It only passes files to the provided walkFn
-//   2. It follows symlinks...without loop detection :(
+//   2. It follows symlinks...without much loop detection :(
 //   3. It quits immediately upon error
 //   4. It only passes files with the provided file extensions to the provided
 //      walkFn
@@ -29,7 +29,8 @@ func Walk(
 	exts []string,
 	walkFn func(string) error,
 ) error {
-	return walk(fs, root, "", exts, walkFn)
+	visited := make(map[string]bool)
+	return walk(fs, root, "", exts, walkFn, visited)
 }
 
 func walk(
@@ -38,6 +39,7 @@ func walk(
 	linkRoot string,
 	exts []string,
 	walkFn func(string) error,
+	visited map[string]bool,
 ) error {
 	logrus.Debugf("walk root %s (link root %s) for exts %s", root, linkRoot, exts)
 	return afero.Walk(
@@ -57,19 +59,28 @@ func walk(
 					return errors.Wrap(err, "read link")
 				}
 
-				return walk(fs, link, path, exts, walkFn)
+				return walk(fs, link, path, exts, walkFn, visited)
 			} else {
 				logrus.Debugf("looking at file %s", path)
 
+				if visited[path] {
+					return nil
+				}
+
+				var realPath string
 				if linkRoot != "" {
-					path = strings.ReplaceAll(path, root, linkRoot)
-					logrus.Debugf("actually though %s", path)
+					realPath = strings.ReplaceAll(path, root, linkRoot)
+					logrus.Debugf("actually though %s", realPath)
+				} else {
+					realPath = path
 				}
 
 				actualExt := filepath.Ext(path)
 				for _, ext := range exts {
 					if ext == actualExt {
-						return walkFn(path)
+						err := walkFn(realPath)
+						visited[path] = true
+						return err
 					}
 				}
 			}

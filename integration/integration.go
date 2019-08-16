@@ -52,6 +52,10 @@ func Run(t *testing.T) {
 			testFunc: executableLocalRegistry,
 		},
 		{
+			name:     "ExecutableRunTwice",
+			testFunc: executableRunTwice,
+		},
+		{
 			name:     "Googletest",
 			testFunc: googletest,
 		},

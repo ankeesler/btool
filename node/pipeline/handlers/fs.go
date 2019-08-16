@@ -95,7 +95,6 @@ func (fs *fs) handleNode(
 	return nil
 }
 
-// Return an include path relative to the root!
 func (fs *fs) resolveInclude(include, dir, root string) (string, error) {
 	rootRelJoin := filepath.Join(root, include)
 	if exists, err := afero.Exists(fs.effess, rootRelJoin); err != nil {

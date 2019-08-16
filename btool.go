@@ -3,10 +3,12 @@
 package btool
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
@@ -53,11 +55,25 @@ func Run(cfg *Cfg) error {
 		return errors.Wrap(err, "mkdir all")
 	}
 
-	if err := os.Symlink(rootAbs, projectDir); err != nil {
+	info, err := os.Stat(projectDir)
+	logrus.Debugf("examining projectDir %s (%s)", info)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return errors.Wrap(err, "stat")
+		}
+	} else if (info.Mode() & os.ModeSymlink) != 0 {
+		return fmt.Errorf("expected %s to be symlink (%s)", projectDir, info)
+	} else if err := os.Symlink(rootAbs, projectDir); err != nil {
 		return errors.Wrap(err, "symlink")
 	}
+	logrus.Debugf("symlinked %s to %s", projectDir, rootAbs)
 
-	target := filepath.Join(projectDir, cfg.Target)
+	var target string
+	if strings.HasPrefix(cfg.Target, cfg.Cache) {
+		target = cfg.Target
+	} else {
+		target = filepath.Join(projectDir, cfg.Target)
+	}
 
 	ctx := pipeline.NewCtx()
 	p := pipeline.New(ctx)
@@ -79,8 +95,9 @@ func Run(cfg *Cfg) error {
 		handlers.NewFS(fs, projectDir),
 		handlers.NewObject(s, rf, project, target),
 		handlers.NewExecutable(s, rf, project, target),
+		handlers.NewSymlink(rf, cfg.Output, target),
 		handlers.NewSortAlpha(),
-		handlers.NewResolve(fs, target),
+		handlers.NewResolve(fs, cfg.Output),
 	)
 
 	if err := p.Run(); err != nil {
@@ -109,10 +126,13 @@ func createRegistryHandlers(
 		case "http", "https":
 			c := &http.Client{}
 			r = registrypkg.NewHTTPRegistry(registry, c)
+			logrus.Debugf("creating http registry from %s", registry)
 		case "file":
 			r, err = registrypkg.CreateFSRegistry(fs, url.Path, registry)
+			logrus.Debugf("creating fs registry from %s", url.Path)
 		default:
 			r, err = registrypkg.CreateFSRegistry(fs, registry, registry)
+			logrus.Debugf("creating fs registry from %s", registry)
 		}
 
 		hs = append(hs, handlers.NewRegistry(fs, s, rf, r))

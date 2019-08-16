@@ -3,6 +3,7 @@ package resolvers
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
@@ -20,6 +21,10 @@ func NewSymlink() node.Resolver {
 func (s *symlink) Resolve(n *node.Node) error {
 	if len(n.Dependencies) != 1 {
 		return fmt.Errorf("expected 1 dependency, got %d", len(n.Dependencies))
+	}
+
+	if err := os.MkdirAll(filepath.Dir(n.Name), 0755); err != nil {
+		return errors.Wrap(err, "mkdir all")
 	}
 
 	if _, err := os.Stat(n.Name); err != nil {

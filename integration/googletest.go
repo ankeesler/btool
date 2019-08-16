@@ -1,18 +1,19 @@
 package integration
 
-import "path/filepath"
+import (
+	"os"
+	"path/filepath"
+
+	"github.com/stretchr/testify/require"
+)
 
 func googletest(c *config) {
-	gtesta := filepath.Join(
-		c.cache,
-		"projects",
-		"googletest",
-		"gtest.a",
-	)
+	here, err := os.Getwd()
+	require.Nil(c.t, err)
 	c.run(
 		c.btool,
 		"-target",
-		gtesta,
+		filepath.Join(c.cache, "projects", "googletest", "gtest.a"),
 		"-root",
 		c.root,
 		"-cache",
@@ -20,10 +21,12 @@ func googletest(c *config) {
 		"-loglevel",
 		"debug",
 		"-registries",
-		"/Users/ankeesler/workspace/btool/data",
+		filepath.Join(here, "..", "data"),
+		"-output",
+		"gtest.a",
 	)
 	c.run(
 		"ls",
-		gtesta,
+		"gtest.a",
 	)
 }

@@ -18,6 +18,8 @@ func executable(c *config) {
 		c.cache,
 		"-output",
 		"main",
+		"-loglevel",
+		"debug",
 	)
 	c.run(
 		"./main",
@@ -41,8 +43,31 @@ func executableLocalRegistry(c *config) {
 		registryData,
 		"-output",
 		"main",
+		"-loglevel",
+		"debug",
 	)
 	c.run(
 		"./main",
 	)
+}
+
+func executableRunTwice(c *config) {
+	for i := 0; i < 2; i++ {
+		c.run(
+			c.btool,
+			"-target",
+			"main",
+			"-root",
+			c.root,
+			"-cache",
+			c.cache,
+			"-output",
+			"main",
+			"-loglevel",
+			"debug",
+		)
+		c.run(
+			"./main",
+		)
+	}
 }
