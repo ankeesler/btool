@@ -30,6 +30,8 @@ func ParseLevel(level string) (Level, error) {
 		return LevelDebug, nil
 	case "info":
 		return LevelInfo, nil
+	case "error":
+		return LevelError, nil
 	default:
 		return 0, errors.New("unknown level: " + level)
 	}
@@ -74,6 +76,8 @@ func colorLevel(level Level) string {
 		return color.HiBlackString("%5s", "debug")
 	case LevelInfo:
 		return color.HiBlueString("%5s", "info")
+	case LevelError:
+		return color.HiRedString("%5s", "info")
 	default:
 		return fmt.Sprintf("%5s", "???")
 	}

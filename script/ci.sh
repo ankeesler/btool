@@ -2,10 +2,17 @@
 
 set -eou pipefail
 
+announce() {
+  echo "========================================================================"
+  echo "          $1"  
+  echo "========================================================================"
+  "$@"
+}
+
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-./script/test.sh
-./script/build-container.sh btool
-./script/build-container.sh btoolregistry
-./script/push-container.sh btool
-./script/push-container.sh btoolregistry
-./script/cf-push.sh
+announce ./script/test.sh
+announce ./script/build-container.sh btool
+announce ./script/build-container.sh btoolregistry
+announce ./script/push-container.sh btool
+announce ./script/push-container.sh btoolregistry
+announce ./script/cf-push.sh

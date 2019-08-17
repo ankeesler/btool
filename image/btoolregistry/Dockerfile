@@ -11,7 +11,7 @@ EXPOSE 8080
 CMD [ \
   "./registry", \
   "-loglevel", \
-  "trace", \
+  "debug", \
   "-dir", \
   "data", \
   "-address", \
