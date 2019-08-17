@@ -41,7 +41,7 @@ func walk(
 	walkFn func(string) error,
 	visited map[string]bool,
 ) error {
-	logrus.Debugf("walk root %s (link root %s) for exts %s", root, linkRoot, exts)
+	logrus.Debugf("walk root %s (link root: %s) for exts %s", root, linkRoot, exts)
 	return afero.Walk(
 		fs,
 		root,

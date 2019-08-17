@@ -56,14 +56,17 @@ func Run(cfg *Cfg) error {
 	}
 
 	info, err := os.Stat(projectDir)
-	logrus.Debugf("examining projectDir %s (%s)", info)
+	logrus.Debugf("examining projectDir %s (%s)", projectDir, info)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return errors.Wrap(err, "stat")
 		}
 	} else if (info.Mode() & os.ModeSymlink) != 0 {
 		return fmt.Errorf("expected %s to be symlink (%s)", projectDir, info)
-	} else if err := os.Symlink(rootAbs, projectDir); err != nil {
+	} else if err := os.Remove(projectDir); err != nil {
+		return errors.Wrap(err, "remote")
+	}
+	if err := os.Symlink(rootAbs, projectDir); err != nil {
 		return errors.Wrap(err, "symlink")
 	}
 	logrus.Debugf("symlinked %s to %s", projectDir, rootAbs)
