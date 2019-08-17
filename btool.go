@@ -10,6 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/node/builder"
+	"github.com/ankeesler/btool/node/builder/currenter"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/resolverfactory"
@@ -100,11 +103,21 @@ func Run(cfg *Cfg) error {
 		handlers.NewExecutable(s, rf, project, target),
 		handlers.NewSymlink(rf, cfg.Output, target),
 		handlers.NewSortAlpha(),
-		handlers.NewResolve(fs, cfg.Output),
 	)
 
 	if err := p.Run(); err != nil {
 		return errors.Wrap(err, "pipeline run")
+	}
+
+	targetN := node.Find(cfg.Output, ctx.Nodes)
+	if targetN == nil {
+		return errors.New("unknown target: " + cfg.Output)
+	}
+
+	c := currenter.New()
+	b := builder.New(c)
+	if err := b.Build(targetN); err != nil {
+		return errors.Wrap(err, "build")
 	}
 
 	return nil
