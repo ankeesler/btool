@@ -14,15 +14,26 @@ type Currenter interface {
 	Current(*node.Node) (bool, error)
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Callback
+
+// Callback is an interface that clients can use to be notified about resolutions
+// when they happen. It also tells the clients whether or not the node was up
+// to date.
+type Callback interface {
+	OnResolve(name string, current bool)
+}
+
 // Builder can Build() a full node.Node graph.
 type Builder struct {
-	c Currenter
+	c  Currenter
+	cb Callback
 }
 
 // New creates a new Builder.
-func New(c Currenter) *Builder {
+func New(c Currenter, cb Callback) *Builder {
 	return &Builder{
-		c: c,
+		c:  c,
+		cb: cb,
 	}
 }
 
@@ -44,12 +55,14 @@ func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
 		}
 	}
 
-	if n.Resolver != nil {
-		current, err := b.c.Current(n)
-		if err != nil {
-			return errors.Wrap(err, "current")
-		}
+	current, err := b.c.Current(n)
+	if err != nil {
+		return errors.Wrap(err, "current")
+	}
 
+	b.cb.OnResolve(n.Name, current)
+
+	if n.Resolver != nil {
 		if !current {
 			log.Debugf("resolving %s", n.Name)
 			if err := n.Resolver.Resolve(n); err != nil {

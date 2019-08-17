@@ -8,6 +8,7 @@ import (
 	"github.com/ankeesler/btool/node/builder/builderfakes"
 	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/go-test/deep"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,49 +39,40 @@ func TestBuilderBuild(t *testing.T) {
 		name       string
 		nodes      []*node.Node
 		target     string
-		current    map[string]bool
+		current    []string
 		exResolved []string
+		exCallback []string
 	}{
 		{
-			name:   "All",
-			nodes:  nodes,
-			target: "a",
-			current: map[string]bool{
-				"a": false,
-				"b": false,
-				"c": false,
-			},
+			name:       "All",
+			nodes:      nodes,
+			target:     "a",
+			current:    []string{},
 			exResolved: []string{"c", "b", "a"},
+			exCallback: []string{"c", "b", "a"},
 		},
 		{
-			name:   "UpToDate",
-			nodes:  nodes,
-			target: "a",
-			current: map[string]bool{
-				"a": true,
-				"b": true,
-				"c": true,
-			},
+			name:       "UpToDate",
+			nodes:      nodes,
+			target:     "a",
+			current:    []string{"a", "b", "c"},
 			exResolved: []string{},
+			exCallback: []string{"c", "b", "a"},
 		},
 		{
-			name:   "Some",
-			nodes:  nodes,
-			target: "a",
-			current: map[string]bool{
-				"a": false,
-				"b": true,
-				"c": true,
-			},
+			name:       "Some",
+			nodes:      nodes,
+			target:     "a",
+			current:    []string{"c", "b"},
 			exResolved: []string{"a"},
+			exCallback: []string{"c", "b", "a"},
 		},
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			c := &builderfakes.FakeCurrenter{}
 			c.CurrentStub = func(n *node.Node) (bool, error) {
-				current := datum.current[n.Name]
-				return current, nil
+				return contains(n.Name, datum.current), nil
 			}
 
 			acResolved := make([]string, 0)
@@ -96,9 +88,29 @@ func TestBuilderBuild(t *testing.T) {
 			n := node.Find(datum.target, datum.nodes)
 			require.NotNil(t, n)
 
-			b := builder.New(c)
+			callback := &builderfakes.FakeCallback{}
+
+			b := builder.New(c, callback)
 			require.Nil(t, b.Build(n))
 			require.Nil(t, deep.Equal(datum.exResolved, acResolved))
+
+			assert.Equal(t, len(datum.exCallback), callback.OnResolveCallCount())
+			for i, exName := range datum.exCallback {
+				exCurrent := contains(exName, datum.current)
+
+				acName, acCurrent := callback.OnResolveArgsForCall(i)
+				assert.Equal(t, exName, acName)
+				assert.Equal(t, exCurrent, acCurrent)
+			}
 		})
 	}
+}
+
+func contains(s string, ss []string) bool {
+	for _, tuna := range ss {
+		if tuna == s {
+			return true
+		}
+	}
+	return false
 }

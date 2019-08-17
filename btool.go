@@ -115,7 +115,8 @@ func Run(cfg *Cfg) error {
 	}
 
 	c := currenter.New()
-	b := builder.New(c)
+	cb := newUI()
+	b := builder.New(c, cb)
 	if err := b.Build(targetN); err != nil {
 		return errors.Wrap(err, "build")
 	}
