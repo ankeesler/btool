@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/sirupsen/logrus"
 )
 
 type object struct {
@@ -81,7 +81,7 @@ func objectNFromSourceN(
 	}
 
 	object := strings.ReplaceAll(sourceN.Name, ext, ".o")
-	logrus.Debugf(
+	log.Debugf(
 		"adding %s -> %s",
 		object,
 		sourceN.Name,

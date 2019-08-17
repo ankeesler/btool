@@ -35,14 +35,14 @@ package resolvers
 //	if err := afero.WriteFile(g.fs, hFile, hContent, 0600); err != nil {
 //		return errors.Wrap(err, "write "+hFile)
 //	}
-//	logrus.Infof("generated %s", hFile)
+//	log.Infof("generated %s", hFile)
 //
 //	cFile := filepath.Join(g.config.Root, path+".cc")
 //	cContent := g.cContent(path)
 //	if err := afero.WriteFile(g.fs, cFile, cContent, 0600); err != nil {
 //		return errors.Wrap(err, "write "+cFile)
 //	}
-//	logrus.Infof("generated %s", cFile)
+//	log.Infof("generated %s", cFile)
 //
 //	return nil
 //}

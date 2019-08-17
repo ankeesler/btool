@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node/registry"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -41,7 +41,7 @@ func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 		path = path[1:]
 	}
 
-	logrus.Debugf("handling %s %s", req.Method, path)
+	log.Debugf("handling %s %s", req.Method, path)
 
 	rsp.Header().Set("Content-Type", "application/x-yaml")
 
@@ -56,7 +56,7 @@ func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 			object = gaggle
 		}
 	}
-	logrus.Debug("response object: ", object)
+	log.Debugf("response object: %s", object)
 
 	if err != nil {
 		rsp.WriteHeader(http.StatusInternalServerError)
@@ -72,7 +72,7 @@ func (ra *registryApi) ServeHTTP(rsp http.ResponseWriter, req *http.Request) {
 	e := yaml.NewEncoder(rsp)
 	defer e.Close()
 
-	logrus.Debugf("encoding object %s", object)
+	log.Debugf("encoding object %s", object)
 	if err := e.Encode(object); err != nil {
 		rsp.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(rsp, "---\nerror: %s\n", err.Error())

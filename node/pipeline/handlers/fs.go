@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers/includes"
 	"github.com/ankeesler/btool/node/pipeline/handlers/walk"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -28,7 +28,7 @@ func NewFS(effess afero.Fs, root string) pipeline.Handler {
 }
 
 func (fs *fs) Handle(ctx *pipeline.Ctx) error {
-	logrus.Debugf("scanning from root %s", fs.root)
+	log.Debugf("scanning from root %s", fs.root)
 
 	nodeMap := make(map[string]*node.Node)
 	if err := walk.Walk(
@@ -36,7 +36,7 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 		fs.root,
 		[]string{".c", ".cc", ".h"},
 		func(file string) error {
-			logrus.Debugf("adding node %s", file)
+			log.Debugf("adding node %s", file)
 			n := node.New(file)
 			ctx.Nodes = append(ctx.Nodes, n)
 			nodeMap[n.Name] = n
@@ -48,7 +48,7 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 	}
 
 	for _, n := range nodeMap {
-		logrus.Debugf("deps_local: handling node %s", n)
+		log.Debugf("deps_local: handling node %s", n)
 		if err := fs.handleNode(n, nodeMap, fs.root); err != nil {
 			return errors.Wrap(err, fmt.Sprintf("handle node %s", n.Name))
 		}
@@ -69,13 +69,13 @@ func (fs *fs) handleNode(
 	if err != nil {
 		return errors.Wrap(err, "read file "+path)
 	}
-	logrus.Debugf("read file %s", path)
+	log.Debugf("read file %s", path)
 
 	includes, err := includes.Parse(data)
 	if err != nil {
 		return errors.Wrap(err, "parse includes")
 	}
-	logrus.Debugf("includes = %s", includes)
+	log.Debugf("includes = %s", includes)
 
 	for _, include := range includes {
 		includeName, err := fs.resolveInclude(include, filepath.Dir(path), root)
@@ -88,7 +88,7 @@ func (fs *fs) handleNode(
 			return fmt.Errorf("unknown node for include name %s", includeName)
 		}
 
-		logrus.Debugf("adding dependency %s -> %s", n.Name, includeN.Name)
+		log.Debugf("adding dependency %s -> %s", n.Name, includeN.Name)
 		n.Dependencies = append(n.Dependencies, includeN)
 	}
 

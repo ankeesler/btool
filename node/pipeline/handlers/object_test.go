@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/ankeesler/btool/node/pipeline"
@@ -12,15 +11,11 @@ import (
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestObject(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	data := []struct {
 		name  string
 		nodes testutil.Nodes

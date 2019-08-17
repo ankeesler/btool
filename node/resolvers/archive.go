@@ -3,9 +3,9 @@ package resolvers
 import (
 	"os/exec"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type archive struct {
@@ -21,7 +21,7 @@ func NewArchive(archiver string) node.Resolver {
 }
 
 func (a *archive) Resolve(n *node.Node) error {
-	logrus.Debugf("archiver: resolve %s/%s", n, n.Dependencies)
+	log.Debugf("archiver: resolve %s/%s", n, n.Dependencies)
 
 	cmd := exec.Command(
 		a.archiver,
@@ -32,7 +32,7 @@ func (a *archive) Resolve(n *node.Node) error {
 		cmd.Args = append(cmd.Args, dN.Name)
 	}
 
-	logrus.Debugf("archiver: running %s from %s", cmd.Args, cmd.Dir)
+	log.Debugf("archiver: running %s from %s", cmd.Args, cmd.Dir)
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(o))

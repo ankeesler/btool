@@ -8,9 +8,9 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -35,7 +35,7 @@ func (u *unzip) Resolve(n *node.Node) error {
 		return errors.Wrap(err, "read file")
 	}
 	zipBuf := bytes.NewBuffer(zipData)
-	logrus.Debugf("zip buf len = %d", zipBuf.Len())
+	log.Debugf("zip buf len = %d", zipBuf.Len())
 
 	fs := afero.NewOsFs()
 	if err := u.unzip(fs, u.outputDir, zipBuf); err != nil {
@@ -59,7 +59,7 @@ func (u *unzip) unzip(
 	}
 
 	for _, file := range zipR.File {
-		logrus.Debugf("unzip file %s", file.Name)
+		log.Debugf("unzip file %s", file.Name)
 		if err := u.unzipFile(fs, destDir, file); err != nil {
 			return errors.Wrap(err, "unzip file")
 		}
@@ -81,12 +81,12 @@ func (u *unzip) unzipFile(
 
 	path := filepath.Join(destDir, file.Name)
 	if file.FileInfo().IsDir() {
-		logrus.Debugf("unzip: mkdir %s", path)
+		log.Debugf("unzip: mkdir %s", path)
 		if err := fs.Mkdir(path, 0755); err != nil {
 			return errors.Wrap(err, "mkdir")
 		}
 	} else {
-		logrus.Debugf("unzip: create %s", path)
+		log.Debugf("unzip: create %s", path)
 		w, err := fs.Create(path)
 		if err != nil {
 			return errors.Wrap(err, "create")

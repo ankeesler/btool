@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -65,6 +65,6 @@ func (nodes Nodes) PopulateFS(root string, fs afero.Fs) {
 			panic(err)
 		}
 
-		logrus.Debugf("created file " + file)
+		log.Debugf("created file " + file)
 	}
 }

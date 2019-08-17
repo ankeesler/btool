@@ -4,19 +4,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node/registry"
 	"github.com/ankeesler/btool/node/registry/testutil"
 	"github.com/go-test/deep"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
 
 func TestFSRegistry(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	fs := afero.NewMemMapFs()
 
 	root := "/some/path/to/root"

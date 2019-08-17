@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/builder"
 	"github.com/ankeesler/btool/node/builder/currenter"
@@ -19,7 +20,6 @@ import (
 	"github.com/ankeesler/btool/node/pipeline/handlers/store"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -52,14 +52,14 @@ func Run(cfg *Cfg) error {
 	project := filepath.Base(rootAbs)
 	projectDir := s.ProjectDir(project)
 
-	logrus.Debugf("root: %s, project: %s", rootAbs, project)
+	log.Debugf("root: %s, project: %s", rootAbs, project)
 
 	if err := os.MkdirAll(filepath.Dir(projectDir), 0755); err != nil {
 		return errors.Wrap(err, "mkdir all")
 	}
 
 	info, err := os.Stat(projectDir)
-	logrus.Debugf("examining projectDir %s (%s)", projectDir, info)
+	log.Debugf("examining projectDir %s (%s)", projectDir, info)
 	if err != nil {
 		if !os.IsNotExist(err) {
 			return errors.Wrap(err, "stat")
@@ -72,7 +72,7 @@ func Run(cfg *Cfg) error {
 	if err := os.Symlink(rootAbs, projectDir); err != nil {
 		return errors.Wrap(err, "symlink")
 	}
-	logrus.Debugf("symlinked %s to %s", projectDir, rootAbs)
+	log.Debugf("symlinked %s to %s", projectDir, rootAbs)
 
 	var target string
 	if strings.HasPrefix(cfg.Target, cfg.Cache) {
@@ -142,13 +142,13 @@ func createRegistryHandlers(
 		case "http", "https":
 			c := &http.Client{}
 			r = registrypkg.NewHTTPRegistry(registry, c)
-			logrus.Debugf("creating http registry from %s", registry)
+			log.Debugf("creating http registry from %s", registry)
 		case "file":
 			r, err = registrypkg.CreateFSRegistry(fs, url.Path, registry)
-			logrus.Debugf("creating fs registry from %s", url.Path)
+			log.Debugf("creating fs registry from %s", url.Path)
 		default:
 			r, err = registrypkg.CreateFSRegistry(fs, registry, registry)
-			logrus.Debugf("creating fs registry from %s", registry)
+			log.Debugf("creating fs registry from %s", registry)
 		}
 
 		hs = append(hs, handlers.NewRegistry(fs, s, rf, r))

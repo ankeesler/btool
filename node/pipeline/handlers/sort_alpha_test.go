@@ -4,17 +4,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
-	"github.com/sirupsen/logrus"
 )
 
 func TestSortAlpha(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	h := handlers.NewSortAlpha()
 
 	nodeA := node.New("a")

@@ -8,20 +8,16 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/resolvers"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestUnzip(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	data := []struct {
 		name      string
 		failure   bool
@@ -77,14 +73,14 @@ func dirSHA256(fs afero.Fs, dir string) (string, error) {
 			return errors.Wrap(err, "rel")
 		}
 
-		logrus.Debugf("summing path %s", relPath)
+		log.Debugf("summing path %s", relPath)
 		h.Write([]byte(relPath))
 
 		if info.IsDir() {
 			return nil
 		}
 
-		logrus.Debugf("summing data for path %s", path)
+		log.Debugf("summing data for path %s", path)
 		data, err := afero.ReadFile(fs, path)
 		if err != nil {
 			return errors.Wrap(err, "read "+path)

@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/sirupsen/logrus"
 )
 
 type executable struct {
@@ -77,7 +77,7 @@ func (e *executable) collectObjects(
 	sourceN *node.Node,
 	objectNodes []*node.Node,
 ) []*node.Node {
-	logrus.Debugf("collect objects from %s", sourceN.Name)
+	log.Debugf("collect objects from %s", sourceN.Name)
 
 	objectN := objectNFromSourceN(e.s, e.rf, e.project, sourceN)
 	if node.Find(objectN.Name, objectNodes) != nil {
@@ -93,7 +93,7 @@ func (e *executable) collectObjects(
 		}
 
 		sourceN := node.Find(source, ctx.Nodes)
-		logrus.Debugf("dependency %s, source %s, found %s", dN, source, sourceN)
+		log.Debugf("dependency %s, source %s, found %s", dN, source, sourceN)
 		if sourceN != nil {
 			objectNodes = e.collectObjects(ctx, sourceN, objectNodes)
 		}

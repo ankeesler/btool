@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type download struct {
@@ -47,7 +47,7 @@ func (d *download) Resolve(n *node.Node) error {
 	}
 
 	outputFile := n.Name
-	logrus.Debugf(
+	log.Debugf(
 		"got %d bytes from %s, writing to %s",
 		len(data),
 		d.url,

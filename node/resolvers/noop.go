@@ -1,8 +1,8 @@
 package resolvers
 
 import (
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
-	"github.com/sirupsen/logrus"
 )
 
 type noop struct {
@@ -14,6 +14,6 @@ func NewNoop() node.Resolver {
 }
 
 func (noop *noop) Resolve(n *node.Node) error {
-	logrus.Infof("resolve %s", n)
+	log.Infof("resolve %s", n)
 	return nil
 }

@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type symlink struct {
@@ -22,7 +22,7 @@ func NewSymlink(rf ResolverFactory, to, from string) pipeline.Handler {
 }
 
 func (s *symlink) Handle(ctx *pipeline.Ctx) error {
-	logrus.Debugf("symlink from %s to %s", s.from, s.to)
+	log.Debugf("symlink from %s to %s", s.from, s.to)
 
 	fromN := node.Find(s.from, ctx.Nodes)
 	if fromN == nil {

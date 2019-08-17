@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -38,7 +38,7 @@ func (hr *HTTPRegistry) Index() (*Index, error) {
 	if err := hr.get(hr.url, i); err != nil {
 		return nil, errors.Wrap(err, "get")
 	}
-	logrus.Debugf("index -> %s", i)
+	log.Debugf("index -> %s", i)
 	return i, nil
 }
 
@@ -51,7 +51,7 @@ func (hr *HTTPRegistry) Gaggle(path string) (*Gaggle, error) {
 			return nil, errors.Wrap(err, "get")
 		}
 	}
-	logrus.Debugf("Gaggle(%s) -> %s", path, gaggle)
+	log.Debugf("Gaggle(%s) -> %s", path, gaggle)
 	return gaggle, nil
 }
 
@@ -66,7 +66,7 @@ func (hr *HTTPRegistry) get(url string, object interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "read body")
 	}
-	logrus.Debugf("get returned %d/%s", rsp.StatusCode, string(data))
+	log.Debugf("get returned %d/%s", rsp.StatusCode, string(data))
 
 	if rsp.StatusCode == http.StatusNotFound {
 		return errNotFound

@@ -2,9 +2,9 @@
 package builder
 
 import (
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Currenter
@@ -35,10 +35,10 @@ func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
 		return nil
 	}
 
-	logrus.Debugf("building %s", n.Name)
+	log.Debugf("building %s", n.Name)
 
 	for _, dN := range n.Dependencies {
-		logrus.Debugf("building dependency %s", dN.Name)
+		log.Debugf("building dependency %s", dN.Name)
 		if err := b.build(dN, built); err != nil {
 			return errors.Wrap(err, "resolve "+dN.Name)
 		}
@@ -51,7 +51,7 @@ func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
 		}
 
 		if !current {
-			logrus.Debugf("resolving %s", n.Name)
+			log.Debugf("resolving %s", n.Name)
 			if err := n.Resolver.Resolve(n); err != nil {
 				return errors.Wrap(err, "really resolve "+n.Name)
 			}

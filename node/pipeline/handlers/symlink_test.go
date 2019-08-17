@@ -3,7 +3,6 @@ package handlers_test
 import (
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/ankeesler/btool/node/pipeline"
@@ -11,14 +10,10 @@ import (
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSymlink(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	symlinkR := &nodefakes.FakeResolver{}
 
 	rf := &handlersfakes.FakeResolverFactory{}

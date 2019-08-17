@@ -7,16 +7,14 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool"
-	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/toolchain"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func main() {
-	logrus.SetFormatter(formatter.New())
 	if err := run(); err != nil {
-		logrus.Error(err)
+		log.Errorf(err.Error())
 		os.Exit(1)
 	}
 }
@@ -40,11 +38,11 @@ func run() error {
 		os.Exit(1)
 	}
 
-	level, err := logrus.ParseLevel(*loglevel)
+	level, err := log.ParseLevel(*loglevel)
 	if err != nil {
 		return errors.Wrap(err, "parse log level")
 	}
-	logrus.SetLevel(level)
+	log.CurrentLevel = level
 
 	tc, err := toolchain.Find()
 	if err != nil {

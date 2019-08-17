@@ -5,16 +5,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/pipelinefakes"
-	"github.com/sirupsen/logrus"
 )
 
 func TestPipeline(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	goodHandlerA := &pipelinefakes.FakeHandler{}
 	goodHandlerA.HandleStub = func(ctx *pipeline.Ctx) error {
 		ctx.KV["key"] = "value"

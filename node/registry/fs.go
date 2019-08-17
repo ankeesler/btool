@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
@@ -40,7 +40,7 @@ func CreateFSRegistry(fs afero.Fs, dir, name string) (*FSRegistry, error) {
 			}
 
 			if !strings.HasSuffix(path, "_btool.yml") {
-				logrus.Debugf("skipping path %s", path)
+				log.Debugf("skipping path %s", path)
 				return nil
 			}
 
@@ -59,7 +59,7 @@ func CreateFSRegistry(fs afero.Fs, dir, name string) (*FSRegistry, error) {
 				return errors.Wrap(err, "rel")
 			}
 
-			logrus.Debugf("adding file %s: %s", pathRel, gaggle)
+			log.Debugf("adding file %s: %s", pathRel, gaggle)
 			i.Files = append(i.Files, IndexFile{
 				Path:   pathRel,
 				SHA256: sha256String(data),
@@ -72,7 +72,7 @@ func CreateFSRegistry(fs afero.Fs, dir, name string) (*FSRegistry, error) {
 		return nil, errors.Wrap(err, "walk")
 	}
 
-	logrus.Debugf("creating FSRegistry with %s/%v", i, files)
+	log.Debugf("creating FSRegistry with %s/%v", i, files)
 	return newFSRegistry(i, files), nil
 }
 

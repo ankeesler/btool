@@ -5,8 +5,8 @@ package pipeline
 import (
 	"fmt"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Handler
@@ -57,7 +57,7 @@ func (p *Pipeline) Handlers(handlers ...Handler) *Pipeline {
 // fail in their operation. It exits as soon as any Handler fails.
 func (p *Pipeline) Run() error {
 	for _, h := range p.handlers {
-		logrus.Debugf("pipeline: running %s", h.Name())
+		log.Debugf("pipeline: running %s", h.Name())
 		if err := h.Handle(p.ctx); err != nil {
 			return errors.Wrap(err, fmt.Sprintf("handle (%s)", h.Name()))
 		}

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/sirupsen/logrus"
 )
 
 type sortTopo struct {
@@ -21,14 +21,14 @@ func NewSortTopo() pipeline.Handler {
 func (st *sortTopo) Handle(ctx *pipeline.Ctx) error {
 	nodes := ctx.Nodes
 
-	logrus.Debugf("sorting %d nodes", len(nodes))
+	log.Debugf("sorting %d nodes", len(nodes))
 
 	sorted := make([]*node.Node, 0, len(nodes))
 	sortedSet := make(map[*node.Node]bool)
 
 	for len(sorted) != len(nodes) {
 		nodesWithoutDependencies := collectNodesWithoutDependencies(nodes, sortedSet)
-		logrus.Debug("nodesWithoutDependencies:", nodesWithoutDependencies)
+		log.Debugf("nodesWithoutDependencies: %s", nodesWithoutDependencies)
 
 		if len(nodesWithoutDependencies) == 0 {
 			return fmt.Errorf("cycle detected, cannot proceed past %v", sortedSet)

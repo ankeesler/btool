@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
@@ -63,11 +63,11 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 
 		gaggleFile := filepath.Join(registryDir, file.SHA256+".yml")
 		gaggle := new(registrypkg.Gaggle)
-		logrus.Debugf("considering %s", gaggleFile)
+		log.Debugf("considering %s", gaggleFile)
 		if exists, err := afero.Exists(r.fs, gaggleFile); err != nil {
 			return errors.Wrap(err, "exists")
 		} else if !exists {
-			logrus.Debugf("does not exist")
+			log.Debugf("does not exist")
 
 			gaggle, err = r.r.Gaggle(file.Path)
 			if err != nil {
@@ -106,7 +106,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 		if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
 			return errors.Wrap(err, "decode")
 		}
-		logrus.Debugf("metadata: %+v", metadata)
+		log.Debugf("metadata: %+v", metadata)
 
 		projectDir := r.s.ProjectDir(metadata.Project)
 		includeDirs := prependDir(metadata.IncludeDirs, projectDir)
@@ -136,7 +136,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			}
 			nN.Resolver = nodeR
 
-			logrus.Debugf("decoded %s to %s", n, nN)
+			log.Debugf("decoded %s to %s", n, nN)
 			ctx.Nodes = append(ctx.Nodes, nN)
 		}
 	}

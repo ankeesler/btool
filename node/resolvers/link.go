@@ -3,9 +3,9 @@ package resolvers
 import (
 	"os/exec"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 type link struct {
@@ -30,7 +30,7 @@ func (l *link) Resolve(n *node.Node) error {
 		cmd.Args = append(cmd.Args, d.Name)
 	}
 
-	logrus.Debugf("linker: running %s from %s", cmd.Args, cmd.Dir)
+	log.Debugf("linker: running %s from %s", cmd.Args, cmd.Dir)
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(o))

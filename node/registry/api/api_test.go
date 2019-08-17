@@ -6,21 +6,16 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node/registry"
 	"github.com/ankeesler/btool/node/registry/api"
 	"github.com/ankeesler/btool/node/registry/api/apifakes"
 	"github.com/ankeesler/btool/node/registry/testutil"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
 func TestAPI(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	i := testutil.Index()
 	iBytes, err := yaml.Marshal(i)
 	require.Nil(t, err)

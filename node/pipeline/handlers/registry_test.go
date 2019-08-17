@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/ankeesler/btool/node/pipeline"
@@ -12,16 +11,12 @@ import (
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
 	"github.com/ankeesler/btool/node/registry/testutil"
 	"github.com/go-test/deep"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
 
 func TestRegistry(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	fs := afero.NewMemMapFs()
 
 	s := &handlersfakes.FakeStore{}

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
@@ -41,7 +41,7 @@ func walk(
 	walkFn func(string) error,
 	visited map[string]bool,
 ) error {
-	logrus.Debugf("walk root %s (link root: %s) for exts %s", root, linkRoot, exts)
+	log.Debugf("walk root %s (link root: %s) for exts %s", root, linkRoot, exts)
 	return afero.Walk(
 		fs,
 		root,
@@ -51,9 +51,9 @@ func walk(
 			}
 
 			if info.IsDir() {
-				logrus.Debugf("skipping directory %s", path)
+				log.Debugf("skipping directory %s", path)
 			} else if (info.Mode() & os.ModeSymlink) != 0 {
-				logrus.Debugf("looking at link %s", path)
+				log.Debugf("looking at link %s", path)
 				link, err := os.Readlink(path)
 				if err != nil {
 					return errors.Wrap(err, "read link")
@@ -61,7 +61,7 @@ func walk(
 
 				return walk(fs, link, path, exts, walkFn, visited)
 			} else {
-				logrus.Debugf("looking at file %s", path)
+				log.Debugf("looking at file %s", path)
 
 				if visited[path] {
 					return nil
@@ -70,7 +70,7 @@ func walk(
 				var realPath string
 				if linkRoot != "" {
 					realPath = strings.ReplaceAll(path, root, linkRoot)
-					logrus.Debugf("actually though %s", realPath)
+					log.Debugf("actually though %s", realPath)
 				} else {
 					realPath = path
 				}

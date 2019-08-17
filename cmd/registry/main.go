@@ -6,19 +6,17 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ankeesler/btool/formatter"
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node/registry"
 	"github.com/ankeesler/btool/node/registry/api"
 	"github.com/ankeesler/btool/registryname"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 )
 
 func main() {
-	logrus.SetFormatter(formatter.New())
 	if err := run(); err != nil {
-		logrus.Error(err)
+		log.Errorf(err.Error())
 		os.Exit(1)
 	}
 }
@@ -43,12 +41,12 @@ func run() error {
 		os.Exit(1)
 	}
 
-	level, err := logrus.ParseLevel(*loglevel)
+	level, err := log.ParseLevel(*loglevel)
 	if err != nil {
 		return errors.Wrap(err, "parse log level")
 	}
-	logrus.SetLevel(level)
-	logrus.Debugf("log level set to %s", level)
+	log.CurrentLevel = level
+	log.Debugf("log level set to %s", level)
 
 	name, err := registryname.Get(*address)
 	if err != nil {
@@ -60,7 +58,7 @@ func run() error {
 		return errors.Wrap(err, "create registry")
 	}
 
-	logrus.Infof("listening on %s", *address)
+	log.Infof("listening on %s", *address)
 	api := api.New(r)
 	if err := http.ListenAndServe(*address, api); err != nil {
 		return errors.Wrap(err, "listen and serve")

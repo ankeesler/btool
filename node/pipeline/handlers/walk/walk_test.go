@@ -8,10 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node/pipeline/handlers/walk"
 	"github.com/go-test/deep"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
@@ -21,9 +19,6 @@ import (
 // See https://github.com/spf13/afero/pull/212/files.
 
 func TestWalk(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	fs := afero.NewOsFs()
 	files := []string{
 		filepath.Join("dir-a0"),

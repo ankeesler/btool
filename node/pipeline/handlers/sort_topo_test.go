@@ -4,18 +4,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/testutil"
-	"github.com/sirupsen/logrus"
 )
 
 func TestSortTopo(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	h := handlers.NewSortTopo()
 
 	nodes := testutil.BasicNodesC.Copy()

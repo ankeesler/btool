@@ -2,8 +2,8 @@
 package registryname
 
 import (
+	"github.com/ankeesler/btool/log"
 	"github.com/cloudfoundry-community/go-cfenv"
-	"github.com/sirupsen/logrus"
 )
 
 // Get returns the name for the registry running in the current process.
@@ -11,9 +11,9 @@ import (
 func Get(deefault string) (string, error) {
 	app, err := cfenv.Current()
 	if err != nil {
-		logrus.Debugf("note: cannot get cfenv: %s", err.Error())
+		log.Debugf("note: cannot get cfenv: %s", err.Error())
 	} else if len(app.ApplicationURIs) == 0 {
-		logrus.Debugf("note: no cfenv application uris")
+		log.Debugf("note: no cfenv application uris")
 	} else {
 		return app.ApplicationURIs[0], nil
 	}

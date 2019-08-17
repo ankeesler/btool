@@ -3,20 +3,15 @@ package builder_test
 import (
 	"testing"
 
-	"github.com/ankeesler/btool/formatter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/builder"
 	"github.com/ankeesler/btool/node/builder/builderfakes"
 	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/go-test/deep"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 )
 
 func TestBuilderBuild(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(formatter.New())
-
 	// a -> b, c
 	// b -> c
 	// c
