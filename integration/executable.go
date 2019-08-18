@@ -71,3 +71,25 @@ func executableRunTwice(c *config) {
 		)
 	}
 }
+
+func executableSubdirectoryCache(c *config) {
+	wd, err := os.Getwd()
+	require.Nil(c.t, err)
+
+	c.wd = filepath.Join(wd, "..", "example", c.example)
+	cache := filepath.Join(c.wd, "cache")
+	defer os.RemoveAll(cache)
+
+	c.run(
+		c.btool,
+		"-target",
+		"main",
+		"-loglevel",
+		"debug",
+		"-cache",
+		cache,
+	)
+	c.run(
+		"./main",
+	)
+}

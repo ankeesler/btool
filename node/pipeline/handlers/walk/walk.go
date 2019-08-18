@@ -46,6 +46,11 @@ func walk(
 		fs,
 		root,
 		func(path string, info os.FileInfo, err error) error {
+			if visited[path] {
+				return nil
+			}
+			visited[path] = true
+
 			if err != nil {
 				return err
 			}
@@ -63,10 +68,6 @@ func walk(
 			} else {
 				log.Debugf("looking at file %s", path)
 
-				if visited[path] {
-					return nil
-				}
-
 				var realPath string
 				if linkRoot != "" {
 					realPath = strings.ReplaceAll(path, root, linkRoot)
@@ -79,7 +80,6 @@ func walk(
 				for _, ext := range exts {
 					if ext == actualExt {
 						err := walkFn(realPath)
-						visited[path] = true
 						return err
 					}
 				}

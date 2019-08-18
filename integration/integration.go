@@ -11,10 +11,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO: why do main and main.o pop up in the integration directory?
-// TODO: why does running btool to create object dep-0/dep-0.o fail?
-// TODO: write test for symlink issue (it is in a stash).
-
 // Run runs the integration tests.
 func Run(t *testing.T) {
 	btool, err := build("github.com/ankeesler/btool/cmd/btool")
@@ -53,6 +49,10 @@ func Run(t *testing.T) {
 		{
 			name:     "ExecutableRunTwice",
 			testFunc: executableRunTwice,
+		},
+		{
+			name:     "ExecutableSubdirectoryCache",
+			testFunc: executableSubdirectoryCache,
 		},
 		{
 			name:     "Googletest",

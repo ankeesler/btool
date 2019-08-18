@@ -36,6 +36,9 @@ func TestWalk(t *testing.T) {
 
 		filepath.Join("dir-d0"),
 		filepath.Join("dir-d0", "symlink.dir-c0_dir-c1"),
+
+		filepath.Join("dir-e0"),
+		filepath.Join("dir-e0", "symlink.dir-e0"),
 	}
 	root, err := ioutil.TempDir("", "btool_walk_test")
 	require.Nil(t, err)
