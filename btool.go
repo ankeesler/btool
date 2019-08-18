@@ -143,7 +143,7 @@ func createRegistryHandlers(
 		case "http", "https":
 			c := &http.Client{}
 			r = registrypkg.NewHTTPRegistry(registry, c)
-			log.Debugf("creating http registry from %s", registry)
+			log.Debugf("creating http registry from %s", url.Host)
 		case "file":
 			r, err = registrypkg.CreateFSRegistry(fs, url.Path, registry)
 			log.Debugf("creating fs registry from %s", url.Path)

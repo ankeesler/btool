@@ -12,13 +12,13 @@ type config struct {
 	root    string
 	cache   string
 	wd      string
-	fixture string
+	example string
 
 	t *testing.T
 }
 
 func (c *config) run(args ...string) {
-	c.t.Log("run", args)
+	c.t.Log("run", args, "from", c.wd)
 
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Dir = c.wd

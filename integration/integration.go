@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 // TODO: why do main and main.o pop up in the integration directory?
@@ -15,11 +17,6 @@ import (
 
 // Run runs the integration tests.
 func Run(t *testing.T) {
-	genfixture, err := build("github.com/ankeesler/btool/cmd/genfixture")
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	btool, err := build("github.com/ankeesler/btool/cmd/btool")
 	if err != nil {
 		t.Fatal(err)
@@ -37,6 +34,8 @@ func Run(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 	t.Log("tmpDir:", tmpDir)
+
+	exampleDirs := getExampleDirs(t)
 
 	testCases := []testCase{
 		{
@@ -63,32 +62,23 @@ func Run(t *testing.T) {
 
 	for _, testCase := range testCases {
 		testCaseTmpDir := filepath.Join(tmpDir, testCase.name)
-		testCaseFixturesTmpDir := filepath.Join(testCaseTmpDir, "fixtures")
-		if err := exec.Command(
-			genfixture,
-			"-root",
-			testCaseFixturesTmpDir,
-		).Run(); err != nil {
-			t.Fatal(err)
-		}
-
 		t.Run(testCase.name, func(t *testing.T) {
-			fixtures := []string{"BasicC", "BasicCC"}
-			for _, fixture := range fixtures {
-				t.Run(fixture, func(t *testing.T) {
-					testCaseFixtureTmpDir := filepath.Join(testCaseTmpDir, fixture)
+			for _, exampleDir := range exampleDirs {
+				example := filepath.Base(exampleDir)
+				t.Run(example, func(t *testing.T) {
+					testCaseExampleTmpDir := filepath.Join(testCaseTmpDir, example)
 
-					wd := filepath.Join(testCaseFixtureTmpDir, "wd")
+					wd := filepath.Join(testCaseExampleTmpDir, "wd")
 					if err := os.MkdirAll(wd, 0755); err != nil {
 						t.Fatal(err)
 					}
 
 					testCase.testFunc(&config{
 						btool:   btool,
-						root:    filepath.Join(testCaseFixturesTmpDir, fixture),
-						cache:   filepath.Join(testCaseFixtureTmpDir, "cache"),
+						root:    exampleDir,
+						cache:   filepath.Join(testCaseExampleTmpDir, "cache"),
 						wd:      wd,
-						fixture: fixture,
+						example: example,
 
 						t: t,
 					})
@@ -114,4 +104,23 @@ func build(path string) (string, error) {
 	}
 
 	return name, nil
+}
+
+func getExampleDirs(t *testing.T) []string {
+	wd, err := os.Getwd()
+	require.Nil(t, err)
+
+	examplesDir := filepath.Join(wd, "..", "example")
+	infos, err := ioutil.ReadDir(examplesDir)
+	require.Nil(t, err)
+
+	exampleDirs := make([]string, 0)
+	for _, info := range infos {
+		if info.IsDir() {
+			exampleDir := filepath.Join(examplesDir, info.Name())
+			exampleDirs = append(exampleDirs, exampleDir)
+		}
+	}
+
+	return exampleDirs
 }
