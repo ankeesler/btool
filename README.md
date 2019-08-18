@@ -24,13 +24,6 @@ $ go build -o btool ./cmd/btool
 $ ./btool -root example/BasicCC -target main
 ```
 
-### To build `btool`...
-
-```
-$ go build -o btool ./cmd/btool
-$ ./btool -help
-```
-
 ## To run the tests...
 
 ```
