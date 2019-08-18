@@ -35,6 +35,10 @@ func Run(t *testing.T) {
 
 	testCases := []testCase{
 		{
+			name:     "Version",
+			testFunc: version,
+		},
+		{
 			name:     "Object",
 			testFunc: object,
 		},

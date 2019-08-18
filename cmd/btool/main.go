@@ -12,6 +12,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const v = "0.0.1"
+
 func main() {
 	if err := run(); err != nil {
 		log.Errorf(err.Error())
@@ -30,12 +32,18 @@ func run() error {
 		"https://btoolregistry.cfapps.io",
 		"List of registries, e.g., https://a.io,file://path/to/reg/dir",
 	)
+	version := flag.Bool("version", false, "Print version")
 	help := flag.Bool("help", false, "Show this help message")
 
 	flag.Parse()
 	if *help {
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if *version {
+		log.Infof("version %s", v)
+		return nil
 	}
 
 	level, err := log.ParseLevel(*loglevel)

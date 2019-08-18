@@ -17,7 +17,7 @@ type config struct {
 	t *testing.T
 }
 
-func (c *config) run(args ...string) {
+func (c *config) run(args ...string) string {
 	c.t.Log("run", args, "from", c.wd)
 
 	cmd := exec.Command(args[0], args[1:]...)
@@ -25,6 +25,8 @@ func (c *config) run(args ...string) {
 	output, err := cmd.CombinedOutput()
 	c.t.Log("output", string(output))
 	require.Nil(c.t, err)
+
+	return string(output)
 }
 
 type testCase struct {
