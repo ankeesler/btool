@@ -29,3 +29,9 @@ $ ./btool -root example/BasicCC -target main
 ```
 $ go test ./...
 ```
+
+## Guiding Principles
+
+- Ease of use
+- Speed
+- Extensibility
