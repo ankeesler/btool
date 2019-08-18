@@ -9,7 +9,7 @@ import (
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node/registry"
 	"github.com/ankeesler/btool/node/registry/api"
-	"github.com/ankeesler/btool/registryname"
+	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
@@ -48,11 +48,7 @@ func run() error {
 	log.CurrentLevel = level
 	log.Debugf("log level set to %s", level)
 
-	name, err := registryname.Get(*address)
-	if err != nil {
-		return errors.Wrap(err, "get")
-	}
-
+	name := getRegistryName(*address)
 	r, err := registry.CreateFSRegistry(afero.NewOsFs(), *dir, name)
 	if err != nil {
 		return errors.Wrap(err, "create registry")
@@ -65,4 +61,17 @@ func run() error {
 	}
 
 	return nil
+}
+
+func getRegistryName(deefault string) string {
+	app, err := cfenv.Current()
+	if err != nil {
+		log.Debugf("note: cannot get cfenv: %s", err.Error())
+	} else if len(app.ApplicationURIs) == 0 {
+		log.Debugf("note: no cfenv application uris")
+	} else {
+		return app.ApplicationURIs[0]
+	}
+
+	return deefault
 }
