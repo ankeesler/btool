@@ -62,10 +62,10 @@ func Run(t *testing.T) {
 			name:     "Googletest",
 			testFunc: googletest,
 		},
-		{
-			name:     "GoogletestTest",
-			testFunc: googletestTest,
-		},
+		//{
+		//	name:     "GoogletestTest",
+		//	testFunc: googletestTest,
+		//},
 	}
 
 	for _, testCase := range testCases {

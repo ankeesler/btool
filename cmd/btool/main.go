@@ -4,11 +4,11 @@ package main
 import (
 	"flag"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/ankeesler/btool"
 	"github.com/ankeesler/btool/log"
-	"github.com/ankeesler/btool/toolchain"
 	"github.com/pkg/errors"
 )
 
@@ -52,9 +52,9 @@ func run() error {
 	}
 	log.CurrentLevel = level
 
-	tc, err := toolchain.Find()
+	tc, err := findToolchain()
 	if err != nil {
-		return errors.Wrap(err, "toolchain find")
+		return errors.Wrap(err, "find toolchain")
 	}
 
 	cfg := btool.Cfg{
@@ -75,4 +75,37 @@ func run() error {
 	}
 
 	return nil
+}
+
+type toolchain struct {
+	CompilerC  string
+	CompilerCC string
+	Archiver   string
+	Linker     string
+}
+
+var (
+	linux = toolchain{
+		CompilerC:  "gcc",
+		CompilerCC: "g++",
+		Archiver:   "ar",
+		Linker:     "gcc",
+	}
+	darwin = toolchain{
+		CompilerC:  "clang",
+		CompilerCC: "clang++",
+		Archiver:   "ar",
+		Linker:     "clang",
+	}
+)
+
+func findToolchain() (*toolchain, error) {
+	switch runtime.GOOS {
+	case "linux":
+		return &linux, nil
+	case "darwin":
+		return &darwin, nil
+	default:
+		return nil, errors.New("unknown toolchain for system")
+	}
 }
