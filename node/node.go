@@ -1,4 +1,14 @@
 // Package node provides a project-wide abstraction of a build-able unit.
+//
+// Each Node is a file on disk. It depends on other Node's.
+//
+// Each Node has a Resolver which brings it into existence on disk.
+//
+// This allows for a very simple "build" algorithm to bring a Node into
+// existence:
+//   for dependency in node.dependencies:
+//     resolve(dependency)
+//   resolve(node)
 package node
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Resolver
