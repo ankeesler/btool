@@ -26,7 +26,6 @@ func TestPipeline(t *testing.T) {
 	badHandler.HandleStub = func(ctx *pipeline.Ctx) error {
 		return errors.New("some error")
 	}
-	badHandler.NameReturns("bad handler")
 
 	ctx := pipeline.NewCtx()
 
@@ -40,8 +39,6 @@ func TestPipeline(t *testing.T) {
 	badP := pipeline.New(ctx, goodHandlerA, badHandler, goodHandlerB)
 	if err := badP.Run(); err == nil {
 		t.Error("expected failure")
-	} else if ex, ac := "handle (bad handler): some error", err.Error(); ex != ac {
-		t.Error(ex, "!=", ac)
 	}
 
 	data := []struct {

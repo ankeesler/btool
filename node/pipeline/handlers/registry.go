@@ -144,7 +144,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (r *registry) Name() string { return "registry" }
+func (r *registry) String() string { return "registry" }
 
 func (r *registry) newResolver(
 	registryR registrypkg.Resolver,

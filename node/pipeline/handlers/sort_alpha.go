@@ -19,4 +19,4 @@ func (sa *sortAlpha) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (sa *sortAlpha) Name() string { return "alpha sort" }
+func (sa *sortAlpha) String() string { return "alpha sort" }

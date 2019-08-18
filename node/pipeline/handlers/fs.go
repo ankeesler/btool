@@ -57,7 +57,7 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (fs *fs) Name() string { return "fs" }
+func (fs *fs) String() string { return "fs" }
 
 func (fs *fs) handleNode(
 	n *node.Node,

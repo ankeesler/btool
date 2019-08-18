@@ -62,7 +62,7 @@ func (o *object) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (o *object) Name() string { return "object" }
+func (o *object) String() string { return "object" }
 
 func objectNFromSourceN(
 	s Store,

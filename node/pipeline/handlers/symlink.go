@@ -36,4 +36,4 @@ func (s *symlink) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (s *symlink) Name() string { return "symlink" }
+func (s *symlink) String() string { return "symlink" }

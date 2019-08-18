@@ -70,7 +70,7 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (e *executable) Name() string { return "executable" }
+func (e *executable) String() string { return "executable" }
 
 func (e *executable) collectObjects(
 	ctx *pipeline.Ctx,

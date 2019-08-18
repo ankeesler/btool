@@ -34,4 +34,4 @@ func (p *print) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (p *print) Name() string { return "print" }
+func (p *print) String() string { return "print" }

@@ -21,11 +21,6 @@ import (
 //   - return an error if something goes wrong, skrrrt
 type Handler interface {
 	Handle(*Ctx) error
-
-	// TODO: change me to String()! And get rid of me!
-	// Name returns an identifying name for this Handler. This helps with
-	// debugging.
-	Name() string
 }
 
 // Pipeline is an abstraction of a list of operators on a mutable list of
@@ -57,9 +52,9 @@ func (p *Pipeline) Handlers(handlers ...Handler) *Pipeline {
 // fail in their operation. It exits as soon as any Handler fails.
 func (p *Pipeline) Run() error {
 	for _, h := range p.handlers {
-		log.Debugf("pipeline: running %s", h.Name())
+		log.Debugf("pipeline: running %s", h)
 		if err := h.Handle(p.ctx); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("handle (%s)", h.Name()))
+			return errors.Wrap(err, fmt.Sprintf("handle (%s)", h))
 		}
 	}
 

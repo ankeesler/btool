@@ -45,7 +45,7 @@ func (st *sortTopo) Handle(ctx *pipeline.Ctx) error {
 	return nil
 }
 
-func (st *sortTopo) Name() string { return "topo sort" }
+func (st *sortTopo) String() string { return "topo sort" }
 
 func collectNodesWithoutDependencies(
 	nodes []*node.Node,
