@@ -9,7 +9,8 @@ type ResolverFactory interface {
 	NewCompileC(includeDirs []string) node.Resolver
 	NewCompileCC(includeDirs []string) node.Resolver
 	NewArchive() node.Resolver
-	NewLink() node.Resolver
+	NewLinkC() node.Resolver
+	NewLinkCC() node.Resolver
 	NewSymlink() node.Resolver
 
 	NewDownload(url, sha256 string) node.Resolver

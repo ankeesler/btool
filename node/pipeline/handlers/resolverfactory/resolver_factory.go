@@ -10,18 +10,19 @@ import (
 
 // ResolverFactory is a factory type that can create node.Resolver's.
 type ResolverFactory struct {
-	compilerC, compilerCC, archiver, linker string
+	compilerC, compilerCC, archiver, linkerC, linkerCC string
 }
 
 // New creates a new ResolverFactory.
 func New(
-	compilerC, compilerCC, archiver, linker string,
+	compilerC, compilerCC, archiver, linkerC, linkerCC string,
 ) *ResolverFactory {
 	return &ResolverFactory{
 		compilerC:  compilerC,
 		compilerCC: compilerCC,
 		archiver:   archiver,
-		linker:     linker,
+		linkerC:    linkerC,
+		linkerCC:   linkerCC,
 	}
 }
 
@@ -42,10 +43,16 @@ func (rf *ResolverFactory) NewArchive() node.Resolver {
 	return resolvers.NewArchive(rf.archiver)
 }
 
-// NewLink returns a node.Resolver that links multiple objects into an
+// NewLinkC returns a node.Resolver that links multiple C objects into an
 // executable.
-func (rf *ResolverFactory) NewLink() node.Resolver {
-	return resolvers.NewLink(rf.linker)
+func (rf *ResolverFactory) NewLinkC() node.Resolver {
+	return resolvers.NewLink(rf.linkerC)
+}
+
+// NewLinkCC returns a node.Resolver that links multiple C++ objects into an
+// executable.
+func (rf *ResolverFactory) NewLinkCC() node.Resolver {
+	return resolvers.NewLink(rf.linkerCC)
 }
 
 // NewSymlink returns a node.Resolver that symlinks a node to another.

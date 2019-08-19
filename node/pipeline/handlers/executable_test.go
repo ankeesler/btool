@@ -39,12 +39,14 @@ func TestExecutable(t *testing.T) {
 
 			compileCR := &nodefakes.FakeResolver{}
 			compileCCR := &nodefakes.FakeResolver{}
-			linkR := &nodefakes.FakeResolver{}
+			linkCR := &nodefakes.FakeResolver{}
+			linkCCR := &nodefakes.FakeResolver{}
 
 			rf := &handlersfakes.FakeResolverFactory{}
 			rf.NewCompileCReturns(compileCR)
 			rf.NewCompileCCReturns(compileCCR)
-			rf.NewLinkReturnsOnCall(0, linkR)
+			rf.NewLinkCReturnsOnCall(0, linkCR)
+			rf.NewLinkCCReturnsOnCall(0, linkCCR)
 
 			h := handlers.NewExecutable(s, rf, "some-project", "main")
 			ctx := pipeline.NewCtx()
@@ -53,7 +55,11 @@ func TestExecutable(t *testing.T) {
 
 			name := "main"
 			executableN := node.New(name)
-			executableN.Resolver = linkR
+			if strings.HasSuffix(datum.name, "CC") {
+				executableN.Resolver = linkCCR
+			} else {
+				executableN.Resolver = linkCR
+			}
 
 			exNodes := datum.nodesWithObjects
 			exNodes = append(exNodes, executableN)

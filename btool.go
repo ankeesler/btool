@@ -35,7 +35,8 @@ type Cfg struct {
 	CompilerC  string
 	CompilerCC string
 	Archiver   string
-	Linker     string
+	LinkerC    string
+	LinkerCC   string
 
 	Registries []string
 }
@@ -88,7 +89,8 @@ func Run(cfg *Cfg) error {
 		cfg.CompilerC,
 		cfg.CompilerCC,
 		cfg.Archiver,
-		cfg.Linker,
+		cfg.LinkerC,
+		cfg.LinkerCC,
 	)
 
 	rhs, err := createRegistryHandlers(fs, s, rf, cfg.Registries)

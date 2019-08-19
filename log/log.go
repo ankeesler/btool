@@ -77,7 +77,7 @@ func colorLevel(level Level) string {
 	case LevelInfo:
 		return color.HiBlueString("%5s", "info")
 	case LevelError:
-		return color.HiRedString("%5s", "info")
+		return color.HiRedString("%5s", "error")
 	default:
 		return fmt.Sprintf("%5s", "???")
 	}

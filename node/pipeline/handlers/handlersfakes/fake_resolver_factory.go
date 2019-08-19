@@ -53,14 +53,24 @@ type FakeResolverFactory struct {
 	newDownloadReturnsOnCall map[int]struct {
 		result1 node.Resolver
 	}
-	NewLinkStub        func() node.Resolver
-	newLinkMutex       sync.RWMutex
-	newLinkArgsForCall []struct {
+	NewLinkCStub        func() node.Resolver
+	newLinkCMutex       sync.RWMutex
+	newLinkCArgsForCall []struct {
 	}
-	newLinkReturns struct {
+	newLinkCReturns struct {
 		result1 node.Resolver
 	}
-	newLinkReturnsOnCall map[int]struct {
+	newLinkCReturnsOnCall map[int]struct {
+		result1 node.Resolver
+	}
+	NewLinkCCStub        func() node.Resolver
+	newLinkCCMutex       sync.RWMutex
+	newLinkCCArgsForCall []struct {
+	}
+	newLinkCCReturns struct {
+		result1 node.Resolver
+	}
+	newLinkCCReturnsOnCall map[int]struct {
 		result1 node.Resolver
 	}
 	NewSymlinkStub        func() node.Resolver
@@ -331,54 +341,106 @@ func (fake *FakeResolverFactory) NewDownloadReturnsOnCall(i int, result1 node.Re
 	}{result1}
 }
 
-func (fake *FakeResolverFactory) NewLink() node.Resolver {
-	fake.newLinkMutex.Lock()
-	ret, specificReturn := fake.newLinkReturnsOnCall[len(fake.newLinkArgsForCall)]
-	fake.newLinkArgsForCall = append(fake.newLinkArgsForCall, struct {
+func (fake *FakeResolverFactory) NewLinkC() node.Resolver {
+	fake.newLinkCMutex.Lock()
+	ret, specificReturn := fake.newLinkCReturnsOnCall[len(fake.newLinkCArgsForCall)]
+	fake.newLinkCArgsForCall = append(fake.newLinkCArgsForCall, struct {
 	}{})
-	fake.recordInvocation("NewLink", []interface{}{})
-	fake.newLinkMutex.Unlock()
-	if fake.NewLinkStub != nil {
-		return fake.NewLinkStub()
+	fake.recordInvocation("NewLinkC", []interface{}{})
+	fake.newLinkCMutex.Unlock()
+	if fake.NewLinkCStub != nil {
+		return fake.NewLinkCStub()
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	fakeReturns := fake.newLinkReturns
+	fakeReturns := fake.newLinkCReturns
 	return fakeReturns.result1
 }
 
-func (fake *FakeResolverFactory) NewLinkCallCount() int {
-	fake.newLinkMutex.RLock()
-	defer fake.newLinkMutex.RUnlock()
-	return len(fake.newLinkArgsForCall)
+func (fake *FakeResolverFactory) NewLinkCCallCount() int {
+	fake.newLinkCMutex.RLock()
+	defer fake.newLinkCMutex.RUnlock()
+	return len(fake.newLinkCArgsForCall)
 }
 
-func (fake *FakeResolverFactory) NewLinkCalls(stub func() node.Resolver) {
-	fake.newLinkMutex.Lock()
-	defer fake.newLinkMutex.Unlock()
-	fake.NewLinkStub = stub
+func (fake *FakeResolverFactory) NewLinkCCalls(stub func() node.Resolver) {
+	fake.newLinkCMutex.Lock()
+	defer fake.newLinkCMutex.Unlock()
+	fake.NewLinkCStub = stub
 }
 
-func (fake *FakeResolverFactory) NewLinkReturns(result1 node.Resolver) {
-	fake.newLinkMutex.Lock()
-	defer fake.newLinkMutex.Unlock()
-	fake.NewLinkStub = nil
-	fake.newLinkReturns = struct {
+func (fake *FakeResolverFactory) NewLinkCReturns(result1 node.Resolver) {
+	fake.newLinkCMutex.Lock()
+	defer fake.newLinkCMutex.Unlock()
+	fake.NewLinkCStub = nil
+	fake.newLinkCReturns = struct {
 		result1 node.Resolver
 	}{result1}
 }
 
-func (fake *FakeResolverFactory) NewLinkReturnsOnCall(i int, result1 node.Resolver) {
-	fake.newLinkMutex.Lock()
-	defer fake.newLinkMutex.Unlock()
-	fake.NewLinkStub = nil
-	if fake.newLinkReturnsOnCall == nil {
-		fake.newLinkReturnsOnCall = make(map[int]struct {
+func (fake *FakeResolverFactory) NewLinkCReturnsOnCall(i int, result1 node.Resolver) {
+	fake.newLinkCMutex.Lock()
+	defer fake.newLinkCMutex.Unlock()
+	fake.NewLinkCStub = nil
+	if fake.newLinkCReturnsOnCall == nil {
+		fake.newLinkCReturnsOnCall = make(map[int]struct {
 			result1 node.Resolver
 		})
 	}
-	fake.newLinkReturnsOnCall[i] = struct {
+	fake.newLinkCReturnsOnCall[i] = struct {
+		result1 node.Resolver
+	}{result1}
+}
+
+func (fake *FakeResolverFactory) NewLinkCC() node.Resolver {
+	fake.newLinkCCMutex.Lock()
+	ret, specificReturn := fake.newLinkCCReturnsOnCall[len(fake.newLinkCCArgsForCall)]
+	fake.newLinkCCArgsForCall = append(fake.newLinkCCArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NewLinkCC", []interface{}{})
+	fake.newLinkCCMutex.Unlock()
+	if fake.NewLinkCCStub != nil {
+		return fake.NewLinkCCStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newLinkCCReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeResolverFactory) NewLinkCCCallCount() int {
+	fake.newLinkCCMutex.RLock()
+	defer fake.newLinkCCMutex.RUnlock()
+	return len(fake.newLinkCCArgsForCall)
+}
+
+func (fake *FakeResolverFactory) NewLinkCCCalls(stub func() node.Resolver) {
+	fake.newLinkCCMutex.Lock()
+	defer fake.newLinkCCMutex.Unlock()
+	fake.NewLinkCCStub = stub
+}
+
+func (fake *FakeResolverFactory) NewLinkCCReturns(result1 node.Resolver) {
+	fake.newLinkCCMutex.Lock()
+	defer fake.newLinkCCMutex.Unlock()
+	fake.NewLinkCCStub = nil
+	fake.newLinkCCReturns = struct {
+		result1 node.Resolver
+	}{result1}
+}
+
+func (fake *FakeResolverFactory) NewLinkCCReturnsOnCall(i int, result1 node.Resolver) {
+	fake.newLinkCCMutex.Lock()
+	defer fake.newLinkCCMutex.Unlock()
+	fake.NewLinkCCStub = nil
+	if fake.newLinkCCReturnsOnCall == nil {
+		fake.newLinkCCReturnsOnCall = make(map[int]struct {
+			result1 node.Resolver
+		})
+	}
+	fake.newLinkCCReturnsOnCall[i] = struct {
 		result1 node.Resolver
 	}{result1}
 }
@@ -506,8 +568,10 @@ func (fake *FakeResolverFactory) Invocations() map[string][][]interface{} {
 	defer fake.newCompileCCMutex.RUnlock()
 	fake.newDownloadMutex.RLock()
 	defer fake.newDownloadMutex.RUnlock()
-	fake.newLinkMutex.RLock()
-	defer fake.newLinkMutex.RUnlock()
+	fake.newLinkCMutex.RLock()
+	defer fake.newLinkCMutex.RUnlock()
+	fake.newLinkCCMutex.RLock()
+	defer fake.newLinkCCMutex.RUnlock()
 	fake.newSymlinkMutex.RLock()
 	defer fake.newSymlinkMutex.RUnlock()
 	fake.newUnzipMutex.RLock()

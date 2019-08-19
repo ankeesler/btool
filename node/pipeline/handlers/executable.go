@@ -64,7 +64,11 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 		ctx.Nodes = append(ctx.Nodes, objectN)
 		targetN.Dependency(objectN)
 	}
-	targetN.Resolver = e.rf.NewLink()
+	if sourceCCN != nil {
+		targetN.Resolver = e.rf.NewLinkCC()
+	} else {
+		targetN.Resolver = e.rf.NewLinkC()
+	}
 	ctx.Nodes = append(ctx.Nodes, targetN)
 
 	return nil

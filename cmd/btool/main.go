@@ -66,7 +66,8 @@ func run() error {
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,
 		Archiver:   tc.Archiver,
-		Linker:     tc.Linker,
+		LinkerC:    tc.LinkerC,
+		LinkerCC:   tc.LinkerCC,
 
 		Registries: strings.Split(*registries, ","),
 	}
@@ -81,7 +82,8 @@ type toolchain struct {
 	CompilerC  string
 	CompilerCC string
 	Archiver   string
-	Linker     string
+	LinkerC    string
+	LinkerCC   string
 }
 
 var (
@@ -89,13 +91,15 @@ var (
 		CompilerC:  "gcc",
 		CompilerCC: "g++",
 		Archiver:   "ar",
-		Linker:     "gcc",
+		LinkerC:    "gcc",
+		LinkerCC:   "g++",
 	}
 	darwin = toolchain{
 		CompilerC:  "clang",
 		CompilerCC: "clang++",
 		Archiver:   "ar",
-		Linker:     "clang",
+		LinkerC:    "clang",
+		LinkerCC:   "clang++",
 	}
 )
 

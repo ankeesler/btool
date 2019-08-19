@@ -163,8 +163,10 @@ func (r *registry) newResolver(
 		nodeR = r.rf.NewCompileCC(includeDirs)
 	case "archive":
 		nodeR = r.rf.NewArchive()
-	case "link":
-		nodeR = r.rf.NewLink()
+	case "linkC":
+		nodeR = r.rf.NewLinkC()
+	case "linkCC":
+		nodeR = r.rf.NewLinkCC()
 	case "symlink":
 		nodeR = r.rf.NewSymlink()
 	case "unzip":
