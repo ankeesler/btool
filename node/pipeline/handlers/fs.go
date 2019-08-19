@@ -7,23 +7,41 @@ import (
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	"github.com/ankeesler/btool/node/pipeline/handlers/includes"
-	"github.com/ankeesler/btool/node/pipeline/handlers/walk"
 	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Collector
+
+// Collector is a type that can make a list of files from a root directory that
+// match some list of file extensions. It should follow symlinks.
+type Collector interface {
+	Collect(root string, exts []string) ([]string, error)
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Includeser
+
+// Includeser is a type that can return a list of #include's from a given file.
+type Includeser interface {
+	Includes(path string) ([]string, error)
+}
+
 type fs struct {
-	effess afero.Fs
-	root   string
+	c    Collector
+	i    Includeser
+	root string
 }
 
 // NewFile creates pipeline.Handler that walks a file tree from a root and
 // collects .c/.cc and .h files.
-func NewFS(effess afero.Fs, root string) pipeline.Handler {
+func NewFS(
+	c Collector,
+	i Includeser,
+	root string,
+) pipeline.Handler {
 	return &fs{
-		effess: effess,
-		root:   root,
+		c:    c,
+		i:    i,
+		root: root,
 	}
 }
 
@@ -31,20 +49,16 @@ func (fs *fs) Handle(ctx *pipeline.Ctx) error {
 	log.Debugf("scanning from root %s", fs.root)
 
 	nodeMap := make(map[string]*node.Node)
-	if err := walk.Walk(
-		fs.effess,
-		fs.root,
-		[]string{".c", ".cc", ".h"},
-		func(file string) error {
-			log.Debugf("adding node %s", file)
-			n := node.New(file)
-			ctx.Nodes = append(ctx.Nodes, n)
-			nodeMap[n.Name] = n
+	paths, err := fs.c.Collect(fs.root, []string{".c", ".cc", ".h"})
+	if err != nil {
+		return errors.Wrap(err, "collect")
+	}
 
-			return nil
-		},
-	); err != nil {
-		return errors.Wrap(err, "walk")
+	for _, path := range paths {
+		log.Debugf("adding node %s", path)
+		n := node.New(path)
+		ctx.Nodes = append(ctx.Nodes, n)
+		nodeMap[path] = n
 	}
 
 	for _, n := range nodeMap {
@@ -65,27 +79,19 @@ func (fs *fs) handleNode(
 	root string,
 ) error {
 	path := n.Name
-	data, err := afero.ReadFile(fs.effess, path)
+	includes, err := fs.i.Includes(path)
 	if err != nil {
-		return errors.Wrap(err, "read file "+path)
-	}
-	log.Debugf("read file %s", path)
-
-	includes, err := includes.Parse(data)
-	if err != nil {
-		return errors.Wrap(err, "parse includes")
+		return errors.Wrap(err, "includes")
 	}
 	log.Debugf("includes = %s", includes)
 
 	for _, include := range includes {
-		includeName, err := fs.resolveInclude(include, filepath.Dir(path), root)
-		if err != nil {
-			return errors.Wrap(err, "resolve include path "+include)
-		}
-
-		includeN, ok := nodeMap[includeName]
+		includeN, ok := nodeMap[filepath.Join(root, include)]
 		if !ok {
-			return fmt.Errorf("unknown node for include name %s", includeName)
+			includeN, ok = nodeMap[filepath.Join(filepath.Dir(path), include)]
+		}
+		if !ok {
+			return fmt.Errorf("unknown node for include %s", include)
 		}
 
 		log.Debugf("adding dependency %s -> %s", n.Name, includeN.Name)
@@ -93,26 +99,4 @@ func (fs *fs) handleNode(
 	}
 
 	return nil
-}
-
-func (fs *fs) resolveInclude(include, dir, root string) (string, error) {
-	rootRelJoin := filepath.Join(root, include)
-	if exists, err := afero.Exists(fs.effess, rootRelJoin); err != nil {
-		return "", errors.Wrap(err, "exists")
-	} else if exists {
-		return rootRelJoin, nil
-	}
-
-	dirRelJoin := filepath.Join(dir, include)
-	if exists, err := afero.Exists(fs.effess, dirRelJoin); err != nil {
-		return "", errors.Wrap(err, "exists")
-	} else if exists {
-		if err != nil {
-			return "", errors.New("rel")
-		} else {
-			return dirRelJoin, nil
-		}
-	}
-
-	return "", errors.New("cannot resolve include: " + include)
 }

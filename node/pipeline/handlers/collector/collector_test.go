@@ -1,15 +1,13 @@
-package walk_test
+package collector_test
 
 import (
-	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/ankeesler/btool/node/pipeline/handlers/walk"
-	"github.com/go-test/deep"
+	"github.com/ankeesler/btool/node/pipeline/handlers/collector"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
@@ -18,7 +16,7 @@ import (
 // Therefore we will run this test with an OS FS (as opposed to a memory FS).
 // See https://github.com/spf13/afero/pull/212/files.
 
-func TestWalk(t *testing.T) {
+func TestCollectorCollect(t *testing.T) {
 	fs := afero.NewOsFs()
 	files := []string{
 		filepath.Join("dir-a0"),
@@ -66,15 +64,6 @@ func TestWalk(t *testing.T) {
 			},
 		},
 		{
-			name:    "Failure",
-			root:    "",
-			exts:    []string{".txt", ".fish"},
-			failure: true,
-			paths: []string{
-				filepath.Join("dir-a0", "file-a0a.txt"),
-			},
-		},
-		{
 			name:    "Symlink",
 			root:    "dir-d0",
 			exts:    []string{".fish"},
@@ -87,26 +76,10 @@ func TestWalk(t *testing.T) {
 
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
-			paths := make([]string, 0)
-			walkFn := func(path string) error {
-				relPath, err := filepath.Rel(root, path)
-				require.Nil(t, err)
-				paths = append(paths, relPath)
-
-				if datum.failure {
-					return errors.New("failure")
-				} else {
-					return nil
-				}
-			}
-
-			err := walk.Walk(fs, filepath.Join(root, datum.root), datum.exts, walkFn)
-			if datum.failure {
-				require.NotNil(t, err)
-			} else {
-				require.Nil(t, err)
-				require.Nil(t, deep.Equal(datum.paths, paths))
-			}
+			c := collector.New()
+			paths, err := c.Collect(filepath.Join(root, datum.root), datum.exts)
+			require.Nil(t, err)
+			require.Equal(t, prependDir(datum.paths, root), paths)
 		})
 	}
 }
@@ -146,4 +119,11 @@ func populateFS(t *testing.T, fs afero.Fs, files []string, root string) {
 			)
 		}
 	}
+}
+
+func prependDir(dirs []string, dir string) []string {
+	for i := range dirs {
+		dirs[i] = filepath.Join(dir, dirs[i])
+	}
+	return dirs
 }

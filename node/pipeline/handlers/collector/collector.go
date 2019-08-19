@@ -1,6 +1,6 @@
-// Package walk provides filesystem walking functionality that is specific to
-// btool.
-package walk
+// Package collector provides filesystem walking functionality that is specific
+// to btool.
+package collector
 
 import (
 	"os"
@@ -12,10 +12,19 @@ import (
 	"github.com/spf13/afero"
 )
 
+// Collector is an object that can walk a file tree and collect file names.
+type Collector struct {
+}
+
+// New creates a new Collector.
+func New() *Collector {
+	return &Collector{}
+}
+
 // Note! afero does not contain support for symlinking currently.
 // See https://github.com/spf13/afero/pull/212/files.
 
-// Walk will walk a filesystem from the provided root. It has opinionated
+// Collect will walk a filesystem from the provided root. It has opinionated
 // specifics (for btool):
 //   1. It only passes files to the provided walkFn
 //   2. It follows symlinks...without much loop detection :(
@@ -23,14 +32,23 @@ import (
 //   4. It only passes files with the provided file extensions to the provided
 //      walkFn
 //   5. The file paths passed to the walkFn contain the symlink in them
-func Walk(
-	fs afero.Fs,
+func (c *Collector) Collect(
 	root string,
 	exts []string,
-	walkFn func(string) error,
-) error {
+) ([]string, error) {
+	paths := make([]string, 0)
+	walkFn := func(path string) error {
+		paths = append(paths, path)
+		return nil
+	}
+
+	fs := afero.NewOsFs()
 	visited := make(map[string]bool)
-	return walk(fs, root, "", exts, walkFn, visited)
+	if err := walk(fs, root, "", exts, walkFn, visited); err != nil {
+		return nil, errors.Wrap(err, "walk")
+	}
+
+	return paths, nil
 }
 
 func walk(

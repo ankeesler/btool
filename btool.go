@@ -16,6 +16,8 @@ import (
 	"github.com/ankeesler/btool/node/builder/currenter"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
+	"github.com/ankeesler/btool/node/pipeline/handlers/collector"
+	"github.com/ankeesler/btool/node/pipeline/handlers/includeser"
 	"github.com/ankeesler/btool/node/pipeline/handlers/resolverfactory"
 	"github.com/ankeesler/btool/node/pipeline/handlers/store"
 	registrypkg "github.com/ankeesler/btool/node/registry"
@@ -85,6 +87,9 @@ func Run(cfg *Cfg) error {
 	ctx := pipeline.NewCtx()
 	p := pipeline.New(ctx)
 
+	collector := collector.New()
+	i := includeser.New()
+
 	rf := resolverfactory.New(
 		cfg.CompilerC,
 		cfg.CompilerCC,
@@ -100,7 +105,7 @@ func Run(cfg *Cfg) error {
 	p.Handlers(rhs...)
 
 	p.Handlers(
-		handlers.NewFS(fs, projectDir),
+		handlers.NewFS(collector, i, projectDir),
 		handlers.NewObject(s, rf, project, target),
 		handlers.NewExecutable(s, rf, project, target),
 		handlers.NewSymlink(rf, cfg.Output, target),
