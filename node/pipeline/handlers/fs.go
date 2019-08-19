@@ -31,7 +31,7 @@ type fs struct {
 	root string
 }
 
-// NewFile creates pipeline.Handler that walks a file tree from a root and
+// NewFS creates a pipeline.Handler that walks a file tree from a root and
 // collects .c/.cc and .h files.
 func NewFS(
 	c Collector,
@@ -45,7 +45,7 @@ func NewFS(
 	}
 }
 
-func (fs *fs) Handle(ctx *pipeline.Ctx) error {
+func (fs *fs) Handle(ctx pipeline.Ctx) error {
 	log.Debugf("scanning from root %s", fs.root)
 
 	nodeMap := make(map[string]*node.Node)

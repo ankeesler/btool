@@ -1,29 +1,33 @@
 package pipeline
 
-import (
-	"fmt"
+import "github.com/ankeesler/btool/node"
 
-	"github.com/ankeesler/btool/node"
-)
-
-// Ctx provides 2 things:
-//   - the node.Node list on which this Pipeline is operating
-//   - a key-value store of information about a particular Pipeline
-type Ctx struct {
-	Nodes []*node.Node
-	KV    map[string]string
+type ctx struct {
+	cb    Callback
+	nodes []*node.Node
 }
 
-// NewCtx creates a new Ctx with an empty node.Node list and an empty
-// key-value store.
-func NewCtx() *Ctx {
-	return &Ctx{
-		Nodes: make([]*node.Node, 0),
-		KV:    make(map[string]string),
+func newCtx(cb Callback) *ctx {
+	return &ctx{
+		cb:    cb,
+		nodes: make([]*node.Node, 0),
 	}
 }
 
-// String returns a string representation of the Ctx.
-func (ctx *Ctx) String() string {
-	return fmt.Sprintf("%s: %s", ctx.Nodes, ctx.KV)
+func (c *ctx) Add(n *node.Node) {
+	c.cb.OnAdd(n)
+	c.nodes = append(c.nodes, n)
+}
+
+func (c *ctx) Find(name string) *node.Node {
+	for _, n := range c.nodes {
+		if n.Name == name {
+			return n
+		}
+	}
+	return nil
+}
+
+func (c *ctx) All() []*node.Node {
+	return c.nodes
 }

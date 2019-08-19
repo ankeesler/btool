@@ -1,62 +1,63 @@
-// Package pipeline provides an abstraction of a series of operators (i.e.,
-// Handler's) on a list of node.Node's.
+// Package pipeline provides an abtraction of a collection mechanism for
+// node.Node's. A caller can create a Pipeline and add a bunch of Handler's
+// that interact with a Ctx to collect node.Node's.
 package pipeline
 
 import (
-	"fmt"
-
-	"github.com/ankeesler/btool/log"
+	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Ctx
+
+// Ctx is an interface with which a Handler interacts to collect node.Node's.
+type Ctx interface {
+	Add(*node.Node)
+	Find(name string) *node.Node
+	All() []*node.Node
+}
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Handler
 
 // Handler is an interface that describes some operator on a Pipeline.
 //
-// Upon being called, a Handler should:
-//   - update the node.Node list field of the provided Ctx in order to propagate
-//     their updates to the node collection
-//   - get or set any keys on the Ctx to provide information to other Handler's
-//     in the Pipeline
-//   - return an error if something goes wrong, skrrrt
+// Upon being called, a Handler should add node.Node's to the provided Ctx, or
+// return an error if it runs into trouble.
 type Handler interface {
-	Handle(*Ctx) error
+	Handle(Ctx) error
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Callback
+
+// Callback is a notification mechanism for when node.Node's are added to a
+// Ctx when running as part of a Pipeline.
+type Callback interface {
+	OnAdd(*node.Node)
 }
 
 // Pipeline is an abstraction of a list of operators on a mutable list of
 // node.Node's.
 type Pipeline struct {
-	ctx      *Ctx
-	handlers []Handler
+	h  Handler
+	cb Callback
 }
 
-// New creates a new Pipeline with a Ctx and a list of Handler's.
-func New(ctx *Ctx, handlers ...Handler) *Pipeline {
+// New creates a new Pipeline with a Handler and a Callback.
+func New(h Handler, cb Callback) *Pipeline {
 	return &Pipeline{
-		ctx:      ctx,
-		handlers: handlers,
+		h:  h,
+		cb: cb,
 	}
-}
-
-// Handlers is a builder method that allows a caller to add a Handler to the
-// Pipeline. It returns the Pipeline so that the calls can be strung together.
-//   p := New(handlerA, handlerB).Handler(handlerC).Handler(handlerD)
-func (p *Pipeline) Handlers(handlers ...Handler) *Pipeline {
-	for _, h := range handlers {
-		p.handlers = append(p.handlers, h)
-	}
-	return p
 }
 
 // Run kicks off the pipeline. It will return an error if any of the Handler's
-// fail in their operation. It exits as soon as any Handler fails.
-func (p *Pipeline) Run() error {
-	for _, h := range p.handlers {
-		log.Debugf("pipeline: running %s", h)
-		if err := h.Handle(p.ctx); err != nil {
-			return errors.Wrap(err, fmt.Sprintf("handle (%s)", h))
-		}
+// fail in their operation. It exits as soon as any Handler fails. If all
+// Handler's succeed, then this function will return a list of node.Node's
+// that the Handler's have collected.
+func (p *Pipeline) Run() ([]*node.Node, error) {
+	ctx := newCtx(p.cb)
+	if err := p.h.Handle(ctx); err != nil {
+		return nil, errors.Wrap(err, "handle")
 	}
-
-	return nil
+	return ctx.All(), nil
 }

@@ -2,77 +2,78 @@ package pipeline_test
 
 import (
 	"errors"
-	"reflect"
 	"testing"
 
+	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/pipelinefakes"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPipeline(t *testing.T) {
+	nodeA := node.New("a")
+	nodeB := node.New("b").Dependency(nodeA)
 	goodHandlerA := &pipelinefakes.FakeHandler{}
-	goodHandlerA.HandleStub = func(ctx *pipeline.Ctx) error {
-		ctx.KV["key"] = "value"
+	goodHandlerA.HandleStub = func(ctx pipeline.Ctx) error {
+		ctx.Add(nodeA)
 		return nil
 	}
 	goodHandlerB := &pipelinefakes.FakeHandler{}
-	goodHandlerB.HandleStub = func(ctx *pipeline.Ctx) error {
-		if ctx.KV["key"] != "value" {
-			t.Error("expected kv entry")
-		}
+	goodHandlerB.HandleStub = func(ctx pipeline.Ctx) error {
+		assert.NotNil(t, ctx.Find(nodeA.Name))
+		ctx.Add(nodeB)
 		return nil
 	}
 	badHandler := &pipelinefakes.FakeHandler{}
-	badHandler.HandleStub = func(ctx *pipeline.Ctx) error {
+	badHandler.HandleStub = func(ctx pipeline.Ctx) error {
 		return errors.New("some error")
 	}
 
-	ctx := pipeline.NewCtx()
-
 	// Happy
-	goodP := pipeline.New(ctx, goodHandlerA, goodHandlerB)
-	if err := goodP.Run(); err != nil {
-		t.Error(err)
-	}
+	cb := &pipelinefakes.FakeCallback{}
+	mh := pipeline.NewMultiHandler().Add(goodHandlerA, goodHandlerB)
+	goodP := pipeline.New(mh, cb)
+	acNodes, err := goodP.Run()
+	require.Nil(t, err)
+	assert.Equal(
+		t,
+		[]*node.Node{
+			nodeA, nodeB,
+		},
+		acNodes,
+	)
+	assert.Equal(t, 2, cb.OnAddCallCount())
+	assert.Equal(t, nodeA, cb.OnAddArgsForCall(0))
+	assert.Equal(t, nodeB, cb.OnAddArgsForCall(1))
 
 	// Sad.
-	badP := pipeline.New(ctx, goodHandlerA, badHandler, goodHandlerB)
-	if err := badP.Run(); err == nil {
-		t.Error("expected failure")
-	}
+	cb = &pipelinefakes.FakeCallback{}
+	mh = pipeline.NewMultiHandler().Add(goodHandlerA, badHandler)
+	badP := pipeline.New(mh, cb)
+	_, err = badP.Run()
+	assert.NotNil(t, err)
+	assert.Equal(t, 1, cb.OnAddCallCount())
+	assert.Equal(t, nodeA, cb.OnAddArgsForCall(0))
 
 	data := []struct {
-		ex              int
-		callCountFunc   func() int
-		argsForCallFunc func(int) *pipeline.Ctx
+		ex            int
+		callCountFunc func() int
 	}{
 		{
-			ex:              2,
-			callCountFunc:   goodHandlerA.HandleCallCount,
-			argsForCallFunc: goodHandlerA.HandleArgsForCall,
+			ex:            2,
+			callCountFunc: goodHandlerA.HandleCallCount,
 		},
 		{
-			ex:              1,
-			callCountFunc:   goodHandlerB.HandleCallCount,
-			argsForCallFunc: goodHandlerB.HandleArgsForCall,
+			ex:            1,
+			callCountFunc: goodHandlerB.HandleCallCount,
 		},
 		{
-			ex:              1,
-			callCountFunc:   badHandler.HandleCallCount,
-			argsForCallFunc: badHandler.HandleArgsForCall,
+			ex:            1,
+			callCountFunc: badHandler.HandleCallCount,
 		},
 	}
 	for _, datum := range data {
-		if ac := datum.callCountFunc(); datum.ex != ac {
-			t.Errorf("%s: %d != %d", reflect.TypeOf(datum.callCountFunc).Name(), datum.ex, ac)
-		}
-
-		ex := ctx
-		for i := 0; i < datum.callCountFunc(); i++ {
-			ac := datum.argsForCallFunc(i)
-			if ex != ac {
-				t.Error(ex, "!=", ac)
-			}
-		}
+		assert.Equal(t, datum.ex, datum.callCountFunc())
 	}
 }

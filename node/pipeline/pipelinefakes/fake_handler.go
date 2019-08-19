@@ -8,10 +8,10 @@ import (
 )
 
 type FakeHandler struct {
-	HandleStub        func(*pipeline.Ctx) error
+	HandleStub        func(pipeline.Ctx) error
 	handleMutex       sync.RWMutex
 	handleArgsForCall []struct {
-		arg1 *pipeline.Ctx
+		arg1 pipeline.Ctx
 	}
 	handleReturns struct {
 		result1 error
@@ -23,11 +23,11 @@ type FakeHandler struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeHandler) Handle(arg1 *pipeline.Ctx) error {
+func (fake *FakeHandler) Handle(arg1 pipeline.Ctx) error {
 	fake.handleMutex.Lock()
 	ret, specificReturn := fake.handleReturnsOnCall[len(fake.handleArgsForCall)]
 	fake.handleArgsForCall = append(fake.handleArgsForCall, struct {
-		arg1 *pipeline.Ctx
+		arg1 pipeline.Ctx
 	}{arg1})
 	fake.recordInvocation("Handle", []interface{}{arg1})
 	fake.handleMutex.Unlock()
@@ -47,13 +47,13 @@ func (fake *FakeHandler) HandleCallCount() int {
 	return len(fake.handleArgsForCall)
 }
 
-func (fake *FakeHandler) HandleCalls(stub func(*pipeline.Ctx) error) {
+func (fake *FakeHandler) HandleCalls(stub func(pipeline.Ctx) error) {
 	fake.handleMutex.Lock()
 	defer fake.handleMutex.Unlock()
 	fake.HandleStub = stub
 }
 
-func (fake *FakeHandler) HandleArgsForCall(i int) *pipeline.Ctx {
+func (fake *FakeHandler) HandleArgsForCall(i int) pipeline.Ctx {
 	fake.handleMutex.RLock()
 	defer fake.handleMutex.RUnlock()
 	argsForCall := fake.handleArgsForCall[i]
