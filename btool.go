@@ -20,6 +20,7 @@ import (
 	"github.com/ankeesler/btool/node/pipeline/handlers/resolverfactory"
 	"github.com/ankeesler/btool/node/pipeline/handlers/store"
 	registrypkg "github.com/ankeesler/btool/node/registry"
+	"github.com/ankeesler/btool/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
@@ -108,7 +109,7 @@ func Run(cfg *Cfg) error {
 		handlers.NewSymlink(rf, cfg.Output, target),
 		handlers.NewSortAlpha(),
 	)
-	cb := newUI()
+	cb := ui.New()
 	p := pipeline.New(mh, cb)
 	ctx, err := p.Run()
 	if err != nil {
