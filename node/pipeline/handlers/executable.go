@@ -33,14 +33,14 @@ func NewExecutable(
 	}
 }
 
-func (e *executable) Handle(ctx *pipeline.Ctx) error {
+func (e *executable) Handle(ctx pipeline.Ctx) error {
 	if filepath.Ext(e.target) != "" {
 		return nil
 	}
 
 	var dN *node.Node
-	sourceCN := node.Find(e.target+".c", ctx.Nodes)
-	sourceCCN := node.Find(e.target+".cc", ctx.Nodes)
+	sourceCN := node.Find(e.target+".c", ctx.All())
+	sourceCCN := node.Find(e.target+".cc", ctx.All())
 	if sourceCN != nil && sourceCCN != nil {
 		return fmt.Errorf(
 			"ambiguous executable %s (%s or %s)",
@@ -61,7 +61,7 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 
 	targetN := node.New(e.target)
 	for _, objectN := range objectNodes {
-		ctx.Nodes = append(ctx.Nodes, objectN)
+		ctx.Add(objectN)
 		targetN.Dependency(objectN)
 	}
 	if sourceCCN != nil {
@@ -69,7 +69,7 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 	} else {
 		targetN.Resolver = e.rf.NewLinkC()
 	}
-	ctx.Nodes = append(ctx.Nodes, targetN)
+	ctx.Add(targetN)
 
 	return nil
 }
@@ -77,7 +77,7 @@ func (e *executable) Handle(ctx *pipeline.Ctx) error {
 func (e *executable) String() string { return "executable" }
 
 func (e *executable) collectObjects(
-	ctx *pipeline.Ctx,
+	ctx pipeline.Ctx,
 	sourceN *node.Node,
 	objectNodes []*node.Node,
 ) []*node.Node {
@@ -96,7 +96,7 @@ func (e *executable) collectObjects(
 			continue
 		}
 
-		sourceN := node.Find(source, ctx.Nodes)
+		sourceN := ctx.Find(source)
 		log.Debugf("dependency %s, source %s, found %s", dN, source, sourceN)
 		if sourceN != nil {
 			objectNodes = e.collectObjects(ctx, sourceN, objectNodes)

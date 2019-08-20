@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool/log"
+	"github.com/ankeesler/btool/node"
 )
 
 type ui int
@@ -20,4 +21,8 @@ func (ui ui) OnResolve(name string, current bool) {
 		b.WriteString(" (up to date)")
 	}
 	log.Infof(b.String())
+}
+
+func (ui ui) OnAdd(n *node.Node) {
+	log.Infof("adding " + n.Name)
 }

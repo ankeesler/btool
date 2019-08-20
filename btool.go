@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool/log"
-	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/builder"
 	"github.com/ankeesler/btool/node/builder/currenter"
 	"github.com/ankeesler/btool/node/pipeline"
@@ -84,9 +83,6 @@ func Run(cfg *Cfg) error {
 		target = filepath.Join(projectDir, cfg.Target)
 	}
 
-	ctx := pipeline.NewCtx()
-	p := pipeline.New(ctx)
-
 	collector := collector.New()
 	i := includeser.New()
 
@@ -102,27 +98,29 @@ func Run(cfg *Cfg) error {
 	if err != nil {
 		return errors.Wrap(err, "create registry handlers")
 	}
-	p.Handlers(rhs...)
 
-	p.Handlers(
+	mh := pipeline.NewMultiHandler()
+	mh.Add(rhs...)
+	mh.Add(
 		handlers.NewFS(collector, i, projectDir),
 		handlers.NewObject(s, rf, project, target),
 		handlers.NewExecutable(s, rf, project, target),
 		handlers.NewSymlink(rf, cfg.Output, target),
 		handlers.NewSortAlpha(),
 	)
-
-	if err := p.Run(); err != nil {
+	cb := newUI()
+	p := pipeline.New(mh, cb)
+	ctx, err := p.Run()
+	if err != nil {
 		return errors.Wrap(err, "pipeline run")
 	}
 
-	targetN := node.Find(cfg.Output, ctx.Nodes)
+	targetN := ctx.Find(cfg.Output)
 	if targetN == nil {
 		return errors.New("unknown target: " + cfg.Output)
 	}
 
 	c := currenter.New()
-	cb := newUI()
 	b := builder.New(c, cb)
 	if err := b.Build(targetN); err != nil {
 		return errors.Wrap(err, "build")

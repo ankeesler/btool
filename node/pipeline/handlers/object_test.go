@@ -6,9 +6,9 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
-	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
+	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
@@ -43,7 +43,7 @@ func TestObject(t *testing.T) {
 			rf.NewCompileCCReturnsOnCall(0, compileCCR)
 
 			h := handlers.NewObject(s, rf, "some-project", "dep-1/dep-1.o")
-			ctx := pipeline.NewCtx()
+			ctx := pipelinetestutil.NewCtx()
 			ctx.Nodes = datum.nodes
 
 			var ext string
@@ -54,7 +54,7 @@ func TestObject(t *testing.T) {
 			}
 
 			source := "dep-1/dep-1" + ext
-			sourceN := node.Find(source, ctx.Nodes)
+			sourceN := ctx.Find(source)
 			require.NotNil(t, sourceN)
 
 			name := "dep-1/dep-1.o"
@@ -67,7 +67,7 @@ func TestObject(t *testing.T) {
 			exNodes := append(datum.nodes.Copy().Cast(), objectN)
 
 			assert.Nil(t, h.Handle(ctx))
-			assert.Nil(t, deep.Equal(exNodes, ctx.Nodes))
+			assert.Nil(t, deep.Equal(exNodes, ctx.All()))
 		})
 	}
 }

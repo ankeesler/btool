@@ -18,8 +18,8 @@ func NewSortTopo() pipeline.Handler {
 	return &sortTopo{}
 }
 
-func (st *sortTopo) Handle(ctx *pipeline.Ctx) error {
-	nodes := ctx.Nodes
+func (st *sortTopo) Handle(ctx pipeline.Ctx) error {
+	nodes := ctx.All()
 
 	log.Debugf("sorting %d nodes", len(nodes))
 
@@ -40,7 +40,7 @@ func (st *sortTopo) Handle(ctx *pipeline.Ctx) error {
 		}
 	}
 
-	ctx.Nodes = sorted
+	//ctx.Nodes = sorted
 
 	return nil
 }

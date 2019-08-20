@@ -33,14 +33,14 @@ func NewObject(
 	}
 }
 
-func (o *object) Handle(ctx *pipeline.Ctx) error {
+func (o *object) Handle(ctx pipeline.Ctx) error {
 	if !strings.HasSuffix(o.target, ".o") {
 		return nil
 	}
 
 	var dN *node.Node
-	sourceCN := node.Find(strings.ReplaceAll(o.target, ".o", ".c"), ctx.Nodes)
-	sourceCCN := node.Find(strings.ReplaceAll(o.target, ".o", ".cc"), ctx.Nodes)
+	sourceCN := node.Find(strings.ReplaceAll(o.target, ".o", ".c"), ctx.All())
+	sourceCCN := node.Find(strings.ReplaceAll(o.target, ".o", ".cc"), ctx.All())
 	if sourceCN != nil && sourceCCN != nil {
 		return fmt.Errorf(
 			"ambiguous object %s (%s or %s)",
@@ -57,7 +57,7 @@ func (o *object) Handle(ctx *pipeline.Ctx) error {
 	}
 
 	objectN := objectNFromSourceN(o.s, o.rf, o.project, dN)
-	ctx.Nodes = append(ctx.Nodes, objectN)
+	ctx.Add(objectN)
 
 	return nil
 }

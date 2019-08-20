@@ -57,7 +57,7 @@ func (fs *fs) Handle(ctx pipeline.Ctx) error {
 	for _, path := range paths {
 		log.Debugf("adding node %s", path)
 		n := node.New(path)
-		ctx.Nodes = append(ctx.Nodes, n)
+		ctx.Add(n)
 		nodeMap[path] = n
 	}
 

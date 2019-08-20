@@ -6,9 +6,9 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
-	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
+	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
 	"github.com/ankeesler/btool/node/registry/testutil"
 	"github.com/go-test/deep"
 	"github.com/spf13/afero"
@@ -72,7 +72,7 @@ func TestRegistry(t *testing.T) {
 	baconN.Resolver = downloadR
 
 	h := handlers.NewRegistry(fs, s, rf, r)
-	ctx := pipeline.NewCtx()
+	ctx := pipelinetestutil.NewCtx()
 	assert.Nil(t, h.Handle(ctx))
 
 	assert.Equal(t, 1, s.RegistryDirCallCount())
@@ -105,5 +105,5 @@ func TestRegistry(t *testing.T) {
 	assert.Equal(t, index.Files[0].Path, r.GaggleArgsForCall(0))
 
 	exNodes := []*node.Node{tunaN, fishN, marlinN, baconN}
-	assert.Nil(t, deep.Equal(exNodes, ctx.Nodes))
+	assert.Nil(t, deep.Equal(exNodes, ctx.All()))
 }

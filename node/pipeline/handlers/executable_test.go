@@ -6,9 +6,9 @@ import (
 
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
-	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
+	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
@@ -49,7 +49,7 @@ func TestExecutable(t *testing.T) {
 			rf.NewLinkCCReturnsOnCall(0, linkCCR)
 
 			h := handlers.NewExecutable(s, rf, "some-project", "main")
-			ctx := pipeline.NewCtx()
+			ctx := pipelinetestutil.NewCtx()
 			ctx.Nodes = datum.nodes
 			require.Nil(t, h.Handle(ctx))
 
@@ -77,10 +77,10 @@ func TestExecutable(t *testing.T) {
 			node.SortAlpha(ctx.Nodes)
 			node.SortAlpha(exNodes)
 
-			t.Log(ctx.Nodes)
+			t.Log(ctx.All())
 			t.Log(exNodes)
 
-			assert.Nil(t, deep.Equal(exNodes.Cast(), ctx.Nodes))
+			assert.Nil(t, deep.Equal(exNodes.Cast(), ctx.All()))
 		})
 	}
 }

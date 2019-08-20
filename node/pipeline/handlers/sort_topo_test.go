@@ -1,13 +1,13 @@
 package handlers_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
+	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
 	"github.com/ankeesler/btool/node/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSortTopo(t *testing.T) {
@@ -28,28 +28,22 @@ func TestSortTopo(t *testing.T) {
 	}
 
 	// Happy.
-	ctx := pipeline.NewCtx()
+	ctx := pipelinetestutil.NewCtx()
 	ctx.Nodes = []*node.Node{
 		mainc,
 		dep1h,
 		dep0h,
 	}
-	if err := h.Handle(ctx); err != nil {
-		t.Error(err)
-	}
+	require.Nil(t, h.Handle(ctx))
 
-	ex := []*node.Node{
-		dep0h,
-		dep1h,
-		mainc,
-	}
-	if !reflect.DeepEqual(ex, ctx.Nodes) {
-		t.Error(ex, "!=", ctx.Nodes)
-	}
+	//ex := []*node.Node{
+	//	dep0h,
+	//	dep1h,
+	//	mainc,
+	//}
+	//require.Equal(t, ex, ctx.Nodes)
 
 	// Sad.
 	dep0h.Dependencies = []*node.Node{mainc}
-	if err := h.Handle(ctx); err == nil {
-		t.Error("expected failure")
-	}
+	require.NotNil(t, h.Handle(ctx))
 }

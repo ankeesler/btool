@@ -1,12 +1,14 @@
 package handlers_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
+	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
+	"github.com/go-test/deep"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSortAlpha(t *testing.T) {
@@ -31,18 +33,14 @@ func TestSortAlpha(t *testing.T) {
 		nodeCCpy.Dependency(node3).Dependency(node2).Dependency(node1),
 	}
 
-	ctx := pipeline.NewCtx()
+	ctx := pipelinetestutil.NewCtx()
 	ctx.Nodes = nodes
-	if err := h.Handle(ctx); err != nil {
-		t.Error(err)
-	}
+	require.Nil(t, h.Handle(ctx))
 
 	ex := []*node.Node{
 		nodeA.Dependency(node0).Dependency(node1),
 		nodeB,
 		nodeC.Dependency(node1).Dependency(node2).Dependency(node3),
 	}
-	if !reflect.DeepEqual(ex, ctx.Nodes) {
-		t.Error(ex, "!=", ctx.Nodes)
-	}
+	assert.Nil(t, deep.Equal(ex, ctx.All()))
 }

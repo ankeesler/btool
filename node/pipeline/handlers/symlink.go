@@ -21,17 +21,17 @@ func NewSymlink(rf ResolverFactory, to, from string) pipeline.Handler {
 	}
 }
 
-func (s *symlink) Handle(ctx *pipeline.Ctx) error {
+func (s *symlink) Handle(ctx pipeline.Ctx) error {
 	log.Debugf("symlink from %s to %s", s.from, s.to)
 
-	fromN := node.Find(s.from, ctx.Nodes)
+	fromN := ctx.Find(s.from)
 	if fromN == nil {
 		return errors.New("unknown symlink source: " + s.from)
 	}
 
 	n := node.New(s.to).Dependency(fromN)
 	n.Resolver = s.rf.NewSymlink()
-	ctx.Nodes = append(ctx.Nodes, n)
+	ctx.Add(n)
 
 	return nil
 }

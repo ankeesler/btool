@@ -14,8 +14,9 @@ func NewSortAlpha() pipeline.Handler {
 	return &sortAlpha{}
 }
 
-func (sa *sortAlpha) Handle(ctx *pipeline.Ctx) error {
-	node.SortAlpha(ctx.Nodes)
+func (sa *sortAlpha) Handle(ctx pipeline.Ctx) error {
+	// TODO: this won't work!
+	node.SortAlpha(ctx.All())
 	return nil
 }
 

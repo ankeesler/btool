@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/log"
-	"github.com/ankeesler/btool/node/pipeline"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
+	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
 	"github.com/ankeesler/btool/node/testutil"
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
@@ -38,7 +38,7 @@ func TestFS(t *testing.T) {
 			i := &handlersfakes.FakeIncludeser{}
 			setupIncludeserFake(root, i, datum.exNodes)
 			h := handlers.NewFS(c, i, root)
-			ctx := pipeline.NewCtx()
+			ctx := pipelinetestutil.NewCtx()
 			err := h.Handle(ctx)
 			require.Nil(t, err)
 
@@ -47,7 +47,7 @@ func TestFS(t *testing.T) {
 				exN.Name = filepath.Join("/", exN.Name)
 			}
 
-			assert.Nil(t, deep.Equal(datum.exNodes.Cast(), ctx.Nodes))
+			assert.Nil(t, deep.Equal(datum.exNodes.Cast(), ctx.All()))
 		})
 	}
 }

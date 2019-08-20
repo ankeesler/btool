@@ -19,17 +19,13 @@ func NewPrint(writer io.Writer) pipeline.Handler {
 	}
 }
 
-func (p *print) Handle(ctx *pipeline.Ctx) error {
-	fmt.Fprintln(p.writer, "*** Nodes ***")
-	for _, n := range ctx.Nodes {
+func (p *print) Handle(ctx pipeline.Ctx) error {
+	for _, n := range ctx.All() {
 		fmt.Fprintf(p.writer, "%s\n", n.Name)
 		for _, d := range n.Dependencies {
 			fmt.Fprintf(p.writer, "> %s\n", d.Name)
 		}
 	}
-
-	fmt.Fprintln(p.writer, "*** KV ***")
-	fmt.Fprintln(p.writer, ctx.KV)
 
 	return nil
 }

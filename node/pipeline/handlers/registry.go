@@ -51,7 +51,7 @@ func NewRegistry(
 	}
 }
 
-func (r *registry) Handle(ctx *pipeline.Ctx) error {
+func (r *registry) Handle(ctx pipeline.Ctx) error {
 	i, err := r.r.Index()
 	if err != nil {
 		return errors.Wrap(err, "index")
@@ -121,7 +121,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 					// TODO: test me.
 					dN = node.New(gaggleFile)
 				} else {
-					dN = node.Find(dName, ctx.Nodes)
+					dN = ctx.Find(dName)
 				}
 
 				if dN == nil {
@@ -137,7 +137,7 @@ func (r *registry) Handle(ctx *pipeline.Ctx) error {
 			nN.Resolver = nodeR
 
 			log.Debugf("decoded %s to %s", n, nN)
-			ctx.Nodes = append(ctx.Nodes, nN)
+			ctx.Add(nN)
 		}
 	}
 
