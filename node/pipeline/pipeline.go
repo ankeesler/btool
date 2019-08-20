@@ -52,12 +52,12 @@ func New(h Handler, cb Callback) *Pipeline {
 
 // Run kicks off the pipeline. It will return an error if any of the Handler's
 // fail in their operation. It exits as soon as any Handler fails. If all
-// Handler's succeed, then this function will return a list of node.Node's
-// that the Handler's have collected.
-func (p *Pipeline) Run() ([]*node.Node, error) {
+// Handler's succeed, then this function will return the Ctx on which the
+// Handler's have been operating.
+func (p *Pipeline) Run() (Ctx, error) {
 	ctx := newCtx(p.cb)
 	if err := p.h.Handle(ctx); err != nil {
 		return nil, errors.Wrap(err, "handle")
 	}
-	return ctx.All(), nil
+	return ctx, nil
 }

@@ -10,7 +10,6 @@ require (
 	github.com/mattn/go-isatty v0.0.7 // indirect
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
 	github.com/mitchellh/mapstructure v1.1.2
-	github.com/onsi/gomega v1.5.0
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/afero v1.2.2
 	github.com/stretchr/testify v1.3.0

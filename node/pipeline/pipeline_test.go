@@ -34,14 +34,14 @@ func TestPipeline(t *testing.T) {
 	cb := &pipelinefakes.FakeCallback{}
 	mh := pipeline.NewMultiHandler().Add(goodHandlerA, goodHandlerB)
 	goodP := pipeline.New(mh, cb)
-	acNodes, err := goodP.Run()
+	ctx, err := goodP.Run()
 	require.Nil(t, err)
 	assert.Equal(
 		t,
 		[]*node.Node{
 			nodeA, nodeB,
 		},
-		acNodes,
+		ctx.All(),
 	)
 	assert.Equal(t, 2, cb.OnAddCallCount())
 	assert.Equal(t, nodeA, cb.OnAddArgsForCall(0))
