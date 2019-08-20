@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Build will run create all node.Node's and dependencies in the node.Node graph.
+// Build will Resolve() all node.Node's and dependencies in the node.Node graph.
 func Build(targetN *node.Node, ui *ui.UI) error {
 	c := currenter.New()
 	b := builder.New(c, ui)
