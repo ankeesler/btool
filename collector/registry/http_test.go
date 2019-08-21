@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ankeesler/btool/node/registry"
-	"github.com/ankeesler/btool/node/registry/registryfakes"
-	"github.com/ankeesler/btool/node/registry/testutil"
+	"github.com/ankeesler/btool/collector/registry"
+	"github.com/ankeesler/btool/collector/registry/registryfakes"
+	"github.com/ankeesler/btool/collector/registry/testutil"
 	"github.com/go-test/deep"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"

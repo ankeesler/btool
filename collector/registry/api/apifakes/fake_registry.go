@@ -4,8 +4,8 @@ package apifakes
 import (
 	"sync"
 
-	"github.com/ankeesler/btool/node/registry"
-	"github.com/ankeesler/btool/node/registry/api"
+	"github.com/ankeesler/btool/collector/registry"
+	"github.com/ankeesler/btool/collector/registry/api"
 )
 
 type FakeRegistry struct {

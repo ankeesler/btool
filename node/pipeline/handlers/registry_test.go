@@ -4,12 +4,12 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/ankeesler/btool/collector/testutil"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
 	"github.com/ankeesler/btool/node/pipeline/handlers/handlersfakes"
 	pipelinetestutil "github.com/ankeesler/btool/node/pipeline/testutil"
-	"github.com/ankeesler/btool/node/registry/testutil"
 	"github.com/go-test/deep"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"

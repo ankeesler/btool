@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ankeesler/btool/node/registry"
-	"github.com/ankeesler/btool/node/registry/testutil"
+	"github.com/ankeesler/btool/collector/registry"
+	"github.com/ankeesler/btool/collector/registry/testutil"
 	"github.com/go-test/deep"
 	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"

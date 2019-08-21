@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/ankeesler/btool/node/registry"
+	"github.com/ankeesler/btool/collector/registry"
 )
 
 type FakeHTTPClient struct {

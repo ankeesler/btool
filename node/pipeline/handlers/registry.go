@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
+	registrypkg "github.com/ankeesler/btool/collector/registry"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/pipeline"
-	registrypkg "github.com/ankeesler/btool/node/registry"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"

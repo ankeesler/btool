@@ -3,8 +3,16 @@
 package btool
 
 import (
+	"path/filepath"
+
+	"github.com/ankeesler/btool/collector"
+	"github.com/ankeesler/btool/collector/scanner"
+	"github.com/ankeesler/btool/collector/scanner/nodestore"
+	"github.com/ankeesler/btool/node/pipeline/handlers/includeser"
+	"github.com/ankeesler/btool/node/pipeline/handlers/resolverfactory"
 	"github.com/ankeesler/btool/ui"
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 )
 
 // Cfg is a configuration struct provided to a Build call.
@@ -32,7 +40,21 @@ type Cfg struct {
 func Run(cfg *Cfg) error {
 	ui := ui.New(cfg.Quiet)
 
-	targetN, err := Collect(cfg, ui)
+	fs := afero.NewOsFs()
+	ns := nodestore.New(ui)
+	i := includeser.New()
+	rf := resolverfactory.New(
+		cfg.CompilerC,
+		cfg.CompilerCC,
+		cfg.Archiver,
+		cfg.LinkerC,
+		cfg.LinkerCC,
+	)
+	s := scanner.New(fs, cfg.Root, ns, i, rf)
+	target := filepath.Join(cfg.Root, cfg.Target)
+	c := collector.New(s, target)
+
+	targetN, err := c.Collect()
 	if err != nil {
 		return errors.Wrap(err, "collect")
 	}

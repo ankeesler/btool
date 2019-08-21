@@ -1,7 +1,7 @@
 // Package testutil provides test utilities for the registry package.
 package testutil
 
-import "github.com/ankeesler/btool/node/registry"
+import "github.com/ankeesler/btool/collector/registry"
 
 func Index() *registry.Index {
 	return &registry.Index{

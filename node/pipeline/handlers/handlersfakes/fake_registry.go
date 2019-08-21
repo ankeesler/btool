@@ -4,8 +4,8 @@ package handlersfakes
 import (
 	"sync"
 
+	"github.com/ankeesler/btool/collector/registry"
 	"github.com/ankeesler/btool/node/pipeline/handlers"
-	"github.com/ankeesler/btool/node/registry"
 )
 
 type FakeRegistry struct {
