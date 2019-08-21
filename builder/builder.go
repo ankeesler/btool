@@ -25,15 +25,17 @@ type Callback interface {
 
 // Builder can Build() a full node.Node graph.
 type Builder struct {
-	c  Currenter
-	cb Callback
+	dryRun bool
+	c      Currenter
+	cb     Callback
 }
 
 // New creates a new Builder.
-func New(c Currenter, cb Callback) *Builder {
+func New(dryRun bool, c Currenter, cb Callback) *Builder {
 	return &Builder{
-		c:  c,
-		cb: cb,
+		dryRun: dryRun,
+		c:      c,
+		cb:     cb,
 	}
 }
 
@@ -65,8 +67,10 @@ func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
 	if n.Resolver != nil {
 		if !current {
 			log.Debugf("resolving %s", n.Name)
-			if err := n.Resolver.Resolve(n); err != nil {
-				return errors.Wrap(err, "really resolve "+n.Name)
+			if !b.dryRun {
+				if err := n.Resolver.Resolve(n); err != nil {
+					return errors.Wrap(err, "really resolve "+n.Name)
+				}
 			}
 		}
 	}

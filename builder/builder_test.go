@@ -90,7 +90,7 @@ func TestBuilderBuild(t *testing.T) {
 
 			callback := &builderfakes.FakeCallback{}
 
-			b := builder.New(c, callback)
+			b := builder.New(false, c, callback)
 			require.Nil(t, b.Build(n))
 			require.Nil(t, deep.Equal(datum.exResolved, acResolved))
 

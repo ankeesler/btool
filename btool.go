@@ -27,6 +27,8 @@ type Cfg struct {
 	Target string
 	Output string
 
+	DryRun bool
+
 	CompilerC  string
 	CompilerCC string
 	Archiver   string
@@ -64,7 +66,7 @@ func Run(cfg *Cfg) error {
 	}
 
 	cur := currenter.New()
-	b := builder.New(cur, ui)
+	b := builder.New(cfg.DryRun, cur, ui)
 	if err := b.Build(targetN); err != nil {
 		return errors.Wrap(err, "build")
 	}
