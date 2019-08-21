@@ -5,23 +5,24 @@ import (
 	"sync"
 
 	"github.com/ankeesler/btool/builder"
+	"github.com/ankeesler/btool/node"
 )
 
 type FakeCallback struct {
-	OnResolveStub        func(string, bool)
+	OnResolveStub        func(*node.Node, bool)
 	onResolveMutex       sync.RWMutex
 	onResolveArgsForCall []struct {
-		arg1 string
+		arg1 *node.Node
 		arg2 bool
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCallback) OnResolve(arg1 string, arg2 bool) {
+func (fake *FakeCallback) OnResolve(arg1 *node.Node, arg2 bool) {
 	fake.onResolveMutex.Lock()
 	fake.onResolveArgsForCall = append(fake.onResolveArgsForCall, struct {
-		arg1 string
+		arg1 *node.Node
 		arg2 bool
 	}{arg1, arg2})
 	fake.recordInvocation("OnResolve", []interface{}{arg1, arg2})
@@ -37,13 +38,13 @@ func (fake *FakeCallback) OnResolveCallCount() int {
 	return len(fake.onResolveArgsForCall)
 }
 
-func (fake *FakeCallback) OnResolveCalls(stub func(string, bool)) {
+func (fake *FakeCallback) OnResolveCalls(stub func(*node.Node, bool)) {
 	fake.onResolveMutex.Lock()
 	defer fake.onResolveMutex.Unlock()
 	fake.OnResolveStub = stub
 }
 
-func (fake *FakeCallback) OnResolveArgsForCall(i int) (string, bool) {
+func (fake *FakeCallback) OnResolveArgsForCall(i int) (*node.Node, bool) {
 	fake.onResolveMutex.RLock()
 	defer fake.onResolveMutex.RUnlock()
 	argsForCall := fake.onResolveArgsForCall[i]

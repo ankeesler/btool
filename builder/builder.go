@@ -20,7 +20,7 @@ type Currenter interface {
 // when they happen. It also tells the clients whether or not the node was up
 // to date.
 type Callback interface {
-	OnResolve(name string, current bool)
+	OnResolve(n *node.Node, current bool)
 }
 
 // Builder can Build() a full node.Node graph.
@@ -62,7 +62,7 @@ func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
 		return errors.Wrap(err, "current")
 	}
 
-	b.cb.OnResolve(n.Name, current)
+	b.cb.OnResolve(n, current)
 
 	if n.Resolver != nil {
 		if !current {

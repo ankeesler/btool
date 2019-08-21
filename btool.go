@@ -7,6 +7,7 @@ import (
 
 	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/builder/currenter"
+	"github.com/ankeesler/btool/cleaner"
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/collector/resolverfactory"
 	"github.com/ankeesler/btool/collector/scanner"
@@ -28,6 +29,7 @@ type Cfg struct {
 	Output string
 
 	DryRun bool
+	Clean  bool
 
 	CompilerC  string
 	CompilerCC string
@@ -65,10 +67,16 @@ func Run(cfg *Cfg) error {
 		return errors.Wrap(err, "collect")
 	}
 
-	cur := currenter.New()
-	b := builder.New(cfg.DryRun, cur, ui)
-	if err := b.Build(targetN); err != nil {
-		return errors.Wrap(err, "build")
+	if cfg.Clean {
+		if err := cleaner.New(fs, ui).Clean(targetN); err != nil {
+			return errors.Wrap(err, "clean")
+		}
+	} else {
+		cur := currenter.New()
+		b := builder.New(cfg.DryRun, cur, ui)
+		if err := b.Build(targetN); err != nil {
+			return errors.Wrap(err, "build")
+		}
 	}
 
 	return nil

@@ -21,13 +21,13 @@ func New(quiet bool) *UI {
 	}
 }
 
-func (ui *UI) OnResolve(name string, current bool) {
+func (ui *UI) OnResolve(n *node.Node, current bool) {
 	if ui.quiet {
 		return
 	}
 
 	b := strings.Builder{}
-	b.WriteString(fmt.Sprintf("resolving %s", name))
+	b.WriteString(fmt.Sprintf("resolving %s", n.Name))
 	if current {
 		b.WriteString(" (up to date)")
 	}
@@ -40,4 +40,12 @@ func (ui *UI) OnAdd(n *node.Node) {
 	}
 
 	log.Infof("adding " + n.Name)
+}
+
+func (ui *UI) OnClean(n *node.Node) {
+	if ui.quiet {
+		return
+	}
+
+	log.Infof("cleaning " + n.Name)
 }

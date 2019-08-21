@@ -97,9 +97,12 @@ func TestBuilderBuild(t *testing.T) {
 			assert.Equal(t, len(datum.exCallback), callback.OnResolveCallCount())
 			for i, exName := range datum.exCallback {
 				exCurrent := contains(exName, datum.current)
+				exN := find(exName, datum.nodes)
+				require.NotNil(t, exN)
 
-				acName, acCurrent := callback.OnResolveArgsForCall(i)
-				assert.Equal(t, exName, acName)
+				acN, acCurrent := callback.OnResolveArgsForCall(i)
+
+				assert.Equal(t, exN, acN)
 				assert.Equal(t, exCurrent, acCurrent)
 			}
 		})

@@ -32,6 +32,7 @@ func run() error {
 		"List of registries, e.g., https://a.io,file://path/to/reg/dir",
 	)
 	dryrun := flag.Bool("dryrun", false, "Do not actually build")
+	clean := flag.Bool("clean", false, "Clean all nodes")
 	version := flag.Bool("version", false, "Print version")
 	help := flag.Bool("help", false, "Show this help message")
 
@@ -63,6 +64,7 @@ func run() error {
 		Target: *target,
 
 		DryRun: *dryrun,
+		Clean:  *clean,
 
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,
