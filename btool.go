@@ -14,6 +14,7 @@ import (
 	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/ankeesler/btool/collector/scanner/nodestore"
 	"github.com/ankeesler/btool/collector/sorter"
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -66,6 +67,8 @@ func Run(cfg *Cfg) error {
 	if err != nil {
 		return errors.Wrap(err, "collect")
 	}
+
+	log.Debugf("graph: %s", targetN)
 
 	if cfg.Clean {
 		if err := cleaner.New(fs, ui).Clean(targetN); err != nil {

@@ -165,6 +165,15 @@ func (s *Scanner) onSource(n *node.Node, ctx *ctx) error {
 		return errors.Wrap(err, "add headers")
 	}
 
+	ext := filepath.Ext(n.Name)
+	object := strings.ReplaceAll(n.Name, ext, ".o")
+	objectN := node.New(object)
+	if err := s.add(objectN, ctx); err != nil {
+		return errors.Wrap(err, "add")
+	}
+
+	n.Dependency(objectN)
+
 	return nil
 }
 
