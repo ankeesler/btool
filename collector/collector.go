@@ -15,22 +15,33 @@ type Scanner interface {
 	Scan(*node.Node) error
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Sorter
+
+// Sorter is an object that can sort a node.Node graph. The only requirements are
+// that it is a stable sort.
+type Sorter interface {
+	Sort(*node.Node) error
+}
+
 // Collector is a type that can build a node.Node graph.
 type Collector struct {
-	s Scanner
-	t string
+	scanner Scanner
+	sorter  Sorter
+	t       string
 }
 
 // New creates a new Collector.
 func New(
 	//registries []Registry,
-	s Scanner,
+	scanner Scanner,
+	sorter Sorter,
 	t string,
 ) *Collector {
 	return &Collector{
 		//registries: registries,
-		s: s,
-		t: t,
+		scanner: scanner,
+		sorter:  sorter,
+		t:       t,
 	}
 }
 

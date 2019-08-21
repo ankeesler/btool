@@ -85,7 +85,7 @@ func TestBuilderBuild(t *testing.T) {
 				n.Resolver = r
 			}
 
-			n := node.Find(datum.target, datum.nodes)
+			n := find(datum.target, datum.nodes)
 			require.NotNil(t, n)
 
 			callback := &builderfakes.FakeCallback{}
@@ -113,4 +113,13 @@ func contains(s string, ss []string) bool {
 		}
 	}
 	return false
+}
+
+func find(target string, nodes []*node.Node) {
+	for _, n := range nodes {
+		if n.Name == target {
+			return n
+		}
+	}
+	return nil
 }
