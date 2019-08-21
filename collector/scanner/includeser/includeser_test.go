@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/ankeesler/btool/node/pipeline/handlers/includeser"
+	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/stretchr/testify/require"
 )
 
