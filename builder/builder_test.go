@@ -7,7 +7,6 @@ import (
 	"github.com/ankeesler/btool/builder/builderfakes"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
-	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -92,7 +91,7 @@ func TestBuilderBuild(t *testing.T) {
 
 			b := builder.New(false, c, callback)
 			require.Nil(t, b.Build(n))
-			require.Nil(t, deep.Equal(datum.exResolved, acResolved))
+			require.Equal(t, datum.exResolved, acResolved)
 
 			assert.Equal(t, len(datum.exCallback), callback.OnResolveCallCount())
 			for i, exName := range datum.exCallback {

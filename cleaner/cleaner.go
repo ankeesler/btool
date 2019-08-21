@@ -3,7 +3,6 @@
 package cleaner
 
 import (
-	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
@@ -41,30 +40,15 @@ func New(ra RemoveAller, cb Callback) *Cleaner {
 // Clean will walk a node.Node graph and remove all node.Node's from the
 // filesystem.
 func (c *Cleaner) Clean(n *node.Node) error {
-	return c.clean(n, make(map[*node.Node]bool))
+	return node.Visit(n, c.visit)
 }
 
-func (c *Cleaner) clean(n *node.Node, cleaned map[*node.Node]bool) error {
-	if cleaned[n] {
-		return nil
-	}
-
-	log.Debugf("cleaning %s", n.Name)
-
-	for _, dN := range n.Dependencies {
-		if err := c.clean(dN, cleaned); err != nil {
-			return errors.Wrap(err, "clean")
-		}
-	}
-
+func (c *Cleaner) visit(n *node.Node) error {
 	if n.Resolver != nil {
 		c.cb.OnClean(n)
 		if err := c.ra.RemoveAll(n.Name); err != nil {
 			return errors.Wrap(err, "remove all")
 		}
 	}
-
-	cleaned[n] = true
-
 	return nil
 }

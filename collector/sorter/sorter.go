@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"github.com/ankeesler/btool/node"
-	"github.com/pkg/errors"
 )
 
 // Sorter is a type that can sort a node.Node graph in a stable way.
@@ -18,15 +17,12 @@ func New() *Sorter {
 }
 
 func (s *Sorter) Sort(n *node.Node) error {
-	for _, dN := range n.Dependencies {
-		if err := s.Sort(dN); err != nil {
-			return errors.Wrap(err, "sort "+dN.Name)
-		}
-	}
+	return node.Visit(n, s.visit)
+}
 
+func (s *Sorter) visit(n *node.Node) error {
 	sort.Slice(n.Dependencies, func(i, j int) bool {
 		return n.Dependencies[i].Name < n.Dependencies[j].Name
 	})
-
 	return nil
 }

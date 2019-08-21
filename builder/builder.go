@@ -40,23 +40,10 @@ func New(dryRun bool, c Currenter, cb Callback) *Builder {
 }
 
 func (b *Builder) Build(n *node.Node) error {
-	return b.build(n, make(map[*node.Node]bool))
+	return node.Visit(n, b.visit)
 }
 
-func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
-	if built[n] {
-		return nil
-	}
-
-	log.Debugf("building %s", n.Name)
-
-	for _, dN := range n.Dependencies {
-		log.Debugf("building dependency %s", dN.Name)
-		if err := b.build(dN, built); err != nil {
-			return errors.Wrap(err, "resolve "+dN.Name)
-		}
-	}
-
+func (b *Builder) visit(n *node.Node) error {
 	current, err := b.c.Current(n)
 	if err != nil {
 		return errors.Wrap(err, "current")
@@ -74,8 +61,6 @@ func (b *Builder) build(n *node.Node, built map[*node.Node]bool) error {
 			}
 		}
 	}
-
-	built[n] = true
 
 	return nil
 }
