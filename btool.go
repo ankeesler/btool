@@ -12,6 +12,7 @@ import (
 	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/ankeesler/btool/collector/scanner/nodestore"
+	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -52,9 +53,10 @@ func Run(cfg *Cfg) error {
 		cfg.LinkerC,
 		cfg.LinkerCC,
 	)
-	s := scanner.New(fs, cfg.Root, ns, i, rf)
+	scanner := scanner.New(fs, cfg.Root, ns, i, rf)
+	sorter := sorter.New()
 	target := filepath.Join(cfg.Root, cfg.Target)
-	c := collector.New(s, target)
+	c := collector.New(scanner, sorter, target)
 
 	targetN, err := c.Collect()
 	if err != nil {

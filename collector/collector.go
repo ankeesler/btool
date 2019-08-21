@@ -50,8 +50,12 @@ func New(
 func (c *Collector) Collect() (*node.Node, error) {
 	start := node.New(c.t)
 
-	if err := c.s.Scan(start); err != nil {
+	if err := c.scanner.Scan(start); err != nil {
 		return nil, errors.Wrap(err, "scan")
+	}
+
+	if err := c.sorter.Sort(start); err != nil {
+		return nil, errors.Wrap(err, "sort")
 	}
 
 	return start, nil

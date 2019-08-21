@@ -1,19 +1,32 @@
 // Package sorter provides a stable way of sorting a node.Node graph.
 package sorter
 
-import "sort"
+import (
+	"sort"
 
-// sortaAlpha sorts the provided node.Node's and dependencies in alphanumeric
-// order.
-func sortAlpha(nodes []*Node) {
-	sohrt(nodes)
-	for _, n := range nodes {
-		sohrt(n.Dependencies)
-	}
+	"github.com/ankeesler/btool/node"
+	"github.com/pkg/errors"
+)
+
+// Sorter is a type that can sort a node.Node graph in a stable way.
+type Sorter struct {
 }
 
-func sohrt(nodes []*Node) {
-	sort.Slice(nodes, func(i, j int) bool {
-		return nodes[i].Name < nodes[j].Name
+// New returns a new Sorter.
+func New() *Sorter {
+	return &Sorter{}
+}
+
+func (s *Sorter) Sort(n *node.Node) error {
+	for _, dN := range n.Dependencies {
+		if err := s.Sort(dN); err != nil {
+			return errors.Wrap(err, "sort "+dN.Name)
+		}
+	}
+
+	sort.Slice(n.Dependencies, func(i, j int) bool {
+		return n.Dependencies[i].Name < n.Dependencies[j].Name
 	})
+
+	return nil
 }
