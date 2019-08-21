@@ -3,7 +3,7 @@ package nodestore
 
 import "github.com/ankeesler/btool/node"
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Listener
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Watcher
 
 // A Watcher can be notified of when node.Node's are added to the NodeStore.
 type Watcher interface {

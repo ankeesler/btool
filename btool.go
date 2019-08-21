@@ -5,11 +5,13 @@ package btool
 import (
 	"path/filepath"
 
+	"github.com/ankeesler/btool/builder"
+	"github.com/ankeesler/btool/builder/currenter"
 	"github.com/ankeesler/btool/collector"
+	"github.com/ankeesler/btool/collector/resolverfactory"
 	"github.com/ankeesler/btool/collector/scanner"
+	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/ankeesler/btool/collector/scanner/nodestore"
-	"github.com/ankeesler/btool/node/pipeline/handlers/includeser"
-	"github.com/ankeesler/btool/node/pipeline/handlers/resolverfactory"
 	"github.com/ankeesler/btool/ui"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -59,7 +61,9 @@ func Run(cfg *Cfg) error {
 		return errors.Wrap(err, "collect")
 	}
 
-	if err := Build(targetN, ui); err != nil {
+	cur := currenter.New()
+	b := builder.New(cur, ui)
+	if err := b.Build(targetN); err != nil {
 		return errors.Wrap(err, "build")
 	}
 
