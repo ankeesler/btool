@@ -115,7 +115,7 @@ func contains(s string, ss []string) bool {
 	return false
 }
 
-func find(target string, nodes []*node.Node) {
+func find(target string, nodes []*node.Node) *node.Node {
 	for _, n := range nodes {
 		if n.Name == target {
 			return n
