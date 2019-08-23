@@ -38,10 +38,10 @@ func Run(t *testing.T) {
 			name:     "Version",
 			testFunc: version,
 		},
-		{
-			name:     "Object",
-			testFunc: object,
-		},
+		//{
+		//	name:     "Object",
+		//	testFunc: object,
+		//},
 		{
 			name:     "Executable",
 			testFunc: executable,
@@ -58,10 +58,10 @@ func Run(t *testing.T) {
 			name:     "ExecutableSubdirectoryCache",
 			testFunc: executableSubdirectoryCache,
 		},
-		{
-			name:     "Googletest",
-			testFunc: googletest,
-		},
+		//{
+		//	name:     "Googletest",
+		//	testFunc: googletest,
+		//},
 		//{
 		//	name:     "GoogletestTest",
 		//	testFunc: googletestTest,

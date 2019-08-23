@@ -16,13 +16,24 @@ func executable(c *config) {
 		c.root,
 		"-cache",
 		c.cache,
-		"-output",
-		"main",
 		"-loglevel",
 		"debug",
 	)
 	c.run(
-		"./main",
+		filepath.Join(c.root, "main"),
+	)
+
+	c.run(
+		c.btool,
+		"-target",
+		"main",
+		"-root",
+		c.root,
+		"-cache",
+		c.cache,
+		"-loglevel",
+		"debug",
+		"-clean",
 	)
 }
 
@@ -41,13 +52,26 @@ func executableLocalRegistry(c *config) {
 		c.cache,
 		"-registries",
 		registryData,
-		"-output",
-		"main",
 		"-loglevel",
 		"debug",
 	)
 	c.run(
-		"./main",
+		filepath.Join(c.root, "main"),
+	)
+
+	c.run(
+		c.btool,
+		"-target",
+		"main",
+		"-root",
+		c.root,
+		"-cache",
+		c.cache,
+		"-registries",
+		registryData,
+		"-loglevel",
+		"debug",
+		"-clean",
 	)
 }
 
@@ -61,15 +85,26 @@ func executableRunTwice(c *config) {
 			c.root,
 			"-cache",
 			c.cache,
-			"-output",
-			"main",
 			"-loglevel",
 			"debug",
 		)
 		c.run(
-			"./main",
+			filepath.Join(c.root, "main"),
 		)
 	}
+
+	c.run(
+		c.btool,
+		"-target",
+		"main",
+		"-root",
+		c.root,
+		"-cache",
+		c.cache,
+		"-loglevel",
+		"debug",
+		"-clean",
+	)
 }
 
 func executableSubdirectoryCache(c *config) {
@@ -90,6 +125,17 @@ func executableSubdirectoryCache(c *config) {
 		cache,
 	)
 	c.run(
-		"./main",
+		filepath.Join(c.root, "main"),
+	)
+
+	c.run(
+		c.btool,
+		"-target",
+		"main",
+		"-loglevel",
+		"debug",
+		"-cache",
+		cache,
+		"-clean",
 	)
 }

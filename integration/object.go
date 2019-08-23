@@ -10,8 +10,6 @@ func object(c *config) {
 			c.root,
 			"-cache",
 			c.cache,
-			"-output",
-			"dep-0/dep-0.o",
 			"-loglevel",
 			"debug",
 		)
@@ -20,4 +18,17 @@ func object(c *config) {
 			"dep-0/dep-0.o",
 		)
 	}
+
+	c.run(
+		c.btool,
+		"-target",
+		"dep-0/dep-0.o",
+		"-root",
+		c.root,
+		"-cache",
+		c.cache,
+		"-clean",
+		"-loglevel",
+		"debug",
+	)
 }
