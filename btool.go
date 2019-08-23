@@ -50,7 +50,7 @@ func Run(cfg *Cfg) error {
 
 	fs := afero.NewOsFs()
 	ns := nodestore.New(ui)
-	i := includeser.New()
+	i := includeser.New(fs)
 	rf := resolverfactory.New(
 		cfg.CompilerC,
 		cfg.CompilerCC,

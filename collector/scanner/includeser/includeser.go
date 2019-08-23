@@ -5,21 +5,24 @@ package includeser
 import (
 	"bufio"
 	"bytes"
-	"io/ioutil"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 )
 
 type Includeser struct {
+	fs afero.Fs
 }
 
-func New() *Includeser {
-	return &Includeser{}
+func New(fs afero.Fs) *Includeser {
+	return &Includeser{
+		fs: fs,
+	}
 }
 
 func (i *Includeser) Includes(path string) ([]string, error) {
-	bytes, err := ioutil.ReadFile(path)
+	bytes, err := afero.ReadFile(i.fs, path)
 	if err != nil {
 		return nil, errors.Wrap(err, "read file")
 	}

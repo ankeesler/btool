@@ -17,6 +17,8 @@ type NodeStore struct {
 }
 
 // New creates a new NodeStore with a Watcher.
+//
+// The provided Watcher can be nil.
 func New(w Watcher) *NodeStore {
 	return &NodeStore{
 		nodes: make(map[string]*node.Node),
@@ -26,7 +28,9 @@ func New(w Watcher) *NodeStore {
 
 func (ns *NodeStore) Add(n *node.Node) {
 	ns.nodes[n.Name] = n
-	ns.w.OnAdd(n)
+	if ns.w != nil {
+		ns.w.OnAdd(n)
+	}
 }
 
 func (ns *NodeStore) Find(name string) *node.Node {

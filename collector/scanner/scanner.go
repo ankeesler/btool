@@ -75,22 +75,31 @@ type ctx struct {
 	libraries    []*node.Node
 	objects      []*node.Node
 	cc           bool
+
+	depth int
 }
 
 // Scan will build up a node.Node graph given a starting node.Node. It will walk
 // the dependencies of the node.Node and build up a graph, or return an error if
 // it runs into trouble.
 func (s *Scanner) Scan(start *node.Node) error {
-	return s.add(start, &ctx{
+	_, err := s.add(start, &ctx{
 		includePaths: []string{s.root},
 	})
+	return err
 }
 
-func (s *Scanner) add(n *node.Node, ctx *ctx) error {
+func (s *Scanner) add(n *node.Node, ctx *ctx) (bool, error) {
 	if s.ns.Find(n.Name) != nil {
-		return nil
+		return false, nil
 	}
 
+	ctx.depth++
+	if ctx.depth == 100 {
+		return false, errors.New("hit depth of 100, failing")
+	}
+
+	log.Debugf("adding %s", n.Name)
 	s.ns.Add(n)
 
 	var err error
@@ -110,28 +119,31 @@ func (s *Scanner) add(n *node.Node, ctx *ctx) error {
 		err = errors.New("unknown file ext: " + ext)
 	}
 
-	return err
+	return true, err
 }
 
-// Each of these functions should do the following:
+// each of these functions should do the following:
 //   - find dependencies of the provided node.Node
 //   - add those dependencies as nodes with s.add()
 //   - add those dependencies as dependencies with n.Dependency()
 //   - set n.Resolver
 //   - update ctx with any related stuff
+//
+// the path currently goes like this:
+//   executable -> source -> header -> source -> header ... -> object
 
 func (s *Scanner) onExecutable(n *node.Node, ctx *ctx) error {
-	object := n.Name + ".o"
-	objectN := node.New(object)
-	if err := s.add(objectN, ctx); err != nil {
-		return errors.Wrap(err, "add "+n.Name)
+	if err := s.addSource(n, ctx); err != nil {
+		return errors.Wrap(err, "add source")
 	}
 
 	for _, oN := range ctx.objects {
+		log.Debugf("object dependency %s -> %s", n.Name, oN.Name)
 		n.Dependency(oN)
 	}
 
 	for _, lN := range ctx.libraries {
+		log.Debugf("library dependency %s -> %s", n.Name, lN.Name)
 		n.Dependency(lN)
 	}
 
@@ -145,34 +157,34 @@ func (s *Scanner) onExecutable(n *node.Node, ctx *ctx) error {
 }
 
 func (s *Scanner) onObject(n *node.Node, ctx *ctx) error {
-	if err := s.addSource(n, ctx, ".o"); err != nil {
-		return errors.Wrap(err, "add source")
-	}
-
 	if ctx.cc {
 		n.Resolver = s.rf.NewCompileCC(ctx.includePaths)
 	} else {
 		n.Resolver = s.rf.NewCompileC(ctx.includePaths)
 	}
 
+	log.Debugf("adding object %s", n.Name)
 	ctx.objects = append(ctx.objects, n)
 
 	return nil
 }
 
 func (s *Scanner) onSource(n *node.Node, ctx *ctx) error {
-	if err := s.addHeaders(n, ctx); err != nil {
-		return errors.Wrap(err, "add headers")
-	}
-
 	ext := filepath.Ext(n.Name)
 	object := strings.ReplaceAll(n.Name, ext, ".o")
 	objectN := node.New(object)
-	if err := s.add(objectN, ctx); err != nil {
+	if added, err := s.add(objectN, ctx); err != nil {
 		return errors.Wrap(err, "add")
+	} else if !added {
+		return nil
 	}
 
-	n.Dependency(objectN)
+	log.Debugf("source/object dependency %s -> %s", objectN.Name, n.Name)
+	objectN.Dependency(n)
+
+	if err := s.addHeaders(n, ctx); err != nil {
+		return errors.Wrap(err, "add headers")
+	}
 
 	return nil
 }
@@ -182,18 +194,26 @@ func (s *Scanner) onHeader(n *node.Node, ctx *ctx) error {
 		return errors.Wrap(err, "add headers")
 	}
 
-	if err := s.addSource(n, ctx, ".h"); err != nil {
+	if err := s.addSource(n, ctx); err != nil {
 		return errors.Wrap(err, "add source")
 	}
 
 	return nil
 }
 
-func (s *Scanner) addSource(n *node.Node, ctx *ctx, ext string) error {
-	var sourceN *node.Node
-	sourceC := strings.ReplaceAll(n.Name, ext, ".c")
-	sourceCC := strings.ReplaceAll(n.Name, ext, ".cc")
+func (s *Scanner) addSource(n *node.Node, ctx *ctx) error {
+	var sourceC, sourceCC string
+	ext := filepath.Ext(n.Name)
+	if ext == "" {
+		sourceC = n.Name + ".c"
+		sourceCC = n.Name + ".cc"
+	} else {
+		sourceC = strings.ReplaceAll(n.Name, ext, ".c")
+		sourceCC = strings.ReplaceAll(n.Name, ext, ".cc")
+	}
 	log.Debugf("considering %s and %s", sourceC, sourceCC)
+
+	var sourceN *node.Node
 	if exists, err := afero.Exists(s.fs, sourceC); err != nil {
 		return errors.Wrap(err, "exists")
 	} else if exists {
@@ -209,11 +229,11 @@ func (s *Scanner) addSource(n *node.Node, ctx *ctx, ext string) error {
 		return errors.New("unknown source for node " + n.Name)
 	}
 
-	if err := s.add(sourceN, ctx); err != nil {
+	if added, err := s.add(sourceN, ctx); err != nil {
 		return errors.Wrap(err, "add "+sourceN.Name)
+	} else if !added {
+		return nil
 	}
-
-	n.Dependency(sourceN)
 
 	return nil
 }
@@ -242,12 +262,13 @@ func (s *Scanner) addHeaders(n *node.Node, ctx *ctx) error {
 			return errors.New("unknown header for include " + include)
 		}
 
-		if err := s.add(headerN, ctx); err != nil {
+		if _, err := s.add(headerN, ctx); err != nil {
 			return errors.Wrap(err, "add "+headerN.Name)
 		}
 
-		log.Debugf("adding dependency %s -> %s", n.Name, headerN.Name)
+		log.Debugf("include dependency %s -> %s", n.Name, headerN.Name)
 		n.Dependency(headerN)
 	}
+
 	return nil
 }

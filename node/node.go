@@ -11,8 +11,6 @@
 //   resolve(node)
 package node
 
-import "strings"
-
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Resolver
 
 // A Resolver interface is something that brings a node into existence on disk.
@@ -48,10 +46,5 @@ func (n *Node) Dependency(d ...*Node) *Node {
 
 // String returns a human-readable representation of a Node.
 func (n *Node) String() string {
-	b := strings.Builder{}
-	Visit(n, func(printMe *Node) error {
-		b.WriteString(printMe.Name + "\n")
-		return nil
-	})
-	return b.String()
+	return n.Name
 }

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/collector/scanner/includeser"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,7 +48,7 @@ func TestIncludeserIncludes(t *testing.T) {
 		_, err = fmt.Fprintln(f, datum.data)
 		require.Nil(t, err)
 
-		i := includeser.New()
+		i := includeser.New(afero.NewOsFs())
 		includes, err := i.Includes(f.Name())
 		require.Nil(t, err)
 		require.Equal(t, datum.includes, includes)
