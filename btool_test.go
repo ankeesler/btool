@@ -39,7 +39,7 @@ func TestBtoolRun(t *testing.T) {
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
 			collector := &btoolfakes.FakeCollector{}
-			collector.CollectReturnsOnCall(0, datum.n, nil)
+			collector.CollectReturnsOnCall(0, nil)
 
 			cleaner := &btoolfakes.FakeCleaner{}
 

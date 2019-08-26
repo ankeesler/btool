@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ankeesler/btool/collector/registry"
-	"github.com/ankeesler/btool/collector/registry/api"
 	"github.com/ankeesler/btool/log"
+	"github.com/ankeesler/btool/registry"
+	"github.com/ankeesler/btool/registry/api"
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"

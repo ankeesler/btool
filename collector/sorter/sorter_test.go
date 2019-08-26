@@ -3,13 +3,14 @@ package sorter_test
 import (
 	"testing"
 
+	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/node"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestSorterSort(t *testing.T) {
+func TestSorterCollect(t *testing.T) {
 	s := sorter.New()
 
 	nodeA := node.New("a")
@@ -25,7 +26,7 @@ func TestSorterSort(t *testing.T) {
 	nodeB.Dependency(node3, node2)
 	nodeC.Dependency(nodeB, nodeA)
 
-	require.Nil(t, s.Sort(nodeA))
+	require.Nil(t, s.Collect(&collector.Ctx{}, nodeA))
 
 	assert.Equal(t, []*node.Node{node0, node1, nodeB}, nodeA.Dependencies)
 	assert.Equal(t, []*node.Node{node2, node3}, nodeB.Dependencies)

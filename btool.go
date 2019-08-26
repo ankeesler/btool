@@ -27,7 +27,7 @@ import (
 
 // Collector creates a node.Node graph.
 type Collector interface {
-	Collect(*node.Node) (*node.Node, error)
+	Collect(*node.Node) error
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Cleaner
@@ -62,10 +62,7 @@ func New(collector Collector, cleaner Cleaner, builder Builder) *Btool {
 
 // Run runs a btool build/clean.
 func (b *Btool) Run(n *node.Node, clean, dryRun bool) error {
-	var err error
-
-	n, err = b.collector.Collect(n)
-	if err != nil {
+	if err := b.collector.Collect(n); err != nil {
 		return errors.Wrap(err, "collect")
 	}
 

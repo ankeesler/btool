@@ -10,7 +10,6 @@ import (
 	"github.com/ankeesler/btool/collector/resolverfactory"
 	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
-	"github.com/ankeesler/btool/collector/scanner/nodestore"
 	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/ui"
@@ -48,7 +47,7 @@ func Run(cfg *Cfg) error {
 	ui := ui.New(cfg.Quiet)
 
 	fs := afero.NewOsFs()
-	ns := nodestore.New(ui)
+	ns := collector.NewNodeStore(ui)
 	i := includeser.New(fs)
 	rf := resolverfactory.New(
 		cfg.CompilerC,
@@ -57,14 +56,15 @@ func Run(cfg *Cfg) error {
 		cfg.LinkerC,
 		cfg.LinkerCC,
 	)
-	scanner := scanner.New(fs, cfg.Root, ns, i, rf)
+	scanner := scanner.New(fs, cfg.Root, i)
 	sorter := sorter.New()
-	target := filepath.Join(cfg.Root, cfg.Target)
 
-	collector := collector.New(scanner, sorter, target)
+	ctx := collector.NewCtx(ns, rf)
+	collector := collector.New(ctx, scanner, sorter)
 	cleaner := cleaner.New(fs, ui)
 	builder := builder.New(cfg.DryRun, currenter.New(), ui)
 
+	target := filepath.Join(cfg.Root, cfg.Target)
 	targetN := node.New(target)
 	b := New(collector, cleaner, builder)
 	return b.Run(targetN, cfg.Clean, cfg.DryRun)

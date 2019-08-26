@@ -6,55 +6,39 @@ import (
 	"github.com/pkg/errors"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Scanner
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Collectini
 
-// Scanner is an object that can build up a local node.Node graph.
-type Scanner interface {
-	// Given a starting node.Node, the Scanner should walk the node.Node graph
-	// in the local FS.
-	Scan(*node.Node) error
+// Collectini is an object that contributes some node.Node's to a graph.
+// It should return an error if it fails to Collect() all the node.Node's that it
+// cares about.
+type Collectini interface {
+	Collect(*Ctx, *node.Node) error
 }
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Sorter
-
-// Sorter is an object that can sort a node.Node graph. The only requirements are
-// that it is a stable sort.
-type Sorter interface {
-	Sort(*node.Node) error
-}
-
-// Collector is a type that can build a node.Node graph.
+// Collector is a type that can build a node.Node graph. It does this via
+// Collectini's that each provide a different part of the node.Node graph.
 type Collector struct {
-	scanner Scanner
-	sorter  Sorter
-	t       string
+	ctx    *Ctx
+	ctinis []Collectini
 }
 
 // New creates a new Collector.
 func New(
-	//registries []Registry,
-	scanner Scanner,
-	sorter Sorter,
-	t string,
+	ctx *Ctx,
+	ctinis ...Collectini,
 ) *Collector {
 	return &Collector{
-		//registries: registries,
-		scanner: scanner,
-		sorter:  sorter,
-		t:       t,
+		ctx:    ctx,
+		ctinis: ctinis,
 	}
 }
 
-// Collect creates a node.Node graph. It should return the node.Node that
-// represents the target with which this Collector has been configured.
-func (c *Collector) Collect(n *node.Node) (*node.Node, error) {
-	if err := c.scanner.Scan(n); err != nil {
-		return nil, errors.Wrap(err, "scan")
+// Collect creates a node.Node graph.
+func (c *Collector) Collect(n *node.Node) error {
+	for _, ctini := range c.ctinis {
+		if err := ctini.Collect(c.ctx, n); err != nil {
+			return errors.Wrap(err, "collect")
+		}
 	}
-
-	if err := c.sorter.Sort(n); err != nil {
-		return nil, errors.Wrap(err, "sort")
-	}
-
-	return n, nil
+	return nil
 }

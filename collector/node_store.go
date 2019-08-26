@@ -1,5 +1,4 @@
-// Package nodestore provides a type that can create and find node.Node's.
-package nodestore
+package collector
 
 import "github.com/ankeesler/btool/node"
 
@@ -19,7 +18,7 @@ type NodeStore struct {
 // New creates a new NodeStore with a Watcher.
 //
 // The provided Watcher can be nil.
-func New(w Watcher) *NodeStore {
+func NewNodeStore(w Watcher) *NodeStore {
 	return &NodeStore{
 		nodes: make(map[string]*node.Node),
 		w:     w,

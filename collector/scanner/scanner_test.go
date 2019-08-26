@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ankeesler/btool/collector"
+	"github.com/ankeesler/btool/collector/collectorfakes"
 	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
-	"github.com/ankeesler/btool/collector/scanner/nodestore"
-	"github.com/ankeesler/btool/collector/scanner/scannerfakes"
 	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
@@ -22,16 +22,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestScannerScan(t *testing.T) {
+func TestScannerCollect(t *testing.T) {
 	fs := afero.NewMemMapFs()
 	root := "/some/root"
-	ns := nodestore.New(nil)
+	ns := collector.NewNodeStore(nil)
 	i := includeser.New(fs)
 	linkCR := &nodefakes.FakeResolver{}
 	linkCCR := &nodefakes.FakeResolver{}
 	compileCR := &nodefakes.FakeResolver{}
 	compileCCR := &nodefakes.FakeResolver{}
-	rf := &scannerfakes.FakeResolverFactory{}
+	rf := &collectorfakes.FakeResolverFactory{}
 	rf.NewLinkCReturns(linkCR)
 	rf.NewLinkCCReturns(linkCCR)
 	rf.NewCompileCReturns(compileCR)
@@ -79,14 +79,15 @@ func TestScannerScan(t *testing.T) {
 		),
 	)
 
-	s := scanner.New(fs, root, ns, i, rf)
+	s := scanner.New(fs, root, i)
 
+	ctx := collector.NewCtx(ns, rf)
 	acMainN := node.New("/some/root/main")
-	require.Nil(t, s.Scan(acMainN))
+	require.Nil(t, s.Collect(ctx, acMainN))
 
 	sorter := sorter.New()
-	sorter.Sort(acMainN)
-	sorter.Sort(exMainN)
+	sorter.Collect(&collector.Ctx{}, acMainN)
+	sorter.Collect(&collector.Ctx{}, exMainN)
 	log.Debugf("%s\n%s", "ac", node.String(acMainN))
 	log.Debugf("%s\n%s", "ex", node.String(exMainN))
 	require.Nil(t, deep.Equal(exMainN, acMainN))
