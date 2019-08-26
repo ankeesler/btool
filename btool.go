@@ -1,83 +1,82 @@
 // Package btool provides fundamental entities that can be used to perform
 // btool domain work.
+//
+// Clients that are lazy should call Run() with the desired Cfg.
+//   ...
+//   err := Run(&Cfg{
+//     ...
+//   })
+//   ...
+//
+// Clients want to go above and beyong should call New() and then Run() on the
+// returned Btool struct.
+//   ...
+//   b := New(...)
+//   err := b.Run(...)
+//   ...
+//
 package btool
 
 import (
-	"path/filepath"
-
-	"github.com/ankeesler/btool/builder"
-	"github.com/ankeesler/btool/builder/currenter"
-	"github.com/ankeesler/btool/cleaner"
-	"github.com/ankeesler/btool/collector"
-	"github.com/ankeesler/btool/collector/resolverfactory"
-	"github.com/ankeesler/btool/collector/scanner"
-	"github.com/ankeesler/btool/collector/scanner/includeser"
-	"github.com/ankeesler/btool/collector/scanner/nodestore"
-	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/log"
-	"github.com/ankeesler/btool/ui"
+	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 )
 
-// Cfg is a configuration struct provided to a Build call.
-//
-// Callers should set all fields.
-type Cfg struct {
-	Root   string
-	Cache  string
-	Target string
-	Output string
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Collector
 
-	DryRun bool
-	Clean  bool
-
-	CompilerC  string
-	CompilerCC string
-	Archiver   string
-	LinkerC    string
-	LinkerCC   string
-
-	Registries []string
-
-	Quiet bool
+// Collector creates a node.Node graph.
+type Collector interface {
+	Collect(*node.Node) (*node.Node, error)
 }
 
-// Run will run a btool build and produce a target.
-// Run calls Collect() and then Build().
-func Run(cfg *Cfg) error {
-	ui := ui.New(cfg.Quiet)
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Cleaner
 
-	fs := afero.NewOsFs()
-	ns := nodestore.New(ui)
-	i := includeser.New(fs)
-	rf := resolverfactory.New(
-		cfg.CompilerC,
-		cfg.CompilerCC,
-		cfg.Archiver,
-		cfg.LinkerC,
-		cfg.LinkerCC,
-	)
-	scanner := scanner.New(fs, cfg.Root, ns, i, rf)
-	sorter := sorter.New()
-	target := filepath.Join(cfg.Root, cfg.Target)
-	c := collector.New(scanner, sorter, target)
+// Cleaner removes the node.Node graph from disk.
+type Cleaner interface {
+	Clean(*node.Node) error
+}
 
-	targetN, err := c.Collect()
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Builder
+
+// Builder brings the node.Node graph into existence.
+type Builder interface {
+	Build(*node.Node) error
+}
+
+// Btool is a type that does the domain work of a btool invocation.
+type Btool struct {
+	collector Collector
+	cleaner   Cleaner
+	builder   Builder
+}
+
+// New returns a new Btool struct.
+func New(collector Collector, cleaner Cleaner, builder Builder) *Btool {
+	return &Btool{
+		collector: collector,
+		cleaner:   cleaner,
+		builder:   builder,
+	}
+}
+
+// Run runs a btool build/clean.
+func (b *Btool) Run(n *node.Node, clean, dryRun bool) error {
+	var err error
+
+	n, err = b.collector.Collect(n)
 	if err != nil {
 		return errors.Wrap(err, "collect")
 	}
 
-	log.Debugf("graph: %s", targetN)
+	log.Debugf("graph: %s", node.String(n))
 
-	if cfg.Clean {
-		if err := cleaner.New(fs, ui).Clean(targetN); err != nil {
+	if clean {
+		if err := b.cleaner.Clean(n); err != nil {
 			return errors.Wrap(err, "clean")
 		}
 	} else {
-		cur := currenter.New()
-		b := builder.New(cfg.DryRun, cur, ui)
-		if err := b.Build(targetN); err != nil {
+		if err := b.builder.Build(n); err != nil {
 			return errors.Wrap(err, "build")
 		}
 	}

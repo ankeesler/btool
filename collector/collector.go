@@ -47,16 +47,14 @@ func New(
 
 // Collect creates a node.Node graph. It should return the node.Node that
 // represents the target with which this Collector has been configured.
-func (c *Collector) Collect() (*node.Node, error) {
-	start := node.New(c.t)
-
-	if err := c.scanner.Scan(start); err != nil {
+func (c *Collector) Collect(n *node.Node) (*node.Node, error) {
+	if err := c.scanner.Scan(n); err != nil {
 		return nil, errors.Wrap(err, "scan")
 	}
 
-	if err := c.sorter.Sort(start); err != nil {
+	if err := c.sorter.Sort(n); err != nil {
 		return nil, errors.Wrap(err, "sort")
 	}
 
-	return start, nil
+	return n, nil
 }
