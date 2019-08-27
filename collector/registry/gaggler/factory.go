@@ -24,6 +24,11 @@ type Registry interface {
 	Gaggle(string) (*registry.Gaggle, error)
 }
 
+// Factory is a type that create Gaggler's.
+//
+// It caches Gaggle()'s by their SHA256 sum.
+// It always retrieves the Index() from the Registry, but it may not have to
+// retrieve any of the the Gaggle()'s associated with that Registry.
 type Factory struct {
 	fs    afero.Fs
 	r     Registry
@@ -34,6 +39,7 @@ type Factory struct {
 	gagglesIndex int
 }
 
+// NewFactory creates a new Factory.
 func NewFactory(fs afero.Fs, r Registry, cache string) *Factory {
 	return &Factory{
 		fs:    fs,
@@ -44,6 +50,23 @@ func NewFactory(fs afero.Fs, r Registry, cache string) *Factory {
 	}
 }
 
+// Next iterates through the Gaggle()'s that this Factory has gotten from a
+// Registry and creates a Gaggler for each Gaggle(). It returns the sequence of
+// Gaggler's. OOnce all of the Gaggler's have been iterated through, this
+// function will return a nil Gaggler.
+//
+// It can be used like this.
+//   f := NewFactory(...)
+//   for {
+//     g, err := f.Next()
+//     if err != nil {
+//       // handle err...
+//     } else if g == nil {
+//       break
+//     } else {
+//       // handle g...
+//     }
+//   }
 func (f *Factory) Next() (*Gaggler, error) {
 	if f.gaggles == nil {
 		if err := f.initGaggles(); err != nil {
