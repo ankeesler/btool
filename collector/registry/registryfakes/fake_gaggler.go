@@ -9,23 +9,31 @@ import (
 )
 
 type FakeGaggler struct {
-	GaggleStub        func() (*registrya.Gaggle, error)
+	GaggleStub        func() *registrya.Gaggle
 	gaggleMutex       sync.RWMutex
 	gaggleArgsForCall []struct {
 	}
 	gaggleReturns struct {
 		result1 *registrya.Gaggle
-		result2 error
 	}
 	gaggleReturnsOnCall map[int]struct {
 		result1 *registrya.Gaggle
-		result2 error
+	}
+	RootStub        func() string
+	rootMutex       sync.RWMutex
+	rootArgsForCall []struct {
+	}
+	rootReturns struct {
+		result1 string
+	}
+	rootReturnsOnCall map[int]struct {
+		result1 string
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeGaggler) Gaggle() (*registrya.Gaggle, error) {
+func (fake *FakeGaggler) Gaggle() *registrya.Gaggle {
 	fake.gaggleMutex.Lock()
 	ret, specificReturn := fake.gaggleReturnsOnCall[len(fake.gaggleArgsForCall)]
 	fake.gaggleArgsForCall = append(fake.gaggleArgsForCall, struct {
@@ -36,10 +44,10 @@ func (fake *FakeGaggler) Gaggle() (*registrya.Gaggle, error) {
 		return fake.GaggleStub()
 	}
 	if specificReturn {
-		return ret.result1, ret.result2
+		return ret.result1
 	}
 	fakeReturns := fake.gaggleReturns
-	return fakeReturns.result1, fakeReturns.result2
+	return fakeReturns.result1
 }
 
 func (fake *FakeGaggler) GaggleCallCount() int {
@@ -48,36 +56,85 @@ func (fake *FakeGaggler) GaggleCallCount() int {
 	return len(fake.gaggleArgsForCall)
 }
 
-func (fake *FakeGaggler) GaggleCalls(stub func() (*registrya.Gaggle, error)) {
+func (fake *FakeGaggler) GaggleCalls(stub func() *registrya.Gaggle) {
 	fake.gaggleMutex.Lock()
 	defer fake.gaggleMutex.Unlock()
 	fake.GaggleStub = stub
 }
 
-func (fake *FakeGaggler) GaggleReturns(result1 *registrya.Gaggle, result2 error) {
+func (fake *FakeGaggler) GaggleReturns(result1 *registrya.Gaggle) {
 	fake.gaggleMutex.Lock()
 	defer fake.gaggleMutex.Unlock()
 	fake.GaggleStub = nil
 	fake.gaggleReturns = struct {
 		result1 *registrya.Gaggle
-		result2 error
-	}{result1, result2}
+	}{result1}
 }
 
-func (fake *FakeGaggler) GaggleReturnsOnCall(i int, result1 *registrya.Gaggle, result2 error) {
+func (fake *FakeGaggler) GaggleReturnsOnCall(i int, result1 *registrya.Gaggle) {
 	fake.gaggleMutex.Lock()
 	defer fake.gaggleMutex.Unlock()
 	fake.GaggleStub = nil
 	if fake.gaggleReturnsOnCall == nil {
 		fake.gaggleReturnsOnCall = make(map[int]struct {
 			result1 *registrya.Gaggle
-			result2 error
 		})
 	}
 	fake.gaggleReturnsOnCall[i] = struct {
 		result1 *registrya.Gaggle
-		result2 error
-	}{result1, result2}
+	}{result1}
+}
+
+func (fake *FakeGaggler) Root() string {
+	fake.rootMutex.Lock()
+	ret, specificReturn := fake.rootReturnsOnCall[len(fake.rootArgsForCall)]
+	fake.rootArgsForCall = append(fake.rootArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Root", []interface{}{})
+	fake.rootMutex.Unlock()
+	if fake.RootStub != nil {
+		return fake.RootStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.rootReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeGaggler) RootCallCount() int {
+	fake.rootMutex.RLock()
+	defer fake.rootMutex.RUnlock()
+	return len(fake.rootArgsForCall)
+}
+
+func (fake *FakeGaggler) RootCalls(stub func() string) {
+	fake.rootMutex.Lock()
+	defer fake.rootMutex.Unlock()
+	fake.RootStub = stub
+}
+
+func (fake *FakeGaggler) RootReturns(result1 string) {
+	fake.rootMutex.Lock()
+	defer fake.rootMutex.Unlock()
+	fake.RootStub = nil
+	fake.rootReturns = struct {
+		result1 string
+	}{result1}
+}
+
+func (fake *FakeGaggler) RootReturnsOnCall(i int, result1 string) {
+	fake.rootMutex.Lock()
+	defer fake.rootMutex.Unlock()
+	fake.RootStub = nil
+	if fake.rootReturnsOnCall == nil {
+		fake.rootReturnsOnCall = make(map[int]struct {
+			result1 string
+		})
+	}
+	fake.rootReturnsOnCall[i] = struct {
+		result1 string
+	}{result1}
 }
 
 func (fake *FakeGaggler) Invocations() map[string][][]interface{} {
@@ -85,6 +142,8 @@ func (fake *FakeGaggler) Invocations() map[string][][]interface{} {
 	defer fake.invocationsMutex.RUnlock()
 	fake.gaggleMutex.RLock()
 	defer fake.gaggleMutex.RUnlock()
+	fake.rootMutex.RLock()
+	defer fake.rootMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

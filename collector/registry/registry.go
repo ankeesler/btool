@@ -18,32 +18,27 @@ import (
 
 // Gaggler is an object that can retrieve registry.Gaggle's from somewhere.
 type Gaggler interface {
-	Gaggle() (*registrypkg.Gaggle, error)
+	Gaggle() *registrypkg.Gaggle
+	Root() string
 }
 
 // Registry is a type that can build a node.Node graph using a
 // registrypkg.Gaggle.
 type Registry struct {
-	g    Gaggler
-	root string
+	g Gaggler
 }
 
 // New creates a new Registry with a Gaggler and a root directory.
-func New(g Gaggler, root string) *Registry {
+func New(g Gaggler) *Registry {
 	return &Registry{
-		g:    g,
-		root: root,
+		g: g,
 	}
 }
 
 func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
-	gaggle, err := r.g.Gaggle()
-	if err != nil {
-		return errors.Wrap(err, "gaggle")
-	}
+	gaggle := r.g.Gaggle()
 
 	metadata := struct {
-		Project     string   `mapstructure:"project"`
 		IncludeDirs []string `mapstructure:"includeDirs"`
 	}{}
 	if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
@@ -52,13 +47,13 @@ func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
 	log.Debugf("metadata: %+v", metadata)
 
 	for _, i := range metadata.IncludeDirs {
-		i = filepath.Join(r.root, i)
+		i = filepath.Join(r.g.Root(), i)
 	}
 
 	for _, n := range gaggle.Nodes {
-		nN := node.New(filepath.Join(r.root, n.Name))
+		nN := node.New(filepath.Join(r.g.Root(), n.Name))
 		for _, d := range n.Dependencies {
-			dName := filepath.Join(r.root, d)
+			dName := filepath.Join(r.g.Root(), d)
 
 			var dN *node.Node
 			if d == "$this" {
@@ -74,7 +69,12 @@ func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
 			nN.Dependency(dN)
 		}
 
-		nodeR, err := r.newResolver(ctx, n.Resolver, metadata.IncludeDirs)
+		nodeR, err := r.newResolver(
+			ctx,
+			n.Resolver,
+			metadata.IncludeDirs,
+			r.g.Root(),
+		)
 		if err != nil {
 			return errors.Wrap(err, "new resolver")
 		}
@@ -91,6 +91,7 @@ func (r *Registry) newResolver(
 	ctx *collector.Ctx,
 	registryR registrypkg.Resolver,
 	includeDirs []string,
+	root string,
 ) (node.Resolver, error) {
 	name := registryR.Name
 	config := registryR.Config
@@ -111,12 +112,14 @@ func (r *Registry) newResolver(
 	case "symlink":
 		nodeR = ctx.RF.NewSymlink()
 	case "unzip":
-		nodeR = ctx.RF.NewUnzip(r.root)
+		nodeR = ctx.RF.NewUnzip(root)
 	case "download":
 		nodeR, err = r.createDownload(ctx, config)
 		if err != nil {
 			err = errors.Wrap(err, "create download")
 		}
+	case "":
+		nodeR = nil
 	default:
 		err = fmt.Errorf("unknown resolver: %s", name)
 	}

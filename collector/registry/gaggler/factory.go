@@ -72,9 +72,14 @@ func (f *Factory) Next() (*Gaggler, error) {
 		if err := f.initGaggles(); err != nil {
 			return nil, errors.Wrap(err, "init gaggle num")
 		}
+	} else if f.gagglesIndex >= len(f.gaggles) {
+		return nil, nil
 	}
 
-	return newGaggler(f.gaggles[f.gagglesIndex]), nil
+	g := f.gaggles[f.gagglesIndex]
+	r := f.roots[f.gagglesIndex]
+	f.gagglesIndex++
+	return newGaggler(g, r), nil
 }
 
 func (f *Factory) initGaggles() error {
