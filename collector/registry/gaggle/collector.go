@@ -7,34 +7,25 @@ import (
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/registry"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Gaggler
-
-// Gaggler is an object that can retrieve registry.Gaggle's from somewhere.
-type Gaggler interface {
-	Gaggle() *registrypkg.Gaggle
-	Root() string
+// Collector is a type that can build a node.Node graph using a registry.Gaggle.
+type Collector struct {
 }
 
-// Registry is a type that can build a node.Node graph using a
-// registrypkg.Gaggle.
-type Registry struct {
-	g Gaggler
+// New creates a new Collector.
+func New() *Collector {
+	return &Collector{}
 }
 
-// New creates a new Registry with a Gaggler and a root directory.
-func New(g Gaggler) *Registry {
-	return &Registry{
-		g: g,
-	}
-}
-
-func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
-	gaggle := r.g.Gaggle()
-
+func (c *Collector) Collect(
+	ctx *collector.Ctx,
+	gaggle *registry.Gaggle,
+	root string,
+) error {
 	metadata := struct {
 		IncludeDirs []string `mapstructure:"includeDirs"`
 	}{}
@@ -44,13 +35,13 @@ func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
 	log.Debugf("metadata: %+v", metadata)
 
 	for _, i := range metadata.IncludeDirs {
-		i = filepath.Join(r.g.Root(), i)
+		i = filepath.Join(root, i)
 	}
 
 	for _, n := range gaggle.Nodes {
-		nN := node.New(filepath.Join(r.g.Root(), n.Name))
+		nN := node.New(filepath.Join(root, n.Name))
 		for _, d := range n.Dependencies {
-			dName := filepath.Join(r.g.Root(), d)
+			dName := filepath.Join(root, d)
 
 			var dN *node.Node
 			if d == "$this" {
@@ -66,11 +57,11 @@ func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
 			nN.Dependency(dN)
 		}
 
-		nodeR, err := r.newResolver(
+		nodeR, err := c.newResolver(
 			ctx,
 			n.Resolver,
 			metadata.IncludeDirs,
-			r.g.Root(),
+			root,
 		)
 		if err != nil {
 			return errors.Wrap(err, "new resolver")
@@ -84,9 +75,9 @@ func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
 	return nil
 }
 
-func (r *Registry) newResolver(
+func (c *Collector) newResolver(
 	ctx *collector.Ctx,
-	registryR registrypkg.Resolver,
+	registryR registry.Resolver,
 	includeDirs []string,
 	root string,
 ) (node.Resolver, error) {
@@ -111,7 +102,7 @@ func (r *Registry) newResolver(
 	case "unzip":
 		nodeR = ctx.RF.NewUnzip(root)
 	case "download":
-		nodeR, err = r.createDownload(ctx, config)
+		nodeR, err = c.createDownload(ctx, config)
 		if err != nil {
 			err = errors.Wrap(err, "create download")
 		}
@@ -124,7 +115,7 @@ func (r *Registry) newResolver(
 	return nodeR, err
 }
 
-func (r *Registry) createDownload(
+func (c *Collector) createDownload(
 	ctx *collector.Ctx,
 	config map[string]interface{},
 ) (node.Resolver, error) {

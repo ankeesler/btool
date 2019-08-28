@@ -5,48 +5,15 @@ import (
 
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/collector/collectorfakes"
-	"github.com/ankeesler/btool/collector/registry"
-	"github.com/ankeesler/btool/collector/registry/registryfakes"
+	"github.com/ankeesler/btool/collector/registry/gaggle"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
+	"github.com/ankeesler/btool/registry"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestRegistryCollect(t *testing.T) {
-	g := &registryfakes.FakeGaggler{}
-	g.GaggleReturnsOnCall(
-		0,
-		&registrypkg.Gaggle{
-			Metadata: map[string]interface{}{
-				"includeDirs": []string{
-					"include/dir",
-					"another/include/dir",
-				},
-			},
-			Nodes: []*registrypkg.Node{
-				&registrypkg.Node{
-					Name:         "a.h",
-					Dependencies: []string{},
-				},
-				&registrypkg.Node{
-					Name:         "a.c",
-					Dependencies: []string{"a.h"},
-				},
-				&registrypkg.Node{
-					Name:         "a.o",
-					Dependencies: []string{"a.c"},
-					Resolver: registrypkg.Resolver{
-						Name: "compileC",
-					},
-				},
-			},
-		},
-	)
-	g.RootReturns("/some/root")
-
-	r := registry.New(g)
-
+func TestCollectorCollect(t *testing.T) {
 	ns := collector.NewNodeStore(nil)
 
 	compilerCR := &nodefakes.FakeResolver{}
@@ -54,11 +21,35 @@ func TestRegistryCollect(t *testing.T) {
 	rf.NewCompileCReturnsOnCall(0, compilerCR)
 
 	ctx := collector.NewCtx(ns, rf)
-	acNode := node.New("main")
-	require.Nil(t, r.Collect(ctx, acNode))
 
-	exNode := node.New("main")
-	assert.Equal(t, exNode, acNode)
+	g := &registry.Gaggle{
+		Metadata: map[string]interface{}{
+			"includeDirs": []string{
+				"include/dir",
+				"another/include/dir",
+			},
+		},
+		Nodes: []*registry.Node{
+			&registry.Node{
+				Name:         "a.h",
+				Dependencies: []string{},
+			},
+			&registry.Node{
+				Name:         "a.c",
+				Dependencies: []string{"a.h"},
+			},
+			&registry.Node{
+				Name:         "a.o",
+				Dependencies: []string{"a.c"},
+				Resolver: registry.Resolver{
+					Name: "compileC",
+				},
+			},
+		},
+	}
+	root := "/some/root"
+	c := gaggle.New()
+	require.Nil(t, c.Collect(ctx, g, root))
 
 	nodeAH := node.New("/some/root/a.h")
 	nodeAC := node.New("/some/root/a.c").Dependency(nodeAH)
