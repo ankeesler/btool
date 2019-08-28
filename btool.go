@@ -30,6 +30,13 @@ type Collector interface {
 	Collect(*node.Node) error
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CollectorCreator
+
+// CollectorCreator creates a Collector.
+type CollectorCreator interface {
+	Create() (Collector, error)
+}
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Cleaner
 
 // Cleaner removes the node.Node graph from disk.
@@ -46,23 +53,28 @@ type Builder interface {
 
 // Btool is a type that does the domain work of a btool invocation.
 type Btool struct {
-	collector Collector
-	cleaner   Cleaner
-	builder   Builder
+	cc      CollectorCreator
+	cleaner Cleaner
+	builder Builder
 }
 
 // New returns a new Btool struct.
-func New(collector Collector, cleaner Cleaner, builder Builder) *Btool {
+func New(cc CollectorCreator, cleaner Cleaner, builder Builder) *Btool {
 	return &Btool{
-		collector: collector,
-		cleaner:   cleaner,
-		builder:   builder,
+		cc:      cc,
+		cleaner: cleaner,
+		builder: builder,
 	}
 }
 
 // Run runs a btool build/clean.
 func (b *Btool) Run(n *node.Node, clean, dryRun bool) error {
-	if err := b.collector.Collect(n); err != nil {
+	c, err := b.cc.Create()
+	if err != nil {
+		return errors.Wrap(err, "create")
+	}
+
+	if err := c.Collect(n); err != nil {
 		return errors.Wrap(err, "collect")
 	}
 

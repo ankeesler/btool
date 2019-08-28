@@ -12,46 +12,43 @@ import (
 
 func TestBtoolRun(t *testing.T) {
 	data := []struct {
-		name             string
-		n                *node.Node
-		clean            bool
-		collectCallCount int
-		cleanCallCount   int
-		buildCallCount   int
+		name           string
+		n              *node.Node
+		clean          bool
+		cleanCallCount int
+		buildCallCount int
 	}{
 		{
-			name:             "Build",
-			n:                node.New(""),
-			clean:            false,
-			collectCallCount: 1,
-			cleanCallCount:   0,
-			buildCallCount:   1,
+			name:           "Build",
+			n:              node.New(""),
+			clean:          false,
+			cleanCallCount: 0,
+			buildCallCount: 1,
 		},
 		{
-			name:             "Clean",
-			n:                node.New(""),
-			clean:            true,
-			collectCallCount: 1,
-			cleanCallCount:   1,
-			buildCallCount:   0,
+			name:           "Clean",
+			n:              node.New(""),
+			clean:          true,
+			cleanCallCount: 1,
+			buildCallCount: 0,
 		},
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
-			collector := &btoolfakes.FakeCollector{}
-			collector.CollectReturnsOnCall(0, nil)
+			c := &btoolfakes.FakeCollector{}
+			cc := &btoolfakes.FakeCollectorCreator{}
+			cc.CreateReturnsOnCall(0, c, nil)
 
 			cleaner := &btoolfakes.FakeCleaner{}
 
 			builder := &btoolfakes.FakeBuilder{}
 
-			b := btool.New(collector, cleaner, builder)
+			b := btool.New(cc, cleaner, builder)
 			require.Nil(t, b.Run(datum.n, datum.clean, false))
 
-			assert.Equal(t, datum.collectCallCount, collector.CollectCallCount())
-			if datum.collectCallCount > 0 {
-				assert.Equal(t, datum.n, collector.CollectArgsForCall(0))
-			}
+			assert.Equal(t, 1, cc.CreateCallCount())
+			assert.Equal(t, 1, c.CollectCallCount())
+			assert.Equal(t, datum.n, c.CollectArgsForCall(0))
 
 			assert.Equal(t, datum.cleanCallCount, cleaner.CleanCallCount())
 			if datum.cleanCallCount > 0 {
