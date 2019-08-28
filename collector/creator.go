@@ -11,7 +11,7 @@ type Creator struct {
 	cinics []CollectiniCreator
 }
 
-func New(ctx *Ctx, cinics []CollectiniCreator) *Creator {
+func NewCreator(ctx *Ctx, cinics []CollectiniCreator) *Creator {
 	return &Creator{
 		ctx:    ctx,
 		cinics: cinics,
@@ -23,9 +23,9 @@ func (c *Creator) Create() (*Collector, error) {
 	for i := range c.cinics {
 		cini, err := c.cinics[i].Create()
 		if err != nil {
-			return errors.Wrap(err, "create")
+			return nil, errors.Wrap(err, "create")
 		}
 		cinis = append(cinis, cini)
 	}
-	return New(c.ctx, cinis)
+	return New(c.ctx, cinis...), nil
 }

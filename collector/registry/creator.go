@@ -5,36 +5,36 @@ import (
 	"github.com/spf13/afero"
 )
 
-type RegistryCreator interface {
-	Create() (Registry, error)
+type ClientCreator interface {
+	Create() (Client, error)
 }
 
 type Creator struct {
 	fs    afero.Fs
-	rc    RegistryCreator
+	cc    ClientCreator
 	cache string
-	g     Gaggler
+	gc    GaggleCollector
 }
 
 func NewCreator(
 	fs afero.Fs,
-	rc RegistryCreator,
+	cc ClientCreator,
 	cache string,
-	g Gaggler,
+	gc GaggleCollector,
 ) *Creator {
 	return &Creator{
 		fs:    fs,
-		rc:    rc,
+		cc:    cc,
 		cache: cache,
-		g:     g,
+		gc:    gc,
 	}
 }
 
-func (c *Creator) Create() (*Registry, error) {
-	r, err := c.rc.Create()
+func (c *Creator) Create() (*Collector, error) {
+	client, err := c.cc.Create()
 	if err != nil {
-		return errors.Wrap(err, "create")
+		return nil, errors.Wrap(err, "create")
 	}
 
-	return New(c.fs, r, c.ccache, c.g), nil
+	return New(c.fs, client, c.cache, c.gc), nil
 }

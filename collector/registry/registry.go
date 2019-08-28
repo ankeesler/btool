@@ -1,143 +1,111 @@
 // Package registry provides functionality to build a node.Node graph using a
-// registrypkg.Gaggle.
+// btool registry.
 package registry
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	registrypkg "github.com/ankeesler/btool/registry"
-	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
+	"github.com/spf13/afero"
+	"gopkg.in/yaml.v2"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Gaggler
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Client
 
-// Gaggler is an object that can retrieve registry.Gaggle's from somewhere.
-type Gaggler interface {
-	Gaggle() *registrypkg.Gaggle
-	Root() string
+// Client is an object that can retrieve registrypkg.Gaggle's from a btool
+// registry.
+type Client interface {
+	// Index should return the registrypkg.Index associated with this particular
+	// Registry. If any error occurs, an error should be returned.
+	Index() (*registrypkg.Index, error)
+	// Gaggle should return the registrypkg.Gaggle associated with the provided
+	// registrypkg.IndexFile.Path. If any error occurs, an error should be returned.
+	// If no registrypkg.Gaggle exists for the provided string, then nil, nil should
+	// be returned.
+	Gaggle(string) (*registrypkg.Gaggle, error)
 }
 
-// Registry is a type that can build a node.Node graph using a
-// registrypkg.Gaggle.
-type Registry struct {
-	g Gaggler
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GaggleCollector
+
+type GaggleCollector interface {
+	Collect(ctx *collector.Ctx, g *registrypkg.Gaggle, root string) error
 }
 
-// New creates a new Registry with a Gaggler and a root directory.
-func New(g Gaggler) *Registry {
-	return &Registry{
-		g: g,
+type Collector struct {
+	fs    afero.Fs
+	c     Client
+	cache string
+	gc    GaggleCollector
+}
+
+func New(
+	fs afero.Fs,
+	c Client,
+	cache string,
+	gc GaggleCollector,
+) *Collector {
+	return &Collector{
+		fs:    fs,
+		c:     c,
+		cache: cache,
+		gc:    gc,
 	}
 }
 
-func (r *Registry) Collect(ctx *collector.Ctx, n *node.Node) error {
-	gaggle := r.g.Gaggle()
-
-	metadata := struct {
-		IncludeDirs []string `mapstructure:"includeDirs"`
-	}{}
-	if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
-		return errors.Wrap(err, "decode")
-	}
-	log.Debugf("metadata: %+v", metadata)
-
-	for _, i := range metadata.IncludeDirs {
-		i = filepath.Join(r.g.Root(), i)
+func (r *Collector) Collect(ctx *collector.Ctx, n *node.Node) error {
+	i, err := r.c.Index()
+	if err != nil {
+		return errors.Wrap(err, "index")
 	}
 
-	for _, n := range gaggle.Nodes {
-		nN := node.New(filepath.Join(r.g.Root(), n.Name))
-		for _, d := range n.Dependencies {
-			dName := filepath.Join(r.g.Root(), d)
+	for _, file := range i.Files {
+		gaggleFile := filepath.Join(r.cache, file.SHA256+".yml")
+		gaggle := new(registrypkg.Gaggle)
+		log.Debugf("considering %s", gaggleFile)
+		if exists, err := afero.Exists(r.fs, gaggleFile); err != nil {
+			return errors.Wrap(err, "exists")
+		} else if !exists {
+			log.Debugf("does not exist")
 
-			var dN *node.Node
-			if d == "$this" {
-				// TODO: test me.
-				dN = node.New("")
-			} else {
-				dN = ctx.NS.Find(dName)
+			gaggle, err = r.c.Gaggle(file.Path)
+			if err != nil {
+				return errors.Wrap(err, "gaggle")
+			} else if gaggle == nil {
+				return errors.New("unknown gaggle at path: " + file.Path)
 			}
 
-			if dN == nil {
-				return fmt.Errorf("cannot find dependency %s/%s of %s", d, dName, n)
+			gaggleData, err := yaml.Marshal(&gaggle)
+			if err != nil {
+				return errors.Wrap(err, "marshal")
 			}
-			nN.Dependency(dN)
+
+			if err := r.fs.MkdirAll(filepath.Dir(gaggleFile), 0755); err != nil {
+				return errors.Wrap(err, "mkdir all")
+			}
+
+			if err := afero.WriteFile(r.fs, gaggleFile, gaggleData, 0644); err != nil {
+				return errors.Wrap(err, "write file")
+			}
+		} else {
+			data, err := afero.ReadFile(r.fs, gaggleFile)
+			if err != nil {
+				return errors.Wrap(err, "read file")
+			}
+
+			if err := yaml.Unmarshal(data, &gaggle); err != nil {
+				return errors.Wrap(err, "unmarshal")
+			}
 		}
 
-		nodeR, err := r.newResolver(
-			ctx,
-			n.Resolver,
-			metadata.IncludeDirs,
-			r.g.Root(),
-		)
-		if err != nil {
-			return errors.Wrap(err, "new resolver")
+		root := filepath.Join(r.cache, file.SHA256)
+		if err := r.gc.Collect(ctx, gaggle, root); err != nil {
+			return errors.Wrap(err, "collect")
 		}
-		nN.Resolver = nodeR
-
-		log.Debugf("decoded %s to %s", n, nN)
-		ctx.NS.Add(nN)
 	}
 
 	return nil
-}
-
-func (r *Registry) newResolver(
-	ctx *collector.Ctx,
-	registryR registrypkg.Resolver,
-	includeDirs []string,
-	root string,
-) (node.Resolver, error) {
-	name := registryR.Name
-	config := registryR.Config
-
-	var nodeR node.Resolver
-	var err error
-	switch name {
-	case "compileC":
-		nodeR = ctx.RF.NewCompileC(includeDirs)
-	case "compileCC":
-		nodeR = ctx.RF.NewCompileCC(includeDirs)
-	case "archive":
-		nodeR = ctx.RF.NewArchive()
-	case "linkC":
-		nodeR = ctx.RF.NewLinkC()
-	case "linkCC":
-		nodeR = ctx.RF.NewLinkCC()
-	case "symlink":
-		nodeR = ctx.RF.NewSymlink()
-	case "unzip":
-		nodeR = ctx.RF.NewUnzip(root)
-	case "download":
-		nodeR, err = r.createDownload(ctx, config)
-		if err != nil {
-			err = errors.Wrap(err, "create download")
-		}
-	case "":
-		nodeR = nil
-	default:
-		err = fmt.Errorf("unknown resolver: %s", name)
-	}
-
-	return nodeR, err
-}
-
-func (r *Registry) createDownload(
-	ctx *collector.Ctx,
-	config map[string]interface{},
-) (node.Resolver, error) {
-	cfg := struct {
-		URL    string
-		SHA256 string
-	}{}
-	if err := mapstructure.Decode(config, &cfg); err != nil {
-		return nil, errors.Wrap(err, "decode")
-	}
-
-	return ctx.RF.NewDownload(cfg.URL, cfg.SHA256), nil
 }

@@ -1,6 +1,7 @@
 package registry_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/ankeesler/btool/collector"
@@ -8,73 +9,77 @@ import (
 	"github.com/ankeesler/btool/collector/registry"
 	"github.com/ankeesler/btool/collector/registry/registryfakes"
 	"github.com/ankeesler/btool/node"
-	"github.com/ankeesler/btool/node/nodefakes"
 	registrypkg "github.com/ankeesler/btool/registry"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestRegistryCollect(t *testing.T) {
-	g := &registryfakes.FakeGaggler{}
-	g.GaggleReturnsOnCall(
+	// TODO: test caching
+
+	fs := afero.NewMemMapFs()
+
+	gaggleA := &registrypkg.Gaggle{}
+	gaggleB := &registrypkg.Gaggle{}
+	gaggleC := &registrypkg.Gaggle{}
+	c := &registryfakes.FakeClient{}
+	c.IndexReturnsOnCall(
 		0,
-		&registrypkg.Gaggle{
-			Metadata: map[string]interface{}{
-				"includeDirs": []string{
-					"include/dir",
-					"another/include/dir",
+		&registrypkg.Index{
+			Files: []registrypkg.IndexFile{
+				registrypkg.IndexFile{
+					Path:   "a",
+					SHA256: "a-sha",
 				},
-			},
-			Nodes: []*registrypkg.Node{
-				&registrypkg.Node{
-					Name:         "a.h",
-					Dependencies: []string{},
+				registrypkg.IndexFile{
+					Path:   "b",
+					SHA256: "b-sha",
 				},
-				&registrypkg.Node{
-					Name:         "a.c",
-					Dependencies: []string{"a.h"},
-				},
-				&registrypkg.Node{
-					Name:         "a.o",
-					Dependencies: []string{"a.c"},
-					Resolver: registrypkg.Resolver{
-						Name: "compileC",
-					},
+				registrypkg.IndexFile{
+					Path:   "c",
+					SHA256: "c-sha",
 				},
 			},
 		},
+		nil,
 	)
-	g.RootReturns("/some/root")
+	c.GaggleReturnsOnCall(0, gaggleA, nil)
+	c.GaggleReturnsOnCall(1, gaggleB, nil)
+	c.GaggleReturnsOnCall(2, gaggleC, nil)
 
-	r := registry.New(g)
+	cache := "/some/cache"
+	gc := &registryfakes.FakeGaggleCollector{}
+	r := registry.New(fs, c, cache, gc)
 
 	ns := collector.NewNodeStore(nil)
-
-	compilerCR := &nodefakes.FakeResolver{}
 	rf := &collectorfakes.FakeResolverFactory{}
-	rf.NewCompileCReturnsOnCall(0, compilerCR)
-
-	ctx := collector.NewCtx(ns, rf)
+	exCtx := collector.NewCtx(ns, rf)
 	acNode := node.New("main")
-	require.Nil(t, r.Collect(ctx, acNode))
-
+	require.Nil(t, r.Collect(exCtx, acNode))
 	exNode := node.New("main")
 	assert.Equal(t, exNode, acNode)
 
-	nodeAH := node.New("/some/root/a.h")
-	nodeAC := node.New("/some/root/a.c").Dependency(nodeAH)
-	nodeAO := node.New("/some/root/a.o").Dependency(nodeAC)
-	nodeAO.Resolver = compilerCR
-	assert.Equal(t, nodeAH, ns.Find(nodeAH.Name))
-	assert.Equal(t, nodeAC, ns.Find(nodeAC.Name))
-	assert.Equal(t, nodeAO, ns.Find(nodeAO.Name))
+	require.Equal(t, 1, c.IndexCallCount())
+	require.Equal(t, 3, c.GaggleCallCount())
+	assert.Equal(t, "a", c.GaggleArgsForCall(0))
+	assert.Equal(t, "b", c.GaggleArgsForCall(1))
+	assert.Equal(t, "c", c.GaggleArgsForCall(2))
 
-	assert.Equal(
-		t,
-		[]string{
-			"include/dir",
-			"another/include/dir",
-		},
-		rf.NewCompileCArgsForCall(0),
-	)
+	var acCtx *collector.Ctx
+	var acGaggle *registrypkg.Gaggle
+	var acRoot string
+	require.Equal(t, 3, gc.CollectCallCount())
+	acCtx, acGaggle, acRoot = gc.CollectArgsForCall(0)
+	assert.Equal(t, exCtx, acCtx)
+	assert.Equal(t, gaggleA, acGaggle)
+	assert.Equal(t, filepath.Join(cache, "a-sha"), acRoot)
+	acCtx, acGaggle, acRoot = gc.CollectArgsForCall(1)
+	assert.Equal(t, exCtx, acCtx)
+	assert.Equal(t, gaggleB, acGaggle)
+	assert.Equal(t, filepath.Join(cache, "b-sha"), acRoot)
+	acCtx, acGaggle, acRoot = gc.CollectArgsForCall(2)
+	assert.Equal(t, exCtx, acCtx)
+	assert.Equal(t, gaggleC, acGaggle)
+	assert.Equal(t, filepath.Join(cache, "c-sha"), acRoot)
 }
