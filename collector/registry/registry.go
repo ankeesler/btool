@@ -31,10 +31,14 @@ type Client interface {
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GaggleCollector
 
+// GaggleCollector is a type that can build a node.Node graph via a
+// registrypkg.Gaggle. It is provided a root to indicate where the node.Node
+// graph members should be located.
 type GaggleCollector interface {
 	Collect(ctx *collector.Ctx, g *registrypkg.Gaggle, root string) error
 }
 
+// Collector is a type that can build a node.Node graph via a btool registry.
 type Collector struct {
 	fs    afero.Fs
 	c     Client
@@ -42,6 +46,7 @@ type Collector struct {
 	gc    GaggleCollector
 }
 
+// New creates a new Collector.
 func New(
 	fs afero.Fs,
 	c Client,

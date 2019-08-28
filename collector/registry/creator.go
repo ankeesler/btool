@@ -5,10 +5,12 @@ import (
 	"github.com/spf13/afero"
 )
 
+// ClientCreator can create a Client.
 type ClientCreator interface {
 	Create() (Client, error)
 }
 
+// Creator is a type that creates a new Collector.
 type Creator struct {
 	fs    afero.Fs
 	cc    ClientCreator
@@ -16,6 +18,7 @@ type Creator struct {
 	gc    GaggleCollector
 }
 
+// NewCreator will create a new Creator.
 func NewCreator(
 	fs afero.Fs,
 	cc ClientCreator,
@@ -30,6 +33,7 @@ func NewCreator(
 	}
 }
 
+// Create will create a new Collector. Is this godoc good enough?
 func (c *Creator) Create() (*Collector, error) {
 	client, err := c.cc.Create()
 	if err != nil {
