@@ -7,6 +7,9 @@ import (
 	"github.com/ankeesler/btool/builder/currenter"
 	"github.com/ankeesler/btool/cleaner"
 	"github.com/ankeesler/btool/collector"
+	registrypkg "github.com/ankeesler/btool/collector"
+	"github.com/ankeesler/btool/collector/registry"
+	"github.com/ankeesler/btool/collector/registry/gaggle"
 	"github.com/ankeesler/btool/collector/resolverfactory"
 	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
@@ -56,16 +59,32 @@ func Run(cfg *Cfg) error {
 		cfg.LinkerC,
 		cfg.LinkerCC,
 	)
-	scanner := scanner.New(fs, cfg.Root, i)
-	sorter := sorter.New()
 
 	ctx := collector.NewCtx(ns, rf)
+
+	cinics := []collector.CollectiniCreator{
+		collector.NewCollectiniAccessor(
+			registry.NewCreator(
+				fs,
+				registrypkg.NewCreator(),
+				cfg.Cache,
+				gaggle.New(),
+			),
+		),
+		collector.NewCollectiniAccessor(
+			scanner.New(fs, cfg.Root, i),
+		),
+		collector.NewCollectiniAccessor(
+			sorter.New(),
+		),
+	}
+	cc := collector.NewCreator(ctx, cinics)
+	ccf := func() (Collector, error) {
+		return cc.Create()
+	}
 	cleaner := cleaner.New(fs, ui)
 	builder := builder.New(cfg.DryRun, currenter.New(), ui)
-
-	cinics := []collector.CollectiniCreator{}
-	cc := collector.NewCreator(ctx, cinics)
-	b := New(cc, cleaner, builder)
+	b := New(ccf, cleaner, builder)
 
 	target := filepath.Join(cfg.Root, cfg.Target)
 	targetN := node.New(target)
