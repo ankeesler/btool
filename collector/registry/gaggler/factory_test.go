@@ -13,6 +13,8 @@ import (
 )
 
 func TestFactoryNext(t *testing.T) {
+	// TODO: test caching
+
 	fs := afero.NewMemMapFs()
 
 	gaggleA := &registry.Gaggle{}
