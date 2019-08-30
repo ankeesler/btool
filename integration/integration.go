@@ -58,10 +58,10 @@ func Run(t *testing.T) {
 			name:     "ExecutableSubdirectoryCache",
 			testFunc: executableSubdirectoryCache,
 		},
-		//{
-		//	name:     "Googletest",
-		//	testFunc: googletest,
-		//},
+		{
+			name:     "Googletest",
+			testFunc: googletest,
+		},
 	}
 
 	for _, testCase := range testCases {
