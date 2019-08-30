@@ -27,6 +27,7 @@ type Ctx struct {
 	RF ResolverFactory
 
 	includePaths map[string]string
+	libraries    map[string][]*node.Node
 }
 
 // NewCtx creates a new Ctx with a NodeStore and a ResolverFactory.
@@ -36,6 +37,7 @@ func NewCtx(ns *NodeStore, rf ResolverFactory) *Ctx {
 		RF: rf,
 
 		includePaths: make(map[string]string),
+		libraries:    make(map[string][]*node.Node),
 	}
 }
 
@@ -73,9 +75,46 @@ func (c *Ctx) IncludePaths(n *node.Node) []string {
 	return includePaths
 }
 
+// AddLibrary make a mapping from a node.Node to a library node.Node. This is
+// so that when Libraries() is called on a node.Node, the Ctx will know which
+// node.Node's require that a library node.Node should be compiled in.
+func (c *Ctx) AddLibrary(n *node.Node, libN *node.Node) {
+	libraries, ok := c.libraries[n.Name]
+	if !ok {
+		libraries = make([]*node.Node, 0)
+	}
+	libraries = append(libraries, libN)
+}
+
+// Libraries walks the dependencies of the provided node.Node and collects the
+// library node.Node's that need to be pulled in.
+func (c *Ctx) Libraries(n *node.Node) []*node.Node {
+	libraries := make([]*node.Node, 0)
+	node.Visit(n, func(nV *node.Node) error {
+		if libraries, ok := c.libraries[nV.Name]; ok {
+			for _, library := range libraries {
+				if !containsNode(libraries, library) {
+					libraries = append(libraries, library)
+				}
+			}
+		}
+		return nil
+	})
+	return libraries
+}
+
 func contains(ss []string, s string) bool {
 	for i := range ss {
 		if ss[i] == s {
+			return true
+		}
+	}
+	return false
+}
+
+func containsNode(nodes []*node.Node, n *node.Node) bool {
+	for i := range nodes {
+		if nodes[i] == n {
 			return true
 		}
 	}

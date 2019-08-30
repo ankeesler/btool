@@ -17,8 +17,10 @@ func TestCollectorCollect(t *testing.T) {
 	ns := collector.NewNodeStore(nil)
 
 	compilerCR := &nodefakes.FakeResolver{}
+	linkerCR := &nodefakes.FakeResolver{}
 	rf := &collectorfakes.FakeResolverFactory{}
 	rf.NewCompileCReturnsOnCall(0, compilerCR)
+	rf.NewLinkCReturnsOnCall(0, linkerCR)
 
 	ctx := collector.NewCtx(ns, rf)
 
@@ -27,6 +29,9 @@ func TestCollectorCollect(t *testing.T) {
 			"includePaths": map[string]string{
 				"a.h": "include/dir",
 				"b.h": "another/include/dir",
+			},
+			"libraries": map[string]string{
+				"a.h": "a.a",
 			},
 		},
 		Nodes: []*registry.Node{
@@ -45,6 +50,13 @@ func TestCollectorCollect(t *testing.T) {
 					Name: "compileC",
 				},
 			},
+			&registry.Node{
+				Name:         "a.a",
+				Dependencies: []string{"a.a"},
+				Resolver: registry.Resolver{
+					Name: "linkC",
+				},
+			},
 		},
 	}
 	root := "/some/root"
@@ -55,9 +67,12 @@ func TestCollectorCollect(t *testing.T) {
 	nodeAC := node.New("/some/root/a.c").Dependency(nodeAH)
 	nodeAO := node.New("/some/root/a.o").Dependency(nodeAC)
 	nodeAO.Resolver = compilerCR
+	nodeAA := node.New("/some/root/a.a").Dependency(nodeAO)
+	nodeAA.Resolver = linkerCR
 	assert.Equal(t, nodeAH, ns.Find(nodeAH.Name))
 	assert.Equal(t, nodeAC, ns.Find(nodeAC.Name))
 	assert.Equal(t, nodeAO, ns.Find(nodeAO.Name))
+	assert.Equal(t, nodeAA, ns.Find(nodeAA.Name))
 
 	assert.Equal(
 		t,
@@ -65,5 +80,13 @@ func TestCollectorCollect(t *testing.T) {
 			"include/dir",
 		},
 		rf.NewCompileCArgsForCall(0),
+	)
+
+	assert.Equal(
+		t,
+		[]*node.Node{
+			nodeAA,
+		},
+		ctx.Libraries(nodeAC),
 	)
 }
