@@ -19,6 +19,7 @@ import (
 	"github.com/go-test/deep"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -91,6 +92,12 @@ func TestScannerCollect(t *testing.T) {
 	log.Debugf("%s\n%s", "ac", node.String(acMainN))
 	log.Debugf("%s\n%s", "ex", node.String(exMainN))
 	require.Nil(t, deep.Equal(exMainN, acMainN))
+
+	assert.Equal(t, 3, rf.NewCompileCCallCount())
+	exIncludePaths := []string{root}
+	assert.Equal(t, exIncludePaths, rf.NewCompileCArgsForCall(0))
+	assert.Equal(t, exIncludePaths, rf.NewCompileCArgsForCall(1))
+	assert.Equal(t, exIncludePaths, rf.NewCompileCArgsForCall(2))
 }
 
 func populateFS(n *node.Node, fs afero.Fs, root string) error {

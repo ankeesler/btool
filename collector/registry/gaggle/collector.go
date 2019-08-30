@@ -27,19 +27,22 @@ func (c *Collector) Collect(
 	root string,
 ) error {
 	metadata := struct {
-		IncludeDirs []string `mapstructure:"includeDirs"`
+		IncludePaths map[string]string `mapstructure:"includePaths"`
 	}{}
 	if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
 		return errors.Wrap(err, "decode")
 	}
 	log.Debugf("metadata: %+v", metadata)
 
-	for _, i := range metadata.IncludeDirs {
-		i = filepath.Join(root, i)
-	}
-
 	for _, n := range gaggle.Nodes {
 		nN := node.New(filepath.Join(root, n.Name))
+
+		log.Debugf("getting %s from include paths", n.Name)
+		if path, ok := metadata.IncludePaths[n.Name]; ok {
+			log.Debugf("setting include path %s for node %s", path, nN)
+			ctx.SetIncludePath(nN, path)
+		}
+
 		for _, d := range n.Dependencies {
 			dName := filepath.Join(root, d)
 
@@ -57,10 +60,11 @@ func (c *Collector) Collect(
 			nN.Dependency(dN)
 		}
 
+		includePaths := ctx.IncludePaths(nN)
 		nodeR, err := c.newResolver(
 			ctx,
 			n.Resolver,
-			metadata.IncludeDirs,
+			includePaths,
 			root,
 		)
 		if err != nil {

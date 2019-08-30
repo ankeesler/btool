@@ -24,9 +24,9 @@ func TestCollectorCollect(t *testing.T) {
 
 	g := &registry.Gaggle{
 		Metadata: map[string]interface{}{
-			"includeDirs": []string{
-				"include/dir",
-				"another/include/dir",
+			"includePaths": map[string]string{
+				"a.h": "include/dir",
+				"b.h": "another/include/dir",
 			},
 		},
 		Nodes: []*registry.Node{
@@ -63,7 +63,6 @@ func TestCollectorCollect(t *testing.T) {
 		t,
 		[]string{
 			"include/dir",
-			"another/include/dir",
 		},
 		rf.NewCompileCArgsForCall(0),
 	)

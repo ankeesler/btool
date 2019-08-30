@@ -45,10 +45,9 @@ func New(
 type state struct {
 	ctx *collector.Ctx
 
-	includePaths []string
-	libraries    []*node.Node
-	objects      []*node.Node
-	cc           bool
+	libraries []*node.Node
+	objects   []*node.Node
+	cc        bool
 
 	depth int
 }
@@ -58,8 +57,7 @@ type state struct {
 // it runs into trouble.
 func (s *Scanner) Collect(ctx *collector.Ctx, start *node.Node) error {
 	_, err := s.add(start, &state{
-		ctx:          ctx,
-		includePaths: []string{s.root},
+		ctx: ctx,
 	})
 	return err
 }
@@ -132,10 +130,12 @@ func (s *Scanner) onExecutable(n *node.Node, state *state) error {
 }
 
 func (s *Scanner) onObject(n *node.Node, state *state) error {
+	includePaths := state.ctx.IncludePaths(n)
+	log.Debugf("include paths for %s: %s", n.Name, includePaths)
 	if state.cc {
-		n.Resolver = state.ctx.RF.NewCompileCC(state.includePaths)
+		n.Resolver = state.ctx.RF.NewCompileCC(includePaths)
 	} else {
-		n.Resolver = state.ctx.RF.NewCompileC(state.includePaths)
+		n.Resolver = state.ctx.RF.NewCompileC(includePaths)
 	}
 
 	log.Debugf("adding object %s", n.Name)
@@ -146,25 +146,27 @@ func (s *Scanner) onObject(n *node.Node, state *state) error {
 
 func (s *Scanner) onSource(n *node.Node, state *state) error {
 	ext := filepath.Ext(n.Name)
+	if err := s.addHeaders(n, state); err != nil {
+		return errors.Wrap(err, "add headers")
+	}
+
 	object := strings.ReplaceAll(n.Name, ext, ".o")
 	objectN := node.New(object)
+	log.Debugf("source/object dependency %s -> %s", objectN.Name, n.Name)
+	objectN.Dependency(n)
 	if added, err := s.add(objectN, state); err != nil {
 		return errors.Wrap(err, "add")
 	} else if !added {
 		return nil
 	}
 
-	log.Debugf("source/object dependency %s -> %s", objectN.Name, n.Name)
-	objectN.Dependency(n)
-
-	if err := s.addHeaders(n, state); err != nil {
-		return errors.Wrap(err, "add headers")
-	}
-
 	return nil
 }
 
 func (s *Scanner) onHeader(n *node.Node, state *state) error {
+	state.ctx.SetIncludePath(n, s.root)
+	log.Debugf("set include path %s for %s", s.root, n)
+
 	if err := s.addHeaders(n, state); err != nil {
 		return errors.Wrap(err, "add headers")
 	}
