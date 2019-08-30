@@ -1,10 +1,10 @@
-package btool_test
+package app_test
 
 import (
 	"testing"
 
-	"github.com/ankeesler/btool"
-	"github.com/ankeesler/btool/btoolfakes"
+	"github.com/ankeesler/btool/app"
+	"github.com/ankeesler/btool/app/appfakes"
 	"github.com/ankeesler/btool/node"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,15 +35,15 @@ func TestBtoolRun(t *testing.T) {
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
-			c := &btoolfakes.FakeCollector{}
-			cc := &btoolfakes.FakeCollectorCreator{}
+			c := &appfakes.FakeCollector{}
+			cc := &appfakes.FakeCollectorCreator{}
 			cc.CreateReturnsOnCall(0, c, nil)
 
-			cleaner := &btoolfakes.FakeCleaner{}
+			cleaner := &appfakes.FakeCleaner{}
 
-			builder := &btoolfakes.FakeBuilder{}
+			builder := &appfakes.FakeBuilder{}
 
-			b := btool.New(cc, cleaner, builder)
+			b := app.New(cc, cleaner, builder)
 			require.Nil(t, b.Run(datum.n, datum.clean, false))
 
 			assert.Equal(t, 1, cc.CreateCallCount())

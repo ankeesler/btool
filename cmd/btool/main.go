@@ -5,7 +5,6 @@ import (
 	"flag"
 	"os"
 	"runtime"
-	"strings"
 
 	"github.com/ankeesler/btool"
 	"github.com/ankeesler/btool/log"
@@ -72,7 +71,7 @@ func run() error {
 		LinkerC:    tc.LinkerC,
 		LinkerCC:   tc.LinkerCC,
 
-		Registries: strings.Split(*registries, ","),
+		Registry: *registry,
 	}
 	if err := btool.Run(&cfg); err != nil {
 		return errors.Wrap(err, "run")
