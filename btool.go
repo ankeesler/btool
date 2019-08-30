@@ -10,6 +10,7 @@
 package btool
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/ankeesler/btool/app"
@@ -24,6 +25,7 @@ import (
 	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/ankeesler/btool/collector/sorter"
+	"github.com/ankeesler/btool/lister"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/ui"
 	"github.com/spf13/afero"
@@ -37,8 +39,9 @@ type Cfg struct {
 	Cache  string
 	Target string
 
-	DryRun bool
 	Clean  bool
+	List   bool
+	DryRun bool
 
 	CompilerC  string
 	CompilerCC string
@@ -121,10 +124,11 @@ func Run(cfg *Cfg) error {
 	}
 	cc := &collectorCreator{ctx: ctx, cinics: cinics}
 	cleaner := cleaner.New(fs, ui)
+	lister := lister.New(os.Stdout)
 	builder := builder.New(cfg.DryRun, currenter.New(), ui)
-	a := app.New(cc, cleaner, builder)
+	a := app.New(cc, cleaner, lister, builder)
 
 	target := filepath.Join(cfg.Root, cfg.Target)
 	targetN := node.New(target)
-	return a.Run(targetN, cfg.Clean, cfg.DryRun)
+	return a.Run(targetN, cfg.Clean, cfg.List, cfg.DryRun)
 }

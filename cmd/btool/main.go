@@ -32,6 +32,7 @@ func run() error {
 	)
 	dryrun := flag.Bool("dryrun", false, "Do not actually build")
 	clean := flag.Bool("clean", false, "Clean all nodes")
+	list := flag.Bool("list", false, "Simply list all targets")
 	version := flag.Bool("version", false, "Print version")
 	help := flag.Bool("help", false, "Show this help message")
 
@@ -64,6 +65,7 @@ func run() error {
 
 		DryRun: *dryrun,
 		Clean:  *clean,
+		List:   *list,
 
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,

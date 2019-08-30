@@ -15,21 +15,36 @@ func TestBtoolRun(t *testing.T) {
 		name           string
 		n              *node.Node
 		clean          bool
+		list           bool
 		cleanCallCount int
+		listCallCount  int
 		buildCallCount int
 	}{
 		{
 			name:           "Build",
 			n:              node.New(""),
 			clean:          false,
+			list:           false,
 			cleanCallCount: 0,
+			listCallCount:  0,
 			buildCallCount: 1,
 		},
 		{
 			name:           "Clean",
 			n:              node.New(""),
 			clean:          true,
+			list:           false,
 			cleanCallCount: 1,
+			listCallCount:  0,
+			buildCallCount: 0,
+		},
+		{
+			name:           "List",
+			n:              node.New(""),
+			clean:          false,
+			list:           true,
+			cleanCallCount: 0,
+			listCallCount:  1,
 			buildCallCount: 0,
 		},
 	}
@@ -40,11 +55,11 @@ func TestBtoolRun(t *testing.T) {
 			cc.CreateReturnsOnCall(0, c, nil)
 
 			cleaner := &appfakes.FakeCleaner{}
-
+			lister := &appfakes.FakeLister{}
 			builder := &appfakes.FakeBuilder{}
 
-			b := app.New(cc, cleaner, builder)
-			require.Nil(t, b.Run(datum.n, datum.clean, false))
+			b := app.New(cc, cleaner, lister, builder)
+			require.Nil(t, b.Run(datum.n, datum.clean, datum.list, false))
 
 			assert.Equal(t, 1, cc.CreateCallCount())
 			assert.Equal(t, 1, c.CollectCallCount())
