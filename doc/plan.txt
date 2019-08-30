@@ -1,0 +1,13 @@
+# What's the plan?
+
+## Milestone: Link test (with googletest dependency)
+
+### TODO
+
+## Milestone: -run flag
+
+## Milestone: -watch flag
+
+## Milestone: multiple targets
+
+## Milestone: C++ implementation

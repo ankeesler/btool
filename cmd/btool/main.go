@@ -26,10 +26,10 @@ func run() error {
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", ".btool", "Cache directory")
 	target := flag.String("target", "main", "Target to build")
-	registries := flag.String(
-		"registries",
+	registry := flag.String(
+		"registry",
 		"https://btoolregistry.cfapps.io",
-		"List of registries, e.g., https://a.io,file://path/to/reg/dir",
+		"Btool registry link, e.g., file://path/to/reg/dir or https://a.io",
 	)
 	dryrun := flag.Bool("dryrun", false, "Do not actually build")
 	clean := flag.Bool("clean", false, "Clean all nodes")

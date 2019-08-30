@@ -14,6 +14,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Client
+
+// Client is an object that can retrieve registrypkg.Gaggle's from a btool
+// registry.
+type Client interface {
+	// Index should return the registrypkg.Index associated with this particular
+	// Registry. If any error occurs, an error should be returned.
+	Index() (*registrypkg.Index, error)
+	// Gaggle should return the registrypkg.Gaggle associated with the provided
+	// registrypkg.IndexFile.Path. If any error occurs, an error should be returned.
+	// If no registrypkg.Gaggle exists for the provided string, then nil, nil should
+	// be returned.
+	Gaggle(string) (*registrypkg.Gaggle, error)
+}
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . GaggleCollector
 
 // GaggleCollector is a type that can build a node.Node graph via a
@@ -26,7 +41,7 @@ type GaggleCollector interface {
 // Collector is a type that can build a node.Node graph via a btool registry.
 type Collector struct {
 	fs    afero.Fs
-	r     registrypkg.Registry
+	c     Client
 	cache string
 	gc    GaggleCollector
 }
@@ -34,20 +49,20 @@ type Collector struct {
 // New creates a new Collector.
 func New(
 	fs afero.Fs,
-	r registrypkg.Registry,
+	c Client,
 	cache string,
 	gc GaggleCollector,
 ) *Collector {
 	return &Collector{
 		fs:    fs,
-		r:     r,
+		c:     c,
 		cache: cache,
 		gc:    gc,
 	}
 }
 
 func (c *Collector) Collect(ctx *collector.Ctx, n *node.Node) error {
-	i, err := c.r.Index()
+	i, err := c.c.Index()
 	if err != nil {
 		return errors.Wrap(err, "index")
 	}
@@ -61,7 +76,7 @@ func (c *Collector) Collect(ctx *collector.Ctx, n *node.Node) error {
 		} else if !exists {
 			log.Debugf("does not exist")
 
-			gaggle, err = c.r.Gaggle(file.Path)
+			gaggle, err = c.c.Gaggle(file.Path)
 			if err != nil {
 				return errors.Wrap(err, "gaggle")
 			} else if gaggle == nil {

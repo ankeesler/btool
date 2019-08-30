@@ -7,7 +7,6 @@ import (
 	"github.com/ankeesler/btool/builder/currenter"
 	"github.com/ankeesler/btool/cleaner"
 	"github.com/ankeesler/btool/collector"
-	registrypkg "github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/collector/registry"
 	"github.com/ankeesler/btool/collector/registry/gaggle"
 	"github.com/ankeesler/btool/collector/resolverfactory"
@@ -15,6 +14,7 @@ import (
 	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/node"
+	registrypkg "github.com/ankeesler/btool/registry"
 	"github.com/ankeesler/btool/ui"
 	"github.com/spf13/afero"
 )
@@ -36,9 +36,42 @@ type Cfg struct {
 	LinkerC    string
 	LinkerCC   string
 
-	Registries []string
+	Registry string
 
 	Quiet bool
+}
+
+type collectorCreator struct {
+	ctx    *collector.Ctx
+	cinics []collector.CollectiniCreator
+}
+
+func (cc *collectorCreator) Create() (Collector, error) {
+	return collector.NewCreator(cc.ctx, cc.cinics).Create()
+}
+
+type registryClientCreator struct {
+	url string
+}
+
+func (rc *registryClientCreator) Create() (registry.Client, error) {
+	return registrypkg.NewCreator(rc.url).Create()
+}
+
+type registryCollectiniCreator struct {
+	fs    afero.Fs
+	rcc   *registryClientCreator
+	cache string
+	gc    *gaggle.Collector
+}
+
+func (cc *registryCollectiniCreator) Create() (collector.Collectini, error) {
+	return registry.NewCreator(
+		cc.fs,
+		cc.rcc,
+		cc.cache,
+		cc.gc,
+	).Create()
 }
 
 // Run will run a btool invocation and produce a target.
@@ -63,14 +96,12 @@ func Run(cfg *Cfg) error {
 	ctx := collector.NewCtx(ns, rf)
 
 	cinics := []collector.CollectiniCreator{
-		collector.NewCollectiniAccessor(
-			registry.NewCreator(
-				fs,
-				registrypkg.NewCreator(),
-				cfg.Cache,
-				gaggle.New(),
-			),
-		),
+		&registryCollectiniCreator{
+			fs:    fs,
+			rcc:   &registryClientCreator{url: cfg.Registry},
+			cache: cfg.Cache,
+			gc:    gaggle.New(),
+		},
 		collector.NewCollectiniAccessor(
 			scanner.New(fs, cfg.Root, i),
 		),
@@ -78,13 +109,10 @@ func Run(cfg *Cfg) error {
 			sorter.New(),
 		),
 	}
-	cc := collector.NewCreator(ctx, cinics)
-	ccf := func() (Collector, error) {
-		return cc.Create()
-	}
+	cc := &collectorCreator{ctx: ctx, cinics: cinics}
 	cleaner := cleaner.New(fs, ui)
 	builder := builder.New(cfg.DryRun, currenter.New(), ui)
-	b := New(ccf, cleaner, builder)
+	b := New(cc, cleaner, builder)
 
 	target := filepath.Join(cfg.Root, cfg.Target)
 	targetN := node.New(target)
