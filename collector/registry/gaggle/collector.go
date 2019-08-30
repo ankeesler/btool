@@ -27,29 +27,30 @@ func (c *Collector) Collect(
 	root string,
 ) error {
 	metadata := struct {
-		IncludePaths map[string]string `mapstructure:"includePaths"`
+		IncludePaths []string          `mapstructure:"includePaths"`
+		Libraries    map[string]string `mapstructure:"libraries"`
 	}{}
 	if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
 		return errors.Wrap(err, "decode")
 	}
 	log.Debugf("metadata: %+v", metadata)
 
+	for _, includePath := range metadata.IncludePaths {
+		includePath = filepath.Join(root, includePath)
+		ctx.AddIncludePath(includePath)
+	}
+
 	for _, n := range gaggle.Nodes {
 		nN := node.New(filepath.Join(root, n.Name))
-
-		log.Debugf("getting %s from include paths", n.Name)
-		if path, ok := metadata.IncludePaths[n.Name]; ok {
-			log.Debugf("setting include path %s for node %s", path, nN)
-			ctx.SetIncludePath(nN, path)
-		}
 
 		for _, d := range n.Dependencies {
 			dName := filepath.Join(root, d)
 
 			var dN *node.Node
 			if d == "$this" {
-				// TODO: test me.
-				dN = node.New("")
+				// TODO: implement me.
+				//dN = node.New("")
+				continue
 			} else {
 				dN = ctx.NS.Find(dName)
 			}
@@ -60,11 +61,10 @@ func (c *Collector) Collect(
 			nN.Dependency(dN)
 		}
 
-		includePaths := ctx.IncludePaths(nN)
 		nodeR, err := c.newResolver(
 			ctx,
 			n.Resolver,
-			includePaths,
+			ctx.IncludePaths(),
 			root,
 		)
 		if err != nil {
@@ -74,6 +74,15 @@ func (c *Collector) Collect(
 
 		log.Debugf("decoded %s to %s", n, nN)
 		ctx.NS.Add(nN)
+	}
+
+	for include, library := range metadata.Libraries {
+		libraryN := ctx.NS.Find(filepath.Join(root, library))
+		if libraryN == nil {
+			return errors.New("unknown library: " + library)
+		}
+		ctx.AddLibrary(include, libraryN)
+		log.Debugf("added library %s for include %s", libraryN, include)
 	}
 
 	return nil

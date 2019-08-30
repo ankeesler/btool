@@ -45,9 +45,10 @@ func New(
 type state struct {
 	ctx *collector.Ctx
 
-	libraries []*node.Node
-	objects   []*node.Node
-	cc        bool
+	includePaths []string
+	libraries    []*node.Node
+	objects      []*node.Node
+	cc           bool
 
 	depth int
 }
@@ -95,13 +96,6 @@ func (s *Scanner) add(n *node.Node, state *state) (bool, error) {
 	return true, err
 }
 
-// each of these functions should do the following:
-//   - find dependencies of the provided node.Node
-//   - add those dependencies as nodes with s.add()
-//   - add those dependencies as dependencies with n.Dependency()
-//   - set n.Resolver
-//   - update state with any related stuff
-//
 // the path currently goes like this:
 //   executable -> source -> header -> source -> header ... -> object
 
@@ -130,13 +124,12 @@ func (s *Scanner) onExecutable(n *node.Node, state *state) error {
 }
 
 func (s *Scanner) onObject(n *node.Node, state *state) error {
-	includePaths := state.ctx.IncludePaths(n)
-	log.Debugf("include paths for %s: %s", n.Name, includePaths)
 	if state.cc {
-		n.Resolver = state.ctx.RF.NewCompileCC(includePaths)
+		n.Resolver = state.ctx.RF.NewCompileCC(state.includePaths)
 	} else {
-		n.Resolver = state.ctx.RF.NewCompileC(includePaths)
+		n.Resolver = state.ctx.RF.NewCompileC(state.includePaths)
 	}
+	state.includePaths = state.includePaths[:0] // clear
 
 	log.Debugf("adding object %s", n.Name)
 	state.objects = append(state.objects, n)
@@ -164,9 +157,6 @@ func (s *Scanner) onSource(n *node.Node, state *state) error {
 }
 
 func (s *Scanner) onHeader(n *node.Node, state *state) error {
-	state.ctx.SetIncludePath(n, s.root)
-	log.Debugf("set include path %s for %s", s.root, n)
-
 	if err := s.addHeaders(n, state); err != nil {
 		return errors.Wrap(err, "add headers")
 	}
@@ -222,6 +212,8 @@ func (s *Scanner) addHeaders(n *node.Node, state *state) error {
 	}
 
 	for _, include := range includes {
+		log.Debugf("searching for include %s in %+v", include, state.ctx)
+
 		var headerN *node.Node
 		rootRelInclude := filepath.Join(s.root, include)
 		dirRelInclude := filepath.Join(filepath.Dir(n.Name), include)
@@ -229,10 +221,20 @@ func (s *Scanner) addHeaders(n *node.Node, state *state) error {
 			return errors.Wrap(err, "exists")
 		} else if exists {
 			headerN = node.New(rootRelInclude)
+			state.includePaths = append(state.includePaths, s.root)
 		} else if exists, err = afero.Exists(s.fs, dirRelInclude); err != nil {
 			return errors.Wrap(err, "exists")
 		} else if exists {
 			headerN = node.New(dirRelInclude)
+		} else if headerN = s.headerForInclude(include, state); headerN != nil {
+			includePath := strings.ReplaceAll(headerN.Name, include, "")
+			state.includePaths = append(state.includePaths, includePath)
+			log.Debugf("added include path %s", includePath)
+
+			if libraries, ok := state.ctx.Libraries(include); ok {
+				log.Debugf("adding libraries %s for include %s", libraries, include)
+				state.libraries = append(state.libraries, libraries...)
+			}
 		}
 
 		if headerN == nil {
@@ -247,5 +249,15 @@ func (s *Scanner) addHeaders(n *node.Node, state *state) error {
 		n.Dependency(headerN)
 	}
 
+	return nil
+}
+
+func (s *Scanner) headerForInclude(include string, state *state) *node.Node {
+	for _, includePath := range state.ctx.IncludePaths() {
+		header := filepath.Join(includePath, include)
+		if headerN := state.ctx.NS.Find(header); headerN != nil {
+			return headerN
+		}
+	}
 	return nil
 }

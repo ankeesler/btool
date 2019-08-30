@@ -37,10 +37,11 @@ func New(
 // Collect creates a node.Node graph.
 func (c *Collector) Collect(n *node.Node) error {
 	for i, ctini := range c.ctinis {
-		log.Debugf("running collectini #%d: %s", i, ctini)
+		log.Debugf("starting collectini #%d", i)
 		if err := ctini.Collect(c.ctx, n); err != nil {
 			return errors.Wrap(err, "collect")
 		}
+		log.Debugf("finishing collectini #%d, ctx is now %+v", i, c.ctx)
 	}
 	return nil
 }
