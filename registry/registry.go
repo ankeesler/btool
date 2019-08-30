@@ -51,17 +51,3 @@ type Resolver struct {
 type Error struct {
 	Error string `yaml:"error"`
 }
-
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Client
-
-// Registry is an object that can retrieve Gaggle's from a btool registry.
-type Registry interface {
-	// Index should return the Index associated with this particular
-	// Registry. If any error occurs, an error should be returned.
-	Index() (*Index, error)
-	// Gaggle should return the Gaggle associated with the provided
-	// IndexFile.Path. If any error occurs, an error should be returned.
-	// If no Gaggle exists for the provided string, then nil, nil should
-	// be returned.
-	Gaggle(string) (*Gaggle, error)
-}

@@ -1,6 +1,9 @@
 package collector
 
-import "github.com/pkg/errors"
+import (
+	"github.com/ankeesler/btool/log"
+	"github.com/pkg/errors"
+)
 
 // CollectiniCreator is an object that can create a Collectini.
 type CollectiniCreator interface {
@@ -25,12 +28,13 @@ func NewCreator(ctx *Ctx, cinics []CollectiniCreator) *Creator {
 // via the CollectiniCreator's.
 func (c *Creator) Create() (*Collector, error) {
 	cinis := make([]Collectini, len(c.cinics))
-	for _, cinic := range c.cinics {
+	for i, cinic := range c.cinics {
 		cini, err := cinic.Create()
 		if err != nil {
 			return nil, errors.Wrap(err, "create")
 		}
-		cinis = append(cinis, cini)
+		log.Debugf("created collectini #%d: %s", i, cini)
+		cinis[i] = cini
 	}
 	return New(c.ctx, cinis...), nil
 }

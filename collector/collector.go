@@ -2,6 +2,7 @@
 package collector
 
 import (
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
@@ -35,7 +36,8 @@ func New(
 
 // Collect creates a node.Node graph.
 func (c *Collector) Collect(n *node.Node) error {
-	for _, ctini := range c.ctinis {
+	for i, ctini := range c.ctinis {
+		log.Debugf("running collectini #%d: %s", i, ctini)
 		if err := ctini.Collect(c.ctx, n); err != nil {
 			return errors.Wrap(err, "collect")
 		}

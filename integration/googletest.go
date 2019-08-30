@@ -20,7 +20,7 @@ func googletest(c *config) {
 		c.cache,
 		"-loglevel",
 		"debug",
-		"-registries",
+		"-registry",
 		filepath.Join(here, "..", "data"),
 		"-output",
 		"gtest.a",

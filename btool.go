@@ -18,13 +18,13 @@ import (
 	"github.com/ankeesler/btool/cleaner"
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/collector/registry"
+	"github.com/ankeesler/btool/collector/registry/clientcreator"
 	"github.com/ankeesler/btool/collector/registry/gaggle"
 	"github.com/ankeesler/btool/collector/resolverfactory"
 	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
 	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/node"
-	registrypkg "github.com/ankeesler/btool/registry"
 	"github.com/ankeesler/btool/ui"
 	"github.com/spf13/afero"
 )
@@ -60,17 +60,9 @@ func (cc *collectorCreator) Create() (app.Collector, error) {
 	return collector.NewCreator(cc.ctx, cc.cinics).Create()
 }
 
-type registryClientCreator struct {
-	url string
-}
-
-func (rc *registryClientCreator) Create() (registry.Client, error) {
-	return registrypkg.NewCreator(rc.url).Create()
-}
-
 type registryCollectiniCreator struct {
 	fs    afero.Fs
-	rcc   *registryClientCreator
+	cc    *clientcreator.Creator
 	cache string
 	gc    *gaggle.Collector
 }
@@ -78,17 +70,25 @@ type registryCollectiniCreator struct {
 func (cc *registryCollectiniCreator) Create() (collector.Collectini, error) {
 	return registry.NewCreator(
 		cc.fs,
-		cc.rcc,
+		cc.cc,
 		cc.cache,
 		cc.gc,
 	).Create()
 }
 
+type dumbCollectiniCreator struct {
+	c collector.Collectini
+}
+
+func (dcc *dumbCollectiniCreator) Create() (collector.Collectini, error) {
+	return dcc.c, nil
+}
+
 // Run will run a btool invocation and produce a target.
 //
-// Under the hood, Run creates the dependencies for a Btool struct via the
-// provided Cfg, passes those dependencies to New(), and calls Run() on the
-// returned Btool struct.
+// Under the hood, Run creates the dependencies for an app.App struct via the
+// provided Cfg, passes those dependencies to app.New(), and calls Run() on the
+// returned app.App struct.
 func Run(cfg *Cfg) error {
 	ui := ui.New(cfg.Quiet)
 
@@ -108,16 +108,16 @@ func Run(cfg *Cfg) error {
 	cinics := []collector.CollectiniCreator{
 		&registryCollectiniCreator{
 			fs:    fs,
-			rcc:   &registryClientCreator{url: cfg.Registry},
+			cc:    clientcreator.New(fs, cfg.Registry),
 			cache: cfg.Cache,
 			gc:    gaggle.New(),
 		},
-		collector.NewCollectiniAccessor(
+		&dumbCollectiniCreator{
 			scanner.New(fs, cfg.Root, i),
-		),
-		collector.NewCollectiniAccessor(
+		},
+		&dumbCollectiniCreator{
 			sorter.New(),
-		),
+		},
 	}
 	cc := &collectorCreator{ctx: ctx, cinics: cinics}
 	cleaner := cleaner.New(fs, ui)
