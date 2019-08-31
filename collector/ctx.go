@@ -55,7 +55,6 @@ func (c *Ctx) AddLibrary(include string, libN *node.Node) {
 	c.libraries[include] = append(libraries, libN)
 }
 
-func (c *Ctx) Libraries(include string) ([]*node.Node, bool) {
-	libraries, ok := c.libraries[include]
-	return libraries, ok
+func (c *Ctx) Libraries(include string) []*node.Node {
+	return c.libraries[include]
 }

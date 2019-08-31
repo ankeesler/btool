@@ -22,6 +22,7 @@ func main() {
 
 func run() error {
 	loglevel := flag.String("loglevel", "info", "Verbosity of log")
+	// TODO: change -loglevel to -debug
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", ".btool", "Cache directory")
 	target := flag.String("target", "main", "Target to build")

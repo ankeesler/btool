@@ -221,7 +221,9 @@ func (s *Scanner) addHeaders(n *node.Node, state *state) error {
 			return errors.Wrap(err, "exists")
 		} else if exists {
 			headerN = node.New(rootRelInclude)
-			state.includePaths = append(state.includePaths, s.root)
+			if !contains(state.includePaths, s.root) {
+				state.includePaths = append(state.includePaths, s.root)
+			}
 		} else if exists, err = afero.Exists(s.fs, dirRelInclude); err != nil {
 			return errors.Wrap(err, "exists")
 		} else if exists {
@@ -229,9 +231,10 @@ func (s *Scanner) addHeaders(n *node.Node, state *state) error {
 		} else if headerN = s.headerForInclude(include, state); headerN != nil {
 			includePath := strings.ReplaceAll(headerN.Name, include, "")
 			state.includePaths = append(state.includePaths, includePath)
+
 			log.Debugf("added include path %s", includePath)
 
-			if libraries, ok := state.ctx.Libraries(include); ok {
+			if libraries := state.ctx.Libraries(include); libraries != nil {
 				log.Debugf("adding libraries %s for include %s", libraries, include)
 				state.libraries = append(state.libraries, libraries...)
 			}
@@ -260,4 +263,13 @@ func (s *Scanner) headerForInclude(include string, state *state) *node.Node {
 		}
 	}
 	return nil
+}
+
+func contains(ss []string, s string) bool {
+	for i := range ss {
+		if ss[i] == s {
+			return true
+		}
+	}
+	return false
 }

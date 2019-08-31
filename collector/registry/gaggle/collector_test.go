@@ -26,9 +26,9 @@ func TestCollectorCollect(t *testing.T) {
 
 	g := &registry.Gaggle{
 		Metadata: map[string]interface{}{
-			"includePaths": map[string]string{
-				"a.h": "include/dir",
-				"b.h": "another/include/dir",
+			"includePaths": []string{
+				"include/dir",
+				"another/include/dir",
 			},
 			"libraries": map[string]string{
 				"a.h": "a.a",
@@ -52,7 +52,7 @@ func TestCollectorCollect(t *testing.T) {
 			},
 			&registry.Node{
 				Name:         "a.a",
-				Dependencies: []string{"a.a"},
+				Dependencies: []string{"a.o"},
 				Resolver: registry.Resolver{
 					Name: "linkC",
 				},
@@ -77,9 +77,19 @@ func TestCollectorCollect(t *testing.T) {
 	assert.Equal(
 		t,
 		[]string{
-			"include/dir",
+			"/some/root/include/dir",
+			"/some/root/another/include/dir",
 		},
 		rf.NewCompileCArgsForCall(0),
+	)
+
+	assert.Equal(
+		t,
+		[]string{
+			"/some/root/include/dir",
+			"/some/root/another/include/dir",
+		},
+		ctx.IncludePaths(),
 	)
 
 	assert.Equal(
@@ -87,6 +97,6 @@ func TestCollectorCollect(t *testing.T) {
 		[]*node.Node{
 			nodeAA,
 		},
-		ctx.Libraries(nodeAC),
+		ctx.Libraries("a.h"),
 	)
 }

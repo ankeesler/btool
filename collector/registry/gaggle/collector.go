@@ -56,7 +56,7 @@ func (c *Collector) Collect(
 			}
 
 			if dN == nil {
-				return fmt.Errorf("cannot find dependency %s/%s of %s", d, dName, n)
+				return fmt.Errorf("cannot find dependency %s of %s", d, n)
 			}
 			nN.Dependency(dN)
 		}
