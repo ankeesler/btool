@@ -59,6 +59,10 @@ type state struct {
 func (s *Scanner) Collect(ctx *collector.Ctx, start *node.Node) error {
 	_, err := s.add(start, &state{
 		ctx: ctx,
+
+		includePaths: make([]string, 0),
+		libraries:    make([]*node.Node, 0),
+		objects:      make([]*node.Node, 0),
 	})
 	return err
 }
