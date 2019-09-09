@@ -84,11 +84,11 @@ func (s *Scanner) add(n *node.Node, state *state) (bool, error) {
 	ext := filepath.Ext(n.Name)
 	switch ext {
 	case "":
-		err = s.onExecutable(n, state)
+		err = s.onExe(n, state)
 	//case ".a":
 	//	err = s.onLibrary(n, state)
 	case ".o":
-		err = s.onObject(n, state)
+		err = s.onObj(n, state)
 	case ".c", ".cc":
 		err = s.onSource(n, state)
 	case ".h":
@@ -100,10 +100,18 @@ func (s *Scanner) add(n *node.Node, state *state) (bool, error) {
 	return true, err
 }
 
-// the path currently goes like this:
-//   executable -> source -> header -> source -> header ... -> object
+// this is a depth first walk, so the path currently goes like this:
+//   1. exe
+//   2. source a (exe + .c or .cc)
+//   3. headers from source a
+//   4.
+//   exe -> source -> header -> source -> header ... -> object
+//   exe
+//   . source
+//   . . header
+//   . source (from above header)
 
-func (s *Scanner) onExecutable(n *node.Node, state *state) error {
+func (s *Scanner) onExe(n *node.Node, state *state) error {
 	if err := s.addSource(n, state); err != nil {
 		return errors.Wrap(err, "add source")
 	}
@@ -127,7 +135,7 @@ func (s *Scanner) onExecutable(n *node.Node, state *state) error {
 	return nil
 }
 
-func (s *Scanner) onObject(n *node.Node, state *state) error {
+func (s *Scanner) onObj(n *node.Node, state *state) error {
 	if state.cc {
 		n.Resolver = state.ctx.RF.NewCompileCC(state.includePaths)
 	} else {

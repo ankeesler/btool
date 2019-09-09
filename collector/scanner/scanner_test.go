@@ -113,6 +113,44 @@ func TestScannerCollect(t *testing.T) {
 			},
 			cc: true,
 		},
+		{
+			name:   "DependencyIncludePath",
+			target: "a",
+			root:   "",
+			exNFunc: func(ctx *collector.Ctx) *node.Node {
+				// a -> b -> lib
+				libH := node.New(".btool/abc123/lib.h")
+
+				bHN := node.New("b.h").Dependency(libH)
+				bCN := node.New("b.c").Dependency(bHN)
+				bON := node.New("b.o").Dependency(bCN)
+				bON.Resolver = compileCR
+
+				aHN := node.New("a.h")
+				aCN := node.New("a.c").Dependency(aHN, bHN)
+				aON := node.New("a.o").Dependency(aCN)
+				aON.Resolver = compileCCR
+
+				aN := node.New("a").Dependency(bON, aON)
+				aN.Resolver = linkCR
+
+				ctx.AddIncludePath(".btool/abc123")
+				ctx.NS.Add(libH)
+
+				return aN
+			},
+			exIncludePaths: [][]string{
+				[]string{ // b.c
+					"",
+					".btool/abc123/",
+				},
+				[]string{ // a.c
+					"",
+					".btool/abc123/",
+				},
+			},
+			cc: false,
+		},
 	}
 	for _, datum := range data {
 		t.Run(datum.name, func(t *testing.T) {
