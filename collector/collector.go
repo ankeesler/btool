@@ -18,6 +18,9 @@ type Collectini interface {
 
 // Collector is a type that can build a node.Node graph. It does this via
 // Collectini's that each provide a different part of the node.Node graph.
+//
+// Each node.Node that a Collectini provides should have its Dependencies and
+// Resolver set property. No partial node.Node's!
 type Collector struct {
 	ctx    *Ctx
 	ctinis []Collectini

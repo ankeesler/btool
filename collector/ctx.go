@@ -1,6 +1,9 @@
 package collector
 
 import (
+	"path/filepath"
+
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 )
 
@@ -45,6 +48,17 @@ func (c *Ctx) AddIncludePath(includePath string) {
 
 func (c *Ctx) IncludePaths() []string {
 	return c.includePaths
+}
+
+func (c *Ctx) HeaderForInclude(include string) *node.Node {
+	for _, includePath := range c.includePaths {
+		header := filepath.Join(includePath, include)
+		log.Debugf("does %s exist", header)
+		if headerN := c.NS.Find(header); headerN != nil {
+			return headerN
+		}
+	}
+	return nil
 }
 
 func (c *Ctx) AddLibrary(include string, libN *node.Node) {

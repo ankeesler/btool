@@ -12,17 +12,19 @@ func TestCtx(t *testing.T) {
 	// a -> b, c
 	// b -> c
 	// c
-	cN := node.New("c")
+	cN := node.New("c-inc/c")
 	bN := node.New("b").Dependency(cN)
 	aN := node.New("a").Dependency(bN, cN)
 
 	ns := collector.NewNodeStore(nil)
+	ns.Add(cN)
 	ctx := collector.NewCtx(ns, nil)
 
 	ctx.AddIncludePath("a-inc")
 	ctx.AddIncludePath("b-inc")
 	ctx.AddIncludePath("c-inc")
 	assert.Equal(t, []string{"a-inc", "b-inc", "c-inc"}, ctx.IncludePaths())
+	assert.Equal(t, cN, ctx.HeaderForInclude("c"))
 
 	ctx.AddLibrary("a-inc", aN)
 	ctx.AddLibrary("a-inc", bN)

@@ -25,10 +25,12 @@ func NewNodeStore(w Watcher) *NodeStore {
 	}
 }
 
-func (ns *NodeStore) Add(n *node.Node) {
-	ns.nodes[n.Name] = n
-	if ns.w != nil {
-		ns.w.OnAdd(n)
+func (ns *NodeStore) Add(nodes ...*node.Node) {
+	for _, n := range nodes {
+		ns.nodes[n.Name] = n
+		if ns.w != nil {
+			ns.w.OnAdd(n)
+		}
 	}
 }
 
