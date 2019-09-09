@@ -104,12 +104,19 @@ func (s *Scanner) add(n *node.Node, state *state) (bool, error) {
 //   1. exe
 //   2. source a (exe + .c or .cc)
 //   3. headers from source a
-//   4.
-//   exe -> source -> header -> source -> header ... -> object
-//   exe
-//   . source
-//   . . header
-//   . source (from above header)
+//   4. source b, c, ... (headers s/.c/.h/ or s/.cc/.h/)
+//
+// a walk for might look like
+//   1. main
+//   2. . main.c
+//   3. . . dep-0.h
+//   4. . . . dep-0.c
+//   5. . . . . dep-0.o
+//   5. . . dep-1.h
+//   6. . . . dep-1.c
+//   7. . . . . dep-0.h (already added)
+//   8. . . . . dep-1.o
+//   9. . . main.o
 
 func (s *Scanner) onExe(n *node.Node, state *state) error {
 	if err := s.addSource(n, state); err != nil {
