@@ -3,9 +3,9 @@ package scanner_test
 import (
 	"testing"
 
-	collector "github.com/ankeesler/btool/collector0"
 	"github.com/ankeesler/btool/collector0/scanner"
 	"github.com/ankeesler/btool/collector0/scanner/scannerfakes"
+	"github.com/ankeesler/btool/collector0/testutil"
 	"github.com/ankeesler/btool/node"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -24,20 +24,19 @@ func TestScannerProduce(t *testing.T) {
 
 	s := scanner.New(w, "root", []string{"some-exts"})
 
-	acStore := collector.NewStore()
-	require.Nil(t, s.Produce(acStore))
-
-	exStore := collector.NewStore()
 	exNodes := makeExNodes(files)
-	for _, exN := range exNodes {
-		exStore.Add(exN)
-	}
-	assert.Equal(t, exStore, acStore)
+	store := testutil.FakeStore(exNodes...)
+	require.Nil(t, s.Produce(store))
 
 	assert.Equal(t, 1, w.WalkCallCount())
 	acRoot, acExts := w.WalkArgsForCall(0)
 	assert.Equal(t, "root", acRoot)
 	assert.Equal(t, []string{"some-exts"}, acExts)
+
+	assert.Equal(t, 5, store.SetCallCount())
+	for i := range files {
+		assert.Equal(t, exNodes[i], store.SetArgsForCall(i))
+	}
 }
 
 func makeExNodes(files []string) []*node.Node {

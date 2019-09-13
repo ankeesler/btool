@@ -64,6 +64,7 @@ func (i *Includes) resolveInclude(
 		return d, nil
 	}
 
+	// TODO: this is ugly! We could pick up the wrong include based on suffix!
 	var includePath string
 	s.ForEach(func(sn *node.Node) {
 		if d != nil {

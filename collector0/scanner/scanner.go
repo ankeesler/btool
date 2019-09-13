@@ -32,14 +32,14 @@ func New(w Walker, root string, exts []string) *Scanner {
 	}
 }
 
-func (s *Scanner) Produce(store *collector.Store) error {
+func (s *Scanner) Produce(store collector.Store) error {
 	files, err := s.w.Walk(s.root, s.exts)
 	if err != nil {
 		return errors.Wrap(err, "walk")
 	}
 
 	for _, file := range files {
-		store.Add(node.New(file))
+		store.Set(node.New(file))
 	}
 
 	return nil
