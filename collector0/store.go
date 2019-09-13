@@ -1,4 +1,4 @@
-package prodcon
+package collector
 
 import "github.com/ankeesler/btool/node"
 

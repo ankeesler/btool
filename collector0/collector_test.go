@@ -1,10 +1,10 @@
-package prodcon_test
+package collector_test
 
 import (
 	"testing"
 
-	"github.com/ankeesler/btool/collector/prodcon"
-	"github.com/ankeesler/btool/collector/prodcon/prodconfakes"
+	collector "github.com/ankeesler/btool/collector0"
+	collectorfakes "github.com/ankeesler/btool/collector0/collector0fakes"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/go-test/deep"
@@ -12,31 +12,31 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPCCollect(t *testing.T) {
-	p0 := &prodconfakes.FakeProducer{}
+func TestCollectorCollect(t *testing.T) {
+	p0 := &collectorfakes.FakeProducer{}
 	p0n0 := node.New("p0n0")
 	p0n1 := node.New("p0n1")
-	p0.ProduceStub = func(s *prodcon.Store) error {
+	p0.ProduceStub = func(s *collector.Store) error {
 		s.Add(p0n0)
 		s.Add(p0n1)
 		return nil
 	}
-	p1 := &prodconfakes.FakeProducer{}
+	p1 := &collectorfakes.FakeProducer{}
 	p1n0 := node.New("p1n0")
 	p1n1 := node.New("p1n1")
-	p1.ProduceStub = func(s *prodcon.Store) error {
+	p1.ProduceStub = func(s *collector.Store) error {
 		s.Add(p1n0)
 		s.Add(p1n1)
 		return nil
 	}
-	producers := []prodcon.Producer{p0, p1}
+	producers := []collector.Producer{p0, p1}
 
-	c0 := &prodconfakes.FakeConsumer{}
+	c0 := &collectorfakes.FakeConsumer{}
 	c0n0 := node.New("c0n0")
 	c0n1 := node.New("c0n1")
-	c0.ConsumeStub = func(s *prodcon.Store, diff *prodcon.Diff) error {
+	c0.ConsumeStub = func(s *collector.Store, diff *collector.Diff) error {
 		log.Debugf("c0.Consume %s", diff)
-		assert.Equal(t, prodcon.DiffAdd, diff.Type)
+		assert.Equal(t, collector.DiffAdd, diff.Type)
 		if diff.Name == "p0n0" {
 			s.Add(c0n0)
 		} else if diff.Name == "p0n1" {
@@ -44,13 +44,13 @@ func TestPCCollect(t *testing.T) {
 		}
 		return nil
 	}
-	c1 := &prodconfakes.FakeConsumer{}
+	c1 := &collectorfakes.FakeConsumer{}
 	c1n0 := node.New("c1n0")
 	c1n1 := node.New("c1n1")
-	c1.ConsumeStub = func(s *prodcon.Store, diff *prodcon.Diff) error {
+	c1.ConsumeStub = func(s *collector.Store, diff *collector.Diff) error {
 		log.Debugf("c1.Consume %s", diff)
 
-		assert.Equal(t, prodcon.DiffAdd, diff.Type)
+		assert.Equal(t, collector.DiffAdd, diff.Type)
 		if diff.Name == "p1n0" {
 			s.Add(c1n0)
 		} else if diff.Name == "p1n1" {
@@ -58,11 +58,11 @@ func TestPCCollect(t *testing.T) {
 		}
 		return nil
 	}
-	consumers := []prodcon.Consumer{c0, c1}
+	consumers := []collector.Consumer{c0, c1}
 
-	acS := prodcon.NewStore()
-	pc := prodcon.New(acS, producers, consumers)
-	require.Nil(t, pc.Run())
+	acS := collector.NewStore()
+	c := collector.New(acS, producers, consumers)
+	require.Nil(t, c.Collect(nil))
 
 	assert.Equal(t, 1, p0.ProduceCallCount())
 	assert.Equal(t, 1, p1.ProduceCallCount())
@@ -82,7 +82,7 @@ func TestPCCollect(t *testing.T) {
 	assertDiff(t, c1, 4, "c0n0")
 	assertDiff(t, c1, 5, "c0n1")
 
-	exS := prodcon.NewStore()
+	exS := collector.NewStore()
 	exS.Add(p0n0)
 	exS.Add(p0n1)
 	exS.Add(p1n0)
@@ -96,12 +96,12 @@ func TestPCCollect(t *testing.T) {
 
 func assertDiff(
 	t *testing.T,
-	c *prodconfakes.FakeConsumer,
+	c *collectorfakes.FakeConsumer,
 	call int,
 	exName string,
 ) {
-	exDiff := &prodcon.Diff{
-		Type: prodcon.DiffAdd,
+	exDiff := &collector.Diff{
+		Type: collector.DiffAdd,
 		Name: exName,
 	}
 	_, acDiff := c.ConsumeArgsForCall(call)

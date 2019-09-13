@@ -1,15 +1,15 @@
-package prodcon_test
+package collector_test
 
 import (
 	"testing"
 
-	"github.com/ankeesler/btool/collector/prodcon"
+	collector "github.com/ankeesler/btool/collector0"
 	"github.com/ankeesler/btool/node"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStore(t *testing.T) {
-	s := prodcon.NewStore()
+	s := collector.NewStore()
 	n0 := node.New("0")
 	n1 := node.New("1")
 	n2 := node.New("2")

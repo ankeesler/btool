@@ -1,9 +1,9 @@
-// Package prodcon provides a producer/consumer framework that can act as a
-// collector.
+// Package collector provides a producer/consumer framework that can act as a
+// node.Node graph builder.
 //
 // Producer's add node.Node's to a Store. Consumer's are notified of node.Node's
 // being added to the Store. A Store is just a place where node.Node's are kept.
-package prodcon
+package collector
 
 import (
 	"fmt"
@@ -54,53 +54,53 @@ type Consumer interface {
 	Consume(*Store, *Diff) error
 }
 
-// PC (i.e., "prodcon") is an object that will run Producer's and Consumer's.
+// Collector is an object that will run Producer's and Consumer's in order to
+// build a node.Node graph.
 //
-// This particular "prodcon" is very synchronus. It will:
+// This particular procedure is very synchronus. It will:
 //   1. run each Producer to completion
 //   2. run all Consumer's on every Diff from a Producer
 //   3. run all Consumer's on every Diff from a Consumer that isn't their own
 //   4. repeat 4 until there are no more Diff's left
-type PC struct {
+type Collector struct {
 	s         *Store
 	producers []Producer
 	consumers []Consumer
 }
 
-// New creates a new PC.
-func New(s *Store, producers []Producer, consumers []Consumer) *PC {
-	return &PC{
+// New creates a new Collector.
+func New(s *Store, producers []Producer, consumers []Consumer) *Collector {
+	return &Collector{
 		s:         s,
 		producers: producers,
 		consumers: consumers,
 	}
 }
 
-// Run runs the PC.
-func (pc *PC) Run() error {
-	diffs, err := pc.produce()
+func (c *Collector) Collect(n *node.Node) error {
+	diffs, err := c.produce()
 	if err != nil {
 		return errors.Wrap(err, "produce")
 	}
 
-	if err := pc.consume(diffs); err != nil {
+	if err := c.consume(diffs); err != nil {
 		return errors.Wrap(err, "consume")
 	}
 
 	return nil
 }
 
-func (pc *PC) produce() ([]*Diff, error) {
+func (c *Collector) produce() ([]*Diff, error) {
 	diffs := make([]*Diff, 0)
-	pc.s.addCallback = func(n *node.Node) {
+	c.s.addCallback = func(n *node.Node) {
 		diffs = append(diffs, &Diff{
 			Type: DiffAdd,
 			Name: n.Name,
 		})
 	}
 
-	for i, p := range pc.producers {
-		if err := p.Produce(pc.s); err != nil {
+	for i, p := range c.producers {
+		if err := p.Produce(c.s); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("producer #%d", i))
 		}
 	}
@@ -108,7 +108,7 @@ func (pc *PC) produce() ([]*Diff, error) {
 	return diffs, nil
 }
 
-func (pc *PC) consume(diffs []*Diff) error {
+func (collector *Collector) consume(diffs []*Diff) error {
 	var from, to int
 	consumerDiffs := make(map[int]Consumer)
 	for {
@@ -121,12 +121,12 @@ func (pc *PC) consume(diffs []*Diff) error {
 		}
 
 		for ; from < to; from++ {
-			for i, c := range pc.consumers {
+			for i, c := range collector.consumers {
 				if consumerDiffs[from] == c {
 					continue
 				}
 
-				pc.s.addCallback = func(n *node.Node) {
+				collector.s.addCallback = func(n *node.Node) {
 					diff := &Diff{
 						Type: DiffAdd,
 						Name: n.Name,
@@ -136,7 +136,7 @@ func (pc *PC) consume(diffs []*Diff) error {
 				}
 
 				diff := diffs[from]
-				if err := c.Consume(pc.s, diff); err != nil {
+				if err := c.Consume(collector.s, diff); err != nil {
 					return errors.Wrap(err, fmt.Sprintf("consumer #%d, diff %s", i, diff))
 				}
 			}
