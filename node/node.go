@@ -24,9 +24,12 @@ type Resolver interface {
 //
 // It has a list of Dependencies of other Node's. It also has a Resolver that
 // is in charge of bringing it into existence on disk.
+//
+// A Node also has a simple map of Labels to which clients can attach metadata.
 type Node struct {
 	Name         string
 	Dependencies []*Node
+	Labels       map[string]string
 	Resolver
 }
 
@@ -35,6 +38,7 @@ func New(name string) *Node {
 	return &Node{
 		Name:         name,
 		Dependencies: make([]*Node, 0),
+		Labels:       make(map[string]string),
 	}
 }
 

@@ -5,14 +5,15 @@ import (
 	"sync"
 
 	collector "github.com/ankeesler/btool/collector0"
+	"github.com/ankeesler/btool/node"
 )
 
 type FakeConsumer struct {
-	ConsumeStub        func(*collector.Store, *collector.Diff) error
+	ConsumeStub        func(collector.Store, *node.Node) error
 	consumeMutex       sync.RWMutex
 	consumeArgsForCall []struct {
-		arg1 *collector.Store
-		arg2 *collector.Diff
+		arg1 collector.Store
+		arg2 *node.Node
 	}
 	consumeReturns struct {
 		result1 error
@@ -24,12 +25,12 @@ type FakeConsumer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeConsumer) Consume(arg1 *collector.Store, arg2 *collector.Diff) error {
+func (fake *FakeConsumer) Consume(arg1 collector.Store, arg2 *node.Node) error {
 	fake.consumeMutex.Lock()
 	ret, specificReturn := fake.consumeReturnsOnCall[len(fake.consumeArgsForCall)]
 	fake.consumeArgsForCall = append(fake.consumeArgsForCall, struct {
-		arg1 *collector.Store
-		arg2 *collector.Diff
+		arg1 collector.Store
+		arg2 *node.Node
 	}{arg1, arg2})
 	fake.recordInvocation("Consume", []interface{}{arg1, arg2})
 	fake.consumeMutex.Unlock()
@@ -49,13 +50,13 @@ func (fake *FakeConsumer) ConsumeCallCount() int {
 	return len(fake.consumeArgsForCall)
 }
 
-func (fake *FakeConsumer) ConsumeCalls(stub func(*collector.Store, *collector.Diff) error) {
+func (fake *FakeConsumer) ConsumeCalls(stub func(collector.Store, *node.Node) error) {
 	fake.consumeMutex.Lock()
 	defer fake.consumeMutex.Unlock()
 	fake.ConsumeStub = stub
 }
 
-func (fake *FakeConsumer) ConsumeArgsForCall(i int) (*collector.Store, *collector.Diff) {
+func (fake *FakeConsumer) ConsumeArgsForCall(i int) (collector.Store, *node.Node) {
 	fake.consumeMutex.RLock()
 	defer fake.consumeMutex.RUnlock()
 	argsForCall := fake.consumeArgsForCall[i]

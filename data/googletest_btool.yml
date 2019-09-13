@@ -25,11 +25,6 @@ nodes:
     - googletest-release-1.8.1.zip
   resolver:
     name: unzip
-- name: googletest-release-1.8.1/googletest/src/gtest_main.cc
-  dependencies:
-    - googletest-release-1.8.1.zip
-  resolver:
-    name: unzip
 
 # Sources
 - name: googletest-release-1.8.1/googletest/src/gtest-all.cc

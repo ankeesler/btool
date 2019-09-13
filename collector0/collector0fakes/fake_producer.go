@@ -8,10 +8,10 @@ import (
 )
 
 type FakeProducer struct {
-	ProduceStub        func(*collector.Store) error
+	ProduceStub        func(collector.Store) error
 	produceMutex       sync.RWMutex
 	produceArgsForCall []struct {
-		arg1 *collector.Store
+		arg1 collector.Store
 	}
 	produceReturns struct {
 		result1 error
@@ -23,11 +23,11 @@ type FakeProducer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeProducer) Produce(arg1 *collector.Store) error {
+func (fake *FakeProducer) Produce(arg1 collector.Store) error {
 	fake.produceMutex.Lock()
 	ret, specificReturn := fake.produceReturnsOnCall[len(fake.produceArgsForCall)]
 	fake.produceArgsForCall = append(fake.produceArgsForCall, struct {
-		arg1 *collector.Store
+		arg1 collector.Store
 	}{arg1})
 	fake.recordInvocation("Produce", []interface{}{arg1})
 	fake.produceMutex.Unlock()
@@ -47,13 +47,13 @@ func (fake *FakeProducer) ProduceCallCount() int {
 	return len(fake.produceArgsForCall)
 }
 
-func (fake *FakeProducer) ProduceCalls(stub func(*collector.Store) error) {
+func (fake *FakeProducer) ProduceCalls(stub func(collector.Store) error) {
 	fake.produceMutex.Lock()
 	defer fake.produceMutex.Unlock()
 	fake.ProduceStub = stub
 }
 
-func (fake *FakeProducer) ProduceArgsForCall(i int) *collector.Store {
+func (fake *FakeProducer) ProduceArgsForCall(i int) collector.Store {
 	fake.produceMutex.RLock()
 	defer fake.produceMutex.RUnlock()
 	argsForCall := fake.produceArgsForCall[i]

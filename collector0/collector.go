@@ -2,7 +2,7 @@
 // node.Node graph builder.
 //
 // Producer's add node.Node's to a Store. Consumer's are notified of node.Node's
-// being added to the Store. A Store is just a place where node.Node's are kept.
+// being Set() to the Store. A Store is just a place where node.Node's are kept.
 package collector
 
 import (
@@ -13,45 +13,36 @@ import (
 	"github.com/pkg/errors"
 )
 
+// These Labels are applied to node.Node's of all kinds.
+const (
+	LabelRoot = "io.btool.root"
+)
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Store
+
+// Store is a place where node.Node's are kept.
+//
+// It has a simple idempotent interface. Set()'ing a node.Node for the first time
+// will create it, setting a node.Node for the second time will update it.
+type Store interface {
+	Get(string) *node.Node
+	Set(*node.Node)
+	ForEach(func(*node.Node))
+}
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Producer
 
 // Producer is a type that adds node.Node's to a Store.
 type Producer interface {
-	Produce(*Store) error
-}
-
-// Type of the CRUD action on a node.Node.
-type DiffType int
-
-const (
-	// A node.Node has been added.
-	DiffAdd DiffType = iota
-)
-
-// Diff describes a change to a node.Node.
-type Diff struct {
-	Type DiffType
-
-	// Name of the node.Node that has been CRUD'd.
-	Name string
-}
-
-func (d *Diff) String() string {
-	var teyep string
-	switch d.Type {
-	case DiffAdd:
-		teyep = "DiffAdd"
-	default:
-		teyep = "???"
-	}
-	return fmt.Sprintf("%s:%s", teyep, d.Name)
+	Produce(Store) error
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Consumer
 
 // Consumer is a type that reacts to Producer's adding node.Node's to a Store.
+// The Consumer is provided the node.Node that was Set() on the Store.
 type Consumer interface {
-	Consume(*Store, *Diff) error
+	Consume(Store, *node.Node) error
 }
 
 // Collector is an object that will run Producer's and Consumer's in order to
@@ -59,19 +50,19 @@ type Consumer interface {
 //
 // This particular procedure is very synchronus. It will:
 //   1. run each Producer to completion
-//   2. run all Consumer's on every Diff from a Producer
-//   3. run all Consumer's on every Diff from a Consumer that isn't their own
-//   4. repeat 4 until there are no more Diff's left
+//   2. run all Consumer's on every Store.Set() from a Producer
+//   3. run all Consumer's on every Store.Set() from a Consumer that isn't their own
+//   4. repeat 4 until there are no more new Store.Set() calls
 type Collector struct {
-	s         *Store
+	s         *store
 	producers []Producer
 	consumers []Consumer
 }
 
 // New creates a new Collector.
-func New(s *Store, producers []Producer, consumers []Consumer) *Collector {
+func New(producers []Producer, consumers []Consumer) *Collector {
 	return &Collector{
-		s:         s,
+		s:         newStore(),
 		producers: producers,
 		consumers: consumers,
 	}
@@ -90,13 +81,10 @@ func (c *Collector) Collect(n *node.Node) error {
 	return nil
 }
 
-func (c *Collector) produce() ([]*Diff, error) {
-	diffs := make([]*Diff, 0)
-	c.s.addCallback = func(n *node.Node) {
-		diffs = append(diffs, &Diff{
-			Type: DiffAdd,
-			Name: n.Name,
-		})
+func (c *Collector) produce() ([]*node.Node, error) {
+	setCalls := make([]*node.Node, 0)
+	c.s.setCallback = func(n *node.Node) {
+		setCalls = append(setCalls, n)
 	}
 
 	for i, p := range c.producers {
@@ -105,39 +93,35 @@ func (c *Collector) produce() ([]*Diff, error) {
 		}
 	}
 
-	return diffs, nil
+	return setCalls, nil
 }
 
-func (collector *Collector) consume(diffs []*Diff) error {
+func (collector *Collector) consume(setCalls []*node.Node) error {
 	var from, to int
-	consumerDiffs := make(map[int]Consumer)
+	consumerSetCalls := make(map[int]Consumer)
 	for {
 		from = to
-		to = len(diffs)
+		to = len(setCalls)
 		if from == to {
 			break
 		} else {
-			log.Debugf("consuming diffs %d:%d", from, to)
+			log.Debugf("consuming setCalls %d:%d", from, to)
 		}
 
 		for ; from < to; from++ {
 			for i, c := range collector.consumers {
-				if consumerDiffs[from] == c {
+				if consumerSetCalls[from] == c {
 					continue
 				}
 
-				collector.s.addCallback = func(n *node.Node) {
-					diff := &Diff{
-						Type: DiffAdd,
-						Name: n.Name,
-					}
-					diffs = append(diffs, diff)
-					consumerDiffs[len(diffs)-1] = c
+				collector.s.setCallback = func(n *node.Node) {
+					setCalls = append(setCalls, n)
+					consumerSetCalls[len(setCalls)-1] = c
 				}
 
-				diff := diffs[from]
-				if err := c.Consume(collector.s, diff); err != nil {
-					return errors.Wrap(err, fmt.Sprintf("consumer #%d, diff %s", i, diff))
+				setCall := setCalls[from]
+				if err := c.Consume(collector.s, setCall); err != nil {
+					return errors.Wrap(err, fmt.Sprintf("consumer #%d, setCall %s", i, setCall))
 				}
 			}
 		}
