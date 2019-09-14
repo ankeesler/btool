@@ -13,11 +13,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// These Labels are applied to node.Node's of all kinds.
-const (
-	LabelRoot = "io.btool.root"
-)
-
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Store
 
 // Store is a place where node.Node's are kept.

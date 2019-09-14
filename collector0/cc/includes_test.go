@@ -3,7 +3,6 @@ package cc_test
 import (
 	"testing"
 
-	collector "github.com/ankeesler/btool/collector0"
 	"github.com/ankeesler/btool/collector0/cc"
 	"github.com/ankeesler/btool/collector0/cc/ccfakes"
 	"github.com/ankeesler/btool/collector0/testutil"
@@ -22,7 +21,6 @@ func TestIncludesConsume(t *testing.T) {
 	bh := node.New("some/path/to/root/b/b.h")
 	gtesth := node.New("deps/path/gtest/gtest.h")
 	ac := node.New("some/path/to/root/a/a.c")
-	ac.Labels[collector.LabelRoot] = "some/path/to/root"
 	s := testutil.FakeStore(ah, bh, gtesth, ac)
 
 	require.Nil(t, i.Consume(s, ac))
