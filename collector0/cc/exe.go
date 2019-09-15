@@ -86,6 +86,11 @@ func collectObjs(
 		}
 
 		src := s.Get(strings.ReplaceAll(d.Name, ".h", ext))
+		if src == nil {
+			log.Debugf("skipping header-only dependency %s", d.Name)
+			continue
+		}
+
 		if err := collectObjs(s, src, ext, objs); err != nil {
 			return err
 		}

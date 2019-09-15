@@ -69,6 +69,29 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 
+	t.Run("LoneHeader", func(t *testing.T) {
+		r := &nodefakes.FakeResolver{}
+
+		rf := &ccfakes.FakeResolverFactory{}
+		rf.NewLinkCCReturnsOnCall(0, r)
+
+		e := cc.NewExe(rf)
+
+		masterh := node.New("master.h")
+		maincc.Dependency(masterh)
+		s := testutil.FakeStore(maino, maincc, ao, acc, ah, bo, bcc, bh, masterh)
+
+		main := node.New("main")
+		require.Nil(t, e.Consume(s, main))
+
+		assert.Equal(t, 1, rf.NewLinkCCCallCount())
+
+		assert.Equal(t, 1, s.SetCallCount())
+		exMain := node.New("main").Dependency(maino, bo, ao)
+		exMain.Resolver = r
+		assert.Equal(t, exMain, s.SetArgsForCall(0))
+	})
+
 	t.Run("Noop", func(t *testing.T) {
 		rf := &ccfakes.FakeResolverFactory{}
 		e := cc.NewExe(rf)
