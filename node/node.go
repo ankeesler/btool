@@ -48,6 +48,13 @@ func (n *Node) Dependency(d ...*Node) *Node {
 	return n
 }
 
+// Label adds a Label to a Node. It returns this Node so calls can be strung
+// together.
+func (n *Node) Label(k, v string) *Node {
+	n.Labels[k] = v
+	return n
+}
+
 // String returns a human-readable representation of a Node.
 func (n *Node) String() string {
 	return n.Name

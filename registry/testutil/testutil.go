@@ -9,11 +9,11 @@ func Index() *registry.Index {
 		Files: []registry.IndexFile{
 			registry.IndexFile{
 				Path:   "file_a_btool.yml",
-				SHA256: "bcd28f7fa81b695eea671c474c11d842410e1925f794d681ce85f9bd4675c0c0",
+				SHA256: "f66a9025bf3d41dad609ea5b90ffd0e8d72b50736f416a6c19e505de5c7f3129",
 			},
 			registry.IndexFile{
 				Path:   "some/path/to/file_b_btool.yml",
-				SHA256: "5d0418f0a8c7f380bc0fb1766d5766a2d2f5f468e552113c4242b1637597d781",
+				SHA256: "ec97db25b5a77e6b0f5ac8017d6125bd751e2a1d89b8463b7e8a3cc0b2300daa",
 			},
 		},
 	}
@@ -29,6 +29,7 @@ func FileAGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "tuna",
 				Dependencies: []string{},
+				Labels:       map[string]string{},
 				Resolver: registry.Resolver{
 					Name: "tuna-resolver",
 					Config: map[string]interface{}{
@@ -39,6 +40,7 @@ func FileAGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "fish",
 				Dependencies: []string{"tuna"},
+				Labels:       map[string]string{},
 				Resolver: registry.Resolver{
 					Name: "fish-resolver",
 					Config: map[string]interface{}{
@@ -60,6 +62,7 @@ func FileBGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "marlin",
 				Dependencies: []string{},
+				Labels:       map[string]string{},
 				Resolver: registry.Resolver{
 					Name: "marlin-resolver",
 					Config: map[string]interface{}{
@@ -70,6 +73,7 @@ func FileBGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "bacon",
 				Dependencies: []string{"marlin"},
+				Labels:       map[string]string{},
 				Resolver: registry.Resolver{
 					Name: "bacon-resolver",
 					Config: map[string]interface{}{

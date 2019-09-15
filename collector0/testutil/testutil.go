@@ -6,14 +6,15 @@ import (
 	"github.com/ankeesler/btool/node"
 )
 
-func FakeStore(nodes ...*node.Node) *collector0fakes.FakeStore {
+func FakeStore(initNodes ...*node.Node) *collector0fakes.FakeStore {
+	nodes := make(map[string]*node.Node)
+	for _, n := range initNodes {
+		nodes[n.Name] = n
+	}
+
 	s := &collector0fakes.FakeStore{}
 	s.GetStub = func(name string) *node.Node {
-		for _, n := range nodes {
-			if n.Name == name {
-				return n
-			}
-		}
+		return nodes[name]
 		return nil
 	}
 	s.ForEachStub = func(f func(*node.Node)) {
@@ -21,5 +22,9 @@ func FakeStore(nodes ...*node.Node) *collector0fakes.FakeStore {
 			f(n)
 		}
 	}
+	s.SetStub = func(n *node.Node) {
+		nodes[n.Name] = n
+	}
+
 	return s
 }
