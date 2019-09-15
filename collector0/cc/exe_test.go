@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TODO: this test is nondeterministic!
+
 func TestExe(t *testing.T) {
 	ah := node.New("a/a.h")
 	ac := node.New("a/a.c").Dependency(ah)

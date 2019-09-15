@@ -3,6 +3,7 @@ package scanner_test
 import (
 	"testing"
 
+	collector "github.com/ankeesler/btool/collector0"
 	"github.com/ankeesler/btool/collector0/scanner"
 	"github.com/ankeesler/btool/collector0/scanner/scannerfakes"
 	"github.com/ankeesler/btool/collector0/testutil"
@@ -42,7 +43,7 @@ func TestScannerProduce(t *testing.T) {
 func makeExNodes(files []string) []*node.Node {
 	nodes := make([]*node.Node, 0)
 	for _, file := range files {
-		nodes = append(nodes, node.New(file))
+		nodes = append(nodes, node.New(file).Label(collector.LabelLocal, "true"))
 	}
 	return nodes
 }

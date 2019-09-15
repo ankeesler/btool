@@ -13,6 +13,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+// These constants are node.Node Label's that are used throughout this framework.
+const (
+	LabelLocal = "io.btool.local"
+)
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Store
 
 // Store is a place where node.Node's are kept.
@@ -63,7 +68,7 @@ func New(producers []Producer, consumers []Consumer) *Collector {
 	}
 }
 
-func (c *Collector) Collect(n *node.Node) error {
+func (c *Collector) Collect() error {
 	diffs, err := c.produce()
 	if err != nil {
 		return errors.Wrap(err, "produce")
@@ -104,6 +109,7 @@ func (collector *Collector) consume(setCalls []*node.Node) error {
 		}
 
 		for ; from < to; from++ {
+			log.Debugf("consuming setCall %s", setCalls[from])
 			for i, c := range collector.consumers {
 				if consumerSetCalls[from] == c {
 					continue

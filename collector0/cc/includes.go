@@ -29,6 +29,16 @@ func NewIncludes(i Includeser) *Includes {
 }
 
 func (i *Includes) Consume(s collector.Store, n *node.Node) error {
+	ext := filepath.Ext(n.Name)
+	if ext != ".c" && ext != ".cc" && ext != ".h" {
+		return nil
+	}
+
+	// TODO: another string conversation mechanism needed here.
+	if l, ok := n.Labels[collector.LabelLocal]; !ok || l != "true" {
+		return nil
+	}
+
 	includes, err := i.i.Includes(n.Name)
 	if err != nil {
 		return errors.Wrap(err, "includes")
@@ -40,6 +50,7 @@ func (i *Includes) Consume(s collector.Store, n *node.Node) error {
 			return errors.Wrap(err, "resolve include")
 		}
 		n.Dependency(d)
+		log.Debugf("include dependency %s -> %s", n, d)
 	}
 
 	s.Set(n)

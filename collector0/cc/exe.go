@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	collector "github.com/ankeesler/btool/collector0"
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
@@ -37,9 +38,13 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 	var err error
 	objs := make(map[string]*node.Node)
 	if c != nil {
+		log.Debugf("exe %s has source %s", n, c)
+
 		err = collectObjs(s, c, ".c", objs)
 		r = e.rf.NewLinkC()
 	} else { // cc
+		log.Debugf("exe %s has source %s", n, cc)
+
 		err = collectObjs(s, cc, ".cc", objs)
 		r = e.rf.NewLinkCC()
 	}
@@ -73,6 +78,7 @@ func collectObjs(
 		return nil
 	}
 	objs[obj.Name] = obj
+	log.Debugf("remembering object %s", obj)
 
 	for _, d := range n.Dependencies {
 		if !strings.HasSuffix(d.Name, ".h") {

@@ -63,7 +63,6 @@ func TestBtoolRun(t *testing.T) {
 
 			assert.Equal(t, 1, cc.CreateCallCount())
 			assert.Equal(t, 1, c.CollectCallCount())
-			assert.Equal(t, datum.n, c.CollectArgsForCall(0))
 
 			assert.Equal(t, datum.cleanCallCount, cleaner.CleanCallCount())
 			if datum.cleanCallCount > 0 {

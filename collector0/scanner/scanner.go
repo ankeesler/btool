@@ -39,7 +39,7 @@ func (s *Scanner) Produce(store collector.Store) error {
 	}
 
 	for _, file := range files {
-		store.Set(node.New(file))
+		store.Set(node.New(file).Label(collector.LabelLocal, "true"))
 	}
 
 	return nil

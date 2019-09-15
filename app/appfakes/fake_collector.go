@@ -5,14 +5,12 @@ import (
 	"sync"
 
 	"github.com/ankeesler/btool/app"
-	"github.com/ankeesler/btool/node"
 )
 
 type FakeCollector struct {
-	CollectStub        func(*node.Node) error
+	CollectStub        func() error
 	collectMutex       sync.RWMutex
 	collectArgsForCall []struct {
-		arg1 *node.Node
 	}
 	collectReturns struct {
 		result1 error
@@ -24,16 +22,15 @@ type FakeCollector struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeCollector) Collect(arg1 *node.Node) error {
+func (fake *FakeCollector) Collect() error {
 	fake.collectMutex.Lock()
 	ret, specificReturn := fake.collectReturnsOnCall[len(fake.collectArgsForCall)]
 	fake.collectArgsForCall = append(fake.collectArgsForCall, struct {
-		arg1 *node.Node
-	}{arg1})
-	fake.recordInvocation("Collect", []interface{}{arg1})
+	}{})
+	fake.recordInvocation("Collect", []interface{}{})
 	fake.collectMutex.Unlock()
 	if fake.CollectStub != nil {
-		return fake.CollectStub(arg1)
+		return fake.CollectStub()
 	}
 	if specificReturn {
 		return ret.result1
@@ -48,17 +45,10 @@ func (fake *FakeCollector) CollectCallCount() int {
 	return len(fake.collectArgsForCall)
 }
 
-func (fake *FakeCollector) CollectCalls(stub func(*node.Node) error) {
+func (fake *FakeCollector) CollectCalls(stub func() error) {
 	fake.collectMutex.Lock()
 	defer fake.collectMutex.Unlock()
 	fake.CollectStub = stub
-}
-
-func (fake *FakeCollector) CollectArgsForCall(i int) *node.Node {
-	fake.collectMutex.RLock()
-	defer fake.collectMutex.RUnlock()
-	argsForCall := fake.collectArgsForCall[i]
-	return argsForCall.arg1
 }
 
 func (fake *FakeCollector) CollectReturns(result1 error) {

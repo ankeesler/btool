@@ -65,7 +65,7 @@ func TestCollectorCollect(t *testing.T) {
 	consumers := []collector.Consumer{c0, c1}
 
 	c := collector.New(producers, consumers)
-	require.Nil(t, c.Collect(acN))
+	require.Nil(t, c.Collect())
 
 	assert.Equal(t, 1, p0.ProduceCallCount())
 	assert.Equal(t, 1, p1.ProduceCallCount())

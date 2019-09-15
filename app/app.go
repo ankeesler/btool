@@ -12,7 +12,7 @@ import (
 
 // Collector creates a node.Node graph.
 type Collector interface {
-	Collect(*node.Node) error
+	Collect() error
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . CollectorCreator
@@ -73,7 +73,7 @@ func (a *App) Run(n *node.Node, clean, list, dryRun bool) error {
 		return errors.Wrap(err, "create")
 	}
 
-	if err := c.Collect(n); err != nil {
+	if err := c.Collect(); err != nil {
 		return errors.Wrap(err, "collect")
 	}
 

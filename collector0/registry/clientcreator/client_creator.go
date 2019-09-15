@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/ankeesler/btool/collector/registry"
+	"github.com/ankeesler/btool/collector0/registry"
 	"github.com/ankeesler/btool/log"
 	registrypkg "github.com/ankeesler/btool/registry"
 	"github.com/pkg/errors"

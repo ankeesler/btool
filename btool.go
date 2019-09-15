@@ -17,17 +17,19 @@ import (
 	"github.com/ankeesler/btool/builder"
 	"github.com/ankeesler/btool/builder/currenter"
 	"github.com/ankeesler/btool/cleaner"
-	"github.com/ankeesler/btool/collector"
-	"github.com/ankeesler/btool/collector/registry"
-	"github.com/ankeesler/btool/collector/registry/clientcreator"
-	"github.com/ankeesler/btool/collector/registry/gaggle"
 	"github.com/ankeesler/btool/collector/resolverfactory"
-	"github.com/ankeesler/btool/collector/scanner"
 	"github.com/ankeesler/btool/collector/scanner/includeser"
-	"github.com/ankeesler/btool/collector/sorter"
+	collector "github.com/ankeesler/btool/collector0"
+	"github.com/ankeesler/btool/collector0/cc"
+	"github.com/ankeesler/btool/collector0/registry"
+	"github.com/ankeesler/btool/collector0/registry/clientcreator"
+	"github.com/ankeesler/btool/collector0/registry/gaggle"
+	"github.com/ankeesler/btool/collector0/scanner"
+	"github.com/ankeesler/btool/collector0/scanner/walker"
 	"github.com/ankeesler/btool/lister"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/ui"
+	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
 
@@ -55,36 +57,51 @@ type Cfg struct {
 }
 
 type collectorCreator struct {
-	ctx    *collector.Ctx
-	cinics []collector.CollectiniCreator
+	fs       afero.Fs
+	rf       *resolverfactory.ResolverFactory
+	root     string
+	cache    string
+	targetN  *node.Node
+	registry string
 }
 
-func (cc *collectorCreator) Create() (app.Collector, error) {
-	return collector.NewCreator(cc.ctx, cc.cinics).Create()
-}
+func (ccreator *collectorCreator) Create() (app.Collector, error) {
+	rc := registry.NewCreator(
+		ccreator.fs,
+		clientcreator.New(ccreator.fs, ccreator.registry),
+		ccreator.cache,
+		gaggle.New(ccreator.rf),
+	)
+	r, err := rc.Create()
+	if err != nil {
+		return nil, errors.Wrap(err, "create registry")
+	}
+	s := scanner.New(
+		walker.New(),
+		ccreator.root,
+		[]string{
+			".c",
+			".cc",
+			".h",
+		},
+	)
+	t := collector.NewTrivialProducer(ccreator.targetN)
+	producers := []collector.Producer{
+		r,
+		s,
+		t,
+	}
 
-type registryCollectiniCreator struct {
-	fs    afero.Fs
-	cc    *clientcreator.Creator
-	cache string
-	gc    *gaggle.Collector
-}
+	i := cc.NewIncludes(includeser.New(ccreator.fs))
+	o := cc.NewObject(ccreator.rf)
+	e := cc.NewExe(ccreator.rf)
+	consumers := []collector.Consumer{
+		i,
+		o,
+		e,
+	}
 
-func (cc *registryCollectiniCreator) Create() (collector.Collectini, error) {
-	return registry.NewCreator(
-		cc.fs,
-		cc.cc,
-		cc.cache,
-		cc.gc,
-	).Create()
-}
-
-type dumbCollectiniCreator struct {
-	c collector.Collectini
-}
-
-func (dcc *dumbCollectiniCreator) Create() (collector.Collectini, error) {
-	return dcc.c, nil
+	return collector.New(producers, consumers), nil
 }
 
 // Run will run a btool invocation and produce a target.
@@ -96,8 +113,6 @@ func Run(cfg *Cfg) error {
 	ui := ui.New(cfg.Quiet)
 
 	fs := afero.NewOsFs()
-	ns := collector.NewNodeStore(ui)
-	i := includeser.New(fs)
 	rf := resolverfactory.New(
 		cfg.CompilerC,
 		cfg.CompilerCC,
@@ -106,29 +121,21 @@ func Run(cfg *Cfg) error {
 		cfg.LinkerCC,
 	)
 
-	ctx := collector.NewCtx(ns, rf)
+	target := filepath.Join(cfg.Root, cfg.Target)
+	targetN := node.New(target)
 
-	cinics := []collector.CollectiniCreator{
-		&registryCollectiniCreator{
-			fs:    fs,
-			cc:    clientcreator.New(fs, cfg.Registry),
-			cache: cfg.Cache,
-			gc:    gaggle.New(),
-		},
-		&dumbCollectiniCreator{
-			scanner.New(fs, cfg.Root, i),
-		},
-		&dumbCollectiniCreator{
-			sorter.New(),
-		},
+	cc := &collectorCreator{
+		fs:       fs,
+		rf:       rf,
+		root:     cfg.Root,
+		cache:    cfg.Cache,
+		targetN:  targetN,
+		registry: cfg.Registry,
 	}
-	cc := &collectorCreator{ctx: ctx, cinics: cinics}
 	cleaner := cleaner.New(fs, ui)
 	lister := lister.New(os.Stdout)
 	builder := builder.New(cfg.DryRun, currenter.New(), ui)
 	a := app.New(cc, cleaner, lister, builder)
 
-	target := filepath.Join(cfg.Root, cfg.Target)
-	targetN := node.New(target)
 	return a.Run(targetN, cfg.Clean, cfg.List, cfg.DryRun)
 }
