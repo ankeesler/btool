@@ -27,10 +27,11 @@ func (o *Object) Consume(s collector.Store, n *node.Node) error {
 	// TODO: is this bad to collect include paths from dependencies first?
 	includePaths := make([]string, 0)
 	node.Visit(n, func(vn *node.Node) error {
-		ips := vn.Labels[LabelIncludePaths]
-		// TODO: this is jank, we should have more of a better interface for this.
-		for _, ip := range strings.Split(ips, ",") {
-			includePaths = append(includePaths, ip)
+		if ips, ok := vn.Labels[LabelIncludePaths]; ok {
+			// TODO: this is jank, we should have more of a better interface for this.
+			for _, ip := range strings.Split(ips, ",") {
+				includePaths = append(includePaths, ip)
+			}
 		}
 		return nil
 	})
@@ -41,7 +42,6 @@ func (o *Object) Consume(s collector.Store, n *node.Node) error {
 	} else {
 		r = o.rf.NewCompileC(includePaths)
 	}
-	n.Resolver = r
 
 	on := node.New(strings.ReplaceAll(n.Name, ext, ".o"))
 	on.Dependency(n)

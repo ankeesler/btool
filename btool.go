@@ -57,8 +57,10 @@ type Cfg struct {
 }
 
 type collectorCreator struct {
-	fs       afero.Fs
-	rf       *resolverfactory.ResolverFactory
+	fs afero.Fs
+	rf *resolverfactory.ResolverFactory
+	ui *ui.UI
+
 	root     string
 	cache    string
 	targetN  *node.Node
@@ -99,6 +101,7 @@ func (ccreator *collectorCreator) Create() (app.Collector, error) {
 		i,
 		o,
 		e,
+		ccreator.ui,
 	}
 
 	return collector.New(producers, consumers), nil
@@ -125,8 +128,10 @@ func Run(cfg *Cfg) error {
 	targetN := node.New(target)
 
 	cc := &collectorCreator{
-		fs:       fs,
-		rf:       rf,
+		fs: fs,
+		rf: rf,
+		ui: ui,
+
 		root:     cfg.Root,
 		cache:    cfg.Cache,
 		targetN:  targetN,
