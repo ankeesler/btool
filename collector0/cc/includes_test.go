@@ -35,6 +35,24 @@ func TestIncludesConsume(t *testing.T) {
 		assert.Equal(t, "some/path/to/root/,deps/path/,", ac.Labels[cc.LabelIncludePaths])
 	})
 
+	t.Run("EmptyIncludePath", func(t *testing.T) {
+		iser := &ccfakes.FakeIncludeser{}
+		iser.IncludesReturnsOnCall(0, []string{"a/a.h"}, nil)
+		i := cc.NewIncludes(iser)
+
+		ah := node.New("a/a.h")
+		ac := node.New("a/a.c").Label(collector.LabelLocal, "true")
+		s := testutil.FakeStore(ah, ac)
+		require.Nil(t, i.Consume(s, ac))
+
+		assert.Equal(t, 1, iser.IncludesCallCount())
+		assert.Equal(t, "a/a.c", iser.IncludesArgsForCall(0))
+
+		assert.Equal(t, 1, s.SetCallCount())
+		assert.Equal(t, ac.Dependency(ah), s.SetArgsForCall(0))
+		assert.Equal(t, ".,", ac.Labels[cc.LabelIncludePaths])
+	})
+
 	t.Run("NotLocal", func(t *testing.T) {
 		iser := &ccfakes.FakeIncludeser{}
 		i := cc.NewIncludes(iser)

@@ -43,7 +43,7 @@ func (c *compile) Resolve(n *node.Node) error {
 		cmd.Args = append(cmd.Args, "-I"+include)
 	}
 
-	log.Debugf("compiler: running %s from %s", cmd.Args, cmd.Dir)
+	log.Debugf("compiler: running %s", cmd.Args)
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(o))

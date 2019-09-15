@@ -88,6 +88,9 @@ func (i *Includes) resolveInclude(
 		}
 
 		includePath = strings.TrimSuffix(sn.Name, include)
+		if includePath == "" {
+			includePath = "."
+		}
 		log.Debugf("yes, and include path is %s", includePath)
 
 		d = sn
