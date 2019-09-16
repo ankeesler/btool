@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ankeesler/btool/collector/sorter"
 	collector "github.com/ankeesler/btool/collector0"
+	"github.com/ankeesler/btool/collector0/sorter"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"

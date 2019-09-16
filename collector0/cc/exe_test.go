@@ -3,9 +3,9 @@ package cc_test
 import (
 	"testing"
 
-	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/collector0/cc"
 	"github.com/ankeesler/btool/collector0/cc/ccfakes"
+	"github.com/ankeesler/btool/collector0/sorter"
 	"github.com/ankeesler/btool/collector0/testutil"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
