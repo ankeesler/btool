@@ -1,13 +1,4 @@
 ---
-metadata:
-  project: googletest
-  #includePaths:
-  #  gtest/gtest.h: googletest-release-1.8.1/googletest/include
-  libraries:
-    gtest/gtest.h: gtest.a
-  includePaths:
-    - googletest-release-1.8.1/googletest/include
-    - googletest-release-1.8.1/googletest
 nodes:
 # Archives
 - name: googletest-release-1.8.1.zip
@@ -23,6 +14,8 @@ nodes:
 - name: googletest-release-1.8.1/googletest/include/gtest/gtest.h
   dependencies:
     - googletest-release-1.8.1.zip
+  labels:
+    io.btool.cc.libraries: gtest.a
   resolver:
     name: unzip
 
@@ -30,11 +23,15 @@ nodes:
 - name: googletest-release-1.8.1/googletest/src/gtest-all.cc
   dependencies:
     - googletest-release-1.8.1.zip
+  labels:
+    io.btool.cc.includePaths: googletest-release-1.8.1/googletest/include,googletest-release-1.8.1/googletest
   resolver:
     name: unzip
 - name: googletest-release-1.8.1/googletest/src/gtest_main.cc
   dependencies:
     - googletest-release-1.8.1.zip
+  labels:
+    io.btool.cc.includePaths: googletest-release-1.8.1/googletest/include,googletest-release-1.8.1/googletest
   resolver:
     name: unzip
 

@@ -1,6 +1,7 @@
 package gaggle
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -67,7 +68,14 @@ func (c *Collector) Collect(
 			nN.Dependency(dN)
 		}
 
-		nN.Labels = n.Labels
+		for k, v := range n.Labels {
+			vBuf := bytes.NewBuffer([]byte{})
+			// TODO: this is jank, we should have more of a better interface for this.
+			for _, vv := range strings.Split(v, ",") {
+				fmt.Fprintf(vBuf, "%s,", filepath.Join(root, vv))
+			}
+			nN.Label(k, vBuf.String())
+		}
 
 		// TODO: is this bad to collect include paths from dependencies first?
 		// TODO: this is duplicated code.
@@ -77,7 +85,9 @@ func (c *Collector) Collect(
 			if ips, ok := vn.Labels["io.btool.cc.includePaths"]; ok {
 				// TODO: this is jank, we should have more of a better interface for this.
 				for _, ip := range strings.Split(ips, ",") {
-					includePaths = append(includePaths, filepath.Join(root, ip))
+					if ip != "" {
+						includePaths = append(includePaths, ip)
+					}
 				}
 			}
 			return nil

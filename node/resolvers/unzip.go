@@ -82,7 +82,7 @@ func (u *unzip) unzipFile(
 	path := filepath.Join(destDir, file.Name)
 	if file.FileInfo().IsDir() {
 		log.Debugf("unzip: mkdir %s", path)
-		if err := fs.Mkdir(path, 0755); err != nil {
+		if err := fs.MkdirAll(path, 0755); err != nil {
 			return errors.Wrap(err, "mkdir")
 		}
 	} else {

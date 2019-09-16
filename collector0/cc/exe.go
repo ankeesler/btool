@@ -53,8 +53,16 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 		return errors.Wrap(err, "collect objs")
 	}
 
+	libraries := make(map[*node.Node]bool)
 	for _, obj := range objs {
 		n.Dependency(obj)
+
+		if err := collectLibraries(s, obj, libraries); err != nil {
+			return errors.Wrap(err, "collect libraries")
+		}
+	}
+	for library := range libraries {
+		n.Dependency(library)
 	}
 	n.Resolver = r
 
@@ -97,4 +105,29 @@ func collectObjs(
 	}
 
 	return nil
+}
+
+func collectLibraries(
+	s collector.Store,
+	n *node.Node,
+	libraries map[*node.Node]bool,
+) error {
+	return node.Visit(n, func(vn *node.Node) error {
+		// TODO: this is jank, we should have more of a better interface for this.
+		if libs, ok := vn.Labels[LabelLibraries]; ok {
+			for _, lib := range strings.Split(libs, ",") {
+				if lib == "" {
+					continue
+				}
+
+				libN := s.Get(lib)
+				if libN == nil {
+					return fmt.Errorf("unknown node for library %s from node %s", lib, vn)
+				}
+
+				libraries[libN] = true
+			}
+		}
+		return nil
+	})
 }

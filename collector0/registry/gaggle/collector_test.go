@@ -27,7 +27,8 @@ func TestCollectorCollect(t *testing.T) {
 				Name:         "a.h",
 				Dependencies: []string{},
 				Labels: map[string]string{
-					"io.btool.cc.includePaths": "include/dir",
+					"io.btool.cc.includePaths": "include/dir0,include/dir1",
+					"io.btool.cc.libraries":    "some/library",
 				},
 			},
 			&registry.Node{
@@ -61,9 +62,10 @@ func TestCollectorCollect(t *testing.T) {
 	require.Nil(t, c.Collect(s, g, root))
 
 	nodeAH := node.New("/some/root/a.h")
-	nodeAH.Label("io.btool.cc.includePaths", "include/dir")
+	nodeAH.Label("io.btool.cc.includePaths", "/some/root/include/dir0,/some/root/include/dir1,")
+	nodeAH.Label("io.btool.cc.libraries", "/some/root/some/library,")
 	nodeAC := node.New("/some/root/a.c").Dependency(nodeAH)
-	nodeAC.Label("io.btool.cc.includePaths", "another/include/dir")
+	nodeAC.Label("io.btool.cc.includePaths", "/some/root/another/include/dir,")
 	nodeAO := node.New("/some/root/a.o").Dependency(nodeAC)
 	nodeAO.Resolver = compilerCR
 	nodeAA := node.New("/some/root/a.a").Dependency(nodeAO)
@@ -76,7 +78,8 @@ func TestCollectorCollect(t *testing.T) {
 	assert.Equal(
 		t,
 		[]string{
-			"/some/root/include/dir",
+			"/some/root/include/dir0",
+			"/some/root/include/dir1",
 			"/some/root/another/include/dir",
 		},
 		rf.NewCompileCArgsForCall(0),

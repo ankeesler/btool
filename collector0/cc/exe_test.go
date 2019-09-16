@@ -19,13 +19,14 @@ func TestExe(t *testing.T) {
 	ac := node.New("a/a.c").Dependency(ah)
 	acc := node.New("a/a.cc").Dependency(ah)
 	ao := node.New("a/a.o").Dependency(ac)
-	bh := node.New("b/b.h").Dependency(ah)
+	bh := node.New("b/b.h").Dependency(ah).Label(cc.LabelLibraries, "c.a,")
 	bc := node.New("b/b.c").Dependency(ah, bh)
 	bcc := node.New("b/b.cc").Dependency(ah, bh)
 	bo := node.New("b/b.o").Dependency(bc)
 	mainc := node.New("main.c").Dependency(bh)
 	maincc := node.New("main.cc").Dependency(bh)
 	maino := node.New("main.o").Dependency(mainc)
+	ca := node.New("c.a")
 
 	t.Run("C", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
@@ -35,7 +36,7 @@ func TestExe(t *testing.T) {
 
 		e := cc.NewExe(rf)
 
-		s := testutil.FakeStore(maino, mainc, ao, ac, ah, bo, bc, bh)
+		s := testutil.FakeStore(maino, mainc, ao, ac, ah, bo, bc, bh, ca)
 
 		main := node.New("main")
 		require.Nil(t, e.Consume(s, main))
@@ -43,7 +44,7 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, rf.NewLinkCCallCount())
 
 		assert.Equal(t, 1, s.SetCallCount())
-		exMain := node.New("main").Dependency(maino, bo, ao)
+		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
@@ -56,7 +57,7 @@ func TestExe(t *testing.T) {
 
 		e := cc.NewExe(rf)
 
-		s := testutil.FakeStore(maino, maincc, ao, acc, ah, bo, bcc, bh)
+		s := testutil.FakeStore(maino, maincc, ao, acc, ah, bo, bcc, bh, ca)
 
 		main := node.New("main")
 		require.Nil(t, e.Consume(s, main))
@@ -64,7 +65,7 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, rf.NewLinkCCCallCount())
 
 		assert.Equal(t, 1, s.SetCallCount())
-		exMain := node.New("main").Dependency(maino, bo, ao)
+		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
@@ -79,7 +80,7 @@ func TestExe(t *testing.T) {
 
 		masterh := node.New("master.h")
 		maincc.Dependency(masterh)
-		s := testutil.FakeStore(maino, maincc, ao, acc, ah, bo, bcc, bh, masterh)
+		s := testutil.FakeStore(maino, maincc, ao, acc, ah, bo, bcc, bh, masterh, ca)
 
 		main := node.New("main")
 		require.Nil(t, e.Consume(s, main))
@@ -87,7 +88,7 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, rf.NewLinkCCCallCount())
 
 		assert.Equal(t, 1, s.SetCallCount())
-		exMain := node.New("main").Dependency(maino, bo, ao)
+		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
