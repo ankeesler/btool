@@ -3,6 +3,10 @@ package integration
 import "path/filepath"
 
 func googletest(c *config) {
+	if c.example != "BasicCC" {
+		return
+	}
+
 	c.run(
 		c.btool,
 		"-target",
