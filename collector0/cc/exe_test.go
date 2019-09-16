@@ -3,6 +3,7 @@ package cc_test
 import (
 	"testing"
 
+	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/collector0/cc"
 	"github.com/ankeesler/btool/collector0/cc/ccfakes"
 	"github.com/ankeesler/btool/collector0/testutil"
@@ -11,8 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-// TODO: this test is nondeterministic!
 
 func TestExe(t *testing.T) {
 	ah := node.New("a/a.h")
@@ -46,6 +45,7 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
+		sorter.New().Sort(exMain)
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 
@@ -67,6 +67,7 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
+		sorter.New().Sort(exMain)
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 
@@ -90,6 +91,7 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
+		sorter.New().Sort(exMain)
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/ankeesler/btool/collector/sorter"
 	collector "github.com/ankeesler/btool/collector0"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
@@ -66,6 +67,7 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 	}
 	n.Resolver = r
 
+	sorter.New().Sort(n)
 	s.Set(n)
 
 	return nil

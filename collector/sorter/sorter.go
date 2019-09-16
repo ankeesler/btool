@@ -4,7 +4,6 @@ package sorter
 import (
 	"sort"
 
-	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/node"
 )
 
@@ -18,7 +17,7 @@ func New() *Sorter {
 }
 
 // Collect will sort the provided node.Node graph in a stable way.
-func (s *Sorter) Collect(_ *collector.Ctx, n *node.Node) error {
+func (s *Sorter) Sort(n *node.Node) error {
 	return node.Visit(n, s.visit)
 }
 
