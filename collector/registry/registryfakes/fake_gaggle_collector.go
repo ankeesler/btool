@@ -10,10 +10,10 @@ import (
 )
 
 type FakeGaggleCollector struct {
-	CollectStub        func(*collector.Ctx, *registrya.Gaggle, string) error
+	CollectStub        func(collector.Store, *registrya.Gaggle, string) error
 	collectMutex       sync.RWMutex
 	collectArgsForCall []struct {
-		arg1 *collector.Ctx
+		arg1 collector.Store
 		arg2 *registrya.Gaggle
 		arg3 string
 	}
@@ -27,11 +27,11 @@ type FakeGaggleCollector struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeGaggleCollector) Collect(arg1 *collector.Ctx, arg2 *registrya.Gaggle, arg3 string) error {
+func (fake *FakeGaggleCollector) Collect(arg1 collector.Store, arg2 *registrya.Gaggle, arg3 string) error {
 	fake.collectMutex.Lock()
 	ret, specificReturn := fake.collectReturnsOnCall[len(fake.collectArgsForCall)]
 	fake.collectArgsForCall = append(fake.collectArgsForCall, struct {
-		arg1 *collector.Ctx
+		arg1 collector.Store
 		arg2 *registrya.Gaggle
 		arg3 string
 	}{arg1, arg2, arg3})
@@ -53,13 +53,13 @@ func (fake *FakeGaggleCollector) CollectCallCount() int {
 	return len(fake.collectArgsForCall)
 }
 
-func (fake *FakeGaggleCollector) CollectCalls(stub func(*collector.Ctx, *registrya.Gaggle, string) error) {
+func (fake *FakeGaggleCollector) CollectCalls(stub func(collector.Store, *registrya.Gaggle, string) error) {
 	fake.collectMutex.Lock()
 	defer fake.collectMutex.Unlock()
 	fake.CollectStub = stub
 }
 
-func (fake *FakeGaggleCollector) CollectArgsForCall(i int) (*collector.Ctx, *registrya.Gaggle, string) {
+func (fake *FakeGaggleCollector) CollectArgsForCall(i int) (collector.Store, *registrya.Gaggle, string) {
 	fake.collectMutex.RLock()
 	defer fake.collectMutex.RUnlock()
 	argsForCall := fake.collectArgsForCall[i]

@@ -5,10 +5,9 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/collector"
-	"github.com/ankeesler/btool/collector/collectorfakes"
 	"github.com/ankeesler/btool/collector/registry"
 	"github.com/ankeesler/btool/collector/registry/registryfakes"
-	"github.com/ankeesler/btool/node"
+	"github.com/ankeesler/btool/collector/testutil"
 	registrypkg "github.com/ankeesler/btool/registry"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
@@ -52,13 +51,8 @@ func TestRegistryCollect(t *testing.T) {
 	gc := &registryfakes.FakeGaggleCollector{}
 	r := registry.New(fs, c, cache, gc)
 
-	ns := collector.NewNodeStore(nil)
-	rf := &collectorfakes.FakeResolverFactory{}
-	exCtx := collector.NewCtx(ns, rf)
-	acNode := node.New("main")
-	require.Nil(t, r.Collect(exCtx, acNode))
-	exNode := node.New("main")
-	assert.Equal(t, exNode, acNode)
+	s := testutil.FakeStore()
+	require.Nil(t, r.Produce(s))
 
 	require.Equal(t, 1, c.IndexCallCount())
 	require.Equal(t, 3, c.GaggleCallCount())
@@ -66,20 +60,20 @@ func TestRegistryCollect(t *testing.T) {
 	assert.Equal(t, "b", c.GaggleArgsForCall(1))
 	assert.Equal(t, "c", c.GaggleArgsForCall(2))
 
-	var acCtx *collector.Ctx
+	var acS collector.Store
 	var acGaggle *registrypkg.Gaggle
 	var acRoot string
 	require.Equal(t, 3, gc.CollectCallCount())
-	acCtx, acGaggle, acRoot = gc.CollectArgsForCall(0)
-	assert.Equal(t, exCtx, acCtx)
+	acS, acGaggle, acRoot = gc.CollectArgsForCall(0)
+	assert.Equal(t, s, acS)
 	assert.Equal(t, gaggleA, acGaggle)
 	assert.Equal(t, filepath.Join(cache, "a-sha"), acRoot)
-	acCtx, acGaggle, acRoot = gc.CollectArgsForCall(1)
-	assert.Equal(t, exCtx, acCtx)
+	acS, acGaggle, acRoot = gc.CollectArgsForCall(1)
+	assert.Equal(t, s, acS)
 	assert.Equal(t, gaggleB, acGaggle)
 	assert.Equal(t, filepath.Join(cache, "b-sha"), acRoot)
-	acCtx, acGaggle, acRoot = gc.CollectArgsForCall(2)
-	assert.Equal(t, exCtx, acCtx)
+	acS, acGaggle, acRoot = gc.CollectArgsForCall(2)
+	assert.Equal(t, s, acS)
 	assert.Equal(t, gaggleC, acGaggle)
 	assert.Equal(t, filepath.Join(cache, "c-sha"), acRoot)
 }

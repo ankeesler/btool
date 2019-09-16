@@ -1,8 +1,10 @@
 package gaggle
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/log"
@@ -12,34 +14,39 @@ import (
 	"github.com/pkg/errors"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ResolverFactory
+
+// ResolverFactory can create node.Resolver's.
+// TODO: this is duplicated, can we not?
+type ResolverFactory interface {
+	NewCompileC(includeDirs []string) node.Resolver
+	NewCompileCC(includeDirs []string) node.Resolver
+	NewArchive() node.Resolver
+	NewLinkC() node.Resolver
+	NewLinkCC() node.Resolver
+	NewSymlink() node.Resolver
+
+	NewDownload(url, sha256 string) node.Resolver
+	NewUnzip(outputDir string) node.Resolver
+}
+
 // Collector is a type that can build a node.Node graph using a registry.Gaggle.
 type Collector struct {
+	rf ResolverFactory
 }
 
 // New creates a new Collector.
-func New() *Collector {
-	return &Collector{}
+func New(rf ResolverFactory) *Collector {
+	return &Collector{
+		rf: rf,
+	}
 }
 
 func (c *Collector) Collect(
-	ctx *collector.Ctx,
+	s collector.Store,
 	gaggle *registry.Gaggle,
 	root string,
 ) error {
-	metadata := struct {
-		IncludePaths []string          `mapstructure:"includePaths"`
-		Libraries    map[string]string `mapstructure:"libraries"`
-	}{}
-	if err := mapstructure.Decode(gaggle.Metadata, &metadata); err != nil {
-		return errors.Wrap(err, "decode")
-	}
-	log.Debugf("metadata: %+v", metadata)
-
-	for _, includePath := range metadata.IncludePaths {
-		includePath = filepath.Join(root, includePath)
-		ctx.AddIncludePath(includePath)
-	}
-
 	for _, n := range gaggle.Nodes {
 		nN := node.New(filepath.Join(root, n.Name))
 
@@ -52,7 +59,7 @@ func (c *Collector) Collect(
 				//dN = node.New("")
 				continue
 			} else {
-				dN = ctx.NS.Find(dName)
+				dN = s.Get(dName)
 			}
 
 			if dN == nil {
@@ -61,38 +68,48 @@ func (c *Collector) Collect(
 			nN.Dependency(dN)
 		}
 
-		nodeR, err := c.newResolver(
-			ctx,
-			n.Resolver,
-			ctx.IncludePaths(),
-			root,
-		)
+		for k, v := range n.Labels {
+			vBuf := bytes.NewBuffer([]byte{})
+			// TODO: this is jank, we should have more of a better interface for this.
+			for _, vv := range strings.Split(v, ",") {
+				fmt.Fprintf(vBuf, "%s,", filepath.Join(root, vv))
+			}
+			nN.Label(k, vBuf.String())
+		}
+
+		// TODO: is this bad to collect include paths from dependencies first?
+		// TODO: this is duplicated code.
+		includePaths := make([]string, 0)
+		node.Visit(nN, func(vn *node.Node) error {
+			// TODO: this shouldn't be hardcoded.
+			if ips, ok := vn.Labels["io.btool.cc.includePaths"]; ok {
+				// TODO: this is jank, we should have more of a better interface for this.
+				for _, ip := range strings.Split(ips, ",") {
+					if ip != "" {
+						includePaths = append(includePaths, ip)
+					}
+				}
+			}
+			return nil
+		})
+
+		nodeR, err := c.newResolver(n.Resolver, root, includePaths)
 		if err != nil {
 			return errors.Wrap(err, "new resolver")
 		}
 		nN.Resolver = nodeR
 
 		log.Debugf("decoded %s to %s", n, nN)
-		ctx.NS.Add(nN)
-	}
-
-	for include, library := range metadata.Libraries {
-		libraryN := ctx.NS.Find(filepath.Join(root, library))
-		if libraryN == nil {
-			return errors.New("unknown library: " + library)
-		}
-		ctx.AddLibrary(include, libraryN)
-		log.Debugf("added library %s for include %s", libraryN, include)
+		s.Set(nN)
 	}
 
 	return nil
 }
 
 func (c *Collector) newResolver(
-	ctx *collector.Ctx,
 	registryR registry.Resolver,
-	includeDirs []string,
 	root string,
+	includePaths []string,
 ) (node.Resolver, error) {
 	name := registryR.Name
 	config := registryR.Config
@@ -101,21 +118,21 @@ func (c *Collector) newResolver(
 	var err error
 	switch name {
 	case "compileC":
-		nodeR = ctx.RF.NewCompileC(includeDirs)
+		nodeR = c.rf.NewCompileC(includePaths)
 	case "compileCC":
-		nodeR = ctx.RF.NewCompileCC(includeDirs)
+		nodeR = c.rf.NewCompileCC(includePaths)
 	case "archive":
-		nodeR = ctx.RF.NewArchive()
+		nodeR = c.rf.NewArchive()
 	case "linkC":
-		nodeR = ctx.RF.NewLinkC()
+		nodeR = c.rf.NewLinkC()
 	case "linkCC":
-		nodeR = ctx.RF.NewLinkCC()
+		nodeR = c.rf.NewLinkCC()
 	case "symlink":
-		nodeR = ctx.RF.NewSymlink()
+		nodeR = c.rf.NewSymlink()
 	case "unzip":
-		nodeR = ctx.RF.NewUnzip(root)
+		nodeR = c.rf.NewUnzip(root)
 	case "download":
-		nodeR, err = c.createDownload(ctx, config)
+		nodeR, err = c.createDownload(config)
 		if err != nil {
 			err = errors.Wrap(err, "create download")
 		}
@@ -129,7 +146,6 @@ func (c *Collector) newResolver(
 }
 
 func (c *Collector) createDownload(
-	ctx *collector.Ctx,
 	config map[string]interface{},
 ) (node.Resolver, error) {
 	cfg := struct {
@@ -140,5 +156,5 @@ func (c *Collector) createDownload(
 		return nil, errors.Wrap(err, "decode")
 	}
 
-	return ctx.RF.NewDownload(cfg.URL, cfg.SHA256), nil
+	return c.rf.NewDownload(cfg.URL, cfg.SHA256), nil
 }

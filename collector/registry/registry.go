@@ -7,7 +7,6 @@ import (
 
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/log"
-	"github.com/ankeesler/btool/node"
 	registrypkg "github.com/ankeesler/btool/registry"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
@@ -35,7 +34,7 @@ type Client interface {
 // registrypkg.Gaggle. It is provided a root to indicate where the node.Node
 // graph members should be located.
 type GaggleCollector interface {
-	Collect(ctx *collector.Ctx, g *registrypkg.Gaggle, root string) error
+	Collect(s collector.Store, g *registrypkg.Gaggle, root string) error
 }
 
 // Collector is a type that can build a node.Node graph via a btool registry.
@@ -61,7 +60,7 @@ func New(
 	}
 }
 
-func (c *Collector) Collect(ctx *collector.Ctx, n *node.Node) error {
+func (c *Collector) Produce(s collector.Store) error {
 	i, err := c.c.Index()
 	if err != nil {
 		return errors.Wrap(err, "index")
@@ -107,7 +106,7 @@ func (c *Collector) Collect(ctx *collector.Ctx, n *node.Node) error {
 		}
 
 		root := filepath.Join(c.cache, file.SHA256)
-		if err := c.gc.Collect(ctx, gaggle, root); err != nil {
+		if err := c.gc.Collect(s, gaggle, root); err != nil {
 			return errors.Wrap(err, "collect")
 		}
 	}

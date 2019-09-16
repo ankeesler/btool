@@ -1,50 +1,132 @@
-// Package collector provides functionality to build a node.Node graph.
+// Package collector provides a producer/consumer framework that can act as a
+// node.Node graph builder.
+//
+// Producer's add node.Node's to a Store. Consumer's are notified of node.Node's
+// being Set() to the Store. A Store is just a place where node.Node's are kept.
 package collector
 
 import (
+	"fmt"
+
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Collectini
+// These constants are node.Node Label's that are used throughout this framework.
+const (
+	LabelLocal = "io.btool.local"
+)
 
-// Collectini is an object that contributes some node.Node's to a graph.
-// It should return an error if it fails to Collect() all the node.Node's that it
-// cares about.
-type Collectini interface {
-	Collect(*Ctx, *node.Node) error
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Store
+
+// Store is a place where node.Node's are kept.
+//
+// It has a simple idempotent interface. Set()'ing a node.Node for the first time
+// will create it, setting a node.Node for the second time will update it.
+type Store interface {
+	Get(string) *node.Node
+	Set(*node.Node)
+	ForEach(func(*node.Node))
 }
 
-// Collector is a type that can build a node.Node graph. It does this via
-// Collectini's that each provide a different part of the node.Node graph.
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Producer
+
+// Producer is a type that adds node.Node's to a Store.
+type Producer interface {
+	Produce(Store) error
+}
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Consumer
+
+// Consumer is a type that reacts to Producer's adding node.Node's to a Store.
+// The Consumer is provided the node.Node that was Set() on the Store.
+type Consumer interface {
+	Consume(Store, *node.Node) error
+}
+
+// Collector is an object that will run Producer's and Consumer's in order to
+// build a node.Node graph.
 //
-// Each node.Node that a Collectini provides should have its Dependencies and
-// Resolver set property. No partial node.Node's!
+// This particular procedure is very synchronus. It will:
+//   1. run each Producer to completion
+//   2. run all Consumer's on every Store.Set() from a Producer
+//   3. run all Consumer's on every Store.Set() from a Consumer that isn't their own
+//   4. repeat 4 until there are no more new Store.Set() calls
 type Collector struct {
-	ctx    *Ctx
-	ctinis []Collectini
+	s         *store
+	producers []Producer
+	consumers []Consumer
 }
 
 // New creates a new Collector.
-func New(
-	ctx *Ctx,
-	ctinis ...Collectini,
-) *Collector {
+func New(producers []Producer, consumers []Consumer) *Collector {
 	return &Collector{
-		ctx:    ctx,
-		ctinis: ctinis,
+		s:         newStore(),
+		producers: producers,
+		consumers: consumers,
 	}
 }
 
-// Collect creates a node.Node graph.
-func (c *Collector) Collect(n *node.Node) error {
-	for i, ctini := range c.ctinis {
-		log.Debugf("starting collectini #%d", i)
-		if err := ctini.Collect(c.ctx, n); err != nil {
-			return errors.Wrap(err, "collect")
-		}
-		log.Debugf("finishing collectini #%d, ctx is now %+v", i, c.ctx)
+func (c *Collector) Collect() error {
+	diffs, err := c.produce()
+	if err != nil {
+		return errors.Wrap(err, "produce")
 	}
+
+	if err := c.consume(diffs); err != nil {
+		return errors.Wrap(err, "consume")
+	}
+
+	return nil
+}
+
+func (c *Collector) produce() ([]*node.Node, error) {
+	setCalls := make([]*node.Node, 0)
+	c.s.setCallback = func(n *node.Node) {
+		setCalls = append(setCalls, n)
+	}
+
+	for i, p := range c.producers {
+		if err := p.Produce(c.s); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("producer #%d", i))
+		}
+	}
+
+	return setCalls, nil
+}
+
+func (collector *Collector) consume(setCalls []*node.Node) error {
+	var from, to int
+	consumerSetCalls := make(map[int]Consumer)
+	for {
+		from = to
+		to = len(setCalls)
+		if from == to {
+			break
+		} else {
+			log.Debugf("consuming setCalls %d:%d", from, to)
+		}
+
+		for ; from < to; from++ {
+			log.Debugf("consuming setCall %s", setCalls[from])
+			for i, c := range collector.consumers {
+				if consumerSetCalls[from] == c {
+					continue
+				}
+
+				collector.s.setCallback = func(n *node.Node) {
+					setCalls = append(setCalls, n)
+					consumerSetCalls[len(setCalls)-1] = c
+				}
+
+				setCall := setCalls[from]
+				if err := c.Consume(collector.s, setCall); err != nil {
+					return errors.Wrap(err, fmt.Sprintf("consumer #%d, setCall %s", i, setCall))
+				}
+			}
+		}
+	}
+
 	return nil
 }
