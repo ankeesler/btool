@@ -18,7 +18,7 @@ func TestExe(t *testing.T) {
 	ac := node.New("a/a.c").Dependency(ah)
 	acc := node.New("a/a.cc").Dependency(ah)
 	ao := node.New("a/a.o").Dependency(ac)
-	bh := node.New("b/b.h").Dependency(ah).Label(cc.LabelLibraries, "c.a,")
+	bh := node.New("b/b.h").Dependency(ah).Label(cc.LabelLibraries, []string{"c.a"})
 	bc := node.New("b/b.c").Dependency(ah, bh)
 	bcc := node.New("b/b.cc").Dependency(ah, bh)
 	bo := node.New("b/b.o").Dependency(bc)

@@ -14,16 +14,21 @@ import (
 
 func TestObj(t *testing.T) {
 	// mainc -> bh -> ah
-	ah := node.New("a.h")
-	ah.Labels[cc.LabelIncludePaths] = "some/include/path,some/other/include/path"
+	ah := node.New("a.h").Label(cc.LabelIncludePaths, []string{
+		"some/include/path",
+		"some/other/include/path",
+	})
 	bh := node.New("b.h")
-	bh.Dependency(ah)
-	bh.Labels[cc.LabelIncludePaths] = "some/other/other/include/path"
-	mainc := node.New("main.c")
-	mainc.Labels[cc.LabelIncludePaths] = "some/main/include/path"
+	bh.Dependency(ah).Label(cc.LabelIncludePaths, []string{
+		"some/other/other/include/path",
+	})
+	mainc := node.New("main.c").Label(cc.LabelIncludePaths, []string{
+		"some/main/include/path",
+	})
 	mainc.Dependency(bh)
-	maincc := node.New("main.cc")
-	maincc.Labels[cc.LabelIncludePaths] = "some/main/include/path"
+	maincc := node.New("main.cc").Label(cc.LabelIncludePaths, []string{
+		"some/main/include/path",
+	})
 	maincc.Dependency(bh)
 
 	t.Run("BasicC", func(t *testing.T) {

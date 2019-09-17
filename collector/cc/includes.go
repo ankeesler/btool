@@ -34,8 +34,9 @@ func (i *Includes) Consume(s collector.Store, n *node.Node) error {
 		return nil
 	}
 
-	// TODO: another string conversation mechanism needed here.
-	if l, ok := n.Labels[collector.LabelLocal]; !ok || l != "true" {
+	if b, err := collector.BoolLabel(n, collector.LabelLocal); err != nil {
+		return errors.Wrap(err, "bool label")
+	} else if !b {
 		return nil
 	}
 
@@ -76,7 +77,7 @@ func (i *Includes) resolveInclude(
 	}
 
 	// TODO: this is ugly! We could pick up the wrong include based on suffix!
-	var includePath string
+	var err error
 	s.ForEach(func(sn *node.Node) {
 		if d != nil {
 			return
@@ -87,16 +88,19 @@ func (i *Includes) resolveInclude(
 			return
 		}
 
-		includePath = strings.TrimSuffix(sn.Name, include)
+		includePath := strings.TrimSuffix(sn.Name, include)
 		if includePath == "" {
 			includePath = "."
 		}
 		log.Debugf("yes, and include path is %s", includePath)
 
 		d = sn
-		n.Labels[LabelIncludePaths] += includePath + ","
+		err = collector.AppendLabel(n, LabelIncludePaths, includePath)
+
 	})
-	if d != nil {
+	if err != nil {
+		return nil, errors.Wrap(err, "for each")
+	} else if d != nil {
 		return d, nil
 	}
 

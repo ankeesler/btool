@@ -30,10 +30,10 @@ type Gaggle struct {
 
 // Node is a serialized form of a node.Node.
 type Node struct {
-	Name         string            `yaml:"name"`
-	Dependencies []string          `yaml:"dependencies"`
-	Labels       map[string]string `yaml:"labels"`
-	Resolver     Resolver          `yaml:"resolver"`
+	Name         string                 `yaml:"name"`
+	Dependencies []string               `yaml:"dependencies"`
+	Labels       map[string]interface{} `yaml:"labels"`
+	Resolver     Resolver               `yaml:"resolver"`
 }
 
 // String returns a human-readable representation of a Node.

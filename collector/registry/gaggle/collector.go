@@ -1,10 +1,9 @@
 package gaggle
 
 import (
-	"bytes"
 	"fmt"
 	"path/filepath"
-	"strings"
+	"reflect"
 
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/log"
@@ -52,13 +51,14 @@ func (c *Collector) Collect(
 			nN.Dependency(dN)
 		}
 
-		for k, v := range n.Labels {
-			vBuf := bytes.NewBuffer([]byte{})
-			// TODO: this is jank, we should have more of a better interface for this.
-			for _, vv := range strings.Split(v, ",") {
-				fmt.Fprintf(vBuf, "%s,", filepath.Join(root, vv))
-			}
-			nN.Label(k, vBuf.String())
+		nN.Labels = n.Labels
+
+		// TODO: this shound't be hardcoded.
+		if err := prependRoot(nN, "io.btool.cc.includePaths", root); err != nil {
+			return errors.Wrap(err, "prepend root")
+		}
+		if err := prependRoot(nN, "io.btool.cc.libraries", root); err != nil {
+			return errors.Wrap(err, "prepend root")
 		}
 
 		// TODO: is this bad to collect include paths from dependencies first?
@@ -132,4 +132,28 @@ func (c *Collector) createDownload(
 	}
 
 	return c.rf.NewDownload(cfg.URL, cfg.SHA256), nil
+}
+
+func prependRoot(n *node.Node, label string, root string) error {
+	values, ok := n.Labels[label]
+	if !ok {
+		return nil
+	}
+
+	valuesSlice, ok := values.([]string)
+	if !ok {
+		return fmt.Errorf(
+			"expected []string type for values, got %s (%s)",
+			reflect.TypeOf(values),
+			values,
+		)
+	}
+
+	for i := range valuesSlice {
+		valuesSlice[i] = filepath.Join(root, valuesSlice[i])
+	}
+
+	n.Labels[label] = valuesSlice
+
+	return nil
 }

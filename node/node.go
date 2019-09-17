@@ -29,7 +29,7 @@ type Resolver interface {
 type Node struct {
 	Name         string
 	Dependencies []*Node
-	Labels       map[string]string
+	Labels       map[string]interface{}
 	Resolver
 }
 
@@ -38,7 +38,7 @@ func New(name string) *Node {
 	return &Node{
 		Name:         name,
 		Dependencies: make([]*Node, 0),
-		Labels:       make(map[string]string),
+		Labels:       make(map[string]interface{}),
 	}
 }
 
@@ -50,7 +50,7 @@ func (n *Node) Dependency(d ...*Node) *Node {
 
 // Label adds a Label to a Node. It returns this Node so calls can be strung
 // together.
-func (n *Node) Label(k, v string) *Node {
+func (n *Node) Label(k string, v interface{}) *Node {
 	n.Labels[k] = v
 	return n
 }

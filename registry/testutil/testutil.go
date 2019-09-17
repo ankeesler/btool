@@ -29,7 +29,7 @@ func FileAGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "tuna",
 				Dependencies: []string{},
-				Labels:       map[string]string{},
+				Labels:       map[string]interface{}{},
 				Resolver: registry.Resolver{
 					Name: "tuna-resolver",
 					Config: map[string]interface{}{
@@ -40,7 +40,7 @@ func FileAGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "fish",
 				Dependencies: []string{"tuna"},
-				Labels:       map[string]string{},
+				Labels:       map[string]interface{}{},
 				Resolver: registry.Resolver{
 					Name: "fish-resolver",
 					Config: map[string]interface{}{
@@ -62,7 +62,7 @@ func FileBGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "marlin",
 				Dependencies: []string{},
-				Labels:       map[string]string{},
+				Labels:       map[string]interface{}{},
 				Resolver: registry.Resolver{
 					Name: "marlin-resolver",
 					Config: map[string]interface{}{
@@ -73,7 +73,7 @@ func FileBGaggle() *registry.Gaggle {
 			&registry.Node{
 				Name:         "bacon",
 				Dependencies: []string{"marlin"},
-				Labels:       map[string]string{},
+				Labels:       map[string]interface{}{},
 				Resolver: registry.Resolver{
 					Name: "bacon-resolver",
 					Config: map[string]interface{}{
