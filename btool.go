@@ -95,7 +95,7 @@ func (ccreator *collectorCreator) Create() (app.Collector, error) {
 	}
 
 	i := cc.NewIncludes(includeser.New(ccreator.fs))
-	o := cc.NewObject(ccreator.rf)
+	o := cc.NewObj(ccreator.rf)
 	e := cc.NewExe(ccreator.rf)
 	consumers := []collector.Consumer{
 		i,

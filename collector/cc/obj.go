@@ -8,17 +8,20 @@ import (
 	"github.com/ankeesler/btool/node"
 )
 
-type Object struct {
+// Obj is a type that can add .o node.Node's to a collector.Store given .c/.cc
+// node.Node's.
+type Obj struct {
 	rf collector.ResolverFactory
 }
 
-func NewObject(rf collector.ResolverFactory) *Object {
-	return &Object{
+// NewObj creates a new Obj.
+func NewObj(rf collector.ResolverFactory) *Obj {
+	return &Obj{
 		rf: rf,
 	}
 }
 
-func (o *Object) Consume(s collector.Store, n *node.Node) error {
+func (o *Obj) Consume(s collector.Store, n *node.Node) error {
 	ext := filepath.Ext(n.Name)
 	if ext != ".cc" && ext != ".c" {
 		return nil

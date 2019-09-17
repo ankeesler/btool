@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestObject(t *testing.T) {
+func TestObj(t *testing.T) {
 	// mainc -> bh -> ah
 	ah := node.New("a.h")
 	ah.Labels[cc.LabelIncludePaths] = "some/include/path,some/other/include/path"
@@ -31,7 +31,7 @@ func TestObject(t *testing.T) {
 
 		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewCompileCReturnsOnCall(0, r)
-		o := cc.NewObject(rf)
+		o := cc.NewObj(rf)
 
 		s := testutil.FakeStore(ah, bh, mainc)
 		require.Nil(t, o.Consume(s, mainc))
@@ -57,7 +57,7 @@ func TestObject(t *testing.T) {
 
 		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewCompileCCReturnsOnCall(0, r)
-		o := cc.NewObject(rf)
+		o := cc.NewObj(rf)
 
 		s := testutil.FakeStore(ah, bh, mainc)
 		require.Nil(t, o.Consume(s, maincc))
@@ -80,7 +80,7 @@ func TestObject(t *testing.T) {
 
 	t.Run("NonCCFile", func(t *testing.T) {
 		rf := &collectorfakes.FakeResolverFactory{}
-		o := cc.NewObject(rf)
+		o := cc.NewObj(rf)
 
 		s := testutil.FakeStore(ah, bh, mainc)
 		require.Nil(t, o.Consume(s, node.New("a.h")))
