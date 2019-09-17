@@ -8,6 +8,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// TODO: move all of these *er concrete types to subpackages.
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Collector
 
 // Collector creates a node.Node graph.
