@@ -21,8 +21,7 @@ func main() {
 }
 
 func run() error {
-	loglevel := flag.String("loglevel", "info", "Verbosity of log")
-	// TODO: change -loglevel to -debug
+	debug := flag.Bool("debug", false, "Turn on debug printing")
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", ".btool", "Cache directory")
 	target := flag.String("target", "main", "Target to build")
@@ -48,7 +47,12 @@ func run() error {
 		return nil
 	}
 
-	level, err := log.ParseLevel(*loglevel)
+	loglevel := "info"
+	if *debug {
+		loglevel = "debug"
+	}
+
+	level, err := log.ParseLevel(loglevel)
 	if err != nil {
 		return errors.Wrap(err, "parse log level")
 	}

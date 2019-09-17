@@ -15,8 +15,7 @@ func googletest(c *config) {
 		c.root,
 		"-cache",
 		c.cache,
-		"-loglevel",
-		"debug",
+		"-debug",
 	)
 	c.run(
 		filepath.Join(c.root, "dep-1/dep-1-test"),
@@ -29,8 +28,7 @@ func googletest(c *config) {
 		c.root,
 		"-cache",
 		c.cache,
-		"-loglevel",
-		"debug",
+		"-debug",
 		"-clean",
 	)
 }
