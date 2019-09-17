@@ -6,6 +6,7 @@ import (
 
 	"github.com/ankeesler/btool/collector"
 	"github.com/ankeesler/btool/node"
+	"github.com/pkg/errors"
 )
 
 // Obj is a type that can add .o node.Node's to a collector.Store given .c/.cc
@@ -28,16 +29,10 @@ func (o *Obj) Consume(s collector.Store, n *node.Node) error {
 	}
 
 	// TODO: is this bad to collect include paths from dependencies first?
-	includePaths := make([]string, 0)
-	node.Visit(n, func(vn *node.Node) error {
-		if ips, ok := vn.Labels[LabelIncludePaths]; ok {
-			// TODO: this is jank, we should have more of a better interface for this.
-			for _, ip := range strings.Split(ips, ",") {
-				includePaths = append(includePaths, ip)
-			}
-		}
-		return nil
-	})
+	includePaths, err := collector.CollectLabels(n, LabelIncludePaths)
+	if err != nil {
+		return errors.Wrap(err, "collect labels")
+	}
 
 	var r node.Resolver
 	if ext == ".cc" {

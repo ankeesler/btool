@@ -62,20 +62,11 @@ func (c *Collector) Collect(
 		}
 
 		// TODO: is this bad to collect include paths from dependencies first?
-		// TODO: this is duplicated code.
-		includePaths := make([]string, 0)
-		node.Visit(nN, func(vn *node.Node) error {
-			// TODO: this shouldn't be hardcoded.
-			if ips, ok := vn.Labels["io.btool.cc.includePaths"]; ok {
-				// TODO: this is jank, we should have more of a better interface for this.
-				for _, ip := range strings.Split(ips, ",") {
-					if ip != "" {
-						includePaths = append(includePaths, ip)
-					}
-				}
-			}
-			return nil
-		})
+		// TODO: this shouldn't be hardcoded.
+		includePaths, err := collector.CollectLabels(nN, "io.btool.cc.includePaths")
+		if err != nil {
+			return errors.Wrap(err, "collect labels")
+		}
 
 		nodeR, err := c.newResolver(n.Resolver, root, includePaths)
 		if err != nil {
