@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/collector/cc"
-	"github.com/ankeesler/btool/collector/cc/ccfakes"
+	"github.com/ankeesler/btool/collector/collectorfakes"
 	"github.com/ankeesler/btool/collector/sorter"
 	"github.com/ankeesler/btool/collector/testutil"
 	"github.com/ankeesler/btool/node"
@@ -30,7 +30,7 @@ func TestExe(t *testing.T) {
 	t.Run("C", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
 
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewLinkCReturnsOnCall(0, r)
 
 		e := cc.NewExe(rf)
@@ -52,7 +52,7 @@ func TestExe(t *testing.T) {
 	t.Run("CC", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
 
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewLinkCCReturnsOnCall(0, r)
 
 		e := cc.NewExe(rf)
@@ -74,7 +74,7 @@ func TestExe(t *testing.T) {
 	t.Run("LoneHeader", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
 
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewLinkCCReturnsOnCall(0, r)
 
 		e := cc.NewExe(rf)
@@ -96,7 +96,7 @@ func TestExe(t *testing.T) {
 	})
 
 	t.Run("Noop", func(t *testing.T) {
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		e := cc.NewExe(rf)
 		s := testutil.FakeStore()
 		require.Nil(t, e.Consume(s, node.New("main.c")))

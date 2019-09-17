@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/collector/cc"
-	"github.com/ankeesler/btool/collector/cc/ccfakes"
+	"github.com/ankeesler/btool/collector/collectorfakes"
 	"github.com/ankeesler/btool/collector/testutil"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
@@ -29,7 +29,7 @@ func TestObject(t *testing.T) {
 	t.Run("BasicC", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
 
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewCompileCReturnsOnCall(0, r)
 		o := cc.NewObject(rf)
 
@@ -55,7 +55,7 @@ func TestObject(t *testing.T) {
 	t.Run("BasicCC", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
 
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		rf.NewCompileCCReturnsOnCall(0, r)
 		o := cc.NewObject(rf)
 
@@ -79,7 +79,7 @@ func TestObject(t *testing.T) {
 	})
 
 	t.Run("NonCCFile", func(t *testing.T) {
-		rf := &ccfakes.FakeResolverFactory{}
+		rf := &collectorfakes.FakeResolverFactory{}
 		o := cc.NewObject(rf)
 
 		s := testutil.FakeStore(ah, bh, mainc)

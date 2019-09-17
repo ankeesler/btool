@@ -9,10 +9,10 @@ import (
 )
 
 type Object struct {
-	rf ResolverFactory
+	rf collector.ResolverFactory
 }
 
-func NewObject(rf ResolverFactory) *Object {
+func NewObject(rf collector.ResolverFactory) *Object {
 	return &Object{
 		rf: rf,
 	}

@@ -14,29 +14,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . ResolverFactory
-
-// ResolverFactory can create node.Resolver's.
-// TODO: this is duplicated, can we not?
-type ResolverFactory interface {
-	NewCompileC(includeDirs []string) node.Resolver
-	NewCompileCC(includeDirs []string) node.Resolver
-	NewArchive() node.Resolver
-	NewLinkC() node.Resolver
-	NewLinkCC() node.Resolver
-	NewSymlink() node.Resolver
-
-	NewDownload(url, sha256 string) node.Resolver
-	NewUnzip(outputDir string) node.Resolver
-}
-
 // Collector is a type that can build a node.Node graph using a registry.Gaggle.
 type Collector struct {
-	rf ResolverFactory
+	rf collector.ResolverFactory
 }
 
 // New creates a new Collector.
-func New(rf ResolverFactory) *Collector {
+func New(rf collector.ResolverFactory) *Collector {
 	return &Collector{
 		rf: rf,
 	}

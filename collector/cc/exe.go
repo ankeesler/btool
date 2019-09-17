@@ -13,10 +13,10 @@ import (
 )
 
 type Exe struct {
-	rf ResolverFactory
+	rf collector.ResolverFactory
 }
 
-func NewExe(rf ResolverFactory) *Exe {
+func NewExe(rf collector.ResolverFactory) *Exe {
 	return &Exe{
 		rf: rf,
 	}

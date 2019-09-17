@@ -3,8 +3,8 @@ package gaggle_test
 import (
 	"testing"
 
+	"github.com/ankeesler/btool/collector/collectorfakes"
 	"github.com/ankeesler/btool/collector/registry/gaggle"
-	"github.com/ankeesler/btool/collector/registry/gaggle/gagglefakes"
 	"github.com/ankeesler/btool/collector/testutil"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
@@ -16,7 +16,7 @@ import (
 func TestCollectorCollect(t *testing.T) {
 	compilerCR := &nodefakes.FakeResolver{}
 	linkerCR := &nodefakes.FakeResolver{}
-	rf := &gagglefakes.FakeResolverFactory{}
+	rf := &collectorfakes.FakeResolverFactory{}
 	rf.NewCompileCReturnsOnCall(0, compilerCR)
 	rf.NewLinkCReturnsOnCall(0, linkerCR)
 
