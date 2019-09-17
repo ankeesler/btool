@@ -114,22 +114,19 @@ func collectLibraries(
 	n *node.Node,
 	libraries map[*node.Node]bool,
 ) error {
-	return node.Visit(n, func(vn *node.Node) error {
-		// TODO: this is jank, we should have more of a better interface for this.
-		if libs, ok := vn.Labels[LabelLibraries]; ok {
-			for _, lib := range strings.Split(libs, ",") {
-				if lib == "" {
-					continue
-				}
+	libs, err := collector.CollectLabels(n, LabelLibraries)
+	if err != nil {
+		return errors.Wrap(err, "collect labels")
+	}
 
-				libN := s.Get(lib)
-				if libN == nil {
-					return fmt.Errorf("unknown node for library %s from node %s", lib, vn)
-				}
-
-				libraries[libN] = true
-			}
+	for _, lib := range libs {
+		libN := s.Get(lib)
+		if libN == nil {
+			return fmt.Errorf("unknown node for library %s", lib)
 		}
-		return nil
-	})
+
+		libraries[libN] = true
+	}
+
+	return nil
 }
