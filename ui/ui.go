@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ankeesler/btool/collector"
+	"github.com/ankeesler/btool/app/collector"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 )
