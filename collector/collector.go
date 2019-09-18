@@ -13,11 +13,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// These constants are node.Node Label's that are used throughout this framework.
-const (
-	LabelLocal = "io.btool.local"
-)
-
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Store
 
 // Store is a place where node.Node's are kept.

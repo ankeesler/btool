@@ -3,9 +3,9 @@ package gaggle
 import (
 	"fmt"
 	"path/filepath"
-	"reflect"
 
 	"github.com/ankeesler/btool/collector"
+	"github.com/ankeesler/btool/collector/cc"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/registry"
@@ -53,19 +53,14 @@ func (c *Collector) Collect(
 
 		nN.Labels = n.Labels
 
-		// TODO: this shound't be hardcoded.
-		if err := prependRoot(nN, "io.btool.cc.includePaths", root); err != nil {
-			return errors.Wrap(err, "prepend root")
-		}
-		if err := prependRoot(nN, "io.btool.cc.libraries", root); err != nil {
+		if err := prependRoot(nN, root); err != nil {
 			return errors.Wrap(err, "prepend root")
 		}
 
-		// TODO: is this bad to collect include paths from dependencies first?
-		// TODO: this shouldn't be hardcoded.
-		includePaths, err := collector.CollectLabels(nN, "io.btool.cc.includePaths")
+		// TODO: is this bad to reach across sibling packages?
+		includePaths, err := cc.CollectIncludePaths(nN)
 		if err != nil {
-			return errors.Wrap(err, "collect labels")
+			return errors.Wrap(err, "collect include paths")
 		}
 
 		nodeR, err := c.newResolver(n.Resolver, root, includePaths)
@@ -134,26 +129,32 @@ func (c *Collector) createDownload(
 	return c.rf.NewDownload(cfg.URL, cfg.SHA256), nil
 }
 
-func prependRoot(n *node.Node, label string, root string) error {
-	values, ok := n.Labels[label]
-	if !ok {
-		return nil
+func prependRoot(n *node.Node, root string) error {
+	// TODO: is this bad to reach across sibling packages?
+	var labels cc.Labels
+	if err := collector.FromLabels(n, &labels); err != nil {
+		return errors.Wrap(err, "from labels")
 	}
 
-	valuesSlice, ok := values.([]string)
-	if !ok {
-		return fmt.Errorf(
-			"expected []string type for values, got %s (%s)",
-			reflect.TypeOf(values),
-			values,
-		)
+	if labels.IncludePaths == nil {
+		labels.IncludePaths = []string{}
 	}
 
-	for i := range valuesSlice {
-		valuesSlice[i] = filepath.Join(root, valuesSlice[i])
+	for i := range labels.IncludePaths {
+		labels.IncludePaths[i] = filepath.Join(root, labels.IncludePaths[i])
 	}
 
-	n.Labels[label] = valuesSlice
+	if labels.Libraries == nil {
+		labels.Libraries = []string{}
+	}
+
+	for i := range labels.Libraries {
+		labels.Libraries[i] = filepath.Join(root, labels.Libraries[i])
+	}
+
+	if err := collector.ToLabels(n, &labels); err != nil {
+		return errors.Wrap(err, "to labels")
+	}
 
 	return nil
 }

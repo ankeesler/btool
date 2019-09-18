@@ -18,25 +18,30 @@ type Includeser interface {
 	Includes(path string) ([]string, error)
 }
 
+// Includes is a collector.Consumer that adds dependencies to local C/C++
+// node.Node's.
 type Includes struct {
 	i Includeser
 }
 
+// NewIncludes creates a new Includes.
 func NewIncludes(i Includeser) *Includes {
 	return &Includes{
 		i: i,
 	}
 }
 
+// Consume will react to local .c/.cc/.h files and add Dependencies and
+// IncludePaths to a node.Node depending on what #include's the file contains.
 func (i *Includes) Consume(s collector.Store, n *node.Node) error {
 	ext := filepath.Ext(n.Name)
 	if ext != ".c" && ext != ".cc" && ext != ".h" {
 		return nil
 	}
 
-	if b, err := collector.BoolLabel(n, collector.LabelLocal); err != nil {
-		return errors.Wrap(err, "bool label")
-	} else if !b {
+	if local, err := isLocal(n); err != nil {
+		return errors.Wrap(err, "is local")
+	} else if !local {
 		return nil
 	}
 
@@ -95,8 +100,7 @@ func (i *Includes) resolveInclude(
 		log.Debugf("yes, and include path is %s", includePath)
 
 		d = sn
-		err = collector.AppendLabel(n, LabelIncludePaths, includePath)
-
+		err = AppendIncludePaths(n, includePath)
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "for each")
@@ -105,4 +109,30 @@ func (i *Includes) resolveInclude(
 	}
 
 	return nil, fmt.Errorf("cannot resolve include %s for node %s", include, n)
+}
+
+func isLocal(n *node.Node) (bool, error) {
+	var labels collector.Labels
+	if err := collector.FromLabels(n, &labels); err != nil {
+		return false, errors.Wrap(err, "from labels")
+	}
+
+	return labels.Local, nil
+}
+
+// AppendIncludePaths will append the provided include paths to the node.Node's
+// Labels.
+func AppendIncludePaths(n *node.Node, includePaths ...string) error {
+	var labels Labels
+	if err := collector.FromLabels(n, &labels); err != nil {
+		return errors.Wrap(err, "from labels")
+	}
+
+	labels.IncludePaths = append(labels.IncludePaths, includePaths...)
+
+	if err := collector.ToLabels(n, &labels); err != nil {
+		return errors.Wrap(err, "to labels")
+	}
+
+	return nil
 }

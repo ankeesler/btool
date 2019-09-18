@@ -1,12 +1,13 @@
+// Package cc provides collector.Producer's and collector.Consumer's specific to
+// C/C++ code.
 package cc
 
-// The following are Labels used to decorate node.Node's.
-const (
+// Labels is a data structure that stores unmarshaled node.Node Label data.
+// This data is common to all C/C++ related node.Node's.
+type Labels struct {
 	// Include paths required when compiling this thing.
-	// A list of comma separated paths.
-	LabelIncludePaths = "io.btool.cc.includePaths"
+	IncludePaths []string `mapstructure:"io.btool.collector.cc.includePaths"`
 
 	// Libraries required when linking this thing.
-	// A list of comma separated paths.
-	LabelLibraries = "io.btool.cc.libraries"
-)
+	Libraries []string `mapstructure:"io.btool.collector.cc.libraries"`
+}

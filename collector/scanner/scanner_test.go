@@ -43,7 +43,9 @@ func TestScannerProduce(t *testing.T) {
 func makeExNodes(files []string) []*node.Node {
 	nodes := make([]*node.Node, 0)
 	for _, file := range files {
-		nodes = append(nodes, node.New(file).Label(collector.LabelLocal, "true"))
+		n := node.New(file)
+		collector.MustToLabels(n, collector.Labels{Local: true})
+		nodes = append(nodes, n)
 	}
 	return nodes
 }

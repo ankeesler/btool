@@ -14,22 +14,28 @@ import (
 
 func TestObj(t *testing.T) {
 	// mainc -> bh -> ah
-	ah := node.New("a.h").Label(cc.LabelIncludePaths, []string{
+	ah := node.New("a.h")
+	require.Nil(t, cc.AppendIncludePaths(
+		ah,
 		"some/include/path",
 		"some/other/include/path",
-	})
+	))
 	bh := node.New("b.h")
-	bh.Dependency(ah).Label(cc.LabelIncludePaths, []string{
+	bh.Dependency(ah)
+	require.Nil(t, cc.AppendIncludePaths(
+		bh,
 		"some/other/other/include/path",
-	})
-	mainc := node.New("main.c").Label(cc.LabelIncludePaths, []string{
-		"some/main/include/path",
-	})
+	))
+	mainc := node.New("main.c")
 	mainc.Dependency(bh)
-	maincc := node.New("main.cc").Label(cc.LabelIncludePaths, []string{
+	require.Nil(t, cc.AppendIncludePaths(mainc,
 		"some/main/include/path",
-	})
+	))
+	maincc := node.New("main.cc")
 	maincc.Dependency(bh)
+	require.Nil(t, cc.AppendIncludePaths(maincc,
+		"some/main/include/path",
+	))
 
 	t.Run("BasicC", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}

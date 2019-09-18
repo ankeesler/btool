@@ -15,7 +15,7 @@ nodes:
   dependencies:
     - googletest-release-1.8.1.zip
   labels:
-    io.btool.cc.libraries:
+    io.btool.collector.cc.libraries:
       - gtest.a
   resolver:
     name: unzip
@@ -25,7 +25,7 @@ nodes:
   dependencies:
     - googletest-release-1.8.1.zip
   labels:
-    io.btool.cc.includePaths:
+    io.btool.collector.cc.includePaths:
       - googletest-release-1.8.1/googletest/include
       - googletest-release-1.8.1/googletest
   resolver:
@@ -34,7 +34,7 @@ nodes:
   dependencies:
     - googletest-release-1.8.1.zip
   labels:
-    io.btool.cc.includePaths:
+    io.btool.collector.cc.includePaths:
       - googletest-release-1.8.1/googletest/include
       - googletest-release-1.8.1/googletest
   resolver:

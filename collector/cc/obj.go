@@ -22,16 +22,18 @@ func NewObj(rf collector.ResolverFactory) *Obj {
 	}
 }
 
+// Consume will listen for .c/.cc files and create objects for them. It will walk
+// the node.Node.Dependencies in order to collect a list of include paths for
+// compilation.
 func (o *Obj) Consume(s collector.Store, n *node.Node) error {
 	ext := filepath.Ext(n.Name)
 	if ext != ".cc" && ext != ".c" {
 		return nil
 	}
 
-	// TODO: is this bad to collect include paths from dependencies first?
-	includePaths, err := collector.CollectLabels(n, LabelIncludePaths)
+	includePaths, err := CollectIncludePaths(n)
 	if err != nil {
-		return errors.Wrap(err, "collect labels")
+		return errors.Wrap(err, "collect include paths")
 	}
 
 	var r node.Resolver
@@ -48,4 +50,24 @@ func (o *Obj) Consume(s collector.Store, n *node.Node) error {
 	s.Set(on)
 
 	return nil
+}
+
+// CollectIncludePaths will walk a node.Node graph and return all of the include
+// paths encoutered as a part of a node.Node's Labels along the way.
+func CollectIncludePaths(n *node.Node) ([]string, error) {
+	includePaths := make([]string, 0)
+	if err := node.Visit(n, func(vn *node.Node) error {
+		var labels Labels
+		if err := collector.FromLabels(vn, &labels); err != nil {
+			return errors.Wrap(err, "from labels")
+		}
+
+		includePaths = append(includePaths, labels.IncludePaths...)
+
+		return nil
+	}); err != nil {
+		return nil, errors.Wrap(err, "visit")
+	}
+
+	return includePaths, nil
 }

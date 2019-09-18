@@ -39,7 +39,13 @@ func (s *Scanner) Produce(store collector.Store) error {
 	}
 
 	for _, file := range files {
-		store.Set(node.New(file).Label(collector.LabelLocal, "true"))
+		n := node.New(file)
+
+		if err := collector.ToLabels(n, collector.Labels{Local: true}); err != nil {
+			return errors.Wrap(err, "to labels")
+		}
+
+		store.Set(n)
 	}
 
 	return nil

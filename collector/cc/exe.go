@@ -12,16 +12,21 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Exe is a collector.Consumer that adds executable node.Node's.
 type Exe struct {
 	rf collector.ResolverFactory
 }
 
+// NewExe creates a new Exe.
 func NewExe(rf collector.ResolverFactory) *Exe {
 	return &Exe{
 		rf: rf,
 	}
 }
 
+// Consume will listen to executable node.Node's (i.e., node.Node's with no file
+// extension) and create a link target for that node.Node. It walks the source
+// tree backwards to find the dependent objects and libraries.
 func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 	if filepath.Ext(n.Name) != "" {
 		return nil
@@ -114,18 +119,24 @@ func collectLibraries(
 	n *node.Node,
 	libraries map[*node.Node]bool,
 ) error {
-	libs, err := collector.CollectLabels(n, LabelLibraries)
-	if err != nil {
-		return errors.Wrap(err, "collect labels")
-	}
-
-	for _, lib := range libs {
-		libN := s.Get(lib)
-		if libN == nil {
-			return fmt.Errorf("unknown node for library %s", lib)
+	if err := node.Visit(n, func(vn *node.Node) error {
+		var labels Labels
+		if err := collector.FromLabels(vn, &labels); err != nil {
+			return errors.Wrap(err, "from labels")
 		}
 
-		libraries[libN] = true
+		for _, library := range labels.Libraries {
+			libraryN := s.Get(library)
+			if libraryN == nil {
+				return fmt.Errorf("unknown node for library %s", library)
+			}
+
+			libraries[libraryN] = true
+		}
+
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "visit")
 	}
 
 	return nil
