@@ -6,7 +6,6 @@
 //     ...
 //   })
 //   ...
-
 package btool
 
 import (
