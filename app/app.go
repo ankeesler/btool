@@ -43,12 +43,20 @@ type Builder interface {
 	Build(*node.Node) error
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Runner
+
+// Runner runs a node.Node.
+type Runner interface {
+	Run(*node.Node) error
+}
+
 // App is a type that does the domain work of a btool invocation.
 type App struct {
 	cc      CollectorCreator
 	cleaner Cleaner
 	lister  Lister
 	builder Builder
+	runner  Runner
 }
 
 // New returns a new App struct.
@@ -57,17 +65,19 @@ func New(
 	cleaner Cleaner,
 	lister Lister,
 	builder Builder,
+	runner Runner,
 ) *App {
 	return &App{
 		cc:      cc,
 		cleaner: cleaner,
 		lister:  lister,
 		builder: builder,
+		runner:  runner,
 	}
 }
 
 // Run runs a btool build/clean.
-func (a *App) Run(n *node.Node, clean, list, dryRun bool) error {
+func (a *App) Run(n *node.Node, clean, list, run bool) error {
 	c, err := a.cc.Create()
 	if err != nil {
 		return errors.Wrap(err, "create")
@@ -86,6 +96,10 @@ func (a *App) Run(n *node.Node, clean, list, dryRun bool) error {
 	} else if list {
 		if err := a.lister.List(n); err != nil {
 			return errors.Wrap(err, "list")
+		}
+	} else if run {
+		if err := a.runner.Run(n); err != nil {
+			return errors.Wrap(err, "run")
 		}
 	} else {
 		if err := a.builder.Build(n); err != nil {

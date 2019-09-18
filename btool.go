@@ -26,6 +26,7 @@ import (
 	"github.com/ankeesler/btool/app/collector/scanner"
 	"github.com/ankeesler/btool/app/collector/scanner/walker"
 	"github.com/ankeesler/btool/app/lister"
+	"github.com/ankeesler/btool/app/runner"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/ui"
 	"github.com/pkg/errors"
@@ -42,6 +43,7 @@ type Cfg struct {
 
 	Clean  bool
 	List   bool
+	Run    bool
 	DryRun bool
 
 	CompilerC  string
@@ -139,7 +141,8 @@ func Run(cfg *Cfg) error {
 	cleaner := cleaner.New(fs, ui)
 	lister := lister.New(os.Stdout)
 	builder := builder.New(cfg.DryRun, currenter.New(), ui)
-	a := app.New(cc, cleaner, lister, builder)
+	runner := runner.New(ui)
+	a := app.New(cc, cleaner, lister, builder, runner)
 
-	return a.Run(targetN, cfg.Clean, cfg.List, cfg.DryRun)
+	return a.Run(targetN, cfg.Clean, cfg.List, cfg.Run)
 }

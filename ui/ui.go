@@ -59,3 +59,11 @@ func (ui *UI) OnClean(n *node.Node) {
 
 	log.Infof("cleaning " + n.Name)
 }
+
+func (ui *UI) OnRun(n *node.Node) {
+	if ui.quiet {
+		return
+	}
+
+	log.Infof("running " + n.Name + "...")
+}
