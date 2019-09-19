@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set -eou pipefail
+set -eo pipefail
+
+if [[ -z "$BTOOL" ]]; then
+  BTOOL="$(which btool)"
+fi 
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-btool -run -target node/node_test
+"$BTOOL" -run -target node/node_test
