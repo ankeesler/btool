@@ -30,10 +30,10 @@ func run() error {
 		"https://btoolregistry.cfapps.io",
 		"Btool registry link, e.g., file://path/to/reg/dir or https://a.io",
 	)
-	dryrun := flag.Bool("dryrun", false, "Do not actually build")
+	dryrun := flag.Bool("dryrun", false, "Do not actually build (or run)")
 	clean := flag.Bool("clean", false, "Clean all nodes")
 	list := flag.Bool("list", false, "Simply list all targets")
-	run := flag.Bool("run", false, "Run the target")
+	run := flag.Bool("run", false, "Run the target (after building)")
 	version := flag.Bool("version", false, "Print version")
 	help := flag.Bool("help", false, "Show this help message")
 

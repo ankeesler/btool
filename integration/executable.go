@@ -17,17 +17,6 @@ func executable(c *config) {
 		"-cache",
 		c.cache,
 		"-debug",
-	)
-
-	c.run(
-		c.btool,
-		"-target",
-		"main",
-		"-root",
-		c.root,
-		"-cache",
-		c.cache,
-		"-debug",
 		"-run",
 	)
 
@@ -48,19 +37,6 @@ func executableLocalRegistry(c *config) {
 	dir, err := os.Getwd()
 	require.Nil(c.t, err)
 	registryData := filepath.Join(dir, "..", "data")
-
-	c.run(
-		c.btool,
-		"-target",
-		"main",
-		"-root",
-		c.root,
-		"-cache",
-		c.cache,
-		"-registry",
-		registryData,
-		"-debug",
-	)
 
 	c.run(
 		c.btool,
@@ -102,16 +78,6 @@ func executableRunTwice(c *config) {
 			"-cache",
 			c.cache,
 			"-debug",
-		)
-		c.run(
-			c.btool,
-			"-target",
-			"main",
-			"-root",
-			c.root,
-			"-cache",
-			c.cache,
-			"-debug",
 			"-run",
 		)
 	}
@@ -136,15 +102,6 @@ func executableSubdirectoryCache(c *config) {
 	c.wd = filepath.Join(wd, "..", "example", c.example)
 	cache := filepath.Join(c.wd, "cache")
 	defer os.RemoveAll(cache)
-
-	c.run(
-		c.btool,
-		"-target",
-		"main",
-		"-debug",
-		"-cache",
-		cache,
-	)
 
 	c.run(
 		c.btool,

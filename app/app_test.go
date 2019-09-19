@@ -63,7 +63,7 @@ func TestBtoolRun(t *testing.T) {
 			run:            true,
 			cleanCallCount: 0,
 			listCallCount:  0,
-			buildCallCount: 0,
+			buildCallCount: 1,
 			runCallCount:   1,
 		},
 	}

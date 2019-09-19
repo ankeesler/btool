@@ -97,13 +97,15 @@ func (a *App) Run(n *node.Node, clean, list, run bool) error {
 		if err := a.lister.List(n); err != nil {
 			return errors.Wrap(err, "list")
 		}
-	} else if run {
-		if err := a.runner.Run(n); err != nil {
-			return errors.Wrap(err, "run")
-		}
 	} else {
 		if err := a.builder.Build(n); err != nil {
 			return errors.Wrap(err, "build")
+		}
+
+		if run {
+			if err := a.runner.Run(n); err != nil {
+				return errors.Wrap(err, "run")
+			}
 		}
 	}
 
