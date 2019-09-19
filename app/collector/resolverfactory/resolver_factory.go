@@ -45,14 +45,14 @@ func (rf *ResolverFactory) NewArchive() node.Resolver {
 
 // NewLinkC returns a node.Resolver that links multiple C objects into an
 // executable.
-func (rf *ResolverFactory) NewLinkC() node.Resolver {
-	return resolvers.NewLink(rf.linkerC)
+func (rf *ResolverFactory) NewLinkC(linkFlags []string) node.Resolver {
+	return resolvers.NewLink(rf.linkerC, linkFlags)
 }
 
 // NewLinkCC returns a node.Resolver that links multiple C++ objects into an
 // executable.
-func (rf *ResolverFactory) NewLinkCC() node.Resolver {
-	return resolvers.NewLink(rf.linkerCC)
+func (rf *ResolverFactory) NewLinkCC(linkFlags []string) node.Resolver {
+	return resolvers.NewLink(rf.linkerCC, linkFlags)
 }
 
 // NewSymlink returns a node.Resolver that symlinks a node to another.

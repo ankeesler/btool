@@ -10,13 +10,15 @@ import (
 
 type link struct {
 	linker string
+	flags  []string
 }
 
 // NewLink returns a node.Resolver that links a bunch of object files into
 // an executable.
-func NewLink(linker string) node.Resolver {
+func NewLink(linker string, flags []string) node.Resolver {
 	return &link{
 		linker: linker,
+		flags:  flags,
 	}
 }
 
@@ -29,8 +31,9 @@ func (l *link) Resolve(n *node.Node) error {
 	for _, d := range n.Dependencies {
 		cmd.Args = append(cmd.Args, d.Name)
 	}
+	cmd.Args = append(cmd.Args, l.flags...)
 
-	log.Debugf("linker: running %s from %s", cmd.Args, cmd.Dir)
+	log.Debugf("linker: running %s", cmd.Args)
 	o, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.Wrap(err, string(o))

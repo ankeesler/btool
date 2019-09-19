@@ -54,9 +54,13 @@ func TestCollectorCollect(t *testing.T) {
 				},
 			},
 			&registry.Node{
-				Name:         "a.a",
+				Name:         "a",
 				Dependencies: []string{"a.o"},
-				Labels:       map[string]interface{}{},
+				Labels: map[string]interface{}{
+					"io.btool.collector.cc.linkFlags": []interface{}{
+						"-someflag",
+					},
+				},
 				Resolver: registry.Resolver{
 					Name: "linkC",
 				},
@@ -81,6 +85,9 @@ func TestCollectorCollect(t *testing.T) {
 		[]string{
 			"/some/root/some/library",
 		},
+	).Label(
+		"io.btool.collector.cc.linkFlags",
+		[]string(nil),
 	)
 	nodeAC := node.New("/some/root/a.c").Dependency(nodeAH)
 	nodeAC.Label(
@@ -91,6 +98,9 @@ func TestCollectorCollect(t *testing.T) {
 	).Label(
 		"io.btool.collector.cc.libraries",
 		[]string{},
+	).Label(
+		"io.btool.collector.cc.linkFlags",
+		[]string(nil),
 	)
 	nodeAO := node.New("/some/root/a.o").Dependency(nodeAC)
 	nodeAO.Label(
@@ -99,15 +109,23 @@ func TestCollectorCollect(t *testing.T) {
 	).Label(
 		"io.btool.collector.cc.libraries",
 		[]string{},
+	).Label(
+		"io.btool.collector.cc.linkFlags",
+		[]string(nil),
 	)
 	nodeAO.Resolver = compilerCR
-	nodeAA := node.New("/some/root/a.a").Dependency(nodeAO)
+	nodeAA := node.New("/some/root/a").Dependency(nodeAO)
 	nodeAA.Label(
 		"io.btool.collector.cc.includePaths",
 		[]string{},
 	).Label(
 		"io.btool.collector.cc.libraries",
 		[]string{},
+	).Label(
+		"io.btool.collector.cc.linkFlags",
+		[]string{
+			"-someflag",
+		},
 	)
 	nodeAA.Resolver = linkerCR
 	assert.Equal(t, nodeAH, s.Get(nodeAH.Name))
@@ -123,6 +141,14 @@ func TestCollectorCollect(t *testing.T) {
 			"/some/root/another/include/dir",
 		},
 		rf.NewCompileCArgsForCall(0),
+	)
+
+	assert.Equal(
+		t,
+		[]string{
+			"-someflag",
+		},
+		rf.NewLinkCArgsForCall(0),
 	)
 
 	//assert.Equal(

@@ -28,6 +28,7 @@ func TestExe(t *testing.T) {
 	maincc := node.New("main.cc").Dependency(bh)
 	maino := node.New("main.o").Dependency(mainc)
 	ca := node.New("c.a")
+	collector.MustToLabels(ca, cc.Labels{LinkFlags: []string{"-someflag"}})
 
 	t.Run("C", func(t *testing.T) {
 		r := &nodefakes.FakeResolver{}
@@ -43,6 +44,7 @@ func TestExe(t *testing.T) {
 		require.Nil(t, e.Consume(s, main))
 
 		assert.Equal(t, 1, rf.NewLinkCCallCount())
+		assert.Equal(t, []string{"-someflag"}, rf.NewLinkCArgsForCall(0))
 
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
@@ -65,6 +67,7 @@ func TestExe(t *testing.T) {
 		require.Nil(t, e.Consume(s, main))
 
 		assert.Equal(t, 1, rf.NewLinkCCCallCount())
+		assert.Equal(t, []string{"-someflag"}, rf.NewLinkCCArgsForCall(0))
 
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
@@ -89,6 +92,7 @@ func TestExe(t *testing.T) {
 		require.Nil(t, e.Consume(s, main))
 
 		assert.Equal(t, 1, rf.NewLinkCCCallCount())
+		assert.Equal(t, []string{"-someflag"}, rf.NewLinkCCArgsForCall(0))
 
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)

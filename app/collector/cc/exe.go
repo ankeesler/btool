@@ -40,19 +40,14 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 		return fmt.Errorf("no known source for exe %s", n)
 	}
 
-	var r node.Resolver
 	var err error
 	objs := make(map[string]*node.Node)
 	if c != nil {
 		log.Debugf("exe %s has source %s", n, c)
-
 		err = collectObjs(s, c, ".c", objs)
-		r = e.rf.NewLinkC()
 	} else { // cc
 		log.Debugf("exe %s has source %s", n, cc)
-
 		err = collectObjs(s, cc, ".cc", objs)
-		r = e.rf.NewLinkCC()
 	}
 
 	if err != nil {
@@ -69,6 +64,19 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 	}
 	for library := range libraries {
 		n.Dependency(library)
+	}
+
+	var linkFlags []string
+	linkFlags, err = CollectLinkFlags(n)
+	if err != nil {
+		return errors.Wrap(err, "collect link flags")
+	}
+
+	var r node.Resolver
+	if c != nil {
+		r = e.rf.NewLinkC(linkFlags)
+	} else {
+		r = e.rf.NewLinkCC(linkFlags)
 	}
 	n.Resolver = r
 
@@ -140,4 +148,10 @@ func collectLibraries(
 	}
 
 	return nil
+}
+
+// CollectLinkFlag will walk a node.Node graph and return all of the linker flags
+// paths encoutered as a part of a node.Node's Labels along the way.
+func CollectLinkFlags(n *node.Node) ([]string, error) {
+	return collectLabels(n, func(l *Labels) []string { return l.LinkFlags })
 }

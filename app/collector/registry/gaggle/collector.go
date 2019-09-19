@@ -62,8 +62,12 @@ func (c *Collector) Collect(
 		if err != nil {
 			return errors.Wrap(err, "collect include paths")
 		}
+		linkFlags, err := cc.CollectLinkFlags(nN)
+		if err != nil {
+			return errors.Wrap(err, "collect include paths")
+		}
 
-		nodeR, err := c.newResolver(n.Resolver, root, includePaths)
+		nodeR, err := c.newResolver(n.Resolver, root, includePaths, linkFlags)
 		if err != nil {
 			return errors.Wrap(err, "new resolver")
 		}
@@ -80,6 +84,7 @@ func (c *Collector) newResolver(
 	registryR registry.Resolver,
 	root string,
 	includePaths []string,
+	linkFlags []string,
 ) (node.Resolver, error) {
 	name := registryR.Name
 	config := registryR.Config
@@ -94,9 +99,9 @@ func (c *Collector) newResolver(
 	case "archive":
 		nodeR = c.rf.NewArchive()
 	case "linkC":
-		nodeR = c.rf.NewLinkC()
+		nodeR = c.rf.NewLinkC(linkFlags)
 	case "linkCC":
-		nodeR = c.rf.NewLinkCC()
+		nodeR = c.rf.NewLinkCC(linkFlags)
 	case "symlink":
 		nodeR = c.rf.NewSymlink()
 	case "unzip":
