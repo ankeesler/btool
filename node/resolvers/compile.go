@@ -3,6 +3,7 @@ package resolvers
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
@@ -28,6 +29,14 @@ func (c *compile) Resolve(n *node.Node) error {
 		return fmt.Errorf("expected %d dependencies, got %d", 1, len(n.Dependencies))
 	}
 
+	// TODO: wow what a hack! We should provide these flags another way...
+	var std string
+	if strings.HasSuffix(c.compiler, "++") {
+		std = "c++17"
+	} else {
+		std = "c17"
+	}
+
 	cmd := exec.Command(
 		c.compiler,
 		"-o",
@@ -38,6 +47,7 @@ func (c *compile) Resolve(n *node.Node) error {
 		"-Werror",
 		"-g",
 		"-O0",
+		"--std="+std,
 	)
 	for _, include := range c.includes {
 		cmd.Args = append(cmd.Args, "-I"+include)
