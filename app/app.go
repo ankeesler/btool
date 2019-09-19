@@ -50,6 +50,15 @@ type Runner interface {
 	Run(*node.Node) error
 }
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Watcher
+
+// Watcher listens for changes in the node.Node graph. The call will block until
+// a change is made to one of the provided node.Node's on disk. The call will
+// return an error if there was a problem with the call.
+type Watcher interface {
+	Watch(*node.Node) error
+}
+
 // App is a type that does the domain work of a btool invocation.
 type App struct {
 	cc      CollectorCreator
@@ -57,6 +66,7 @@ type App struct {
 	lister  Lister
 	builder Builder
 	runner  Runner
+	watcher Watcher
 }
 
 // New returns a new App struct.
@@ -66,6 +76,7 @@ func New(
 	lister Lister,
 	builder Builder,
 	runner Runner,
+	watcher Watcher,
 ) *App {
 	return &App{
 		cc:      cc,
@@ -73,11 +84,12 @@ func New(
 		lister:  lister,
 		builder: builder,
 		runner:  runner,
+		watcher: watcher,
 	}
 }
 
 // Run runs a btool build/clean.
-func (a *App) Run(n *node.Node, clean, list, run bool) error {
+func (a *App) Run(n *node.Node, clean, list, run, watch bool) error {
 	c, err := a.cc.Create()
 	if err != nil {
 		return errors.Wrap(err, "create")
@@ -98,13 +110,32 @@ func (a *App) Run(n *node.Node, clean, list, run bool) error {
 			return errors.Wrap(err, "list")
 		}
 	} else {
-		if err := a.builder.Build(n); err != nil {
-			return errors.Wrap(err, "build")
-		}
+		for {
+			err := a.builder.Build(n)
+			if err != nil {
+				if !watch {
+					return errors.Wrap(err, "build")
+				} else {
+					log.Errorf("build: %s", err)
+				}
+			}
 
-		if run {
-			if err := a.runner.Run(n); err != nil {
-				return errors.Wrap(err, "run")
+			if err == nil && run {
+				if err := a.runner.Run(n); err != nil {
+					if !watch {
+						return errors.Wrap(err, "run")
+					} else {
+						log.Errorf("run: %s", err)
+					}
+				}
+			}
+
+			if watch {
+				if err := a.watcher.Watch(n); err != nil {
+					return errors.Wrap(err, "watch")
+				}
+			} else {
+				break
 			}
 		}
 	}

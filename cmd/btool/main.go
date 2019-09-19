@@ -34,6 +34,7 @@ func run() error {
 	clean := flag.Bool("clean", false, "Clean all nodes")
 	list := flag.Bool("list", false, "Simply list all targets")
 	run := flag.Bool("run", false, "Run the target (after building)")
+	watch := flag.Bool("watch", false, "Watch for file changes and rebuild (or rerun)")
 	version := flag.Bool("version", false, "Print version")
 	help := flag.Bool("help", false, "Show this help message")
 
@@ -73,6 +74,7 @@ func run() error {
 		Clean:  *clean,
 		List:   *list,
 		Run:    *run,
+		Watch:  *watch,
 
 		CompilerC:  tc.CompilerC,
 		CompilerCC: tc.CompilerCC,
