@@ -3,6 +3,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"runtime"
 
@@ -40,7 +41,7 @@ func run() error {
 
 	flag.Parse()
 	if *help {
-		flag.Usage()
+		printHelp()
 		os.Exit(1)
 	}
 
@@ -125,4 +126,25 @@ func findToolchain() (*toolchain, error) {
 	default:
 		return nil, errors.New("unknown toolchain for system")
 	}
+}
+
+func printHelp() {
+	fmt.Println(os.Args[0], "- The simplest C/C++ build tool.")
+
+	fmt.Println()
+	fmt.Println("Examples")
+	fmt.Println("  btool -target main -root some/root")
+	fmt.Println("  \tbuild an executable main from project root at ./some/root")
+	fmt.Println("  btool -target main -run")
+	fmt.Println("  \tbuild and run an executable main")
+	fmt.Println("  btool -target main -run -watch")
+	fmt.Println("  \tbuild and run an executable main continuously on file changes")
+	fmt.Println("  btool -list -root some/root")
+	fmt.Println("  \tlist the possible targets in project ./some/root")
+	fmt.Println("  btool -clean -target main")
+	fmt.Println("  \tdelete all built files associated with target main")
+
+	fmt.Println()
+	fmt.Println("Flags")
+	flag.PrintDefaults()
 }

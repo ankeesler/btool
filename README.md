@@ -1,6 +1,6 @@
 # btool
 
-Zero-configuration C/C++ build tool.
+The simplest C/C++ build tool.
 
 ![btool](btool.png)
 
