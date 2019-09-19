@@ -9,8 +9,8 @@ import (
 	"github.com/ankeesler/btool/registry"
 	"github.com/ankeesler/btool/registry/registryfakes"
 	"github.com/ankeesler/btool/registry/testutil"
-	"github.com/go-test/deep"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )
 
@@ -63,9 +63,7 @@ func TestHTTPRegistryIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if diff := deep.Equal(exI, acI); diff != nil {
-		t.Error(exI, "!=", acI)
-	}
+	assert.Equal(t, exI, acI)
 
 	// 404
 	_, err = r.Index()
@@ -136,9 +134,7 @@ func TestHTTPRegistryGaggle(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if diff := deep.Equal(exGaggle, acGaggle); diff != nil {
-		t.Error(exGaggle, "!=", acGaggle)
-	}
+	assert.Equal(t, exGaggle, acGaggle)
 
 	// 404
 	acGaggle, err = r.Gaggle("some/gaggle")

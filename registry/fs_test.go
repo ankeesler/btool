@@ -6,8 +6,9 @@ import (
 
 	"github.com/ankeesler/btool/registry"
 	"github.com/ankeesler/btool/registry/testutil"
-	"github.com/go-test/deep"
 	"github.com/spf13/afero"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 )
 
@@ -44,11 +45,8 @@ func TestFSRegistry(t *testing.T) {
 
 	exIndex := testutil.Index()
 	acIndex, err := r.Index()
-	if err != nil {
-		t.Error(err)
-	} else if diff := deep.Equal(exIndex, acIndex); diff != nil {
-		t.Error(diff)
-	}
+	require.Nil(t, err)
+	require.Equal(t, exIndex, acIndex)
 
 	data := []struct {
 		name   string
@@ -92,9 +90,7 @@ func TestFSRegistry(t *testing.T) {
 				return
 			}
 
-			if diff := deep.Equal(datum.gaggle, acGaggle); diff != nil {
-				t.Error(diff)
-			}
+			assert.Equal(t, datum.gaggle, acGaggle)
 		})
 	}
 }
