@@ -3,6 +3,7 @@
 
 #include <map>
 #include <ostream>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -14,11 +15,13 @@ class Node {
 
   const std::string &Name() const { return name_; }
   void String(std::ostream *os) const;
+  void Visit(std::function<void(const Node *)>) const;
 
   void AddDep(Node *dep) { deps_.push_back(dep); }
 
  private:
   void String(std::ostream *os, int indent) const;
+  void Visit(std::function<void(const Node *)>, std::set<const Node *> *) const;
 
   std::string name_;
   std::vector<Node *> deps_;

@@ -1,6 +1,7 @@
 #include "node.h"
 
 #include <sstream>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -27,6 +28,26 @@ TEST(Node, Print) {
   std::stringstream ss;
   a.String(&ss);
   EXPECT_EQ(ex, ss.str());
+}
+
+TEST(Node, Visit) {
+  // a -> b, c
+  // b -> c
+  // c -> d
+  // d
+  ::btool::node::Node d("d");
+  ::btool::node::Node c("c");
+  c.AddDep(&d);
+  ::btool::node::Node b("b");
+  b.AddDep(&c);
+  ::btool::node::Node a("a");
+  a.AddDep(&b);
+  a.AddDep(&c);
+
+  std::vector<const ::btool::node::Node *> ex{&d, &c, &b, &a};
+  std::vector<const ::btool::node::Node *> visited;
+  a.Visit([&visited](const ::btool::node::Node *vn) { visited.push_back(vn); });
+  EXPECT_EQ(ex, visited);
 }
 
 int main(int argc, char *argv[]) {

@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
@@ -24,6 +25,7 @@ func (c *Currenter) Current(n *node.Node) (bool, error) {
 	nInfo, err := os.Lstat(n.Name)
 	if err != nil {
 		if os.IsNotExist(err) {
+			log.Debugf("%s does not exist", n)
 			return false, nil
 		} else {
 			return false, errors.Wrap(err, "lstat")
@@ -31,6 +33,7 @@ func (c *Currenter) Current(n *node.Node) (bool, error) {
 	}
 
 	latestT := time.Time{}
+	var latestN *node.Node
 	for _, dN := range n.Dependencies {
 		dInfo, err := os.Lstat(dN.Name)
 		if err != nil {
@@ -40,10 +43,12 @@ func (c *Currenter) Current(n *node.Node) (bool, error) {
 		modT := dInfo.ModTime()
 		if modT.After(latestT) {
 			latestT = modT
+			latestN = dN
 		}
 	}
 
 	if latestT.After(nInfo.ModTime()) {
+		log.Debugf("%s has a newer dependency: %s", n, latestN)
 		return false, nil
 	}
 

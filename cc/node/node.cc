@@ -1,6 +1,7 @@
 #include "node/node.h"
 
 #include <ostream>
+#include <set>
 
 namespace btool::node {
 
@@ -14,6 +15,22 @@ void Node::String(std::ostream *os, int indent) const {
   for (auto dep : deps_) {
     dep->String(os, indent + 1);
   }
+}
+
+void Node::Visit(std::function<void(const Node *)> f) const {
+  std::set<const Node *> visited;
+  Visit(f, &visited);
+}
+
+void Node::Visit(std::function<void(const Node *)> f,
+                 std::set<const Node *> *visited) const {
+  if (visited->count(this) == 0) {
+    for (auto dep : deps_) {
+      dep->Visit(f, visited);
+    }
+    f(this);
+  }
+  visited->insert(this);
 }
 
 };  // namespace btool::node

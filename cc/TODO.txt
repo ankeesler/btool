@@ -1,0 +1,1 @@
+- valgrind, or some sort of thing to check memory leaks
