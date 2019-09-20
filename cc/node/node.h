@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <ostream>
 #include <vector>
 
 namespace btool::node {
@@ -12,9 +13,15 @@ public:
   Node(const std::string& name) : name_(name) { }
 
   const std::string& Name() const { return name_; }
+  void String(std::ostream *os) const;
+
+  void AddDep(Node *dep) { deps_.push_back(dep); }
 
 private:
+  void String(std::ostream *os, int indent) const;
+
   std::string name_;
+  std::vector<Node*> deps_;
 };
 
 }; // namespace btool::node
