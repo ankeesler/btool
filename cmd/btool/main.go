@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/ankeesler/btool"
@@ -22,9 +23,14 @@ func main() {
 }
 
 func run() error {
+	home, ok := os.LookupEnv("HOME")
+	if !ok {
+		home = "."
+	}
+
 	debug := flag.Bool("debug", false, "Turn on debug printing")
 	root := flag.String("root", ".", "Root of node list")
-	cache := flag.String("cache", ".btool", "Cache directory")
+	cache := flag.String("cache", filepath.Join(home, ".btool"), "Cache directory")
 	target := flag.String("target", "main", "Target to build")
 	registry := flag.String(
 		"registry",

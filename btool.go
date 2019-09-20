@@ -116,7 +116,7 @@ func (ccreator *collectorCreator) Create() (app.Collector, error) {
 // provided Cfg, passes those dependencies to app.New(), and calls Run() on the
 // returned app.App struct.
 func Run(cfg *Cfg) error {
-	ui := ui.New(cfg.Quiet)
+	ui := ui.New(cfg.Quiet, cfg.Cache)
 
 	fs := afero.NewOsFs()
 	rf := resolverfactory.New(

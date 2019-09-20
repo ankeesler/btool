@@ -14,14 +14,16 @@ import (
 // UI is an object that can provide pretty btool command line printing.
 type UI struct {
 	quiet bool
+	cache string
 
 	added map[*node.Node]bool
 }
 
 // New creates a new UI.
-func New(quiet bool) *UI {
+func New(quiet bool, cache string) *UI {
 	return &UI{
 		quiet: quiet,
+		cache: cache,
 
 		added: make(map[*node.Node]bool),
 	}
@@ -33,7 +35,7 @@ func (ui *UI) OnResolve(n *node.Node, current bool) {
 	}
 
 	b := strings.Builder{}
-	b.WriteString(fmt.Sprintf("resolving %s", shortenName(n.Name)))
+	b.WriteString(fmt.Sprintf("resolving %s", shortenName(n.Name, ui.cache)))
 	if current {
 		b.WriteString(" (up to date)")
 	}
@@ -46,7 +48,7 @@ func (ui *UI) Consume(s collector.Store, n *node.Node) error {
 	}
 
 	if _, ok := ui.added[n]; !ok {
-		log.Infof("adding " + shortenName(n.Name))
+		log.Infof("adding " + shortenName(n.Name, ui.cache))
 		ui.added[n] = true
 	}
 
@@ -58,7 +60,7 @@ func (ui *UI) OnClean(n *node.Node) {
 		return
 	}
 
-	log.Infof("cleaning " + shortenName(n.Name))
+	log.Infof("cleaning " + shortenName(n.Name, ui.cache))
 }
 
 func (ui *UI) OnRun(n *node.Node) {
@@ -66,12 +68,16 @@ func (ui *UI) OnRun(n *node.Node) {
 		return
 	}
 
-	log.Infof("running " + shortenName(n.Name) + "...")
+	log.Infof("running " + shortenName(n.Name, ui.cache) + "...")
 }
 
-func shortenName(name string) string {
-	// this length is enough to show the first 3 sha characters after ".btool/"
-	const prefixLength = 9
+func shortenName(name, cache string) string {
+	// this length is enough to show the first 3 sha characters after "$CACHE/"
+	const prefixLength = 10
+
+	if strings.HasPrefix(name, cache) {
+		name = strings.Replace(name, cache, "$CACHE", 1)
+	}
 
 	base := filepath.Base(name)
 

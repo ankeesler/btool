@@ -8,20 +8,34 @@ import (
 
 func TestShortenName(t *testing.T) {
 	data := []struct {
-		in, out string
+		cache, in, out string
 	}{
 		{
 			// short enough
-			in:  "abc123/a.cc",
-			out: "abc123/a.cc",
+			cache: "nah",
+			in:    "abc123/a.cc",
+			out:   "abc123/a.cc",
+		},
+		{
+			// short enough with cache
+			cache: "abc123",
+			in:    "abc123/a.cc",
+			out:   "$CACHE/a.cc",
 		},
 		{
 			// long
-			in:  "0123456789abcdefghij/0123456789.txt",
-			out: "012345678.../0123456789.txt",
+			cache: "nah",
+			in:    "0123456789abcdefghij/0123456789.txt",
+			out:   "0123456789.../0123456789.txt",
+		},
+		{
+			// long with cache
+			cache: "a",
+			in:    "a/0123456789abcdefghij/0123456789.txt",
+			out:   "$CACHE/012.../0123456789.txt",
 		},
 	}
 	for _, datum := range data {
-		assert.Equal(t, datum.out, shortenName(datum.in))
+		assert.Equal(t, datum.out, shortenName(datum.in, datum.cache))
 	}
 }
