@@ -4,9 +4,7 @@
 
 namespace btool::node {
 
-void Node::String(std::ostream *os) const {
-  String(os, 0);
-}
+void Node::String(std::ostream *os) const { String(os, 0); }
 
 void Node::String(std::ostream *os, int indent) const {
   for (int i = 0; i < indent; ++i) {
@@ -18,4 +16,4 @@ void Node::String(std::ostream *os, int indent) const {
   }
 }
 
-}; // namespace btool::node
+};  // namespace btool::node

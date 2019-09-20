@@ -61,9 +61,9 @@ class %s {
 
 };
 
-}; // namespace %s
+};  // namespace %s
 
-#endif // %s
+#endif  // %s
 `,
 		ifndef,
 		ifndef,
