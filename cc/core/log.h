@@ -4,8 +4,12 @@
 namespace btool::core {
 
 void Debugf(const char *, int, const char *, ...);
+void Infof(const char *, int, const char *, ...);
+void Errorf(const char *, int, const char *, ...);
 
-#define DEBUG(f, ...) Debugf(__FILE__, __LINE__, f, __VA_ARGS__)
+#define DEBUG(f, ...) ::btool::core::Debugf(__FILE__, __LINE__, f, __VA_ARGS__)
+#define INFO(f, ...) ::btool::core::Infof(__FILE__, __LINE__, f, __VA_ARGS__)
+#define ERROR(f, ...) ::btool::core::Errorf(__FILE__, __LINE__, f, __VA_ARGS__)
 
 };  // namespace btool::core
 

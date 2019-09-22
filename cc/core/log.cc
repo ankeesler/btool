@@ -5,13 +5,43 @@
 
 namespace btool::core {
 
-void Debugf(const char *file, int line, const char *format, ...) {
-  va_list list;
+static void logf(const char *file,
+                 int line,
+                 const char *area,
+                 const char *format,
+                 va_list args);
 
-  va_start(list, format);
-  fprintf(stderr, "btool | %s:%d | ", file, line);
-  vfprintf(stderr, format, list);
-  va_end(list);
+void Infof(const char *file, int line, const char *format, ...) {
+  va_list args;
+
+  va_start(args, format);
+  logf(file, line, "info", format, args);
+  va_end(args);
+}
+
+void Debugf(const char *file, int line, const char *format, ...) {
+  va_list args;
+
+  va_start(args, format);
+  logf(file, line, "debug", format, args);
+  va_end(args);
+}
+
+void Errorf(const char *file, int line, const char *format, ...) {
+  va_list args;
+
+  va_start(args, format);
+  logf(file, line, "error", format, args);
+  va_end(args);
+}
+
+static void logf(const char *file,
+                 int line,
+                 const char *area,
+                 const char *format,
+                 va_list args) {
+  ::fprintf(stderr, "btool | %s | %s:%d | ", area, file, line);
+  ::vfprintf(stderr, format, args);
 }
 
 };  // namespace btool::core
