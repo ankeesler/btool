@@ -5,11 +5,8 @@
 
 namespace btool::core {
 
-static void logf(const char *file,
-                 int line,
-                 const char *area,
-                 const char *format,
-                 va_list args);
+static void logf(const char *file, int line, const char *area,
+                 const char *format, va_list args);
 
 void Infof(const char *file, int line, const char *format, ...) {
   va_list args;
@@ -35,11 +32,8 @@ void Errorf(const char *file, int line, const char *format, ...) {
   va_end(args);
 }
 
-static void logf(const char *file,
-                 int line,
-                 const char *area,
-                 const char *format,
-                 va_list args) {
+static void logf(const char *file, int line, const char *area,
+                 const char *format, va_list args) {
   ::fprintf(stderr, "btool | %s | %s:%d | ", area, file, line);
   ::vfprintf(stderr, format, args);
 }
