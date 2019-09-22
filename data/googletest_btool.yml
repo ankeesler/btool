@@ -65,5 +65,8 @@ nodes:
   dependencies:
     - googletest-release-1.8.1/googletest/src/gtest-all.o
     - googletest-release-1.8.1/googletest/src/gtest_main.o
+  labels:
+    io.btool.collector.cc.linkFlags:
+      - "-lpthread"
   resolver:
     name: archive

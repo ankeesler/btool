@@ -121,9 +121,9 @@ class %s {
 
 };
 
-}; // namespace %s
+};  // namespace %s
 
-#endif // %s
+#endif  // %s
 `,
 			datum.ifndef,
 			datum.ifndef,
