@@ -1,1 +1,2 @@
 - valgrind, or some sort of thing to check memory leaks
+- is it cool to pass strings in by value to copy them over in constructors?
