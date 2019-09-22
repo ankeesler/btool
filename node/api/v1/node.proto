@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+//package btool.node.v1;
+
+option go_package = "node";
+
+// Node Repository API
+//
+// The Node Repository API is used to get collections of btool Nodes.
+service NodeRepository {
+  // List the projects that this service knows about.
+  rpc ListRepositories(ListRepositoriesRequest) returns (ListRepositoriesResponse) {}
+}
+
+message ListRepositoriesRequest {
+}
+
+message ListRepositoriesResponse {
+  // The list of requested repositories.
+  repeated Repository repositories = 1;
+}
+
+message Repository {
+  // The name of the repository.
+  string name = 1;
+
+  // The revision of this repository.
+  //
+  // This should be different for every mutation of the repository (i.e., when the
+  // Nodes change in this repository, this string should change.
+  //
+  // Said another way, this version should change iff any Node data changes in
+  // this repository.
+  string revision = 2;
+
+  // The btool Nodes in this repository.
+  repeated Node nodes = 3;
+}
+
+message Node {
+  // The name of this Node.
+  string name = 1;
+
+  // The names of the dependencies of this Node.
+  repeated string dependencies = 2;
+
+  // Opaque metadata associated with this Node.
+  map<string, string> labels = 3;
+
+  // This Node's Resolver.
+  Resolver resolver = 4;
+}
+
+message Resolver {
+  // The name of this Resolver.
+  string name = 1;
+
+  // Opaque configuration for this Resolver.
+  map<string, string> config = 2;
+}
