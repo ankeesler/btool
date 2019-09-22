@@ -49,8 +49,3 @@ TEST(Node, Visit) {
   a.Visit([&visited](const ::btool::node::Node *vn) { visited.push_back(vn); });
   EXPECT_EQ(ex, visited);
 }
-
-int main(int argc, char *argv[]) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}

@@ -16,7 +16,7 @@ nodes:
     - googletest-release-1.8.1.zip
   labels:
     io.btool.collector.cc.libraries:
-      - gtest.a
+      - gtest_main.a
   resolver:
     name: unzip
 
