@@ -34,17 +34,21 @@ func (c *Currenter) Current(n *node.Node) (bool, error) {
 
 	latestT := time.Time{}
 	var latestN *node.Node
-	for _, dN := range n.Dependencies {
-		dInfo, err := os.Lstat(dN.Name)
+	if err := node.Visit(n, func(vn *node.Node) error {
+		vnInfo, err := os.Lstat(vn.Name)
 		if err != nil {
-			return false, errors.Wrap(err, "lstat")
+			return errors.Wrap(err, "lstat")
 		}
 
-		modT := dInfo.ModTime()
+		modT := vnInfo.ModTime()
 		if modT.After(latestT) {
 			latestT = modT
-			latestN = dN
+			latestN = vn
 		}
+
+		return nil
+	}); err != nil {
+		return false, errors.Wrap(err, "visit")
 	}
 
 	if latestT.After(nInfo.ModTime()) {
