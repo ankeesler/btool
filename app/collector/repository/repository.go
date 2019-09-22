@@ -22,7 +22,7 @@ type Unmarshaler interface {
 // via an Unmarshaler interface.
 type Repository struct {
 	fs    afero.Fs
-	c     nodev1.NodeRepositoryClient
+	c     nodev1.RegistryClient
 	u     Unmarshaler
 	cache string
 }
@@ -30,7 +30,7 @@ type Repository struct {
 // New creates a new Repository.
 func New(
 	fs afero.Fs,
-	c nodev1.NodeRepositoryClient,
+	c nodev1.RegistryClient,
 	u Unmarshaler,
 	cache string,
 ) *Repository {

@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-type FakeNodeRepositoryClient struct {
+type FakeRegistryClient struct {
 	ListRepositoriesStub        func(context.Context, *node.ListRepositoriesRequest, ...grpc.CallOption) (*node.ListRepositoriesResponse, error)
 	listRepositoriesMutex       sync.RWMutex
 	listRepositoriesArgsForCall []struct {
@@ -29,7 +29,7 @@ type FakeNodeRepositoryClient struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakeNodeRepositoryClient) ListRepositories(arg1 context.Context, arg2 *node.ListRepositoriesRequest, arg3 ...grpc.CallOption) (*node.ListRepositoriesResponse, error) {
+func (fake *FakeRegistryClient) ListRepositories(arg1 context.Context, arg2 *node.ListRepositoriesRequest, arg3 ...grpc.CallOption) (*node.ListRepositoriesResponse, error) {
 	fake.listRepositoriesMutex.Lock()
 	ret, specificReturn := fake.listRepositoriesReturnsOnCall[len(fake.listRepositoriesArgsForCall)]
 	fake.listRepositoriesArgsForCall = append(fake.listRepositoriesArgsForCall, struct {
@@ -49,26 +49,26 @@ func (fake *FakeNodeRepositoryClient) ListRepositories(arg1 context.Context, arg
 	return fakeReturns.result1, fakeReturns.result2
 }
 
-func (fake *FakeNodeRepositoryClient) ListRepositoriesCallCount() int {
+func (fake *FakeRegistryClient) ListRepositoriesCallCount() int {
 	fake.listRepositoriesMutex.RLock()
 	defer fake.listRepositoriesMutex.RUnlock()
 	return len(fake.listRepositoriesArgsForCall)
 }
 
-func (fake *FakeNodeRepositoryClient) ListRepositoriesCalls(stub func(context.Context, *node.ListRepositoriesRequest, ...grpc.CallOption) (*node.ListRepositoriesResponse, error)) {
+func (fake *FakeRegistryClient) ListRepositoriesCalls(stub func(context.Context, *node.ListRepositoriesRequest, ...grpc.CallOption) (*node.ListRepositoriesResponse, error)) {
 	fake.listRepositoriesMutex.Lock()
 	defer fake.listRepositoriesMutex.Unlock()
 	fake.ListRepositoriesStub = stub
 }
 
-func (fake *FakeNodeRepositoryClient) ListRepositoriesArgsForCall(i int) (context.Context, *node.ListRepositoriesRequest, []grpc.CallOption) {
+func (fake *FakeRegistryClient) ListRepositoriesArgsForCall(i int) (context.Context, *node.ListRepositoriesRequest, []grpc.CallOption) {
 	fake.listRepositoriesMutex.RLock()
 	defer fake.listRepositoriesMutex.RUnlock()
 	argsForCall := fake.listRepositoriesArgsForCall[i]
 	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3
 }
 
-func (fake *FakeNodeRepositoryClient) ListRepositoriesReturns(result1 *node.ListRepositoriesResponse, result2 error) {
+func (fake *FakeRegistryClient) ListRepositoriesReturns(result1 *node.ListRepositoriesResponse, result2 error) {
 	fake.listRepositoriesMutex.Lock()
 	defer fake.listRepositoriesMutex.Unlock()
 	fake.ListRepositoriesStub = nil
@@ -78,7 +78,7 @@ func (fake *FakeNodeRepositoryClient) ListRepositoriesReturns(result1 *node.List
 	}{result1, result2}
 }
 
-func (fake *FakeNodeRepositoryClient) ListRepositoriesReturnsOnCall(i int, result1 *node.ListRepositoriesResponse, result2 error) {
+func (fake *FakeRegistryClient) ListRepositoriesReturnsOnCall(i int, result1 *node.ListRepositoriesResponse, result2 error) {
 	fake.listRepositoriesMutex.Lock()
 	defer fake.listRepositoriesMutex.Unlock()
 	fake.ListRepositoriesStub = nil
@@ -94,7 +94,7 @@ func (fake *FakeNodeRepositoryClient) ListRepositoriesReturnsOnCall(i int, resul
 	}{result1, result2}
 }
 
-func (fake *FakeNodeRepositoryClient) Invocations() map[string][][]interface{} {
+func (fake *FakeRegistryClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.listRepositoriesMutex.RLock()
@@ -106,7 +106,7 @@ func (fake *FakeNodeRepositoryClient) Invocations() map[string][][]interface{} {
 	return copiedInvocations
 }
 
-func (fake *FakeNodeRepositoryClient) recordInvocation(key string, args []interface{}) {
+func (fake *FakeRegistryClient) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -118,4 +118,4 @@ func (fake *FakeNodeRepositoryClient) recordInvocation(key string, args []interf
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ node.NodeRepositoryClient = new(FakeNodeRepositoryClient)
+var _ node.RegistryClient = new(FakeRegistryClient)

@@ -13,7 +13,7 @@ import (
 
 func TestRepositoryProduce(t *testing.T) {
 	fs := afero.NewMemMapFs()
-	c := &v1fakes.FakeNodeRepositoryClient{}
+	c := &v1fakes.FakeRegistryClient{}
 	u := &repositoryfakes.FakeUnmarshaler{}
 	r := repository.New(fs, c, u, "some/cache")
 

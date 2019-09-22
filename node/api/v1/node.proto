@@ -1,13 +1,11 @@
 syntax = "proto3";
 
-//package btool.node.v1;
-
 option go_package = "node";
 
-// Node Repository API
+// Registry API
 //
-// The Node Repository API is used to get collections of btool Nodes.
-service NodeRepository {
+// The Registry API is used to get collections of btool Nodes.
+service Registry {
   // List the projects that this service knows about.
   rpc ListRepositories(ListRepositoriesRequest) returns (ListRepositoriesResponse) {}
 }

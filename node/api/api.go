@@ -5,4 +5,4 @@
 package api
 
 //go:generate protoc --go_out=plugins=grpc:. v1/node.proto
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 v1 NodeRepositoryClient
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 v1 RegistryClient
