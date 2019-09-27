@@ -28,6 +28,7 @@ func run() error {
 		home = "."
 	}
 
+	// TODO: add back loglevel so we can have a quiet printing functionality.
 	debug := flag.Bool("debug", false, "Turn on debug printing")
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", filepath.Join(home, ".btool"), "Cache directory")
