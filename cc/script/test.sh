@@ -7,7 +7,7 @@ if [[ -z "$BTOOL" ]]; then
 fi 
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-"$BTOOL" -run -target node/node_test
-"$BTOOL" -run -target core/flags_test
-"$BTOOL" -run -target app/lister/lister_test
-"$BTOOL" -run -target btool
+"$BTOOL" -loglevel error -run -target node/node_test
+"$BTOOL" -loglevel error -run -target core/flags_test
+"$BTOOL" -loglevel error -run -target app/lister/lister_test
+"$BTOOL" -loglevel error -run -target btool
