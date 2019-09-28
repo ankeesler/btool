@@ -84,11 +84,25 @@ func run() error {
 		Run:    *run,
 		Watch:  *watch,
 
-		CompilerC:  tc.CompilerC,
+		CompilerC: tc.CompilerC,
+		CompilerCFlags: []string{
+			"-Wall",
+			"-Werror",
+			"-g",
+			"-O0",
+			"--std=c17",
+		},
 		CompilerCC: tc.CompilerCC,
-		Archiver:   tc.Archiver,
-		LinkerC:    tc.LinkerC,
-		LinkerCC:   tc.LinkerCC,
+		CompilerCCFlags: []string{
+			"-Wall",
+			"-Werror",
+			"-g",
+			"-O0",
+			"--std=c++17",
+		},
+		Archiver: tc.Archiver,
+		LinkerC:  tc.LinkerC,
+		LinkerCC: tc.LinkerCC,
 
 		Registry: *registry,
 	}

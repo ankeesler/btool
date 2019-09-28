@@ -7,6 +7,9 @@ import (
 	"github.com/pkg/errors"
 )
 
+// TODO: cleaner should not clean downloaded cache files.
+// Makes it easier to run offline.
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . RemoveAller
 
 // RemoveAller is a type that can delete a file from the filesystem. If the file

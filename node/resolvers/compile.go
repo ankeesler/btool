@@ -3,7 +3,6 @@ package resolvers
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
@@ -13,14 +12,16 @@ import (
 type compile struct {
 	compiler string
 	includes []string
+	flags    []string
 }
 
 // NewCompile returns a node.Resolver that runs a compiler in order to generate
 // an object file.
-func NewCompile(compiler string, includes []string) node.Resolver {
+func NewCompile(compiler string, includes, flags []string) node.Resolver {
 	return &compile{
 		compiler: compiler,
 		includes: includes,
+		flags:    flags,
 	}
 }
 
@@ -29,29 +30,17 @@ func (c *compile) Resolve(n *node.Node) error {
 		return fmt.Errorf("expected %d dependencies, got %d", 1, len(n.Dependencies))
 	}
 
-	// TODO: wow what a hack! We should provide these flags another way...
-	var std string
-	if strings.HasSuffix(c.compiler, "++") {
-		std = "c++17"
-	} else {
-		std = "c17"
-	}
-
 	cmd := exec.Command(
 		c.compiler,
 		"-o",
 		n.Name,
 		"-c",
 		n.Dependencies[0].Name,
-		"-Wall",
-		"-Werror",
-		"-g",
-		"-O0",
-		"--std="+std,
 	)
 	for _, include := range c.includes {
 		cmd.Args = append(cmd.Args, "-I"+include)
 	}
+	cmd.Args = append(cmd.Args, c.flags...)
 
 	log.Debugf("compiler: running %s", cmd.Args)
 	o, err := cmd.CombinedOutput()

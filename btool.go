@@ -48,11 +48,13 @@ type Cfg struct {
 	Watch  bool
 	DryRun bool
 
-	CompilerC  string
-	CompilerCC string
-	Archiver   string
-	LinkerC    string
-	LinkerCC   string
+	CompilerC       string
+	CompilerCFlags  []string
+	CompilerCC      string
+	CompilerCCFlags []string
+	Archiver        string
+	LinkerC         string
+	LinkerCC        string
 
 	Registry string
 
@@ -125,6 +127,8 @@ func Run(cfg *Cfg) error {
 		cfg.Archiver,
 		cfg.LinkerC,
 		cfg.LinkerCC,
+		cfg.CompilerCFlags,
+		cfg.CompilerCCFlags,
 	)
 
 	target := filepath.Join(cfg.Root, cfg.Target)

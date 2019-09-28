@@ -11,11 +11,14 @@ import (
 // ResolverFactory is a factory type that can create node.Resolver's.
 type ResolverFactory struct {
 	compilerC, compilerCC, archiver, linkerC, linkerCC string
+
+	compilerCFlags, compilerCCFlags []string
 }
 
 // New creates a new ResolverFactory.
 func New(
 	compilerC, compilerCC, archiver, linkerC, linkerCC string,
+	compilerCFlags, compilerCCFlags []string,
 ) *ResolverFactory {
 	return &ResolverFactory{
 		compilerC:  compilerC,
@@ -23,18 +26,21 @@ func New(
 		archiver:   archiver,
 		linkerC:    linkerC,
 		linkerCC:   linkerCC,
+
+		compilerCFlags:  compilerCFlags,
+		compilerCCFlags: compilerCCFlags,
 	}
 }
 
 // NewCompileC returns a node.Resolver that compiles a C source into an object.
 func (rf *ResolverFactory) NewCompileC(includePaths []string) node.Resolver {
-	return resolvers.NewCompile(rf.compilerC, includePaths)
+	return resolvers.NewCompile(rf.compilerC, includePaths, rf.compilerCFlags)
 }
 
 // NewCompileCC returns a node.Resolver that compiles a C++ source into an
 // object.
 func (rf *ResolverFactory) NewCompileCC(includePaths []string) node.Resolver {
-	return resolvers.NewCompile(rf.compilerCC, includePaths)
+	return resolvers.NewCompile(rf.compilerCC, includePaths, rf.compilerCCFlags)
 }
 
 // NewArchive returns a node.Resolver that archives multiple objects into a
