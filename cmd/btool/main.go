@@ -28,8 +28,7 @@ func run() error {
 		home = "."
 	}
 
-	// TODO: add back loglevel so we can have a quiet printing functionality.
-	debug := flag.Bool("debug", false, "Turn on debug printing")
+	loglevel := flag.String("loglevel", "info", "Set log level (debug, info, error)")
 	root := flag.String("root", ".", "Root of node list")
 	cache := flag.String("cache", filepath.Join(home, ".btool"), "Cache directory")
 	target := flag.String("target", "main", "Target to build")
@@ -57,12 +56,7 @@ func run() error {
 		return nil
 	}
 
-	loglevel := "info"
-	if *debug {
-		loglevel = "debug"
-	}
-
-	level, err := log.ParseLevel(loglevel)
+	level, err := log.ParseLevel(*loglevel)
 	if err != nil {
 		return errors.Wrap(err, "parse log level")
 	}

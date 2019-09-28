@@ -13,8 +13,8 @@ func googletest(c *config) {
 		c.root,
 		"-cache",
 		c.cache,
-		"-debug",
-		"-run",
+		"-loglevel",
+		"debug",
 	)
 
 	c.run(
@@ -25,7 +25,8 @@ func googletest(c *config) {
 		c.root,
 		"-cache",
 		c.cache,
-		"-debug",
+		"-loglevel",
+		"debug",
 		"-clean",
 	)
 }

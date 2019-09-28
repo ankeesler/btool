@@ -10,7 +10,8 @@ func object(c *config) {
 			c.root,
 			"-cache",
 			c.cache,
-			"-debug",
+			"-loglevel",
+			"debug",
 		)
 		c.run(
 			"ls",
@@ -27,6 +28,7 @@ func object(c *config) {
 		"-cache",
 		c.cache,
 		"-clean",
-		"-debug",
+		"-loglevel",
+		"debug",
 	)
 }
