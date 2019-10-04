@@ -7,6 +7,8 @@ import (
 	"github.com/ankeesler/btool/app/collector/testutil"
 	"github.com/ankeesler/btool/node"
 	nodev1 "github.com/ankeesler/btool/node/api/v1"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/any"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -48,10 +50,37 @@ func TestUnmarshalerUnmarshal(t *testing.T) {
 	from := &nodev1.Node{
 		Name:         "a",
 		Dependencies: []string{"b", "c"},
+		Labels: map[string]*any.Any{
+			"io.btool.collector.cc.includePaths": marshalAny(
+				t,
+				"include/dir0",
+				"include/dir1",
+			),
+		},
 	}
-	to := node.New("some/root/a").Dependency(b, c)
+	to := node.New(
+		"some/root/a",
+	).Dependency(
+		b,
+		c,
+	).Label(
+		"io.btool.collector.cc.includePaths",
+		[]string{
+			"/some/root/include/dir0",
+			"/some/root/include/dir1",
+		},
+	)
 
 	n, err := u.Unmarshal(s, from, "some/root")
 	require.Nil(t, err)
 	assert.Equal(t, to, n)
+}
+
+func marshalAny(t *testing.T, strings ...string) *any.Any {
+	m := nodev1.Strings{
+		Strings: strings,
+	}
+	any, err := ptypes.MarshalAny(&m)
+	require.Nil(t, err)
+	return any
 }
