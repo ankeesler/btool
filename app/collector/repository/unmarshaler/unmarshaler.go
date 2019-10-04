@@ -30,7 +30,7 @@ func (u *Unmarshaler) Unmarshal(
 	n := node.New(filepath.Join(root, apiN.Name))
 
 	if err := prependRoot(n, root); err != nil {
-		return errors.Wrap(err, "prepend root")
+		return nil, errors.Wrap(err, "prepend root")
 	}
 
 	for _, apiD := range apiN.Dependencies {

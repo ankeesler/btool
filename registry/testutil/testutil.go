@@ -5,7 +5,6 @@ import "github.com/ankeesler/btool/registry"
 
 func Index() *registry.Index {
 	return &registry.Index{
-		Name: "some-index",
 		Files: []registry.IndexFile{
 			registry.IndexFile{
 				Path:   "file_a_btool.yml",
