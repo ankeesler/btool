@@ -1,9 +1,8 @@
-// Package testutil provides test utilities for the registry package.
-package testutil
+package registry_test
 
 import "github.com/ankeesler/btool/registry"
 
-func Index() *registry.Index {
+func index() *registry.Index {
 	return &registry.Index{
 		Files: []registry.IndexFile{
 			registry.IndexFile{
@@ -18,7 +17,7 @@ func Index() *registry.Index {
 	}
 }
 
-func FileAGaggle() *registry.Gaggle {
+func fileAGaggle() *registry.Gaggle {
 	return &registry.Gaggle{
 		Metadata: map[string]interface{}{
 			"foo":     "bar",
@@ -51,7 +50,7 @@ func FileAGaggle() *registry.Gaggle {
 	}
 }
 
-func FileBGaggle() *registry.Gaggle {
+func fileBGaggle() *registry.Gaggle {
 	return &registry.Gaggle{
 		Metadata: map[string]interface{}{
 			"bat":     "mayonnaise",

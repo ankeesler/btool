@@ -1,19 +1,9 @@
-FROM golang:buster
-WORKDIR /app
-COPY . /app
-RUN go env && CGO_ENABLED=0 go build -o /tmp/registry ./cmd/registry
+FROM nginx
 
-FROM alpine
-WORKDIR /app
-COPY --from=0 /tmp/registry .
-COPY --from=0 /app/data data
-EXPOSE 8080
-CMD [ \
-  "./registry", \
-  "-loglevel", \
-  "debug", \
-  "-dir", \
-  "data", \
-  "-address", \
-  ":8080" \
-]
+COPY registry/data/*.yml /usr/share/nginx/data/
+RUN cd /usr/share/nginx/data && ls *.yml \
+  | grep -v index.yml \
+  | xargs -n1 sha256sum  \
+  | awk '{printf "- path: %s\n  sha256: %s", $2, $1}' >> /usr/share/nginx/data/index.yml
+
+COPY registry/data/*.conf /etc/nginx/conf.d/

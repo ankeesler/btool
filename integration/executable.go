@@ -38,7 +38,7 @@ func executable(c *config) {
 func executableLocalRegistry(c *config) {
 	dir, err := os.Getwd()
 	require.Nil(c.t, err)
-	registryData := filepath.Join(dir, "..", "data")
+	registryData := filepath.Join(dir, "..", "registry", "data")
 
 	c.run(
 		c.btool,

@@ -18,12 +18,6 @@ func Run(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	registry, err := build("github.com/ankeesler/btool/cmd/registry")
-	if err != nil {
-		t.Fatal(err)
-	}
-	_ = registry
-
 	tmpDir, err := ioutil.TempDir("", "btool_node_integration_test")
 	if err != nil {
 		t.Fatal(err)

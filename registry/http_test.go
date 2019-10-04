@@ -8,7 +8,6 @@ import (
 
 	"github.com/ankeesler/btool/registry"
 	"github.com/ankeesler/btool/registry/registryfakes"
-	"github.com/ankeesler/btool/registry/testutil"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
@@ -27,7 +26,7 @@ func (rcb *readCloser) Close() error {
 }
 
 func TestHTTPRegistryIndex(t *testing.T) {
-	exI := testutil.Index()
+	exI := index()
 
 	buf200 := bytes.NewBuffer([]byte{})
 	e := yaml.NewEncoder(buf200)
@@ -98,7 +97,7 @@ func TestHTTPRegistryIndex(t *testing.T) {
 }
 
 func TestHTTPRegistryGaggle(t *testing.T) {
-	exGaggle := testutil.FileAGaggle()
+	exGaggle := fileAGaggle()
 
 	buf200 := bytes.NewBuffer([]byte{})
 	e := yaml.NewEncoder(buf200)

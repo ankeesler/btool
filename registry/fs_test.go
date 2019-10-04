@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ankeesler/btool/registry"
-	"github.com/ankeesler/btool/registry/testutil"
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,9 +16,8 @@ func TestFSRegistry(t *testing.T) {
 
 	root := "/some/path/to/root"
 	files := map[string]*registry.Gaggle{
-		"file_a_btool.yml":              testutil.FileAGaggle(),
-		"some/path/to/file_b_btool.yml": testutil.FileBGaggle(),
-		"whatever.yml":                  nil,
+		"file_a_btool.yml":              fileAGaggle(),
+		"some/path/to/file_b_btool.yml": fileBGaggle(),
 	}
 	for file, gaggle := range files {
 		file = filepath.Join(root, file)
@@ -43,7 +41,7 @@ func TestFSRegistry(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	exIndex := testutil.Index()
+	exIndex := index()
 	acIndex, err := r.Index()
 	require.Nil(t, err)
 	require.Equal(t, exIndex, acIndex)
@@ -55,16 +53,16 @@ func TestFSRegistry(t *testing.T) {
 	}{
 		{
 			name:   "file_a_btool.yml",
-			gaggle: testutil.FileAGaggle(),
+			gaggle: fileAGaggle(),
 			exists: true,
 		},
 		{
 			name:   "some/path/to/file_b_btool.yml",
-			gaggle: testutil.FileBGaggle(),
+			gaggle: fileBGaggle(),
 			exists: true,
 		},
 		{
-			name:   "whatever.yml",
+			name:   "index.yml",
 			exists: false,
 		},
 		{

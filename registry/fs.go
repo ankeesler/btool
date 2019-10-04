@@ -39,7 +39,7 @@ func CreateFSRegistry(fs afero.Fs, dir, name string) (*FSRegistry, error) {
 				return err
 			}
 
-			if !strings.HasSuffix(path, "_btool.yml") {
+			if path == "index.yml" || !strings.HasSuffix(path, ".yml") {
 				log.Debugf("skipping path %s", path)
 				return nil
 			}
