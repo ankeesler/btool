@@ -15,7 +15,7 @@ class MockRemoveAller : public ::btool::app::cleaner::Cleaner::RemoveAller {
   MOCK_METHOD2(RemoveAll, bool(const std::string &, std::string *));
 };
 
-TEST(Cleaner, Clean) {
+TEST(Cleaner, Success) {
   InSequence s;
 
   std::string err;
@@ -41,4 +41,30 @@ TEST(Cleaner, Clean) {
   a.AddDep(&c);
 
   EXPECT_TRUE(cleaner.Clean(a, &err)) << err;
+}
+
+TEST(Cleaner, Failure) {
+  InSequence s;
+
+  std::string err;
+  MockRemoveAller mra;
+  EXPECT_CALL(mra, RemoveAll("d", &err)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("c", &err)).WillOnce(Return(false));
+
+  ::btool::app::cleaner::Cleaner cleaner(&mra);
+
+  // a -> b, c
+  // b -> c
+  // c -> d
+  // d
+  ::btool::node::Node d("d");
+  ::btool::node::Node c("c");
+  c.AddDep(&d);
+  ::btool::node::Node b("b");
+  b.AddDep(&c);
+  ::btool::node::Node a("a");
+  a.AddDep(&b);
+  a.AddDep(&c);
+
+  EXPECT_FALSE(cleaner.Clean(a, &err)) << err;
 }
