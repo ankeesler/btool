@@ -19,6 +19,14 @@ nodes:
       - gtest_main.a
   resolver:
     name: unzip
+- name: googletest-release-1.8.1/googlemock/include/gmock/gmock.h
+  dependencies:
+    - googletest-release-1.8.1.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - gmock.a
+  resolver:
+    name: unzip
 
 # Sources
 - name: googletest-release-1.8.1/googletest/src/gtest-all.cc
@@ -28,6 +36,16 @@ nodes:
     io.btool.collector.cc.includePaths:
       - googletest-release-1.8.1/googletest/include
       - googletest-release-1.8.1/googletest
+  resolver:
+    name: unzip
+- name: googletest-release-1.8.1/googlemock/src/gmock-all.cc
+  dependencies:
+    - googletest-release-1.8.1.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - googletest-release-1.8.1/googlemock/include
+      - googletest-release-1.8.1/googlemock
+      - googletest-release-1.8.1/googletest/include
   resolver:
     name: unzip
 - name: googletest-release-1.8.1/googletest/src/gtest_main.cc
@@ -46,6 +64,11 @@ nodes:
     - googletest-release-1.8.1/googletest/src/gtest-all.cc
   resolver:
     name: compileCC
+- name: googletest-release-1.8.1/googlemock/src/gmock-all.o
+  dependencies:
+    - googletest-release-1.8.1/googlemock/src/gmock-all.cc
+  resolver:
+    name: compileCC
 - name: googletest-release-1.8.1/googletest/src/gtest_main.o
   dependencies:
     - googletest-release-1.8.1/googletest/src/gtest_main.cc
@@ -59,6 +82,14 @@ nodes:
   labels:
     io.btool.collector.cc.linkFlags:
       - "-lpthread"
+  resolver:
+    name: archive
+- name: gmock.a
+  dependencies:
+    - googletest-release-1.8.1/googlemock/src/gmock-all.o
+  #labels:
+  #  io.btool.collector.cc.linkFlags:
+  #    - "-lpthread"
   resolver:
     name: archive
 - name: gtest_main.a
