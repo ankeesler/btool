@@ -37,3 +37,8 @@ TEST(Cmd, Fail) {
   EXPECT_EQ("cat: this/file/does/not/exist: No such file or directory\n",
             err.str());
 }
+
+TEST(Cmd, DoesNotExist) {
+  ::btool::core::Cmd c("this-binary-does-not-exist");
+  EXPECT_EQ(255, c.Run());
+}

@@ -1,11 +1,16 @@
 #include "app/runner/runner.h"
 
-#include <string>
+#include <iostream>
 
-#include "node/node.h"
+#include "core/cmd.h"
 
 namespace btool::app::runner {
 
-bool Run(const ::btool::node::Node &node, std::string *err) { return true; }
+bool Runner::Run(const ::btool::node::Node &node) {
+  cb_->OnRun(node);
+
+  ::btool::core::Cmd cmd(node.Name().c_str());
+  return (cmd.Run() == 0);
+}
 
 };  // namespace btool::app::runner

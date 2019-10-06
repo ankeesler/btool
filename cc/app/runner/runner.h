@@ -9,7 +9,18 @@ namespace btool::app::runner {
 
 class Runner {
  public:
-  bool Run(const ::btool::node::Node &node, std::string *err);
+  class Callback {
+   public:
+    virtual ~Callback() {}
+    virtual void OnRun(const ::btool::node::Node &node) = 0;
+  };
+
+  Runner(Callback *cb) : cb_(cb) {}
+
+  bool Run(const ::btool::node::Node &node);
+
+ private:
+  Callback *cb_;
 };
 
 };  // namespace btool::app::runner

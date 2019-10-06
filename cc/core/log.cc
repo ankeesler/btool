@@ -36,6 +36,7 @@ static void logf(const char *file, int line, const char *area,
                  const char *format, va_list args) {
   ::fprintf(stderr, "btool | %s | %s:%d | ", area, file, line);
   ::vfprintf(stderr, format, args);
+  ::fflush(stderr);
 }
 
 };  // namespace btool::core

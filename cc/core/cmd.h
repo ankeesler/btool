@@ -1,6 +1,7 @@
 #ifndef BTOOL_CORE_CMD_H_
 #define BTOOL_CORE_CMD_H_
 
+#include <iostream>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -9,7 +10,7 @@ namespace btool::core {
 
 class Cmd {
  public:
-  Cmd(const char *path) : path_(path) {}
+  Cmd(const char *path) : path_(path), out_(&std::cout), err_(&std::cerr) {}
 
   void Arg(const char *arg) { args_.push_back(arg); }
 

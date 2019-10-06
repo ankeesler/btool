@@ -9,6 +9,7 @@ class Cleaner {
  public:
   class RemoveAller {
    public:
+    virtual ~RemoveAller() {}
     virtual bool RemoveAll(const std::string &path, std::string *err) = 0;
   };
 

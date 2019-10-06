@@ -56,8 +56,6 @@ int Cmd::Run(void) {
     default:
       return RunParent(ret, child_stdout, child_stderr);
   }
-
-  return ret;
 }
 
 int Cmd::RunChild(int stdout_fds[2], int stderr_fds[2]) {
@@ -103,7 +101,9 @@ int Cmd::RunChild(int stdout_fds[2], int stderr_fds[2]) {
   int ret = ::execvp(args[0], (char *const *)args.data());
 
   // If the above call worked, we won't get here.
-  DEBUG("child failed: %d (%s)\n", ret, strerror(errno));
+  DEBUG("child failed, exiting: %d (%s)\n", ret, strerror(errno));
+
+  ::exit(ret);
 
   return ret;
 }
@@ -119,13 +119,13 @@ int Cmd::RunParent(int child_pid, int child_stdout_fds[2],
     return -1;
   }
 
-  if (out_ != nullptr && !Read(out_, child_stdout_fds[kPipeRead])) {
+  if (!Read(out_, child_stdout_fds[kPipeRead])) {
     DEBUG("failed to read from child stdout fd %d\n",
           child_stdout_fds[kPipeRead]);
     return -1;
   }
 
-  if (err_ != nullptr && !Read(err_, child_stderr_fds[kPipeRead])) {
+  if (!Read(err_, child_stderr_fds[kPipeRead])) {
     DEBUG("failed to read from child stderr fd %d\n",
           child_stderr_fds[kPipeRead]);
     return -1;
