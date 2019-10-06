@@ -5,26 +5,18 @@
 #include "gtest/gtest.h"
 
 #include "node/node.h"
+#include "node/testing/node.h"
 
 TEST(Lister, List) {
   std::stringstream ss;
   ::btool::app::lister::Lister l(&ss);
 
-  // a -> b, c
-  // b -> c
-  // c -> d
-  // d
-  ::btool::node::Node d("d");
-  ::btool::node::Node c("c");
-  c.AddDep(&d);
-  ::btool::node::Node b("b");
-  b.AddDep(&c);
-  ::btool::node::Node a("a");
-  a.AddDep(&b);
-  a.AddDep(&c);
+  auto nodes = ::btool::node::testing::Nodes0123();
 
-  l.List(a);
+  l.List(*nodes->at(0));
 
   std::string ex = "a\n. b\n. . c\n. . . d\n. c\n. . d\n";
   EXPECT_EQ(ex, ss.str());
+
+  ::btool::node::testing::Free(nodes);
 }

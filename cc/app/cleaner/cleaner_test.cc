@@ -6,6 +6,7 @@
 #include "gtest/gtest.h"
 
 #include "node/node.h"
+#include "node/testing/node.h"
 
 using ::testing::InSequence;
 using ::testing::Return;
@@ -27,20 +28,11 @@ TEST(Cleaner, Success) {
 
   ::btool::app::cleaner::Cleaner cleaner(&mra);
 
-  // a -> b, c
-  // b -> c
-  // c -> d
-  // d
-  ::btool::node::Node d("d");
-  ::btool::node::Node c("c");
-  c.AddDep(&d);
-  ::btool::node::Node b("b");
-  b.AddDep(&c);
-  ::btool::node::Node a("a");
-  a.AddDep(&b);
-  a.AddDep(&c);
+  auto nodes = ::btool::node::testing::Nodes0123();
 
-  EXPECT_TRUE(cleaner.Clean(a, &err)) << err;
+  EXPECT_TRUE(cleaner.Clean(*nodes->at(0), &err)) << err;
+
+  ::btool::node::testing::Free(nodes);
 }
 
 TEST(Cleaner, Failure) {
@@ -53,18 +45,9 @@ TEST(Cleaner, Failure) {
 
   ::btool::app::cleaner::Cleaner cleaner(&mra);
 
-  // a -> b, c
-  // b -> c
-  // c -> d
-  // d
-  ::btool::node::Node d("d");
-  ::btool::node::Node c("c");
-  c.AddDep(&d);
-  ::btool::node::Node b("b");
-  b.AddDep(&c);
-  ::btool::node::Node a("a");
-  a.AddDep(&b);
-  a.AddDep(&c);
+  auto nodes = ::btool::node::testing::Nodes0123();
 
-  EXPECT_FALSE(cleaner.Clean(a, &err)) << err;
+  EXPECT_FALSE(cleaner.Clean(*nodes->at(0), &err)) << err;
+
+  ::btool::node::testing::Free(nodes);
 }
