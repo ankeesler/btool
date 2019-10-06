@@ -16,6 +16,7 @@ class Node {
   const std::string &Name() const { return name_; }
   void String(std::ostream *os) const;
   void Visit(std::function<void(const Node *)>) const;
+  const std::vector<Node *> &Deps() const { return deps_; }
 
   void AddDep(Node *dep) { deps_.push_back(dep); }
 

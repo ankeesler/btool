@@ -35,3 +35,14 @@ TEST(Node, Visit) {
 
   ::btool::node::testing::Free(nodes);
 }
+
+TEST(Node, Deps) {
+  auto nodes = ::btool::node::testing::Nodes0123();
+
+  auto deps = nodes->at(0)->Deps();
+  EXPECT_EQ(2, deps.size());
+  EXPECT_EQ("b", deps[0]->Name());
+  EXPECT_EQ("c", deps[1]->Name());
+
+  ::btool::node::testing::Free(nodes);
+}
