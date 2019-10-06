@@ -15,34 +15,28 @@ TEST(Node, First) {
 TEST(Node, Print) {
   auto nodes = ::btool::node::testing::Nodes0123();
 
-  std::string ex = "a\n. b\n. . c\n. . . d\n. c\n. . d\n";
+  std::string ex = "0\n. 1\n. . 2\n. . . 3\n. 2\n. . 3\n";
   std::stringstream ss;
-  nodes->at(0)->String(&ss);
+  nodes->Get("0")->String(&ss);
   EXPECT_EQ(ex, ss.str());
-
-  ::btool::node::testing::Free(nodes);
 }
 
 TEST(Node, Visit) {
   auto nodes = ::btool::node::testing::Nodes0123();
 
-  std::vector<const ::btool::node::Node *> ex{nodes->at(3), nodes->at(2),
-                                              nodes->at(1), nodes->at(0)};
+  std::vector<const ::btool::node::Node *> ex{nodes->Get("3"), nodes->Get("2"),
+                                              nodes->Get("1"), nodes->Get("0")};
   std::vector<const ::btool::node::Node *> visited;
-  nodes->at(0)->Visit(
+  nodes->Get("0")->Visit(
       [&visited](const ::btool::node::Node *vn) { visited.push_back(vn); });
   EXPECT_EQ(ex, visited);
-
-  ::btool::node::testing::Free(nodes);
 }
 
 TEST(Node, Deps) {
   auto nodes = ::btool::node::testing::Nodes0123();
 
-  auto deps = nodes->at(0)->Deps();
+  auto deps = nodes->Get("0")->Deps();
   EXPECT_EQ(2, deps.size());
-  EXPECT_EQ("b", deps[0]->Name());
-  EXPECT_EQ("c", deps[1]->Name());
-
-  ::btool::node::testing::Free(nodes);
+  EXPECT_EQ("1", deps[0]->Name());
+  EXPECT_EQ("2", deps[1]->Name());
 }
