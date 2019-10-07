@@ -15,10 +15,8 @@ TEST(Lister, List) {
 
   auto nodes = ::btool::node::testing::Nodes0123();
 
-  l.List(*nodes->at(0));
+  l.List(*nodes->Get("0"));
 
-  std::string ex = "a\n. b\n. . c\n. . . d\n. c\n. . d\n";
+  std::string ex = "0\n. 1\n. . 2\n. . . 3\n. 2\n. . 3\n";
   EXPECT_EQ(ex, ss.str());
-
-  ::btool::node::testing::Free(nodes);
 }

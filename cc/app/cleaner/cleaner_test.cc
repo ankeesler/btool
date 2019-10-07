@@ -21,18 +21,16 @@ TEST(Cleaner, Success) {
 
   std::string err;
   MockRemoveAller mra;
-  EXPECT_CALL(mra, RemoveAll("d", &err)).WillOnce(Return(true));
-  EXPECT_CALL(mra, RemoveAll("c", &err)).WillOnce(Return(true));
-  EXPECT_CALL(mra, RemoveAll("b", &err)).WillOnce(Return(true));
-  EXPECT_CALL(mra, RemoveAll("a", &err)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("3", &err)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("2", &err)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("1", &err)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("0", &err)).WillOnce(Return(true));
 
   ::btool::app::cleaner::Cleaner cleaner(&mra);
 
   auto nodes = ::btool::node::testing::Nodes0123();
 
-  EXPECT_TRUE(cleaner.Clean(*nodes->at(0), &err)) << err;
-
-  ::btool::node::testing::Free(nodes);
+  EXPECT_TRUE(cleaner.Clean(*nodes->Get("0"), &err)) << err;
 }
 
 TEST(Cleaner, Failure) {
@@ -40,14 +38,12 @@ TEST(Cleaner, Failure) {
 
   std::string err;
   MockRemoveAller mra;
-  EXPECT_CALL(mra, RemoveAll("d", &err)).WillOnce(Return(true));
-  EXPECT_CALL(mra, RemoveAll("c", &err)).WillOnce(Return(false));
+  EXPECT_CALL(mra, RemoveAll("3", &err)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("2", &err)).WillOnce(Return(false));
 
   ::btool::app::cleaner::Cleaner cleaner(&mra);
 
   auto nodes = ::btool::node::testing::Nodes0123();
 
-  EXPECT_FALSE(cleaner.Clean(*nodes->at(0), &err)) << err;
-
-  ::btool::node::testing::Free(nodes);
+  EXPECT_FALSE(cleaner.Clean(*nodes->Get("0"), &err)) << err;
 }
