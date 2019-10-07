@@ -1,5 +1,7 @@
 #include "node.h"
 
+#include <memory>
+
 // workaround for bug-00
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -9,8 +11,8 @@
 
 namespace btool::node::testing {
 
-::btool::node::Store *Nodes0123() {
-  auto s = new ::btool::node::Store;
+std::unique_ptr<::btool::node::Store> Nodes0123() {
+  auto s = std::unique_ptr<::btool::node::Store>(new ::btool::node::Store);
 
   // 0 -> 1, 2
   // 1 -> 2

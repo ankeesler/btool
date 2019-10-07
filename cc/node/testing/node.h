@@ -16,7 +16,7 @@ class MockResolver : public ::btool::node::Node::Resolver {
   MOCK_METHOD2(Resolve, bool(const ::btool::node::Node &, std::string *));
 };
 
-::btool::node::Store *Nodes0123();
+std::unique_ptr<::btool::node::Store> Nodes0123();
 
 };  // namespace btool::node::testing
 

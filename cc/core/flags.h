@@ -1,6 +1,8 @@
 #ifndef BTOOL_CORE_FLAGS_H_
 #define BTOOL_CORE_FLAGS_H_
 
+#include <cstring>
+
 #include <map>
 #include <string>
 
@@ -16,7 +18,7 @@ class Flags {
  private:
   struct cmp_str {
     bool operator()(const char *a, const char *b) const {
-      return std::strcmp(a, b) < 0;
+      return ::strcmp(a, b) < 0;
     }
   };
   std::map<const char *, bool *, cmp_str> bools_;

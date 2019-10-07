@@ -12,6 +12,7 @@
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
 - Is it cool to pass strings in by value to copy them over in constructors?
 - Error handling is terrible.
+- Test C++ code on Linux.
 
 # Bugs
 
