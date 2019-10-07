@@ -1,6 +1,7 @@
 #ifndef BTOOL_NODE_TESTING_NODE_H_
 #define BTOOL_NODE_TESTING_NODE_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 

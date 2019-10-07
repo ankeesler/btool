@@ -2,6 +2,7 @@
 #define BTOOL_NODE_STORE_H_
 
 #include <map>
+#include <string>
 
 #include "node/node.h"
 
@@ -15,7 +16,7 @@ class Store {
   Node *Get(const char *name) const;
 
  private:
-  std::map<const char *, Node *> nodes_;
+  std::map<std::string, Node *> nodes_;
 };
 
 };  // namespace btool::node

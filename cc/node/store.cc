@@ -1,6 +1,7 @@
 #include "node/store.h"
 
 #include <map>
+#include <string>
 
 namespace btool::node {
 
@@ -11,13 +12,17 @@ Store::~Store() {
 }
 
 Node *Store::Create(const char *name) {
-  auto node = new Node(name);
+  // TODO: this performance is bad?
+  std::string key(name);
+  auto node = new Node(key);
   nodes_[name] = node;
   return node;
 }
 
 Node *Store::Get(const char *name) const {
-  auto it = nodes_.find(name);
+  // TODO: this performance is bad?
+  std::string key(name);
+  auto it = nodes_.find(key);
   if (it == nodes_.end()) {
     return nullptr;
   } else {

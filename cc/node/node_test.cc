@@ -38,7 +38,7 @@ TEST(Node, Deps) {
   auto nodes = ::btool::node::testing::Nodes0123();
 
   auto deps = nodes->Get("0")->Deps();
-  EXPECT_EQ(2, deps.size());
+  EXPECT_EQ(2UL, deps.size());
   EXPECT_EQ("1", deps[0]->Name());
   EXPECT_EQ("2", deps[1]->Name());
 }
