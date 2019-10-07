@@ -9,6 +9,14 @@
 
 # Chores
 
-- Use valgrind to check memory leaks
+- Use valgrind to check memory leaks (or -fsanitize= with clang?)
 - Is it cool to pass strings in by value to copy them over in constructors?
 - Error handling is terrible.
+
+# Bugs
+
+### 00: Including header doesn't bring that header's include paths
+- This is because the exe consumer is pulling in a .o file that has not been
+  updated by the inc consumer yet, so it is missing include paths...
+
+### 01: Can't put includes to the right of headers

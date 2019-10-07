@@ -1,5 +1,6 @@
 #include "node/node.h"
 
+#include <functional>
 #include <ostream>
 #include <set>
 

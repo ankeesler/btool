@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool/app/collector"
+	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
 )
@@ -35,6 +36,7 @@ func (o *Obj) Consume(s collector.Store, n *node.Node) error {
 	if err != nil {
 		return errors.Wrap(err, "collect include paths")
 	}
+	log.Debugf("collected include paths %s for node %s", includePaths, n)
 
 	var r node.Resolver
 	if ext == ".cc" {
