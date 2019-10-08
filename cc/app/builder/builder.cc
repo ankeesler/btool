@@ -2,24 +2,26 @@
 
 #include <string>
 
+#include "core/err.h"
 #include "node/node.h"
 
 namespace btool::app::builder {
 
-bool Builder::Build(const ::btool::node::Node &node, std::string *err) {
-  bool success = true;
+::btool::core::VoidErr Builder::Build(const ::btool::node::Node &node) {
+  ::btool::core::VoidErr err;
 
   node.Visit([&](const ::btool::node::Node *n) {
-    if (success) {
-      bool current;
-      success = c_->Current(*n, &current, err);
-      if (!current) {
-        success = n->Resolver()->Resolve(*n, err);
+    if (!err) {
+      auto current_err = c_->Current(*n);
+      if (current_err) {
+        err = ::btool::core::VoidErr::Failure(current_err.Msg());
+      } else if (!current_err.Ret()) {
+        err = n->Resolver()->Resolve(*n);
       }
     }
   });
 
-  return success;
+  return err;
 }
 
 };  // namespace btool::app::builder

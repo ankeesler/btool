@@ -73,6 +73,10 @@ TEST(Err, Void) {
   EXPECT_EQ(f, VoidFailure());
 
   EXPECT_NE(s, f);
+
+  ::btool::core::VoidErr err;
+  EXPECT_EQ(err, ::btool::core::VoidErr::Success());
+  EXPECT_EQ(err, s);
 }
 
 TEST(Err, Tuna) {

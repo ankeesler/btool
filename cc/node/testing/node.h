@@ -7,6 +7,7 @@
 
 #include "gmock/gmock.h"
 
+#include "core/err.h"
 #include "node/node.h"
 #include "node/store.h"
 
@@ -14,7 +15,7 @@ namespace btool::node::testing {
 
 class MockResolver : public ::btool::node::Node::Resolver {
  public:
-  MOCK_METHOD2(Resolve, bool(const ::btool::node::Node &, std::string *));
+  MOCK_METHOD1(Resolve, ::btool::core::VoidErr(const ::btool::node::Node &));
 };
 
 std::unique_ptr<::btool::node::Store> Nodes0123();
