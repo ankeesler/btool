@@ -6,7 +6,6 @@ import (
 	"github.com/ankeesler/btool/app/collector"
 	"github.com/ankeesler/btool/app/collector/cc"
 	"github.com/ankeesler/btool/app/collector/collectorfakes"
-	"github.com/ankeesler/btool/app/collector/sorter"
 	"github.com/ankeesler/btool/app/collector/testutil"
 	"github.com/ankeesler/btool/node"
 	"github.com/ankeesler/btool/node/nodefakes"
@@ -49,7 +48,6 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
-		sorter.New().Sort(exMain)
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 
@@ -72,7 +70,6 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
-		sorter.New().Sort(exMain)
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 
@@ -97,7 +94,6 @@ func TestExe(t *testing.T) {
 		assert.Equal(t, 1, s.SetCallCount())
 		exMain := node.New("main").Dependency(maino, bo, ao, ca)
 		exMain.Resolver = r
-		sorter.New().Sort(exMain)
 		assert.Equal(t, exMain, s.SetArgsForCall(0))
 	})
 

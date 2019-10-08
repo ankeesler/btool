@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/ankeesler/btool/app/collector"
-	"github.com/ankeesler/btool/app/collector/sorter"
 	"github.com/ankeesler/btool/log"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
@@ -41,28 +40,28 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 	}
 
 	var err error
-	objs := make(map[string]*node.Node)
+	objs := make([]*node.Node, 0)
 	if c != nil {
 		log.Debugf("exe %s has source %s", n, c)
-		err = collectObjs(s, c, ".c", objs)
+		err = collectObjs(s, c, ".c", &objs)
 	} else { // cc
 		log.Debugf("exe %s has source %s", n, cc)
-		err = collectObjs(s, cc, ".cc", objs)
+		err = collectObjs(s, cc, ".cc", &objs)
 	}
 
 	if err != nil {
 		return errors.Wrap(err, "collect objs")
 	}
 
-	libraries := make(map[*node.Node]bool)
+	libraries := make([]*node.Node, 0)
 	for _, obj := range objs {
 		n.Dependency(obj)
 
-		if err := collectLibraries(s, obj, libraries); err != nil {
+		if err := collectLibraries(s, obj, &libraries); err != nil {
 			return errors.Wrap(err, "collect libraries")
 		}
 	}
-	for library := range libraries {
+	for _, library := range libraries {
 		n.Dependency(library)
 	}
 
@@ -80,7 +79,6 @@ func (e *Exe) Consume(s collector.Store, n *node.Node) error {
 	}
 	n.Resolver = r
 
-	sorter.New().Sort(n)
 	s.Set(n)
 
 	return nil
@@ -91,16 +89,16 @@ func collectObjs(
 	s collector.Store,
 	n *node.Node,
 	ext string,
-	objs map[string]*node.Node,
+	objs *[]*node.Node,
 ) error {
 	obj := s.Get(strings.ReplaceAll(n.Name, ext, ".o"))
 	if obj == nil {
 		return fmt.Errorf("no know object for %s", n)
 	}
-	if _, ok := objs[obj.Name]; ok {
+	if contains(*objs, obj) {
 		return nil
 	}
-	objs[obj.Name] = obj
+	*objs = append(*objs, obj)
 	log.Debugf("remembering object %s", obj)
 
 	for _, d := range n.Dependencies {
@@ -125,7 +123,7 @@ func collectObjs(
 func collectLibraries(
 	s collector.Store,
 	n *node.Node,
-	libraries map[*node.Node]bool,
+	libraries *[]*node.Node,
 ) error {
 	if err := node.Visit(n, func(vn *node.Node) error {
 		var labels Labels
@@ -139,7 +137,7 @@ func collectLibraries(
 				return fmt.Errorf("unknown node for library %s", library)
 			}
 
-			libraries[libraryN] = true
+			*libraries = append(*libraries, libraryN)
 		}
 
 		return nil
@@ -154,4 +152,13 @@ func collectLibraries(
 // paths encoutered as a part of a node.Node's Labels along the way.
 func CollectLinkFlags(n *node.Node) ([]string, error) {
 	return collectLabels(n, func(l *Labels) []string { return l.LinkFlags })
+}
+
+func contains(nodes []*node.Node, n *node.Node) bool {
+	for _, nn := range nodes {
+		if nn == n {
+			return true
+		}
+	}
+	return false
 }
