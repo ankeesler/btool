@@ -21,6 +21,7 @@ class Node {
   };
 
   Node(const std::string &name) : name_(name) {}
+  Node(const char *name) : name_(name) {}
 
   const std::string &Name() const { return name_; }
   void String(std::ostream *os) const;

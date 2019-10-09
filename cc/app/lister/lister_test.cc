@@ -9,14 +9,14 @@
 #include "node/node.h"
 #include "node/testing/node.h"
 
-TEST(Lister, List) {
+class ListerTest : public ::btool::node::testing::NodeTest {};
+
+TEST_F(ListerTest, List) {
   std::stringstream ss;
   ::btool::app::lister::Lister l(&ss);
 
-  auto nodes = ::btool::node::testing::Nodes0123();
+  l.List(a_);
 
-  l.List(*nodes->Get("0"));
-
-  std::string ex = "0\n. 1\n. . 2\n. . . 3\n. 2\n. . 3\n";
+  std::string ex = "a\n. b\n. . c\n. . . d\n. c\n. . d\n";
   EXPECT_EQ(ex, ss.str());
 }

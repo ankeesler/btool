@@ -19,107 +19,73 @@ class MockCurrenter : public ::btool::app::builder::Builder::Currenter {
   MOCK_METHOD1(Current, ::btool::core::Err<bool>(const ::btool::node::Node &));
 };
 
-TEST(Builder, BuildAll) {
-  auto nodes = ::btool::node::testing::Nodes0123();
+class BuilderTest : public ::btool::node::testing::NodeTest {};
 
-  ::btool::node::testing::MockResolver mr0;
-  nodes->Get("0")->SetResolver(&mr0);
-  ::btool::node::testing::MockResolver mr1;
-  nodes->Get("1")->SetResolver(&mr1);
-  ::btool::node::testing::MockResolver mr2;
-  nodes->Get("2")->SetResolver(&mr2);
-  ::btool::node::testing::MockResolver mr3;
-  nodes->Get("3")->SetResolver(&mr3);
-
+TEST_F(BuilderTest, BuildAll) {
   InSequence s;
   MockCurrenter mc;
-  std::string err;
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("3"))))
+  EXPECT_CALL(mc, Current(Ref(d_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(false)));
-  EXPECT_CALL(mr3, Resolve(Ref(*nodes->Get("3"))))
+  EXPECT_CALL(dr_, Resolve(Ref(d_)))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("2"))))
+  EXPECT_CALL(mc, Current(Ref(c_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(false)));
-  EXPECT_CALL(mr2, Resolve(Ref(*nodes->Get("2"))))
+  EXPECT_CALL(cr_, Resolve(Ref(c_)))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("1"))))
+  EXPECT_CALL(mc, Current(Ref(b_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(false)));
-  EXPECT_CALL(mr1, Resolve(Ref(*nodes->Get("1"))))
+  EXPECT_CALL(br_, Resolve(Ref(b_)))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("0"))))
+  EXPECT_CALL(mc, Current(Ref(a_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(false)));
-  EXPECT_CALL(mr0, Resolve(Ref(*nodes->Get("0"))))
+  EXPECT_CALL(ar_, Resolve(Ref(a_)))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
   ::btool::app::builder::Builder b(&mc);
-  EXPECT_EQ(::btool::core::VoidErr::Success(), b.Build(*nodes->Get("0")));
+  EXPECT_EQ(::btool::core::VoidErr::Success(), b.Build(a_));
 }
 
-TEST(Builder, UpToDate) {
-  auto nodes = ::btool::node::testing::Nodes0123();
-
-  ::btool::node::testing::MockResolver mr0;
-  nodes->Get("0")->SetResolver(&mr0);
-  ::btool::node::testing::MockResolver mr1;
-  nodes->Get("1")->SetResolver(&mr1);
-  ::btool::node::testing::MockResolver mr2;
-  nodes->Get("2")->SetResolver(&mr2);
-  ::btool::node::testing::MockResolver mr3;
-  nodes->Get("3")->SetResolver(&mr3);
-
+TEST_F(BuilderTest, UpToDate) {
   InSequence s;
   MockCurrenter mc;
-  std::string err;
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("3"))))
+  EXPECT_CALL(mc, Current(Ref(d_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(true)));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("2"))))
+  EXPECT_CALL(mc, Current(Ref(c_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(true)));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("1"))))
+  EXPECT_CALL(mc, Current(Ref(b_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(true)));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("0"))))
+  EXPECT_CALL(mc, Current(Ref(a_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(true)));
 
   ::btool::app::builder::Builder b(&mc);
-  EXPECT_EQ(::btool::core::VoidErr::Success(), b.Build(*nodes->Get("0")));
+  EXPECT_EQ(::btool::core::VoidErr::Success(), b.Build(a_));
 }
 
-TEST(Builder, Some) {
-  auto nodes = ::btool::node::testing::Nodes0123();
-
-  ::btool::node::testing::MockResolver mr0;
-  nodes->Get("0")->SetResolver(&mr0);
-  ::btool::node::testing::MockResolver mr1;
-  nodes->Get("1")->SetResolver(&mr1);
-  ::btool::node::testing::MockResolver mr2;
-  nodes->Get("2")->SetResolver(&mr2);
-  ::btool::node::testing::MockResolver mr3;
-  nodes->Get("3")->SetResolver(&mr3);
-
+TEST_F(BuilderTest, Some) {
   InSequence s;
   MockCurrenter mc;
-  std::string err;
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("3"))))
+  EXPECT_CALL(mc, Current(Ref(d_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(true)));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("2"))))
+  EXPECT_CALL(mc, Current(Ref(c_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(false)));
-  EXPECT_CALL(mr2, Resolve(Ref(*nodes->Get("2"))))
+  EXPECT_CALL(cr_, Resolve(Ref(c_)))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("1"))))
+  EXPECT_CALL(mc, Current(Ref(b_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(false)));
-  EXPECT_CALL(mr1, Resolve(Ref(*nodes->Get("1"))))
+  EXPECT_CALL(br_, Resolve(Ref(b_)))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
-  EXPECT_CALL(mc, Current(Ref(*nodes->Get("0"))))
+  EXPECT_CALL(mc, Current(Ref(a_)))
       .WillOnce(Return(::btool::core::Err<bool>::Success(true)));
 
   ::btool::app::builder::Builder b(&mc);
-  EXPECT_EQ(::btool::core::VoidErr::Success(), b.Build(*nodes->Get("0")));
+  EXPECT_EQ(::btool::core::VoidErr::Success(), b.Build(a_));
 }
