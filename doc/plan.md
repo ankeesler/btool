@@ -6,6 +6,7 @@
 - Single line UI for collecting and resolving nodes
 - Ability to select multiple targets at once
 - Run a debugger with -debug
+- Targets are per-os/arch
 
 # Chores
 

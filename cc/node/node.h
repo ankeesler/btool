@@ -20,7 +20,6 @@ class Node {
     virtual ::btool::core::VoidErr Resolve(const Node &node) = 0;
   };
 
-  Node(const std::string &name) : name_(name) {}
   Node(const char *name) : name_(name) {}
 
   const std::string &Name() const { return name_; }

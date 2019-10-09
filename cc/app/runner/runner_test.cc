@@ -27,6 +27,7 @@ TEST(Runner, Failure) {
   // and thus the mock will not be freed in that process. It isn't leaked in
   // the parent process though!
   MockCallback mcb;
+  ::testing::Mock::AllowLeak(&mcb);
   ::btool::node::Node n("this-binary-does-not-exist");
   EXPECT_CALL(mcb, OnRun(Ref(n)));
 

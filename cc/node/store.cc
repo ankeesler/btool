@@ -14,8 +14,8 @@ Store::~Store() {
 Node *Store::Create(const char *name) {
   // TODO: this performance is bad?
   std::string key(name);
-  auto node = new Node(key);
-  nodes_[name] = node;
+  auto node = new Node(name);
+  nodes_[key] = node;
   return node;
 }
 
