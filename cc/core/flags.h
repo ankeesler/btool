@@ -11,6 +11,7 @@ namespace btool::core {
 class Flags {
  public:
   void Bool(const char *name, bool *value) { bools_[name] = value; }
+  void String(const char *name, std::string *value) { strings_[name] = value; }
 
   // Returns true on success.
   bool Parse(int argc, const char *argv[], std::string *err);
@@ -22,6 +23,7 @@ class Flags {
     }
   };
   std::map<const char *, bool *, cmp_str> bools_;
+  std::map<const char *, std::string *, cmp_str> strings_;
 };
 
 };  // namespace btool::core

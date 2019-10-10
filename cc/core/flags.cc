@@ -13,11 +13,18 @@ bool Flags::Parse(int argc, const char *argv[], std::string *err) {
 
   for (int i = 0; i < argc; ++i) {
     const char *name = argv[i] + 1;  // move past '-'
-    bool *value = bools_[name];
-    DEBUG("found flag %s, %s value\n", name,
-          (value == nullptr ? "NOT" : "also"));
-    if (value != nullptr) {
-      *value = true;
+    bool *bv = bools_[name];
+    DEBUG("found bool flag %s, %s value\n", name,
+          (bv == nullptr ? "NOT" : "also"));
+    if (bv != nullptr) {
+      *bv = true;
+    }
+
+    std::string *sv = strings_[name];
+    DEBUG("found string flag %s, %s value\n", name,
+          (sv == nullptr ? "NOT" : "also"));
+    if (sv != nullptr) {
+      *sv = argv[++i];
     }
   }
   return true;

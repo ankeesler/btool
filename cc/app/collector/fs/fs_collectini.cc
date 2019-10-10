@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include <functional>
+#include <iostream>
 #include <memory>
 
 #include "core/err.h"
@@ -28,7 +29,7 @@ static ::btool::core::VoidErr Walk(std::string *root,
 
   struct ::stat s;
   if (::stat(root->c_str(), &s) == -1) {
-    DEBUG("lstat: %s\n", ::strerror(errno));
+    DEBUG("lstat %s: %s\n", root->c_str(), ::strerror(errno));
     return ::btool::core::VoidErr::Failure("couldn't lstat node");
   }
 

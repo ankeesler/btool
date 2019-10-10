@@ -10,6 +10,7 @@
 #include "app/cleaner/cleaner.h"
 #include "app/cleaner/remove_aller_impl.h"
 #include "app/collector/collector.h"
+#include "app/collector/fs/fs_collectini.h"
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
 #include "core/err.h"
@@ -23,17 +24,24 @@ int main(int argc, const char *argv[]) {
   bool debug = false;
   f.Bool("debug", &debug);
 
+  bool list = false;
+  f.Bool("list", &list);
+
+  std::string root = ".";
+  f.String("root", &root);
+
   std::string err_s;
   bool success = f.Parse(argc, argv, &err_s);
   if (!success) {
     ERROR("parse flags: %s\n", err_s.c_str());
     exit(1);
   }
-  DEBUG("debug is %d\n", debug);
 
   ::btool::ui::UI ui;
 
+  ::btool::app::collector::fs::FSCollectini fsc(root.c_str());
   ::btool::app::collector::Collector collector;
+  collector.AddCollectini(&fsc);
 
   ::btool::app::cleaner::RemoveAllerImpl rai;
   ::btool::app::cleaner::Cleaner cleaner(&rai);
@@ -46,7 +54,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::runner::Runner runner(&ui);
 
   ::btool::app::App a(&collector, &cleaner, &lister, &builder, &runner);
-  auto err = a.Run(false, false, false);
+  auto err = a.Run(false, list, false);
   if (err) {
     ERROR("%s\n", err.Msg());
     return 1;
