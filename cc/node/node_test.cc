@@ -7,6 +7,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+// workaround for bug-00
+#include "core/err.h"
 #include "node/testing/node.h"
 
 class NodeTest : public ::btool::node::testing::NodeTest {};

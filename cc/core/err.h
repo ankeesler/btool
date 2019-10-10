@@ -14,9 +14,13 @@ namespace btool::core {
 // once.
 //
 // Err is movable and copyable.
+//
+// Declaring an Err with the default constructor means Success.
 template <typename T>
 class Err {
  public:
+  Err<T>(T ret) : ret_(ret), msg_(nullptr) {}
+
   static Err<T> Success(T ret) {
     Err<T> err;
     err.ret_ = ret;
@@ -58,11 +62,19 @@ class Err {
   const char *msg_;
 };
 
+template <typename T>
+std::ostream &operator<<(std::ostream &os, const Err<T> &err) {
+  if (err) {
+    os << "err: failure: " << err.Msg();
+  } else {
+    os << "err: success: " << err.Ret();
+  }
+  return os;
+}
+
 // VoidErr
 //
 // This type behaves exactly as an Err<void> would from above.
-//
-// Declaring a VoidErr with the default constructor means Success.
 class VoidErr {
  public:
   static VoidErr Success() {
@@ -102,6 +114,8 @@ class VoidErr {
  private:
   const char *msg_;
 };
+
+std::ostream &operator<<(std::ostream &os, const VoidErr &err);
 
 };  // namespace btool::core
 

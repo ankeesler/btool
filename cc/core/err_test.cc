@@ -1,6 +1,7 @@
 #include "err.h"
 
 #include <iostream>
+#include <ostream>
 
 #include "gtest/gtest.h"
 
@@ -22,10 +23,15 @@ static ::btool::core::VoidErr VoidFailure() {
 
 class Tuna {
  public:
-  int Fish() { return 5; }
+  int Fish() const { return 5; }
 
-  bool operator==(const Tuna& t) const { return true; }
+  bool operator==(const Tuna &t) const { return true; }
 };
+
+std::ostream &operator<<(std::ostream &os, const Tuna &tuna) {
+  os << "tuna: " << tuna.Fish();
+  return os;
+}
 
 static ::btool::core::Err<Tuna> TunaSuccess() {
   Tuna t;

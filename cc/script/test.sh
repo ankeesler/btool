@@ -14,6 +14,7 @@ $BTOOL -loglevel error -run -target core/err_test
 $BTOOL -loglevel error -run -target node/node_test
 
 $BTOOL -loglevel error -run -target app/builder/builder_test
+$BTOOL -loglevel error -run -target app/builder/currenter_impl_test
 $BTOOL -loglevel error -run -target app/cleaner/cleaner_test
 $BTOOL -loglevel error -run -target app/lister/lister_test
 $BTOOL -loglevel error -run -target app/runner/runner_test
