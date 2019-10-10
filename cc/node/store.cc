@@ -17,7 +17,7 @@ Node *Store::Put(const char *name) {
   auto node = nodes_[key];
   if (node == nullptr) {
     node = new Node(name);
-    nodes_[key] = node;
+    Set(node);
   }
   return node;
 }
@@ -38,6 +38,15 @@ Node *Store::Get(const char *name) const {
   } else {
     return it->second;
   }
+}
+
+std::ostream &operator<<(std::ostream &os, const Store &s) {
+  os << "[ ";
+  for (auto kv : s.nodes_) {
+    os << '\'' << kv.second->Name() << '\'' << " ";
+  }
+  os << "]";
+  return os;
 }
 
 };  // namespace btool::node

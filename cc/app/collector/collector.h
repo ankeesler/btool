@@ -16,12 +16,11 @@ class Collector : public ::btool::app::App::Collector {
     virtual ::btool::core::VoidErr Collect(::btool::node::Store *) = 0;
   };
 
-  Collector(std::vector<Collectini *> *cs) : cs_(cs) {}
-
+  void AddCollectini(Collectini *c) { cs_.push_back(c); }
   ::btool::core::VoidErr Collect() override;
 
  private:
-  std::vector<Collectini *> *cs_;
+  std::vector<Collectini *> cs_;
 };
 
 };  // namespace btool::app::collector

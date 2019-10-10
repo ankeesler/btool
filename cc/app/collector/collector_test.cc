@@ -24,8 +24,11 @@ TEST(Collector, A) {
   MockCollectini c2;
   EXPECT_CALL(c2, Collect(_))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
-  std::vector<::btool::app::collector::Collector::Collectini *> cs{&c0, &c1,
-                                                                   &c2};
-  ::btool::app::collector::Collector c(&cs);
+
+  ::btool::app::collector::Collector c;
+  c.AddCollectini(&c0);
+  c.AddCollectini(&c1);
+  c.AddCollectini(&c2);
+
   EXPECT_FALSE(c.Collect());
 }

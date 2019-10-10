@@ -8,7 +8,7 @@ namespace btool::app::collector {
 
 ::btool::core::VoidErr Collector::Collect() {
   ::btool::node::Store s;
-  for (auto c : *cs_) {
+  for (auto c : cs_) {
     auto err = c->Collect(&s);
     if (err) {
       return err;

@@ -33,8 +33,7 @@ int main(int argc, const char *argv[]) {
 
   ::btool::ui::UI ui;
 
-  std::vector<::btool::app::collector::Collector::Collectini *> cs;
-  ::btool::app::collector::Collector collector(&cs);
+  ::btool::app::collector::Collector collector;
 
   ::btool::app::cleaner::RemoveAllerImpl rai;
   ::btool::app::cleaner::Cleaner cleaner(&rai);

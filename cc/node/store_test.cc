@@ -34,6 +34,12 @@ TEST(Store, Listener) {
   MockListener l1;
 
   InSequence s;
+  EXPECT_CALL(l0, OnSet(&store, "a"));
+  EXPECT_CALL(l1, OnSet(&store, "a"));
+
+  EXPECT_CALL(l0, OnSet(&store, "b"));
+  EXPECT_CALL(l1, OnSet(&store, "b"));
+
   EXPECT_CALL(l0, OnSet(&store, "b"));
   EXPECT_CALL(l1, OnSet(&store, "b"));
 
