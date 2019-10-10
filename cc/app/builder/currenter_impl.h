@@ -1,7 +1,7 @@
 #ifndef BTOOL_APP_BUILDER_CURRENTERIMPL_H_
 #define BTOOL_APP_BUILDER_CURRENTERIMPL_H_
 
-#include "app/builder/builder.h"
+#include "builder.h"
 #include "core/err.h"
 #include "node/node.h"
 

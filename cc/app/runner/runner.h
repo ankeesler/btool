@@ -3,11 +3,13 @@
 
 #include <string>
 
+#include "app/app.h"
+#include "core/err.h"
 #include "node/node.h"
 
 namespace btool::app::runner {
 
-class Runner {
+class Runner : public ::btool::app::App::Runner {
  public:
   class Callback {
    public:
@@ -17,7 +19,7 @@ class Runner {
 
   Runner(Callback *cb) : cb_(cb) {}
 
-  bool Run(const ::btool::node::Node &node);
+  ::btool::core::VoidErr Run(const ::btool::node::Node &node) override;
 
  private:
   Callback *cb_;

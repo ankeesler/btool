@@ -18,7 +18,7 @@ TEST(Runner, Success) {
   EXPECT_CALL(mcb, OnRun(Ref(n)));
 
   ::btool::app::runner::Runner r(&mcb);
-  EXPECT_TRUE(r.Run(n));
+  EXPECT_FALSE(r.Run(n));
 }
 
 TEST(Runner, Failure) {
@@ -32,5 +32,5 @@ TEST(Runner, Failure) {
   EXPECT_CALL(mcb, OnRun(Ref(n)));
 
   ::btool::app::runner::Runner r(&mcb);
-  EXPECT_FALSE(r.Run(n));
+  EXPECT_TRUE(r.Run(n));
 }

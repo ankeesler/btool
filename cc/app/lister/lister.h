@@ -3,15 +3,17 @@
 
 #include <ostream>
 
+#include "app/app.h"
+#include "core/err.h"
 #include "node/node.h"
 
 namespace btool::app::lister {
 
-class Lister {
+class Lister : public ::btool::app::App::Lister {
  public:
   Lister(std::ostream *os) : os_(os) {}
 
-  void List(const ::btool::node::Node &node);
+  ::btool::core::VoidErr List(const ::btool::node::Node &node) override;
 
  private:
   std::ostream *os_;

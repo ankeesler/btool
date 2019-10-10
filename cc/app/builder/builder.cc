@@ -15,7 +15,7 @@ namespace btool::app::builder {
       auto current_err = c_->Current(*n);
       if (current_err) {
         err = ::btool::core::VoidErr::Failure(current_err.Msg());
-      } else if (!current_err.Ret()) {
+      } else if (!current_err.Ret() && n->Resolver() != nullptr) {
         err = n->Resolver()->Resolve(*n);
       }
     }

@@ -2,20 +2,21 @@
 
 #include <string>
 
+#include "core/err.h"
 #include "node/node.h"
 
 namespace btool::app::cleaner {
 
-bool Cleaner::Clean(const ::btool::node::Node& node, std::string* err) {
-  bool success = true;
+::btool::core::VoidErr Cleaner::Clean(const ::btool::node::Node& node) {
+  ::btool::core::VoidErr err;
 
   node.Visit([&](const ::btool::node::Node* n) {
-    if (success) {
-      success = ra_->RemoveAll(n->Name(), err);
+    if (!err) {
+      err = ra_->RemoveAll(n->Name());
     }
   });
 
-  return success;
+  return err;
 }
 
 };  // namespace btool::app::cleaner

@@ -3,11 +3,12 @@
 
 #include <vector>
 
+#include "app/app.h"
 #include "node/store.h"
 
 namespace btool::app::collector {
 
-class Collector {
+class Collector : public ::btool::app::App::Collector {
  public:
   class Collectini {
    public:
@@ -17,7 +18,7 @@ class Collector {
 
   Collector(std::vector<Collectini *> *cs) : cs_(cs) {}
 
-  ::btool::core::VoidErr Collect();
+  ::btool::core::VoidErr Collect() override;
 
  private:
   std::vector<Collectini *> *cs_;

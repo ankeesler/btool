@@ -3,12 +3,13 @@
 
 #include <string>
 
+#include "app/app.h"
 #include "core/err.h"
 #include "node/node.h"
 
 namespace btool::app::builder {
 
-class Builder {
+class Builder : public ::btool::app::App::Builder {
  public:
   class Currenter {
    public:
@@ -19,7 +20,7 @@ class Builder {
 
   Builder(Currenter *c) : c_(c) {}
 
-  ::btool::core::VoidErr Build(const ::btool::node::Node &node);
+  ::btool::core::VoidErr Build(const ::btool::node::Node &node) override;
 
  private:
   Currenter *c_;

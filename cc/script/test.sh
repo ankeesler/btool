@@ -12,6 +12,7 @@ $BTOOL -loglevel error -run -target core/cmd_test
 $BTOOL -loglevel error -run -target core/err_test
 
 $BTOOL -loglevel error -run -target node/node_test
+$BTOOL -loglevel error -run -target node/store_test
 
 $BTOOL -loglevel error -run -target app/app_test
 $BTOOL -loglevel error -run -target app/builder/builder_test
