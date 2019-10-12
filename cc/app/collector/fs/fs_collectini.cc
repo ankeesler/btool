@@ -19,8 +19,7 @@ static ::btool::core::VoidErr Walk(std::string *root,
                                    std::function<void(const std::string &)> f);
 
 ::btool::core::VoidErr FSCollectini::Collect(::btool::node::Store *s) {
-  return Walk(new std::string(root_),
-              [&](const std::string &path) { s->Put(path.c_str()); });
+  return Walk(&root_, [&](const std::string &path) { s->Put(path.c_str()); });
 }
 
 static ::btool::core::VoidErr Walk(std::string *root,
@@ -58,14 +57,12 @@ static ::btool::core::VoidErr Walk(std::string *root,
   }
 
   for (auto child : children) {
-    auto new_root = new std::string(*root + "/" + child);
-    auto err = Walk(new_root, f);
+    std::string new_root(*root + "/" + child);
+    auto err = Walk(&new_root, f);
     if (err) {
       return err;
     }
   }
-
-  delete root;
 
   return ::btool::core::VoidErr::Success();
 }
