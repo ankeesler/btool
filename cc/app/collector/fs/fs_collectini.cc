@@ -2,7 +2,6 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <sys/stat.h>
 #include <cstring>
 
 #include <functional>
@@ -17,6 +16,7 @@ namespace btool::app::collector::fs {
 
 static ::btool::core::VoidErr Walk(const std::string &root,
                                    std::function<void(const std::string &)> f);
+static bool HasExt(const char *file, const char *ext);
 
 ::btool::core::VoidErr FSCollectini::Collect(::btool::node::Store *s) {
   return Walk(root_, [&](const std::string &path) { s->Put(path.c_str()); });
@@ -26,34 +26,33 @@ static ::btool::core::VoidErr Walk(const std::string &root,
                                    std::function<void(const std::string &)> f) {
   DEBUG("walk %s\n", root.c_str());
 
-  struct ::stat s;
-  if (::stat(root.c_str(), &s) == -1) {
-    DEBUG("lstat %s: %s\n", root.c_str(), ::strerror(errno));
-    return ::btool::core::VoidErr::Failure("couldn't lstat node");
+  std::vector<std::string> children;
+  ::DIR *dir = ::opendir(root.c_str());
+  if (dir == nullptr) {
+    DEBUG("opendir: %s\n", ::strerror(errno));
+    return ::btool::core::VoidErr::Failure("opendir");
   }
 
-  std::vector<std::string> children;
-  if ((s.st_mode & S_IFDIR) != 0) {
-    ::DIR *dir = ::opendir(root.c_str());
-    if (dir == nullptr) {
-      DEBUG("opendir: %s\n", ::strerror(errno));
-      return ::btool::core::VoidErr::Failure("opendir");
-    }
-
-    struct dirent *dirent = nullptr;
-    while ((dirent = readdir(dir)) != nullptr) {
-      const char *d_name = dirent->d_name;
+  struct dirent *dirent = nullptr;
+  while ((dirent = readdir(dir)) != nullptr) {
+    const char *d_name = dirent->d_name;
+    if ((dirent->d_type & DT_DIR) != 0) {
       if (::strcmp(d_name, ".") != 0 && ::strcmp(d_name, "..") != 0) {
         children.push_back(d_name);
       }
+    } else if ((dirent->d_type & DT_REG) != 0) {
+      if (HasExt(d_name, ".c") || HasExt(d_name, ".cc") ||
+          HasExt(d_name, ".h")) {
+        std::string file(root + '/' + d_name);
+        DEBUG("visit %s\n", file.c_str());
+        f(file);
+      }
     }
+  }
 
-    if (::closedir(dir) == -1) {
-      DEBUG("closedir: %s\n", ::strerror(errno));
-      return ::btool::core::VoidErr::Failure("closedir");
-    }
-  } else {
-    f(root);
+  if (::closedir(dir) == -1) {
+    DEBUG("closedir: %s\n", ::strerror(errno));
+    return ::btool::core::VoidErr::Failure("closedir");
   }
 
   for (auto child : children) {
@@ -65,6 +64,13 @@ static ::btool::core::VoidErr Walk(const std::string &root,
   }
 
   return ::btool::core::VoidErr::Success();
+}
+
+static bool HasExt(const char *file, const char *ext) {
+  size_t file_len = ::strlen(file);
+  size_t ext_len = ::strlen(ext);
+  return (file_len > ext_len &&
+          (::memcmp(file + file_len - ext_len, ext, ext_len) == 0));
 }
 
 };  // namespace btool::app::collector::fs
