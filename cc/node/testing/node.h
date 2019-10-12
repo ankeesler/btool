@@ -27,22 +27,33 @@ class NodeTest : public ::testing::Test {
     a_.AddDep(&c_);
     a_.SetResolver(&ar_);
 
+    tmpa_.AddDep(&tmpb_);
+    tmpa_.AddDep(&tmpc_);
+
     b_.AddDep(&c_);
     b_.SetResolver(&br_);
 
+    tmpb_.AddDep(&tmpc_);
+
     c_.AddDep(&d_);
     c_.SetResolver(&cr_);
+
+    tmpc_.AddDep(&tmpd_);
 
     d_.SetResolver(&dr_);
   }
 
   ::btool::node::Node a_{"a"};
+  ::btool::node::Node tmpa_{"/tmp/a"};
   MockResolver ar_;
   ::btool::node::Node b_{"b"};
+  ::btool::node::Node tmpb_{"/tmp/b"};
   MockResolver br_;
   ::btool::node::Node c_{"c"};
+  ::btool::node::Node tmpc_{"/tmp/c"};
   MockResolver cr_;
   ::btool::node::Node d_{"d"};
+  ::btool::node::Node tmpd_{"/tmp/d"};
   MockResolver dr_;
 };
 

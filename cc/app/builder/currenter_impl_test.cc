@@ -15,7 +15,7 @@ class CurrenterTest : public ::btool::node::testing::NodeTest {};
 class NodeFile {
  public:
   NodeFile(const ::btool::node::Node &node) : node_(node) {
-    ::usleep(1000);
+    ::usleep(100000);
 
     ::FILE *f = ::fopen(node.Name().c_str(), "w");
     EXPECT_TRUE(f != nullptr) << "cannot open " << node.Name().c_str();
@@ -30,7 +30,7 @@ class NodeFile {
   }
 
   void Modify() {
-    ::usleep(1000);
+    ::usleep(100000);
 
     ::FILE *f = ::fopen(node_.Name().c_str(), "a");
     fprintf(f, "modify\n");
@@ -45,63 +45,63 @@ class NodeFile {
 TEST_F(CurrenterTest, NoDeps) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(d_);
+  auto err = ci.Current(tmpd_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
-  NodeFile nf(d_);
+  NodeFile nf(tmpd_);
   nf.Modify();
 
-  err = ci.Current(d_);
+  err = ci.Current(tmpd_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
 }
 
 TEST_F(CurrenterTest, AdjacentDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(c_);
+  auto err = ci.Current(tmpc_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
-  NodeFile nfd(d_);
-  err = ci.Current(c_);
+  NodeFile nfd(tmpd_);
+  err = ci.Current(tmpc_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
-  NodeFile nfc(c_);
-  err = ci.Current(c_);
+  NodeFile nfc(tmpc_);
+  err = ci.Current(tmpc_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
 
   nfd.Modify();
-  err = ci.Current(c_);
+  err = ci.Current(tmpc_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
   nfc.Modify();
-  err = ci.Current(c_);
+  err = ci.Current(tmpc_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
 }
 
 TEST_F(CurrenterTest, AncestorDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(b_);
+  auto err = ci.Current(tmpb_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
-  NodeFile nfd(d_);
-  NodeFile nfc(c_);
-  err = ci.Current(b_);
+  NodeFile nfd(tmpd_);
+  NodeFile nfc(tmpc_);
+  err = ci.Current(tmpb_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
-  NodeFile nfb(b_);
-  err = ci.Current(b_);
+  NodeFile nfb(tmpb_);
+  err = ci.Current(tmpb_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
 
   nfd.Modify();
-  err = ci.Current(b_);
+  err = ci.Current(tmpb_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
   nfc.Modify();
-  err = ci.Current(b_);
+  err = ci.Current(tmpb_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
 
   nfb.Modify();
-  err = ci.Current(b_);
+  err = ci.Current(tmpb_);
   EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
 }
