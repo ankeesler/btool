@@ -15,26 +15,26 @@
 
 namespace btool::app::collector::fs {
 
-static ::btool::core::VoidErr Walk(std::string *root,
+static ::btool::core::VoidErr Walk(const std::string &root,
                                    std::function<void(const std::string &)> f);
 
 ::btool::core::VoidErr FSCollectini::Collect(::btool::node::Store *s) {
-  return Walk(&root_, [&](const std::string &path) { s->Put(path.c_str()); });
+  return Walk(root_, [&](const std::string &path) { s->Put(path.c_str()); });
 }
 
-static ::btool::core::VoidErr Walk(std::string *root,
+static ::btool::core::VoidErr Walk(const std::string &root,
                                    std::function<void(const std::string &)> f) {
-  DEBUG("walk %s\n", root->c_str());
+  DEBUG("walk %s\n", root.c_str());
 
   struct ::stat s;
-  if (::stat(root->c_str(), &s) == -1) {
-    DEBUG("lstat %s: %s\n", root->c_str(), ::strerror(errno));
+  if (::stat(root.c_str(), &s) == -1) {
+    DEBUG("lstat %s: %s\n", root.c_str(), ::strerror(errno));
     return ::btool::core::VoidErr::Failure("couldn't lstat node");
   }
 
-  std::vector<const char *> children;
+  std::vector<std::string> children;
   if ((s.st_mode & S_IFDIR) != 0) {
-    ::DIR *dir = ::opendir(root->c_str());
+    ::DIR *dir = ::opendir(root.c_str());
     if (dir == nullptr) {
       DEBUG("opendir: %s\n", ::strerror(errno));
       return ::btool::core::VoidErr::Failure("opendir");
@@ -42,7 +42,7 @@ static ::btool::core::VoidErr Walk(std::string *root,
 
     struct dirent *dirent = nullptr;
     while ((dirent = readdir(dir)) != nullptr) {
-      char *d_name = dirent->d_name;
+      const char *d_name = dirent->d_name;
       if (::strcmp(d_name, ".") != 0 && ::strcmp(d_name, "..") != 0) {
         children.push_back(d_name);
       }
@@ -53,12 +53,12 @@ static ::btool::core::VoidErr Walk(std::string *root,
       return ::btool::core::VoidErr::Failure("closedir");
     }
   } else {
-    f(*root);
+    f(root);
   }
 
   for (auto child : children) {
-    std::string new_root(*root + "/" + child);
-    auto err = Walk(&new_root, f);
+    std::string new_root(root + '/' + child);
+    auto err = Walk(new_root, f);
     if (err) {
       return err;
     }
