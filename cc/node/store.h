@@ -44,7 +44,7 @@ class Store {
   void Set(Node *node);
 
   // Get returns nullptr iff no Node exists with the provided name.
-  Node *Get(const char *name) const;
+  Node *Get(const std::string &name) const;
 
   // Listen adds a Listener to this Store. The Listener will be notified when
   // about various Store events.

@@ -29,10 +29,9 @@ void Store::Set(Node *node) {
   }
 }
 
-Node *Store::Get(const char *name) const {
+Node *Store::Get(const std::string &name) const {
   // TODO: this performance is bad?
-  std::string key(name);
-  auto it = nodes_.find(key);
+  auto it = nodes_.find(name);
   if (it == nodes_.end()) {
     return nullptr;
   } else {

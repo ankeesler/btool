@@ -4,7 +4,7 @@ set -eo pipefail
 
 image="$1"
 if [[ -z "$image" ]]; then
-    echo "usage: run-container.sh <image>"
+    echo "usage: push-container.sh <image>"
     exit 1
 fi
 
