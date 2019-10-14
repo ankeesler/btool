@@ -2,10 +2,12 @@
 
 #include <string>
 
+#include "util/fs/fs.h"
+
 namespace btool::app::cleaner {
 
 ::btool::core::VoidErr RemoveAllerImpl::RemoveAll(const std::string &path) {
-  return ::btool::core::VoidErr::Success();
+  return ::btool::util::fs::RemoveAll(path);
 }
 
 };  // namespace btool::app::cleaner
