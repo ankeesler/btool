@@ -2,19 +2,19 @@
 
 The simplest C/C++ build tool.
 
-![btool](btool.png)
-
 ```
 $ ./btool -root /tmp/BasicC -target main
 $ /tmp/BasicC/main
 hey! i am running!
 ```
 
+![btool](btool.png)
+
 ### To try out `btool`...
 
 ```
-$ docker run -it ankeesler/btool
-$ btool -root example/BasicCC -target main
+$ docker run -it ankeesler/btool btool -root example/BasicCC -target main -run -loglevel error
+hey!
 ```
 
 #### OR
