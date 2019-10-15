@@ -1,4 +1,4 @@
-#include "core/cmd.h"
+#include "util/cmd.h"
 
 #include <errno.h>
 #include <sys/wait.h>
@@ -9,7 +9,7 @@
 
 #include "core/log.h"
 
-namespace btool::core {
+namespace btool::util {
 
 const int kPipeRead = 0;
 const int kPipeWrite = 1;
@@ -159,4 +159,4 @@ int Cmd::RunParent(int child_pid, int child_stdout_fds[2],
   return WEXITSTATUS(stat);
 }
 
-};  // namespace btool::core
+};  // namespace btool::util

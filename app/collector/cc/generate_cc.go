@@ -89,7 +89,7 @@ namespace %s {
 
 }; // namespace %s
 `,
-		filepath.Base(path+".h"),
+		filepath.Base(path)+".h",
 		namespace,
 		namespace,
 	)

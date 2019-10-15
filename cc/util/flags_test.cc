@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 
 TEST(Flags, Bool) {
-  ::btool::core::Flags f;
+  ::btool::util::Flags f;
 
   bool a = false, b = true, c = false;
   f.Bool("a", &a);

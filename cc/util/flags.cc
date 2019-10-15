@@ -1,10 +1,10 @@
-#include "core/flags.h"
+#include "flags.h"
 
 #include <string>
 
 #include "log.h"
 
-namespace btool::core {
+namespace btool::util {
 
 bool Flags::Parse(int argc, const char *argv[], std::string *err) {
   for (auto kv : bools_) {
@@ -30,4 +30,4 @@ bool Flags::Parse(int argc, const char *argv[], std::string *err) {
   return true;
 }
 
-};  // namespace btool::core
+};  // namespace btool::util

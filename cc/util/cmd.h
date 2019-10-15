@@ -1,12 +1,12 @@
-#ifndef BTOOL_CORE_CMD_H_
-#define BTOOL_CORE_CMD_H_
+#ifndef BTOOL_UTIL_CMD_H_
+#define BTOOL_UTIL_CMD_H_
 
 #include <iostream>
 #include <ostream>
 #include <string>
 #include <vector>
 
-namespace btool::core {
+namespace btool::util {
 
 class Cmd {
  public:
@@ -29,6 +29,6 @@ class Cmd {
   std::ostream *out_, *err_;
 };
 
-};  // namespace btool::core
+};  // namespace btool::util
 
-#endif  // BTOOL_CORE_CMD_H_
+#endif  // BTOOL_UTIL_CMD_H_

@@ -14,12 +14,12 @@
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
 #include "core/err.h"
-#include "core/flags.h"
 #include "core/log.h"
 #include "ui/ui.h"
+#include "util/flags.h"
 
 int main(int argc, const char *argv[]) {
-  ::btool::core::Flags f;
+  ::btool::util::Flags f;
 
   bool debug = false;
   f.Bool("debug", &debug);

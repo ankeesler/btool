@@ -1,12 +1,12 @@
-#ifndef BTOOL_CORE_FLAGS_H_
-#define BTOOL_CORE_FLAGS_H_
+#ifndef BTOOL_UTIL_FLAGS_H_
+#define BTOOL_UTIL_FLAGS_H_
 
 #include <cstring>
 
 #include <map>
 #include <string>
 
-namespace btool::core {
+namespace btool::util {
 
 class Flags {
  public:
@@ -26,6 +26,6 @@ class Flags {
   std::map<const char *, std::string *, cmp_str> strings_;
 };
 
-};  // namespace btool::core
+};  // namespace btool::util
 
-#endif  // BTOOL_CORE_FLAGS_H_
+#endif  // BTOOL_UTIL_FLAGS_H_

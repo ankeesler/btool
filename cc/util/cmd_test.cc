@@ -1,11 +1,11 @@
-#include "cmd.h"
+#include "util/cmd.h"
 
 #include <sstream>
 
 #include "gtest/gtest.h"
 
 TEST(Cmd, Pass) {
-  ::btool::core::Cmd c("echo");
+  ::btool::util::Cmd c("echo");
 
   c.Arg("-n");
   c.Arg("tuna");
@@ -23,7 +23,7 @@ TEST(Cmd, Pass) {
 }
 
 TEST(Cmd, Fail) {
-  ::btool::core::Cmd c("cat");
+  ::btool::util::Cmd c("cat");
 
   c.Arg("this/file/does/not/exist");
 
@@ -39,6 +39,6 @@ TEST(Cmd, Fail) {
 }
 
 TEST(Cmd, DoesNotExist) {
-  ::btool::core::Cmd c("this-binary-does-not-exist");
+  ::btool::util::Cmd c("this-binary-does-not-exist");
   EXPECT_EQ(255, c.Run());
 }
