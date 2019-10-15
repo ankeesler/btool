@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "app/app.h"
-#include "node/store.h"
+#include "app/collector/store.h"
 
 namespace btool::app::collector {
 
@@ -13,7 +13,7 @@ class Collector : public ::btool::app::App::Collector {
   class Collectini {
    public:
     virtual ~Collectini() {}
-    virtual ::btool::core::VoidErr Collect(::btool::node::Store *) = 0;
+    virtual ::btool::core::VoidErr Collect(Store *) = 0;
   };
 
   void AddCollectini(Collectini *c) { cs_.push_back(c); }

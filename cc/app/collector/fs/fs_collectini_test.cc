@@ -4,7 +4,7 @@
 
 #include "gtest/gtest.h"
 
-#include "node/store.h"
+#include "app/collector/store.h"
 #include "util/fs/fs.h"
 
 class FSCollectiniTest : public ::testing::Test {
@@ -58,7 +58,7 @@ class FSCollectiniTest : public ::testing::Test {
 
 TEST_F(FSCollectiniTest, Yeah) {
   ::btool::app::collector::fs::FSCollectini fsc(Root());
-  ::btool::node::Store s;
+  ::btool::app::collector::Store s;
   EXPECT_EQ(::btool::core::VoidErr::Success(), fsc.Collect(&s));
 
   EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "a.cc")));

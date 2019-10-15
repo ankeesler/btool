@@ -10,7 +10,6 @@
 
 #include "core/err.h"
 #include "node/node.h"
-#include "node/store.h"
 
 namespace btool::node::testing {
 

@@ -1,9 +1,11 @@
-#include "node/store.h"
+#include "store.h"
 
 #include <map>
 #include <string>
 
-namespace btool::node {
+#include "node/node.h"
+
+namespace btool::app::collector {
 
 Store::~Store() {
   for (auto kv : nodes_) {
@@ -11,25 +13,24 @@ Store::~Store() {
   }
 }
 
-Node *Store::Put(const char *name) {
+::btool::node::Node *Store::Put(std::string name) {
   // TODO: this performance is bad?
-  std::string key(name);
-  auto node = nodes_[key];
+  auto node = nodes_[name];
   if (node == nullptr) {
-    node = new Node(name);
+    node = new ::btool::node::Node(name);
     Set(node);
   }
   return node;
 }
 
-void Store::Set(Node *node) {
+void Store::Set(::btool::node::Node *node) {
   nodes_[node->Name()] = node;
   for (auto l : ls_) {
     l->OnSet(this, node->Name());
   }
 }
 
-Node *Store::Get(const std::string &name) const {
+::btool::node::Node *Store::Get(const std::string &name) const {
   // TODO: this performance is bad?
   auto it = nodes_.find(name);
   if (it == nodes_.end()) {
@@ -48,4 +49,4 @@ std::ostream &operator<<(std::ostream &os, const Store &s) {
   return os;
 }
 
-};  // namespace btool::node
+};  // namespace btool::app::collector

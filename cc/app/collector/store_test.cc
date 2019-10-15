@@ -1,20 +1,20 @@
-#include "node/store.h"
+#include "store.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "node/node.h"
-#include "node/store.h"
 
 using ::testing::InSequence;
 
-class MockListener : public ::btool::node::Store::Listener {
+class MockListener : public ::btool::app::collector::Store::Listener {
  public:
-  MOCK_METHOD2(OnSet, void(::btool::node::Store *, const std::string &));
+  MOCK_METHOD2(OnSet,
+               void(::btool::app::collector::Store *, const std::string &));
 };
 
 TEST(Store, Basic) {
-  ::btool::node::Store s;
+  ::btool::app::collector::Store s;
   ::btool::node::Node *b = s.Put("b");
   ::btool::node::Node *a = s.Put("a");
   a->AddDep(b);
@@ -28,7 +28,7 @@ TEST(Store, Basic) {
 }
 
 TEST(Store, Listener) {
-  ::btool::node::Store store;
+  ::btool::app::collector::Store store;
 
   MockListener l0;
   MockListener l1;

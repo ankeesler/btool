@@ -1,5 +1,5 @@
-#ifndef BTOOL_NODE_STORE_H_
-#define BTOOL_NODE_STORE_H_
+#ifndef BTOOL_APP_COLLECTOR_STORE_H_
+#define BTOOL_APP_COLLECTOR_STORE_H_
 
 #include <map>
 #include <string>
@@ -7,7 +7,7 @@
 
 #include "node/node.h"
 
-namespace btool::node {
+namespace btool::app::collector {
 
 // Store
 //
@@ -38,25 +38,27 @@ class Store {
 
   // Put is idempotent: if no Node with the provided name exists, it will
   // create it; otherwise, the Node with the provided name will be returned.
-  Node *Put(const char *name);
+  ::btool::node::Node *Put(std::string name);
 
   // Set sets the provided Node to the Store.
-  void Set(Node *node);
+  void Set(::btool::node::Node *node);
 
   // Get returns nullptr iff no Node exists with the provided name.
-  Node *Get(const std::string &name) const;
+  ::btool::node::Node *Get(const std::string &name) const;
 
   // Listen adds a Listener to this Store. The Listener will be notified when
   // about various Store events.
   void Listen(Listener *l) { ls_.push_back(l); }
 
+  bool IsEmpty() const { return nodes_.empty(); }
+
  private:
-  std::map<std::string, Node *> nodes_;
+  std::map<std::string, ::btool::node::Node *> nodes_;
   std::vector<Listener *> ls_;
 };
 
 std::ostream &operator<<(std::ostream &os, const Store &s);
 
-};  // namespace btool::node
+};  // namespace btool::app::collector
 
-#endif  // BTOOL_NODE_STORE_H_
+#endif  // BTOOL_APP_COLLECTOR_STORE_H_

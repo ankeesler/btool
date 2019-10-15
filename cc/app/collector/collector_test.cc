@@ -3,15 +3,16 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "app/collector/store.h"
 #include "core/err.h"
-#include "node/store.h"
 
 using ::testing::_;
 using ::testing::Return;
 
 class MockCollectini : public ::btool::app::collector::Collector::Collectini {
  public:
-  MOCK_METHOD1(Collect, ::btool::core::VoidErr(::btool::node::Store *));
+  MOCK_METHOD1(Collect,
+               ::btool::core::VoidErr(::btool::app::collector::Store *));
 };
 
 TEST(Collector, A) {

@@ -6,6 +6,5 @@
 
 // workaround for bug-00
 #include "node/node.h"
-#include "node/store.h"
 
 namespace btool::node::testing {};  // namespace btool::node::testing
