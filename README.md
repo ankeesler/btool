@@ -20,8 +20,8 @@ hey!
 #### OR
 
 ```
-$ go build -o btool ./cmd/btool
-$ ./btool -root example/BasicCC -target main
+$ go run ./cmd/btool -root example/BasicCC -target main -loglevel error
+hey!
 ```
 
 ## To run the tests...
