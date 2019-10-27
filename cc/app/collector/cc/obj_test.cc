@@ -51,7 +51,7 @@ TEST_F(ObjTest, C) {
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
   EXPECT_TRUE(n);
-  EXPECT_EQ(ex_deps, n->dependencies());
+  EXPECT_EQ(ex_deps, *n->dependencies());
   EXPECT_EQ(&mr_, n->resolver());
 }
 
@@ -67,6 +67,6 @@ TEST_F(ObjTest, CC) {
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
   EXPECT_TRUE(n);
-  EXPECT_EQ(ex_deps, n->dependencies());
+  EXPECT_EQ(ex_deps, *n->dependencies());
   EXPECT_EQ(&mr_, n->resolver());
 }

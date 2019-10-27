@@ -22,22 +22,22 @@ class NodeTest : public ::testing::Test {
  protected:
   void SetUp() override {
     ::testing::Test::SetUp();
-    a_.AddDep(&b_);
-    a_.AddDep(&c_);
+    a_.dependencies()->push_back(&b_);
+    a_.dependencies()->push_back(&c_);
     a_.SetResolver(&ar_);
 
-    tmpa_.AddDep(&tmpb_);
-    tmpa_.AddDep(&tmpc_);
+    tmpa_.dependencies()->push_back(&tmpb_);
+    tmpa_.dependencies()->push_back(&tmpc_);
 
-    b_.AddDep(&c_);
+    b_.dependencies()->push_back(&c_);
     b_.SetResolver(&br_);
 
-    tmpb_.AddDep(&tmpc_);
+    tmpb_.dependencies()->push_back(&tmpc_);
 
-    c_.AddDep(&d_);
+    c_.dependencies()->push_back(&d_);
     c_.SetResolver(&cr_);
 
-    tmpc_.AddDep(&tmpd_);
+    tmpc_.dependencies()->push_back(&tmpd_);
 
     d_.SetResolver(&dr_);
   }

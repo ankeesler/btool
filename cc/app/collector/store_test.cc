@@ -17,10 +17,10 @@ TEST(Store, Basic) {
   ::btool::app::collector::Store s;
   ::btool::node::Node *b = s.Put("b");
   ::btool::node::Node *a = s.Put("a");
-  a->AddDep(b);
+  a->dependencies()->push_back(b);
 
   EXPECT_EQ(a, s.Get("a"));
-  EXPECT_EQ(b, s.Get("a")->Deps()[0]);
+  EXPECT_EQ(b, s.Get("a")->dependencies()->at(0));
   EXPECT_EQ(b, s.Get("b"));
   EXPECT_EQ(nullptr, s.Get("c"));
 

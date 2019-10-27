@@ -44,7 +44,7 @@ void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
     r = rf_->NewCompileCC(include_paths, flags);
   }
   n->SetResolver(r);
-  n->AddDep(d);
+  n->dependencies()->push_back(d);
 }
 
 };  // namespace btool::app::collector::cc

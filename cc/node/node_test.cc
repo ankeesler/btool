@@ -34,8 +34,7 @@ TEST_F(NodeTest, Visit) {
 }
 
 TEST_F(NodeTest, Deps) {
-  auto deps = a_.Deps();
-  EXPECT_EQ(2UL, deps.size());
-  EXPECT_EQ("b", deps[0]->Name());
-  EXPECT_EQ("c", deps[1]->Name());
+  EXPECT_EQ(2UL, a_.dependencies()->size());
+  EXPECT_EQ("b", a_.dependencies()->at(0)->Name());
+  EXPECT_EQ("c", a_.dependencies()->at(1)->Name());
 }

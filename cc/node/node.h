@@ -26,12 +26,11 @@ class Node {
   const std::string &Name() const { return name_; }
   void String(std::ostream *os) const;
   void Visit(std::function<void(const Node *)>) const;
-  const std::vector<Node *> &dependencies() const { return dependencies_; }
   Resolver *resolver() const { return resolver_; }
 
+  std::vector<Node *> *dependencies() { return &dependencies_; }
   PropertyStore *property_store() { return &property_store_; }
 
-  void AddDep(Node *dep) { dependencies_.push_back(dep); }
   void SetResolver(Resolver *resolver) { resolver_ = resolver; }
 
  private:
