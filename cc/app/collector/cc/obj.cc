@@ -10,6 +10,11 @@
 namespace btool::app::collector::cc {
 
 void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
+  auto d = s->Get(name);
+  if (d == nullptr) {
+    return;
+  }
+
   bool c = ::btool::util::string::HasSuffix(name.c_str(), ".c");
   bool cc = ::btool::util::string::HasSuffix(name.c_str(), ".cc");
   if (!c && !cc) {
@@ -34,6 +39,7 @@ void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
     r = rf_->NewCompileCC(include_paths, flags);
   }
   n->SetResolver(r);
+  n->AddDep(d);
 }
 
 };  // namespace btool::app::collector::cc
