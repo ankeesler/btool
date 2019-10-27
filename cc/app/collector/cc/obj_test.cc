@@ -7,6 +7,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
 #include "core/err.h"
@@ -26,14 +27,16 @@ class ObjTest : public ::testing::Test {
 };
 
 TEST_F(ObjTest, IgnoreFileExt) {
-  auto n = s_.Put("foo.go");
+  auto d = s_.Put("foo.go");
+  ::btool::app::collector::Properties(d->property_store()).set_local(true);
   o_.OnSet(&s_, "foo.go");
-  EXPECT_TRUE(s_.IsEmpty());
+  EXPECT_EQ(1, s_.Size());
 }
 
 TEST_F(ObjTest, IgnoreNotLocal) {
+  s_.Put("foo.cc");
   o_.OnSet(&s_, "foo.cc");
-  EXPECT_TRUE(s_.IsEmpty());
+  EXPECT_EQ(1, s_.Size());
 }
 
 TEST_F(ObjTest, C) {
@@ -42,13 +45,14 @@ TEST_F(ObjTest, C) {
   EXPECT_CALL(mrf_, NewCompileC(include_paths, flags)).WillOnce(Return(&mr_));
 
   auto d = s_.Put("foo.c");
+  ::btool::app::collector::Properties(d->property_store()).set_local(true);
   o_.OnSet(&s_, d->Name());
 
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
   EXPECT_TRUE(n);
-  EXPECT_EQ(ex_deps, n->Deps());
-  EXPECT_EQ(&mr_, n->Resolver());
+  EXPECT_EQ(ex_deps, n->dependencies());
+  EXPECT_EQ(&mr_, n->resolver());
 }
 
 TEST_F(ObjTest, CC) {
@@ -57,11 +61,12 @@ TEST_F(ObjTest, CC) {
   EXPECT_CALL(mrf_, NewCompileCC(include_paths, flags)).WillOnce(Return(&mr_));
 
   auto d = s_.Put("foo.cc");
+  ::btool::app::collector::Properties(d->property_store()).set_local(true);
   o_.OnSet(&s_, d->Name());
 
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
   EXPECT_TRUE(n);
-  EXPECT_EQ(ex_deps, n->Deps());
-  EXPECT_EQ(&mr_, n->Resolver());
+  EXPECT_EQ(ex_deps, n->dependencies());
+  EXPECT_EQ(&mr_, n->resolver());
 }

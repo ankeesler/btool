@@ -13,7 +13,7 @@ void Node::String(std::ostream *os, int indent) const {
     *os << ". ";
   }
   *os << name_ << std::endl;
-  for (auto dep : deps_) {
+  for (auto dep : dependencies_) {
     dep->String(os, indent + 1);
   }
 }
@@ -26,7 +26,7 @@ void Node::Visit(std::function<void(const Node *)> f) const {
 void Node::Visit(std::function<void(const Node *)> f,
                  std::set<const Node *> *visited) const {
   if (visited->count(this) == 0) {
-    for (auto dep : deps_) {
+    for (auto dep : dependencies_) {
       dep->Visit(f, visited);
     }
     f(this);

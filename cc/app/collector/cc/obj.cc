@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "node/node.h"
 #include "util/string/string.h"
@@ -12,6 +13,10 @@ namespace btool::app::collector::cc {
 void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
   auto d = s->Get(name);
   if (d == nullptr) {
+    return;
+  }
+
+  if (!::btool::app::collector::Properties(d->property_store()).local()) {
     return;
   }
 

@@ -51,6 +51,7 @@ class Store {
   void Listen(Listener *l) { ls_.push_back(l); }
 
   bool IsEmpty() const { return nodes_.empty(); }
+  std::size_t Size() const { return nodes_.size(); }
 
  private:
   std::map<std::string, ::btool::node::Node *> nodes_;
