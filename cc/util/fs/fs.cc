@@ -38,6 +38,16 @@ std::string Join(const std::string &one, const std::string &two) {
   return one + '/' + two;
 }
 
+std::string Ext(const std::string &path) {
+  std::size_t index = path.rfind('.');
+  if (index == std::string::npos) {
+    return "";
+  } else {
+    return path.substr(index);
+  }
+  return "";
+}
+
 ::btool::core::Err<std::string> TempDir() {
   char s[] = "/tmp/btool_XXXXXX";
   char *dir = ::mkdtemp(s);

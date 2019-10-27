@@ -48,7 +48,7 @@ TEST(IncTest, NotLocal) {
   ::btool::app::collector::cc::Inc i(&mip);
   i.OnSet(&s, "tuna.h");
 
-  EXPECT_EQ(0, s.Get("tuna.h")->dependencies()->size());
+  EXPECT_EQ(0UL, s.Get("tuna.h")->dependencies()->size());
 }
 
 TEST(IncTest, BadFileExt) {
@@ -60,7 +60,7 @@ TEST(IncTest, BadFileExt) {
   ::btool::app::collector::cc::Inc i(&mip);
   i.OnSet(&s, "tuna.go");
 
-  EXPECT_EQ(0, s.Get("tuna.go")->dependencies()->size());
+  EXPECT_EQ(0UL, s.Get("tuna.go")->dependencies()->size());
 }
 
 TEST(IncTest, C) {
@@ -79,14 +79,14 @@ TEST(IncTest, C) {
   i.OnSet(&s, "tuna.c");
 
   auto deps = s.Get("tuna.c")->dependencies();
-  EXPECT_EQ(3, deps->size());
+  EXPECT_EQ(3UL, deps->size());
   EXPECT_EQ("some/root/some/path.h", deps->at(0)->name());
   EXPECT_EQ("some/root/some/other/path.h", deps->at(1)->name());
   EXPECT_EQ("some/lib/include/lib/path.h", deps->at(2)->name());
 
   auto include_paths = ::btool::app::collector::cc::Properties::IncludePaths(
       s.Get("tuna.c")->property_store());
-  EXPECT_EQ(3, include_paths->size());
+  EXPECT_EQ(3UL, include_paths->size());
   EXPECT_EQ("some/root/", include_paths->at(0));
   EXPECT_EQ("some/root/", include_paths->at(1));
   EXPECT_EQ("some/lib/include/", include_paths->at(2));
@@ -104,11 +104,11 @@ TEST(IncTest, EmptyIncludePath) {
   i.OnSet(&s, "tuna.c");
 
   auto deps = s.Get("tuna.c")->dependencies();
-  EXPECT_EQ(1, deps->size());
+  EXPECT_EQ(1UL, deps->size());
   EXPECT_EQ("some/path.h", deps->at(0)->name());
 
   auto include_paths = ::btool::app::collector::cc::Properties::IncludePaths(
       s.Get("tuna.c")->property_store());
-  EXPECT_EQ(1, include_paths->size());
+  EXPECT_EQ(1UL, include_paths->size());
   EXPECT_EQ(".", include_paths->at(0));
 }

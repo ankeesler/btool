@@ -1,5 +1,5 @@
-#ifndef BTOOL_APP_COLLECTOR_CC_OBJ_H_
-#define BTOOL_APP_COLLECTOR_CC_OBJ_H_
+#ifndef BTOOL_APP_COLLECTOR_CC_EXE_H_
+#define BTOOL_APP_COLLECTOR_CC_EXE_H_
 
 #include <string>
 
@@ -9,9 +9,9 @@
 
 namespace btool::app::collector::cc {
 
-class Obj : public ::btool::app::collector::ListenerCollectini {
+class Exe : public ::btool::app::collector::ListenerCollectini {
  public:
-  Obj(::btool::app::collector::ResolverFactory *rf) : rf_(rf) {}
+  Exe(::btool::app::collector::ResolverFactory *rf) : rf_(rf) {}
 
   void OnSet(::btool::app::collector::Store *s,
              const std::string &name) override;
@@ -22,4 +22,4 @@ class Obj : public ::btool::app::collector::ListenerCollectini {
 
 };  // namespace btool::app::collector::cc
 
-#endif  // BTOOL_APP_COLLECTOR_CC_OBJ_H_
+#endif  // BTOOL_APP_COLLECTOR_CC_EXE_H_

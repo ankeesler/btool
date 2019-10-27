@@ -11,6 +11,7 @@ namespace btool::util::fs {
 std::string Base(const std::string &path);
 std::string Dir(const std::string &path);
 std::string Join(const std::string &one, const std::string &two);
+std::string Ext(const std::string &path);
 
 ::btool::core::Err<std::string> TempDir();
 

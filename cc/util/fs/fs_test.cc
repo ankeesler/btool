@@ -31,6 +31,17 @@ TEST(FS, Join) {
   EXPECT_EQ("a/b/c/d/e/f", ::btool::util::fs::Join("a/b/c/d/e", "f"));
 }
 
+TEST(FS, Ext) {
+  EXPECT_EQ("", ::btool::util::fs::Ext("tuna"));
+  EXPECT_EQ("", ::btool::util::fs::Ext("some/path/to/tuna"));
+
+  EXPECT_EQ(".cc", ::btool::util::fs::Ext("tuna.cc"));
+  EXPECT_EQ(".cc", ::btool::util::fs::Ext("some/path/to/tuna.cc"));
+
+  EXPECT_EQ(".o", ::btool::util::fs::Ext("tuna.cc.o"));
+  EXPECT_EQ(".o", ::btool::util::fs::Ext("some/path/to/tuna.cc.o"));
+}
+
 TEST(FS, File) {
   auto err = ::btool::util::fs::TempDir();
   EXPECT_FALSE(err);

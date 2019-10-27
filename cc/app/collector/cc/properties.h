@@ -16,13 +16,35 @@ class Properties {
     return ::btool::app::collector::ReadStringsProperty(ps, kIncludePaths);
   }
 
+  static const std::vector<std::string> *LinkFlags(
+      const ::btool::node::PropertyStore *ps) {
+    return ::btool::app::collector::ReadStringsProperty(ps, kLinkFlags);
+  }
+
+  static const std::vector<std::string> *Libraries(
+      const ::btool::node::PropertyStore *ps) {
+    return ::btool::app::collector::ReadStringsProperty(ps, kLibraries);
+  }
+
   static void AddIncludePath(::btool::node::PropertyStore *ps,
                              const std::string &path) {
     ps->Append(kIncludePaths, path);
   }
 
+  static void AddLinkFlag(::btool::node::PropertyStore *ps,
+                          const std::string &flag) {
+    ps->Append(kLinkFlags, flag);
+  }
+
+  static void AddLibrary(::btool::node::PropertyStore *ps,
+                         const std::string &library) {
+    ps->Append(kLibraries, library);
+  }
+
  private:
   static const std::string kIncludePaths;
+  static const std::string kLinkFlags;
+  static const std::string kLibraries;
 };
 
 };  // namespace btool::app::collector::cc

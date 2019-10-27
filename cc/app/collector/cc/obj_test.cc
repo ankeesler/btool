@@ -57,12 +57,12 @@ class ObjTest : public ::testing::Test {
 
 TEST_F(ObjTest, IgnoreFileExt) {
   o_.OnSet(&s_, "foo.go");
-  EXPECT_EQ(6, s_.Size());
+  EXPECT_EQ(6UL, s_.Size());
 }
 
 TEST_F(ObjTest, IgnoreNotLocal) {
   o_.OnSet(&s_, "bar.c");
-  EXPECT_EQ(6, s_.Size());
+  EXPECT_EQ(6UL, s_.Size());
 }
 
 TEST_F(ObjTest, C) {
