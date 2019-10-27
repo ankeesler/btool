@@ -30,6 +30,7 @@ class Node {
 
   std::vector<Node *> *dependencies() { return &dependencies_; }
   PropertyStore *property_store() { return &property_store_; }
+  const PropertyStore *property_store() const { return &property_store_; }
 
   void SetResolver(Resolver *resolver) { resolver_ = resolver; }
 

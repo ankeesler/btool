@@ -7,6 +7,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "app/collector/cc/properties.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
@@ -17,7 +18,35 @@ using ::testing::Return;
 
 class ObjTest : public ::testing::Test {
  protected:
-  ObjTest() : o_(&mrf_) {}
+  ObjTest() : o_(&mrf_) {
+    auto bh = s_.Put("b.h");
+    ::btool::app::collector::cc::Properties::AddIncludePath(
+        bh->property_store(), "bh/include/path");
+
+    auto ah = s_.Put("a.h");
+    ah->dependencies()->push_back(bh);
+    ::btool::app::collector::cc::Properties::AddIncludePath(
+        ah->property_store(), "ah/include/path");
+
+    auto fooc = s_.Put("foo.c");
+    fooc->dependencies()->push_back(ah);
+    ::btool::app::collector::Properties(fooc->property_store()).set_local(true);
+    ::btool::app::collector::cc::Properties::AddIncludePath(
+        fooc->property_store(), "fooc/include/path");
+
+    auto foocc = s_.Put("foo.cc");
+    foocc->dependencies()->push_back(ah);
+    ::btool::app::collector::Properties(foocc->property_store())
+        .set_local(true);
+    ::btool::app::collector::cc::Properties::AddIncludePath(
+        foocc->property_store(), "foocc/include/path");
+
+    auto foogo = s_.Put("foo.go");
+    ::btool::app::collector::Properties(foogo->property_store())
+        .set_local(true);
+
+    s_.Put("bar.c");
+  }
 
   ::testing::StrictMock<::btool::node::testing::MockResolver> mr_;
   ::testing::StrictMock<::btool::app::collector::testing::MockResolverFactory>
@@ -27,25 +56,22 @@ class ObjTest : public ::testing::Test {
 };
 
 TEST_F(ObjTest, IgnoreFileExt) {
-  auto d = s_.Put("foo.go");
-  ::btool::app::collector::Properties(d->property_store()).set_local(true);
   o_.OnSet(&s_, "foo.go");
-  EXPECT_EQ(1, s_.Size());
+  EXPECT_EQ(6, s_.Size());
 }
 
 TEST_F(ObjTest, IgnoreNotLocal) {
-  s_.Put("foo.cc");
-  o_.OnSet(&s_, "foo.cc");
-  EXPECT_EQ(1, s_.Size());
+  o_.OnSet(&s_, "bar.c");
+  EXPECT_EQ(6, s_.Size());
 }
 
 TEST_F(ObjTest, C) {
-  std::vector<std::string> include_paths;
+  std::vector<std::string> include_paths{"bh/include/path", "ah/include/path",
+                                         "fooc/include/path"};
   std::vector<std::string> flags;
   EXPECT_CALL(mrf_, NewCompileC(include_paths, flags)).WillOnce(Return(&mr_));
 
-  auto d = s_.Put("foo.c");
-  ::btool::app::collector::Properties(d->property_store()).set_local(true);
+  auto d = s_.Get("foo.c");
   o_.OnSet(&s_, d->Name());
 
   auto n = s_.Get("foo.o");
@@ -56,12 +82,12 @@ TEST_F(ObjTest, C) {
 }
 
 TEST_F(ObjTest, CC) {
-  std::vector<std::string> include_paths;
+  std::vector<std::string> include_paths{"bh/include/path", "ah/include/path",
+                                         "foocc/include/path"};
   std::vector<std::string> flags;
   EXPECT_CALL(mrf_, NewCompileCC(include_paths, flags)).WillOnce(Return(&mr_));
 
-  auto d = s_.Put("foo.cc");
-  ::btool::app::collector::Properties(d->property_store()).set_local(true);
+  auto d = s_.Get("foo.cc");
   o_.OnSet(&s_, d->Name());
 
   auto n = s_.Get("foo.o");
