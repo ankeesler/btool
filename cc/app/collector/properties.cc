@@ -1,5 +1,6 @@
 #include "app/collector/properties.h"
 
+#include <functional>
 #include <string>
 #include <vector>
 

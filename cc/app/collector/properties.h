@@ -1,6 +1,7 @@
 #ifndef BTOOL_APP_COLLECTOR_PROPERTIES_H_
 #define BTOOL_APP_COLLECTOR_PROPERTIES_H_
 
+#include <functional>
 #include <string>
 
 #include "node/node.h"

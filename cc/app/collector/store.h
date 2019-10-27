@@ -53,6 +53,14 @@ class Store {
   bool IsEmpty() const { return nodes_.empty(); }
   std::size_t Size() const { return nodes_.size(); }
 
+  std::map<std::string, ::btool::node::Node *>::iterator begin() {
+    return nodes_.begin();
+  }
+
+  std::map<std::string, ::btool::node::Node *>::iterator end() {
+    return nodes_.end();
+  }
+
  private:
   std::map<std::string, ::btool::node::Node *> nodes_;
   std::vector<Listener *> ls_;
