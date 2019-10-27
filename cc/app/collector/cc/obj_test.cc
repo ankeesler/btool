@@ -30,20 +30,20 @@ class ObjTest : public ::testing::Test {
 
     auto fooc = s_.Put("foo.c");
     fooc->dependencies()->push_back(ah);
-    ::btool::app::collector::Properties(fooc->property_store()).set_local(true);
+    ::btool::app::collector::Properties::SetLocal(fooc->property_store(), true);
     ::btool::app::collector::cc::Properties::AddIncludePath(
         fooc->property_store(), "fooc/include/path");
 
     auto foocc = s_.Put("foo.cc");
     foocc->dependencies()->push_back(ah);
-    ::btool::app::collector::Properties(foocc->property_store())
-        .set_local(true);
+    ::btool::app::collector::Properties::SetLocal(foocc->property_store(),
+                                                  true);
     ::btool::app::collector::cc::Properties::AddIncludePath(
         foocc->property_store(), "foocc/include/path");
 
     auto foogo = s_.Put("foo.go");
-    ::btool::app::collector::Properties(foogo->property_store())
-        .set_local(true);
+    ::btool::app::collector::Properties::SetLocal(foogo->property_store(),
+                                                  true);
 
     s_.Put("bar.c");
   }

@@ -9,20 +9,18 @@ namespace btool::app::collector {
 
 class Properties {
  public:
-  Properties(::btool::node::PropertyStore *ps) : ps_(ps) {}
-
-  bool local() const {
+  static bool Local(const ::btool::node::PropertyStore *ps) {
     const bool *l;
-    ps_->Read(kLocal, &l);
+    ps->Read(kLocal, &l);
     return (l == nullptr ? false /* default */ : *l);
   }
 
-  void set_local(bool l) { ps_->Write(kLocal, l); }
+  static void SetLocal(::btool::node::PropertyStore *ps, bool l) {
+    ps->Write(kLocal, l);
+  }
 
  private:
-  const std::string kLocal = "io.btool.app.collector.local";
-
-  ::btool::node::PropertyStore *ps_;
+  static const std::string kLocal;
 };
 
 };  // namespace btool::app::collector

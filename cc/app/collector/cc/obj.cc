@@ -20,7 +20,7 @@ void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
     return;
   }
 
-  if (!::btool::app::collector::Properties(d->property_store()).local()) {
+  if (!::btool::app::collector::Properties::Local(d->property_store())) {
     return;
   }
 
