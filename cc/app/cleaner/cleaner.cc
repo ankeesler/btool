@@ -12,7 +12,7 @@ namespace btool::app::cleaner {
 
   node.Visit([&](const ::btool::node::Node* n) {
     if (!err) {
-      err = ra_->RemoveAll(n->Name());
+      err = ra_->RemoveAll(n->name());
     }
   });
 

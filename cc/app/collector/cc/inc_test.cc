@@ -80,9 +80,9 @@ TEST(IncTest, C) {
 
   auto deps = s.Get("tuna.c")->dependencies();
   EXPECT_EQ(3, deps->size());
-  EXPECT_EQ("some/root/some/path.h", deps->at(0)->Name());
-  EXPECT_EQ("some/root/some/other/path.h", deps->at(1)->Name());
-  EXPECT_EQ("some/lib/include/lib/path.h", deps->at(2)->Name());
+  EXPECT_EQ("some/root/some/path.h", deps->at(0)->name());
+  EXPECT_EQ("some/root/some/other/path.h", deps->at(1)->name());
+  EXPECT_EQ("some/lib/include/lib/path.h", deps->at(2)->name());
 
   auto include_paths = ::btool::app::collector::cc::Properties::IncludePaths(
       s.Get("tuna.c")->property_store());
@@ -105,7 +105,7 @@ TEST(IncTest, EmptyIncludePath) {
 
   auto deps = s.Get("tuna.c")->dependencies();
   EXPECT_EQ(1, deps->size());
-  EXPECT_EQ("some/path.h", deps->at(0)->Name());
+  EXPECT_EQ("some/path.h", deps->at(0)->name());
 
   auto include_paths = ::btool::app::collector::cc::Properties::IncludePaths(
       s.Get("tuna.c")->property_store());

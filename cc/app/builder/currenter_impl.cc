@@ -26,7 +26,7 @@ static ssize_t ComputeModTimeNS(struct ::timespec *ts);
   } else if (node_mod_time_err.Ret() == -1) {
     return ::btool::core::Err<bool>::Success(false);
   }
-  DEBUG("node %s mod time = %ld\n", node.Name().c_str(),
+  DEBUG("node %s mod time = %ld\n", node.name().c_str(),
         node_mod_time_err.Ret());
 
   ::btool::core::Err<bool> err(true);
@@ -43,7 +43,7 @@ static ssize_t ComputeModTimeNS(struct ::timespec *ts);
     }
 
     ssize_t mod_time_ns = dep_mod_time_err.Ret();
-    DEBUG("dep %s mod time = %ld\n", dep->Name().c_str(), mod_time_ns);
+    DEBUG("dep %s mod time = %ld\n", dep->name().c_str(), mod_time_ns);
     if (mod_time_ns > latest_mod_time_ns) {
       latest_mod_time_ns = mod_time_ns;
       latest_mod_time_node = dep;
@@ -54,7 +54,7 @@ static ssize_t ComputeModTimeNS(struct ::timespec *ts);
     return err;
   } else if (latest_mod_time_ns > node_mod_time_err.Ret()) {
     DEBUG("dep %s is newer than node %s\n",
-          latest_mod_time_node->Name().c_str(), node.Name().c_str());
+          latest_mod_time_node->name().c_str(), node.name().c_str());
     return ::btool::core::Err<bool>::Success(false);
   } else {
     return ::btool::core::Err<bool>::Success(true);
@@ -71,7 +71,7 @@ static ssize_t ComputeModTimeNS(struct ::timespec *ts);
 
 static ::btool::core::Err<ssize_t> GetModTime(const ::btool::node::Node &node) {
   struct ::stat s;
-  if (::lstat(node.Name().c_str(), &s) == -1) {
+  if (::lstat(node.name().c_str(), &s) == -1) {
     if (errno == ENOENT) {
       return ::btool::core::Err<ssize_t>::Success(-1);
     } else {

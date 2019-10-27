@@ -23,16 +23,15 @@ class Node {
 
   Node(std::string name) : name_(name), resolver_(nullptr) {}
 
-  const std::string &Name() const { return name_; }
+  const std::string &name() const { return name_; }
+  std::vector<Node *> *dependencies() { return &dependencies_; }
+  Resolver *resolver() const { return resolver_; }
+  void set_resolver(Resolver *resolver) { resolver_ = resolver; }
+  const PropertyStore *property_store() const { return &property_store_; }
+  PropertyStore *property_store() { return &property_store_; }
+
   void String(std::ostream *os) const;
   void Visit(std::function<void(const Node *)>) const;
-  Resolver *resolver() const { return resolver_; }
-
-  std::vector<Node *> *dependencies() { return &dependencies_; }
-  PropertyStore *property_store() { return &property_store_; }
-  const PropertyStore *property_store() const { return &property_store_; }
-
-  void SetResolver(Resolver *resolver) { resolver_ = resolver; }
 
  private:
   void String(std::ostream *os, int indent) const;

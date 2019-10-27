@@ -24,9 +24,9 @@ Store::~Store() {
 }
 
 void Store::Set(::btool::node::Node *node) {
-  nodes_[node->Name()] = node;
+  nodes_[node->name()] = node;
   for (auto l : ls_) {
-    l->OnSet(this, node->Name());
+    l->OnSet(this, node->name());
   }
 }
 
@@ -43,7 +43,7 @@ void Store::Set(::btool::node::Node *node) {
 std::ostream &operator<<(std::ostream &os, const Store &s) {
   os << "[ ";
   for (auto kv : s.nodes_) {
-    os << '\'' << kv.second->Name() << '\'' << " ";
+    os << '\'' << kv.second->name() << '\'' << " ";
   }
   os << "]";
   return os;

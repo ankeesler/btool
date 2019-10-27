@@ -15,7 +15,7 @@ class NodeTest : public ::btool::node::testing::NodeTest {};
 
 TEST(Node, First) {
   ::btool::node::Node a("a");
-  EXPECT_EQ("a", a.Name());
+  EXPECT_EQ("a", a.name());
 }
 
 TEST_F(NodeTest, Print) {
@@ -35,6 +35,6 @@ TEST_F(NodeTest, Visit) {
 
 TEST_F(NodeTest, Deps) {
   EXPECT_EQ(2UL, a_.dependencies()->size());
-  EXPECT_EQ("b", a_.dependencies()->at(0)->Name());
-  EXPECT_EQ("c", a_.dependencies()->at(1)->Name());
+  EXPECT_EQ("b", a_.dependencies()->at(0)->name());
+  EXPECT_EQ("c", a_.dependencies()->at(1)->name());
 }

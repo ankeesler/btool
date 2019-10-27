@@ -17,22 +17,22 @@ class NodeFile {
   NodeFile(const ::btool::node::Node &node) : node_(node) {
     ::usleep(100000);
 
-    ::FILE *f = ::fopen(node.Name().c_str(), "w");
-    EXPECT_TRUE(f != nullptr) << "cannot open " << node.Name().c_str();
+    ::FILE *f = ::fopen(node.name().c_str(), "w");
+    EXPECT_TRUE(f != nullptr) << "cannot open " << node.name().c_str();
     fprintf(f, "open\n");
     fflush(f);
     EXPECT_EQ(0, fclose(f));
   }
 
   ~NodeFile() {
-    int err = ::remove(node_.Name().c_str());
+    int err = ::remove(node_.name().c_str());
     EXPECT_EQ(0, err) << "remove: " << strerror(errno);
   }
 
   void Modify() {
     ::usleep(100000);
 
-    ::FILE *f = ::fopen(node_.Name().c_str(), "a");
+    ::FILE *f = ::fopen(node_.name().c_str(), "a");
     fprintf(f, "modify\n");
     fflush(f);
     EXPECT_EQ(0, fclose(f));

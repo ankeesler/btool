@@ -24,22 +24,22 @@ class NodeTest : public ::testing::Test {
     ::testing::Test::SetUp();
     a_.dependencies()->push_back(&b_);
     a_.dependencies()->push_back(&c_);
-    a_.SetResolver(&ar_);
+    a_.set_resolver(&ar_);
 
     tmpa_.dependencies()->push_back(&tmpb_);
     tmpa_.dependencies()->push_back(&tmpc_);
 
     b_.dependencies()->push_back(&c_);
-    b_.SetResolver(&br_);
+    b_.set_resolver(&br_);
 
     tmpb_.dependencies()->push_back(&tmpc_);
 
     c_.dependencies()->push_back(&d_);
-    c_.SetResolver(&cr_);
+    c_.set_resolver(&cr_);
 
     tmpc_.dependencies()->push_back(&tmpd_);
 
-    d_.SetResolver(&dr_);
+    d_.set_resolver(&dr_);
   }
 
   ::btool::node::Node a_{"a"};

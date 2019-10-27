@@ -42,16 +42,16 @@ static void HandleInclude(::btool::app::collector::Store *s,
 
   for (auto it : *s) {
     auto sn = it.second;
-    DEBUG("does node %s end in include %s\n", sn->Name().c_str(),
+    DEBUG("does node %s end in include %s\n", sn->name().c_str(),
           include.c_str());
-    if (::btool::util::string::HasSuffix(sn->Name().c_str(), include.c_str())) {
+    if (::btool::util::string::HasSuffix(sn->name().c_str(), include.c_str())) {
       d = sn;
 
-      std::size_t index = sn->Name().rfind(include);
+      std::size_t index = sn->name().rfind(include);
       if (index == 0) {
         include_path = ".";
       } else {
-        include_path = sn->Name().substr(0, index);
+        include_path = sn->name().substr(0, index);
       }
       DEBUG("yes, and the include path is %s\n", include_path.c_str());
       break;

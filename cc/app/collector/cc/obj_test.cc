@@ -72,7 +72,7 @@ TEST_F(ObjTest, C) {
   EXPECT_CALL(mrf_, NewCompileC(include_paths, flags)).WillOnce(Return(&mr_));
 
   auto d = s_.Get("foo.c");
-  o_.OnSet(&s_, d->Name());
+  o_.OnSet(&s_, d->name());
 
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
@@ -88,7 +88,7 @@ TEST_F(ObjTest, CC) {
   EXPECT_CALL(mrf_, NewCompileCC(include_paths, flags)).WillOnce(Return(&mr_));
 
   auto d = s_.Get("foo.cc");
-  o_.OnSet(&s_, d->Name());
+  o_.OnSet(&s_, d->name());
 
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
