@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "app/collector/properties.h"
 #include "node/property_store.h"
 
 namespace btool::app::collector::cc {
@@ -12,9 +13,7 @@ class Properties {
  public:
   static const std::vector<std::string> *IncludePaths(
       const ::btool::node::PropertyStore *ps) {
-    const std::vector<std::string> *ips;
-    ps->Read(kIncludePaths, &ips);
-    return ips;
+    return ::btool::app::collector::ReadStringsProperty(ps, kIncludePaths);
   }
 
   static void AddIncludePath(::btool::node::PropertyStore *ps,

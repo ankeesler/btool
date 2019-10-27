@@ -1,7 +1,33 @@
 #include "app/collector/properties.h"
 
+#include <string>
+#include <vector>
+
+#include "node/node.h"
+#include "node/property_store.h"
+
 namespace btool::app::collector {
 
 const std::string Properties::kLocal = "io.btool.app.collector.local";
+
+const std::vector<std::string> *ReadStringsProperty(
+    const ::btool::node::PropertyStore *ps, const std::string &key) {
+  const std::vector<std::string> *strings;
+  ps->Read(key, &strings);
+  return strings;
+}
+
+void CollectStringsProperties(::btool::node::Node *n,
+                              std::vector<std::string> *accumulator,
+                              std::function<const std::vector<std::string> *(
+                                  const ::btool::node::PropertyStore *)>
+                                  f) {
+  n->Visit([accumulator, f](const ::btool::node::Node *vn) {
+    const std::vector<std::string> *accs = f(vn->property_store());
+    if (accs != nullptr) {
+      accumulator->insert(accumulator->end(), accs->begin(), accs->end());
+    }
+  });
+}
 
 };  // namespace btool::app::collector

@@ -54,12 +54,12 @@ void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
 
 void CollectIncludePaths(::btool::node::Node *n,
                          std::vector<std::string> *include_paths) {
-  n->Visit([include_paths](const ::btool::node::Node *vn) {
-    auto ips = Properties::IncludePaths(vn->property_store());
-    if (ips != nullptr) {
-      include_paths->insert(include_paths->end(), ips->begin(), ips->end());
-    }
-  });
+  ::btool::app::collector::CollectStringsProperties(
+      n, include_paths,
+      [](const ::btool::node::PropertyStore *ps)
+          -> const std::vector<std::string> * {
+        return Properties::IncludePaths(ps);
+      });
 }
 
 };  // namespace btool::app::collector::cc

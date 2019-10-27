@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "node/node.h"
 #include "node/property_store.h"
 
 namespace btool::app::collector {
@@ -22,6 +23,15 @@ class Properties {
  private:
   static const std::string kLocal;
 };
+
+const std::vector<std::string> *ReadStringsProperty(
+    const ::btool::node::PropertyStore *ps, const std::string &key);
+
+void CollectStringsProperties(::btool::node::Node *n,
+                              std::vector<std::string> *accumulator,
+                              std::function<const std::vector<std::string> *(
+                                  const ::btool::node::PropertyStore *)>
+                                  f);
 
 };  // namespace btool::app::collector
 
