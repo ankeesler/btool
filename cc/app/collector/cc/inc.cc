@@ -31,8 +31,9 @@ void Inc::OnSet(::btool::app::collector::Store *s, const std::string &name) {
     return;
   }
 
-  ip_->ParseIncludes(
-      [s, n](const std::string &include) { HandleInclude(s, n, include); });
+  ip_->ParseIncludes(name, [s, n](const std::string &include) {
+    HandleInclude(s, n, include);
+  });
 }
 
 static void HandleInclude(::btool::app::collector::Store *s,

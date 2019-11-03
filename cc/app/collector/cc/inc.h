@@ -1,6 +1,7 @@
 #ifndef BTOOL_APP_COLLECTOR_CC_INC_H_
 #define BTOOL_APP_COLLECTOR_CC_INC_H_
 
+#include <functional>
 #include <string>
 
 #include "app/collector/listener_collectini.h"
@@ -13,7 +14,9 @@ class Inc : public ::btool::app::collector::ListenerCollectini {
  public:
   class IncludesParser {
    public:
+    virtual ~IncludesParser() {}
     virtual ::btool::core::VoidErr ParseIncludes(
+        const std::string &path,
         std::function<void(const std::string &)> callback) = 0;
   };
 

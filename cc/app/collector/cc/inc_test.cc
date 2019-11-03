@@ -19,7 +19,8 @@ using ::testing::StrictMock;
 class MockIncludesParser
     : public ::btool::app::collector::cc::Inc::IncludesParser {
  public:
-  MOCK_METHOD1(ParseIncludes, ::btool::core::VoidErr(
+  MOCK_METHOD2(ParseIncludes, ::btool::core::VoidErr(
+                                  const std::string &,
                                   std::function<void(const std::string &)>));
 };
 
@@ -29,6 +30,7 @@ class FakeIncludesParser
   void AddInclude(const std::string &include) { includes_.push_back(include); }
 
   ::btool::core::VoidErr ParseIncludes(
+      const std::string &name,
       std::function<void(const std::string &)> f) override {
     for (auto include : includes_) {
       f(include);

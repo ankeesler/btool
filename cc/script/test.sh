@@ -23,6 +23,7 @@ $BTOOL -loglevel error -run -target app/cleaner/cleaner_test
 $BTOOL -loglevel error -run -target app/collector/collector_test
 $BTOOL -loglevel error -run -target app/collector/store_test
 $BTOOL -loglevel error -run -target app/collector/cc/inc_test
+$BTOOL -loglevel error -run -target app/collector/cc/includes_parser_impl_test
 $BTOOL -loglevel error -run -target app/collector/cc/obj_test
 $BTOOL -loglevel error -run -target app/collector/fs/fs_collectini_test
 $BTOOL -loglevel error -run -target app/lister/lister_test

@@ -13,6 +13,7 @@
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
 - Is it cool to pass strings in by value to copy them over in constructors?
 - Error handling is terrible.
+- How do we throw errors in an OnSet call?
 
 # Bugs
 
@@ -20,4 +21,4 @@
 - This is because the exe consumer is pulling in a .o file that has not been
   updated by the inc consumer yet, so it is missing include paths...
 
-### 01: Can't put includes to the right of headers
+### 01: Can't put comments to the right of headers
