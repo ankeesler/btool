@@ -9,8 +9,13 @@
 #include "app/builder/currenter_impl.h"
 #include "app/cleaner/cleaner.h"
 #include "app/cleaner/remove_aller_impl.h"
+#include "app/collector/cc/exe.h"
+#include "app/collector/cc/inc.h"
+#include "app/collector/cc/includes_parser_impl.h"
+#include "app/collector/cc/obj.h"
 #include "app/collector/collector.h"
 #include "app/collector/fs/fs_collectini.h"
+#include "app/collector/resolver_factory_impl.h"
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
 #include "core/err.h"
@@ -39,8 +44,19 @@ int main(int argc, const char *argv[]) {
 
   ::btool::ui::UI ui;
 
+  ::btool::app::collector::cc::IncludesParserImpl ipi;
+  ::btool::app::collector::cc::Inc i(&ipi);
+
+  ::btool::app::collector::ResolverFactoryImpl rfi;
+  ::btool::app::collector::cc::Obj o(&rfi);
+  ::btool::app::collector::cc::Exe e(&rfi);
+
   ::btool::app::collector::fs::FSCollectini fsc(root.c_str());
+
   ::btool::app::collector::Collector collector;
+  collector.AddCollectini(&i);
+  collector.AddCollectini(&o);
+  collector.AddCollectini(&e);
   collector.AddCollectini(&fsc);
 
   ::btool::app::cleaner::RemoveAllerImpl rai;

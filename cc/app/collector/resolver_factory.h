@@ -11,19 +11,19 @@ namespace btool::app::collector {
 class ResolverFactory {
  public:
   virtual class ::btool::node::Node::Resolver *NewCompileC(
-      std::vector<std::string> include_dirs,
-      std::vector<std::string> flags) = 0;
+      const std::vector<std::string> &include_dirs,
+      const std::vector<std::string> &flags) = 0;
   virtual class ::btool::node::Node::Resolver *NewCompileCC(
-      std::vector<std::string> include_dirs,
-      std::vector<std::string> flags) = 0;
+      const std::vector<std::string> &include_dirs,
+      const std::vector<std::string> &flags) = 0;
   virtual class ::btool::node::Node::Resolver *NewArchive() = 0;
   virtual class ::btool::node::Node::Resolver *NewLinkC(
-      std::vector<std::string> flags) = 0;
+      const std::vector<std::string> &flags) = 0;
   virtual class ::btool::node::Node::Resolver *NewLinkCC(
-      std::vector<std::string> flags) = 0;
+      const std::vector<std::string> &flags) = 0;
 
   virtual class ::btool::node::Node::Resolver *NewDownload(
-      std::string url, std::string sha256) = 0;
+      const std::string &url, const std::string &sha256) = 0;
   virtual class ::btool::node::Node::Resolver *NewUnzip() = 0;
 };
 

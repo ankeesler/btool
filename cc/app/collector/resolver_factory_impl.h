@@ -1,10 +1,11 @@
 #ifndef BTOOL_APP_COLLECTOR_RESOLVERFACTORYIMPL_H_
-#define BTOOL_APP_COLLECTOR_RESOLVERFACTORIYMPL_H_
+#define BTOOL_APP_COLLECTOR_RESOLVERFACTORYIMPL_H_
 
 #include <string>
 #include <vector>
 
-#include "resolver_factory.h"
+#include "app/collector/resolver_factory.h"
+#include "node/node.h"
 
 namespace btool::app::collector {
 
@@ -16,9 +17,7 @@ class ResolverFactoryImpl : public ResolverFactory {
   ::btool::node::Node::Resolver *NewCompileCC(
       const std::vector<std::string> &include_dirs,
       const std::vector<std::string> &flags) override;
-  ::btool::node::Node::Resolver *NewArchive(
-      const std::vector<std::string> &include_dirs,
-      const std::vector<std::string> &flags) override;
+  ::btool::node::Node::Resolver *NewArchive() override;
   ::btool::node::Node::Resolver *NewLinkC(
       const std::vector<std::string> &flags) override;
   ::btool::node::Node::Resolver *NewLinkCC(
