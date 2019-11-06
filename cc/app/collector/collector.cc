@@ -1,5 +1,7 @@
 #include "collector.h"
 
+#include <string>
+
 #include "app/collector/store.h"
 #include "core/err.h"
 #include "core/log.h"
@@ -14,19 +16,24 @@ class StoreLogger : public Store::Listener {
   }
 };
 
-::btool::core::VoidErr Collector::Collect() {
-  Store s;
+::btool::core::Err<::btool::node::Node *> Collector::Collect(
+    const std::string &target) {
   StoreLogger sl;
-  s.Listen(&sl);
+  s_->Listen(&sl);
 
   for (auto c : cs_) {
-    auto err = c->Collect(&s);
+    auto err = c->Collect(s_);
     if (err) {
-      return err;
+      return ::btool::core::Err<::btool::node::Node *>::Failure(err.Msg());
     }
   }
 
-  return ::btool::core::VoidErr::Success();
+  auto n = s_->Get(target);
+  if (n == nullptr) {
+    return ::btool::core::Err<::btool::node::Node *>::Failure("unknown target");
+  }
+
+  return ::btool::core::Err<::btool::node::Node *>::Success(n);
 }
 
 };  // namespace btool::app::collector

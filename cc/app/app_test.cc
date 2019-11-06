@@ -1,5 +1,7 @@
 #include "app.h"
 
+#include <string>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -8,11 +10,13 @@
 
 using ::testing::_;
 using ::testing::InSequence;
+using ::testing::Return;
 using ::testing::StrictMock;
 
 class MockCollector : public ::btool::app::App::Collector {
  public:
-  MOCK_METHOD0(Collect, ::btool::core::VoidErr());
+  MOCK_METHOD1(Collect,
+               ::btool::core::Err<::btool::node::Node *>(const std::string &));
 };
 
 class MockCleaner : public ::btool::app::App::Cleaner {
@@ -49,33 +53,41 @@ class AppTest : public ::testing::Test {
 
 TEST_F(AppTest, Build) {
   InSequence s;
-  EXPECT_CALL(mcollector_, Collect());
+  auto n = new ::btool::node::Node("a");
+  EXPECT_CALL(mcollector_, Collect(_))
+      .WillOnce(Return(::btool::core::Err<::btool::node::Node *>::Success(n)));
   EXPECT_CALL(mbuilder_, Build(_));
 
-  EXPECT_FALSE(a_.Run(false, false, false));
+  EXPECT_FALSE(a_.Run("", false, false, false));
 }
 
 TEST_F(AppTest, Clean) {
   InSequence s;
-  EXPECT_CALL(mcollector_, Collect());
+  auto n = new ::btool::node::Node("a");
+  EXPECT_CALL(mcollector_, Collect(_))
+      .WillOnce(Return(::btool::core::Err<::btool::node::Node *>::Success(n)));
   EXPECT_CALL(mcleaner_, Clean(_));
 
-  EXPECT_FALSE(a_.Run(true, false, false));
+  EXPECT_FALSE(a_.Run("", true, false, false));
 }
 
 TEST_F(AppTest, List) {
   InSequence s;
-  EXPECT_CALL(mcollector_, Collect());
+  auto n = new ::btool::node::Node("a");
+  EXPECT_CALL(mcollector_, Collect(_))
+      .WillOnce(Return(::btool::core::Err<::btool::node::Node *>::Success(n)));
   EXPECT_CALL(mlister_, List(_));
 
-  EXPECT_FALSE(a_.Run(false, true, false));
+  EXPECT_FALSE(a_.Run("", false, true, false));
 }
 
 TEST_F(AppTest, Run) {
   InSequence s;
-  EXPECT_CALL(mcollector_, Collect());
+  auto n = new ::btool::node::Node("a");
+  EXPECT_CALL(mcollector_, Collect(_))
+      .WillOnce(Return(::btool::core::Err<::btool::node::Node *>::Success(n)));
   EXPECT_CALL(mbuilder_, Build(_));
   EXPECT_CALL(mrunner_, Run(_));
 
-  EXPECT_FALSE(a_.Run(false, false, true));
+  EXPECT_FALSE(a_.Run("", false, false, true));
 }

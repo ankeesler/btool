@@ -26,10 +26,15 @@ TEST(Collector, A) {
   EXPECT_CALL(c2, Collect(_))
       .WillOnce(Return(::btool::core::VoidErr::Success()));
 
-  ::btool::app::collector::Collector c;
+  ::btool::app::collector::Store s;
+  auto n = s.Put("some/node");
+
+  ::btool::app::collector::Collector c(&s);
   c.AddCollectini(&c0);
   c.AddCollectini(&c1);
   c.AddCollectini(&c2);
 
-  EXPECT_FALSE(c.Collect());
+  auto err = c.Collect("some/node");
+  EXPECT_FALSE(err);
+  EXPECT_EQ(n, err.Ret());
 }

@@ -1,6 +1,8 @@
 #ifndef BTOOL_APP_APP_H_
 #define BTOOL_APP_APP_H_
 
+#include <string>
+
 #include "core/err.h"
 #include "node/node.h"
 
@@ -11,7 +13,8 @@ class App {
   class Collector {
    public:
     virtual ~Collector() {}
-    virtual ::btool::core::VoidErr Collect() = 0;
+    virtual ::btool::core::Err<::btool::node::Node *> Collect(
+        const std::string &name) = 0;
   };
 
   class Cleaner {
@@ -46,7 +49,8 @@ class App {
         builder_(builder),
         runner_(runner) {}
 
-  ::btool::core::VoidErr Run(bool clean, bool list, bool run);
+  ::btool::core::VoidErr Run(const std::string &target, bool clean, bool list,
+                             bool run);
 
  private:
   Collector *collector_;

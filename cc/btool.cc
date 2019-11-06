@@ -16,6 +16,7 @@
 #include "app/collector/collector.h"
 #include "app/collector/fs/fs_collectini.h"
 #include "app/collector/resolver_factory_impl.h"
+#include "app/collector/store.h"
 #include "app/collector/trivial_collectini.h"
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
@@ -57,10 +58,11 @@ int main(int argc, const char *argv[]) {
 
   ::btool::app::collector::fs::FSCollectini fsc(root.c_str());
 
-  ::btool::app::collector::TrivialCollectini tc(
-      ::btool::util::fs::Join(root, target));
+  auto root_target = ::btool::util::fs::Join(root, target);
+  ::btool::app::collector::TrivialCollectini tc(root_target);
 
-  ::btool::app::collector::Collector collector;
+  ::btool::app::collector::Store s;
+  ::btool::app::collector::Collector collector(&s);
   collector.AddCollectini(&i);
   collector.AddCollectini(&o);
   collector.AddCollectini(&e);
@@ -78,7 +80,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::runner::Runner runner(&ui);
 
   ::btool::app::App a(&collector, &cleaner, &lister, &builder, &runner);
-  auto err = a.Run(false, list, false);
+  auto err = a.Run(root_target, false, list, false);
   if (err) {
     ERROR("%s\n", err.Msg());
     return 1;
