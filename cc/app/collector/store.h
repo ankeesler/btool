@@ -27,8 +27,8 @@ class Store {
     // OnSet notifies a Listener that a Node with the provided name has been
     // Set() to the provided Store.
     //
-    // Note that a call to Put() will trigger a Set() call, which will trigger a
-    // call to OnSet().
+    // Note that an initial call to Put() will trigger a Set() call, which will
+    // trigger a call to OnSet().
     virtual void OnSet(Store *, const std::string &name) = 0;
   };
 

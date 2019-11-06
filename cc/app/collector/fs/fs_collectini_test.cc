@@ -4,6 +4,7 @@
 
 #include "gtest/gtest.h"
 
+#include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "util/fs/fs.h"
 
@@ -61,38 +62,37 @@ TEST_F(FSCollectiniTest, Yeah) {
   ::btool::app::collector::Store s;
   EXPECT_EQ(::btool::core::VoidErr::Success(), fsc.Collect(&s));
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "d.go")));
+  const std::vector<std::string> yes{
+      "a.cc",           "b.h",           "c.c",
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "dir0/d.go")));
+      "dir0/a.cc",      "dir0/b.h",      "dir0/c.c",
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir0/a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir0/b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir0/c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir0/d.go")));
+      "dir0/dir0/a.cc", "dir0/dir0/b.h", "dir0/dir0/c.c",
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir1/a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir1/b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir1/c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "dir0/dir1/d.go")));
+      "dir0/dir1/a.cc", "dir0/dir1/b.h", "dir0/dir1/c.c",
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "dir1/d.go")));
+      "dir1/a.cc",      "dir1/b.h",      "dir1/c.c",
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir0/a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir0/b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir0/c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir0/d.go")));
+      "dir1/dir0/a.cc", "dir1/dir0/b.h", "dir1/dir0/c.c",
 
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir1/a.cc")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir1/b.h")));
-  EXPECT_TRUE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir1/c.c")));
-  EXPECT_FALSE(s.Get(::btool::util::fs::Join(Root(), "dir1/dir1/d.go")));
+      "dir1/dir1/a.cc", "dir1/dir1/b.h", "dir1/dir1/c.c",
+  };
+
+  const std::vector<std::string> no{
+      "d.go",      "dir0/d.go",      "dir0/dir0/d.go", "dir0/dir1/d.go",
+      "dir1/d.go", "dir1/dir0/d.go", "dir1/dir1/d.go",
+
+  };
+
+  for (auto f : yes) {
+    auto n = s.Get(::btool::util::fs::Join(Root(), f));
+    EXPECT_TRUE(n != nullptr);
+    EXPECT_TRUE(
+        ::btool::app::collector::Properties::Local(n->property_store()));
+  }
+
+  for (auto f : no) {
+    auto n = s.Get(::btool::util::fs::Join(Root(), f));
+    EXPECT_TRUE(n == nullptr);
+  }
 }

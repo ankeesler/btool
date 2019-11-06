@@ -1,5 +1,7 @@
 #include "app/collector/cc/inc.h"
 
+#include <cassert>
+
 #include <string>
 
 #include "app/collector/cc/properties.h"
@@ -60,7 +62,9 @@ static void HandleInclude(::btool::app::collector::Store *s,
   }
 
   if (d == nullptr) {
-    throw "ahhhh noooo exceptions are bad!!!";
+    DEBUG("cannot resolve include %s for node %s\n", include.c_str(),
+          n->name().c_str());
+    return;
   }
 
   n->dependencies()->push_back(d);

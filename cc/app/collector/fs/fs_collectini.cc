@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 
+#include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "core/err.h"
 #include "core/log.h"
@@ -29,7 +30,10 @@ namespace btool::app::collector::fs {
             (::btool::util::string::HasSuffix(path.c_str(), ".c") ||
              ::btool::util::string::HasSuffix(path.c_str(), ".cc") ||
              ::btool::util::string::HasSuffix(path.c_str(), ".h"))) {
-          s->Put(path.c_str());
+          auto n = s->Put(path.c_str());
+          ::btool::app::collector::Properties::SetLocal(n->property_store(),
+                                                        true);
+          s->Set(n);
         }
 
         return ::btool::core::VoidErr::Success();

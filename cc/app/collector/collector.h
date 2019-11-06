@@ -5,6 +5,7 @@
 
 #include "app/app.h"
 #include "app/collector/store.h"
+#include "core/err.h"
 
 namespace btool::app::collector {
 

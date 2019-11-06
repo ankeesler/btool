@@ -16,12 +16,14 @@
 #include "app/collector/collector.h"
 #include "app/collector/fs/fs_collectini.h"
 #include "app/collector/resolver_factory_impl.h"
+#include "app/collector/trivial_collectini.h"
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
 #include "core/err.h"
 #include "core/log.h"
 #include "ui/ui.h"
 #include "util/flags.h"
+#include "util/fs/fs.h"
 
 int main(int argc, const char *argv[]) {
   ::btool::util::Flags f;
@@ -29,11 +31,13 @@ int main(int argc, const char *argv[]) {
   bool debug = false;
   f.Bool("debug", &debug);
 
-  bool list = false;
-  f.Bool("list", &list);
-
   std::string root = ".";
   f.String("root", &root);
+  std::string target = "main";
+  f.String("target", &target);
+
+  bool list = false;
+  f.Bool("list", &list);
 
   std::string err_s;
   bool success = f.Parse(argc, argv, &err_s);
@@ -53,11 +57,15 @@ int main(int argc, const char *argv[]) {
 
   ::btool::app::collector::fs::FSCollectini fsc(root.c_str());
 
+  ::btool::app::collector::TrivialCollectini tc(
+      ::btool::util::fs::Join(root, target));
+
   ::btool::app::collector::Collector collector;
   collector.AddCollectini(&i);
   collector.AddCollectini(&o);
   collector.AddCollectini(&e);
   collector.AddCollectini(&fsc);
+  collector.AddCollectini(&tc);
 
   ::btool::app::cleaner::RemoveAllerImpl rai;
   ::btool::app::cleaner::Cleaner cleaner(&rai);
