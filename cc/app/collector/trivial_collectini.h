@@ -3,17 +3,21 @@
 
 #include <string>
 
+#include "app/collector/base_collectini.h"
 #include "app/collector/collector.h"
 #include "app/collector/store.h"
 #include "core/err.h"
 
 namespace btool::app::collector {
 
-class TrivialCollectini : public Collector::Collectini {
+class TrivialCollectini : public BaseCollectini {
  public:
   TrivialCollectini(const std::string &name) : name_(name) {}
 
-  void Collect(Store *s) override { s->Put(name_); }
+  void Collect(Store *s) override {
+    s->Put(name_);
+    Notify(s, name_);
+  }
 
  private:
   const std::string &name_;

@@ -36,10 +36,15 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   }
 
   bool updated = false;
-  ip_->ParseIncludes(name, [s, n, &updated](const std::string &include) {
-    bool new_stuff = HandleInclude(s, n, include);
-    updated = updated || new_stuff;
-  });
+  auto err =
+      ip_->ParseIncludes(name, [s, n, &updated](const std::string &include) {
+        bool new_stuff = HandleInclude(s, n, include);
+        updated = updated || new_stuff;
+      });
+  if (err) {
+    DEBUG("failed to parse includes %s\n", err.Msg());
+    assert(0);
+  }
 
   if (updated) {
     Notify(s, name);

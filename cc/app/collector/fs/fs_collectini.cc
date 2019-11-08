@@ -5,19 +5,21 @@
 #include <cstring>
 
 #include <functional>
-#include <iostream>
-#include <memory>
+#include <vector>
 
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "core/err.h"
 #include "core/log.h"
+#include "node/node.h"
 #include "util/fs/fs.h"
 #include "util/string/string.h"
 
 namespace btool::app::collector::fs {
 
 void FSCollectini::Collect(::btool::app::collector::Store *s) {
+  std::vector<::btool::node::Node *> nodes;
+
   ::btool::util::fs::Walk(
       root_, [&](const std::string &path) -> ::btool::core::VoidErr {
         auto err = ::btool::util::fs::IsFile(path);
@@ -32,11 +34,15 @@ void FSCollectini::Collect(::btool::app::collector::Store *s) {
           auto n = s->Put(path.c_str());
           ::btool::app::collector::Properties::SetLocal(n->property_store(),
                                                         true);
-          Notify(s, n->name());
+          nodes.push_back(n);
         }
 
         return ::btool::core::VoidErr::Success();
       });
+
+  for (auto n : nodes) {
+    Notify(s, n->name());
+  }
 }
 
 };  // namespace btool::app::collector::fs

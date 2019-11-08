@@ -15,6 +15,7 @@ $BTOOL -loglevel error -run -target util/fs/fs_test
 $BTOOL -loglevel error -run -target util/string/string_test
 
 $BTOOL -loglevel error -run -target node/node_test
+$BTOOL -loglevel error -run -target node/property_store_test
 
 $BTOOL -loglevel error -run -target app/app_test
 $BTOOL -loglevel error -run -target app/builder/builder_test
@@ -31,4 +32,4 @@ $BTOOL -loglevel error -run -target app/collector/fs/fs_collectini_test
 $BTOOL -loglevel error -run -target app/lister/lister_test
 $BTOOL -loglevel error -run -target app/runner/runner_test
 
-$BTOOL -loglevel error -run -target btool
+python integration/integration.py
