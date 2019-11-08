@@ -40,7 +40,7 @@ std::string Join(const std::string &one, const std::string &two) {
 
 std::string Ext(const std::string &path) {
   std::size_t index = path.rfind('.');
-  if (index == std::string::npos) {
+  if (index == std::string::npos || index == 0) {
     return "";
   } else {
     return path.substr(index);
@@ -59,21 +59,25 @@ std::string Ext(const std::string &path) {
 }
 
 ::btool::core::Err<std::string> ReadFile(const std::string &path) {
-  std::ifstream ifs(path);
-  if (!ifs) {
+  FILE *f = ::fopen(path.c_str(), "r");
+  if (f == nullptr) {
     return ::btool::core::Err<std::string>::Failure(strerror(errno));
   }
 
   std::string content;
-  do {
+  while (true) {
     const int buf_size = 1 << kIFBufSizeLog;
     char buf[buf_size];
-    ifs.read(buf, buf_size);
-    if (ifs) {
+    ::size_t count = ::fread(buf, 1, buf_size, f);
+    content.append(buf, count);
+    if (ferror(f)) {
       return ::btool::core::Err<std::string>::Failure(strerror(errno));
+    } else if (feof(f)) {
+      break;
     }
-    content.append(buf, ifs.gcount());
-  } while (!ifs.eof());
+  }
+
+  fclose(f);
 
   return ::btool::core::Err<std::string>::Success(content);
 }

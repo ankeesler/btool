@@ -33,6 +33,7 @@ TEST(FS, Join) {
 
 TEST(FS, Ext) {
   EXPECT_EQ("", ::btool::util::fs::Ext("tuna"));
+  EXPECT_EQ("", ::btool::util::fs::Ext("./tuna"));
   EXPECT_EQ("", ::btool::util::fs::Ext("some/path/to/tuna"));
 
   EXPECT_EQ(".cc", ::btool::util::fs::Ext("tuna.cc"));
