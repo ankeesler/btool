@@ -6,4 +6,4 @@ namespace btool::app::collector {
 
 std::vector<BaseCollectini *> BaseCollectini::collectinis;
 
-}; // namespace btool::app::collector
+};  // namespace btool::app::collector

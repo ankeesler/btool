@@ -26,6 +26,9 @@
 #include "util/flags.h"
 #include "util/fs/fs.h"
 
+// workaround for bug-02
+#include "app/collector/base_collectini.h"
+
 int main(int argc, const char *argv[]) {
   ::btool::util::Flags f;
 

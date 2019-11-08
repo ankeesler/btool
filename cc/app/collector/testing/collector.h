@@ -6,6 +6,7 @@
 
 #include "gmock/gmock.h"
 
+#include "app/collector/base_collectini.h"
 #include "app/collector/resolver_factory.h"
 #include "node/node.h"
 
@@ -29,6 +30,24 @@ class MockResolverFactory : public ::btool::app::collector::ResolverFactory {
                class ::btool::node::Node::Resolver *(const std::string &,
                                                      const std::string &));
   MOCK_METHOD0(NewUnzip, class ::btool::node::Node::Resolver *());
+};
+
+class SpyCollectini : public ::btool::app::collector::BaseCollectini {
+ public:
+  std::vector<::btool::app::collector::Store *> collect_calls_;
+  std::vector<std::pair<::btool::app::collector::Store *, std::string>>
+      on_notify_calls_;
+
+  void Collect(::btool::app::collector::Store *s) override {
+    collect_calls_.push_back(s);
+    Notify(s, "some-other-name");
+  }
+
+ protected:
+  void OnNotify(::btool::app::collector::Store *s,
+                const std::string &name) override {
+    on_notify_calls_.push_back({s, name});
+  }
 };
 
 };  // namespace btool::app::collector::testing

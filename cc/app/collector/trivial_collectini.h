@@ -13,10 +13,7 @@ class TrivialCollectini : public Collector::Collectini {
  public:
   TrivialCollectini(const std::string &name) : name_(name) {}
 
-  ::btool::core::VoidErr Collect(Store *s) override {
-    s->Put(name_);
-    return ::btool::core::VoidErr::Success();
-  }
+  void Collect(Store *s) override { s->Put(name_); }
 
  private:
   const std::string &name_;

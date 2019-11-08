@@ -7,6 +7,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+// workaround for bug-02
+#include "app/collector/base_collectini.h"
 #include "app/collector/cc/properties.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
@@ -14,6 +16,7 @@
 #include "core/err.h"
 #include "node/testing/node.h"
 
+using ::testing::ElementsAre;
 using ::testing::Return;
 
 class ObjTest : public ::testing::Test {
@@ -56,12 +59,12 @@ class ObjTest : public ::testing::Test {
 };
 
 TEST_F(ObjTest, IgnoreFileExt) {
-  o_.OnSet(&s_, "foo.go");
+  o_.OnNotify(&s_, "foo.go");
   EXPECT_EQ(6UL, s_.Size());
 }
 
 TEST_F(ObjTest, IgnoreNotLocal) {
-  o_.OnSet(&s_, "bar.c");
+  o_.OnNotify(&s_, "bar.c");
   EXPECT_EQ(6UL, s_.Size());
 }
 
@@ -71,14 +74,22 @@ TEST_F(ObjTest, C) {
   std::vector<std::string> flags;
   EXPECT_CALL(mrf_, NewCompileC(include_paths, flags)).WillOnce(Return(&mr_));
 
+  ::btool::app::collector::testing::SpyCollectini sc;
+
   auto d = s_.Get("foo.c");
-  o_.OnSet(&s_, d->name());
+  o_.OnNotify(&s_, d->name());
 
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
   EXPECT_TRUE(n);
   EXPECT_EQ(ex_deps, *n->dependencies());
   EXPECT_EQ(&mr_, n->resolver());
+
+  EXPECT_THAT(
+      sc.on_notify_calls_,
+      ElementsAre(
+          std::pair<::btool::app::collector::Store *, const std::string &>(
+              &s_, n->name())));
 }
 
 TEST_F(ObjTest, CC) {
@@ -87,12 +98,20 @@ TEST_F(ObjTest, CC) {
   std::vector<std::string> flags;
   EXPECT_CALL(mrf_, NewCompileCC(include_paths, flags)).WillOnce(Return(&mr_));
 
+  ::btool::app::collector::testing::SpyCollectini sc;
+
   auto d = s_.Get("foo.cc");
-  o_.OnSet(&s_, d->name());
+  o_.OnNotify(&s_, d->name());
 
   auto n = s_.Get("foo.o");
   std::vector<::btool::node::Node *> ex_deps{d};
   EXPECT_TRUE(n);
   EXPECT_EQ(ex_deps, *n->dependencies());
   EXPECT_EQ(&mr_, n->resolver());
+
+  EXPECT_THAT(
+      sc.on_notify_calls_,
+      ElementsAre(
+          std::pair<::btool::app::collector::Store *, const std::string &>(
+              &s_, n->name())));
 }

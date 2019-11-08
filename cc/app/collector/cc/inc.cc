@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+#include <algorithm>
 #include <string>
 
 #include "app/collector/cc/properties.h"
@@ -10,13 +11,14 @@
 #include "core/log.h"
 #include "node/node.h"
 #include "util/string/string.h"
+#include "util/util.h"
 
 namespace btool::app::collector::cc {
 
-static void HandleInclude(::btool::app::collector::Store *s,
+static bool HandleInclude(::btool::app::collector::Store *s,
                           ::btool::node::Node *n, const std::string &include);
 
-void Inc::OnSet(::btool::app::collector::Store *s, const std::string &name) {
+void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   auto n = s->Get(name);
   if (n == nullptr) {
     return;
@@ -33,13 +35,21 @@ void Inc::OnSet(::btool::app::collector::Store *s, const std::string &name) {
     return;
   }
 
-  ip_->ParseIncludes(name, [s, n](const std::string &include) {
-    HandleInclude(s, n, include);
+  bool updated = false;
+  ip_->ParseIncludes(name, [s, n, &updated](const std::string &include) {
+    bool new_stuff = HandleInclude(s, n, include);
+    updated = updated || new_stuff;
   });
+
+  if (updated) {
+    Notify(s, name);
+  }
 }
 
-static void HandleInclude(::btool::app::collector::Store *s,
+static bool HandleInclude(::btool::app::collector::Store *s,
                           ::btool::node::Node *n, const std::string &include) {
+  DEBUG("handling include %s\n", include.c_str());
+
   ::btool::node::Node *d = nullptr;
   std::string include_path;
 
@@ -64,11 +74,30 @@ static void HandleInclude(::btool::app::collector::Store *s,
   if (d == nullptr) {
     DEBUG("cannot resolve include %s for node %s\n", include.c_str(),
           n->name().c_str());
-    return;
+    return false;
+  }
+
+  if (::btool::util::Contains(*n->dependencies(), d)) {
+    return false;
   }
 
   n->dependencies()->push_back(d);
-  Properties::AddIncludePath(n->property_store(), include_path);
+
+  auto include_paths = Properties::IncludePaths(n->property_store());
+  bool needs_add = true;
+  if (include_paths != nullptr) {
+    auto it =
+        std::find(include_paths->begin(), include_paths->end(), include_path);
+    if (it != include_paths->end()) {
+      needs_add = false;
+    }
+  }
+
+  if (needs_add) {
+    Properties::AddIncludePath(n->property_store(), include_path);
+  }
+
+  return true;
 }
 
 };  // namespace btool::app::collector::cc

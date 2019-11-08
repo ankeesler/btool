@@ -18,16 +18,9 @@ Store::~Store() {
   auto node = nodes_[name];
   if (node == nullptr) {
     node = new ::btool::node::Node(name);
-    Set(node);
+    nodes_[node->name()] = node;
   }
   return node;
-}
-
-void Store::Set(::btool::node::Node *node) {
-  nodes_[node->name()] = node;
-  for (auto l : ls_) {
-    l->OnSet(this, node->name());
-  }
 }
 
 ::btool::node::Node *Store::Get(const std::string &name) const {

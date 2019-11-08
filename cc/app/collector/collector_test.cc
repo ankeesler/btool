@@ -7,24 +7,19 @@
 #include "core/err.h"
 
 using ::testing::_;
-using ::testing::Return;
 
 class MockCollectini : public ::btool::app::collector::Collector::Collectini {
  public:
-  MOCK_METHOD1(Collect,
-               ::btool::core::VoidErr(::btool::app::collector::Store *));
+  MOCK_METHOD1(Collect, void(::btool::app::collector::Store *));
 };
 
 TEST(Collector, A) {
   MockCollectini c0;
-  EXPECT_CALL(c0, Collect(_))
-      .WillOnce(Return(::btool::core::VoidErr::Success()));
+  EXPECT_CALL(c0, Collect(_));
   MockCollectini c1;
-  EXPECT_CALL(c1, Collect(_))
-      .WillOnce(Return(::btool::core::VoidErr::Success()));
+  EXPECT_CALL(c1, Collect(_));
   MockCollectini c2;
-  EXPECT_CALL(c2, Collect(_))
-      .WillOnce(Return(::btool::core::VoidErr::Success()));
+  EXPECT_CALL(c2, Collect(_));
 
   ::btool::app::collector::Store s;
   auto n = s.Put("some/node");

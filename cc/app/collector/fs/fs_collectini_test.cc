@@ -2,11 +2,18 @@
 
 #include <vector>
 
+// workaround for bug-00
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+// workaround for bug-02
+#include "app/collector/base_collectini.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
+#include "app/collector/testing/collector.h"
 #include "util/fs/fs.h"
+
+using ::testing::Contains;
 
 class FSCollectiniTest : public ::testing::Test {
  protected:
@@ -58,9 +65,10 @@ class FSCollectiniTest : public ::testing::Test {
 };
 
 TEST_F(FSCollectiniTest, Yeah) {
+  ::btool::app::collector::testing::SpyCollectini sc;
   ::btool::app::collector::fs::FSCollectini fsc(Root());
   ::btool::app::collector::Store s;
-  EXPECT_EQ(::btool::core::VoidErr::Success(), fsc.Collect(&s));
+  fsc.Collect(&s);
 
   const std::vector<std::string> yes{
       "a.cc",           "b.h",           "c.c",
@@ -89,6 +97,11 @@ TEST_F(FSCollectiniTest, Yeah) {
     EXPECT_TRUE(n != nullptr);
     EXPECT_TRUE(
         ::btool::app::collector::Properties::Local(n->property_store()));
+    EXPECT_THAT(
+        sc.on_notify_calls_,
+        Contains(
+            std::pair<::btool::app::collector::Store *, const std::string &>(
+                &s, n->name())));
   }
 
   for (auto f : no) {

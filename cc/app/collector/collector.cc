@@ -9,23 +9,10 @@
 
 namespace btool::app::collector {
 
-class StoreLogger : public Store::Listener {
- public:
-  void OnSet(Store *s, const std::string &name) override {
-    DEBUG("store logger: set %s\n", name.c_str());
-  }
-};
-
 ::btool::core::Err<::btool::node::Node *> Collector::Collect(
     const std::string &target) {
-  StoreLogger sl;
-  s_->Listen(&sl);
-
   for (auto c : cs_) {
-    auto err = c->Collect(s_);
-    if (err) {
-      return ::btool::core::Err<::btool::node::Node *>::Failure(err.Msg());
-    }
+    c->Collect(s_);
   }
 
   auto n = s_->Get(target);

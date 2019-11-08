@@ -1,32 +1,19 @@
 #include "app/collector/base_collectini.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
+// workaround for bug-00
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "app/collector/store.h"
-
-class Collectini : public ::btool::app::collector::BaseCollectini {
-  public:
-    std::vector<::btool::app::collector::Store *> collect_calls_;
-    std::vector<std::pair<::btool::app::collector::Store *, std::string>> on_notify_calls_;
-
-    void Collect(::btool::app::collector::Store *s) override {
-      collect_calls_.push_back(s);
-      Notify(s, "some-other-name");
-    }
-
-  protected:
-    void OnNotify(::btool::app::collector::Store *s, const std::string &name) override {
-      on_notify_calls_.push_back({s, name});
-    }
-};
+#include "app/collector/testing/collector.h"
 
 TEST(BaseCollectini, A) {
-  Collectini a;
-  Collectini b;
-  Collectini c;
+  ::btool::app::collector::testing::SpyCollectini a;
+  ::btool::app::collector::testing::SpyCollectini b;
+  ::btool::app::collector::testing::SpyCollectini c;
 
   ::btool::app::collector::Store s;
   a.Collect(&s);

@@ -3,18 +3,19 @@
 
 #include <string>
 
-#include "app/collector/listener_collectini.h"
+#include "app/collector/base_collectini.h"
 #include "app/collector/resolver_factory.h"
 #include "app/collector/store.h"
 
 namespace btool::app::collector::cc {
 
-class Obj : public ::btool::app::collector::ListenerCollectini {
+class Obj : public ::btool::app::collector::BaseCollectini {
  public:
   Obj(::btool::app::collector::ResolverFactory *rf) : rf_(rf) {}
 
-  void OnSet(::btool::app::collector::Store *s,
-             const std::string &name) override;
+  void Collect(::btool::app::collector::Store *s) override {}
+  void OnNotify(::btool::app::collector::Store *s,
+                const std::string &name) override;
 
  private:
   ::btool::app::collector::ResolverFactory *rf_;

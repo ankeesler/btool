@@ -15,7 +15,7 @@ namespace btool::app::collector::cc {
 void CollectIncludePaths(::btool::node::Node *n,
                          std::vector<std::string> *include_paths);
 
-void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
+void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   auto d = s->Get(name);
   if (d == nullptr) {
     DEBUG("obj: drop %s (unknown name)\n", name.c_str());
@@ -54,6 +54,7 @@ void Obj::OnSet(::btool::app::collector::Store *s, const std::string &name) {
   }
   n->set_resolver(r);
   n->dependencies()->push_back(d);
+  Notify(s, n->name());
 }
 
 void CollectIncludePaths(::btool::node::Node *n,

@@ -4,13 +4,13 @@
 #include <functional>
 #include <string>
 
-#include "app/collector/listener_collectini.h"
+#include "app/collector/base_collectini.h"
 #include "app/collector/store.h"
 #include "core/err.h"
 
 namespace btool::app::collector::cc {
 
-class Inc : public ::btool::app::collector::ListenerCollectini {
+class Inc : public ::btool::app::collector::BaseCollectini {
  public:
   class IncludesParser {
    public:
@@ -22,8 +22,9 @@ class Inc : public ::btool::app::collector::ListenerCollectini {
 
   Inc(IncludesParser *ip) : ip_(ip) {}
 
-  void OnSet(::btool::app::collector::Store *s,
-             const std::string &name) override;
+  void Collect(::btool::app::collector::Store *) override {}
+  void OnNotify(::btool::app::collector::Store *s,
+                const std::string &name) override;
 
  private:
   IncludesParser *ip_;

@@ -20,8 +20,10 @@ $BTOOL -loglevel error -run -target app/app_test
 $BTOOL -loglevel error -run -target app/builder/builder_test
 $BTOOL -loglevel error -run -target app/builder/currenter_impl_test
 $BTOOL -loglevel error -run -target app/cleaner/cleaner_test
+$BTOOL -loglevel error -run -target app/collector/base_collectini_test
 $BTOOL -loglevel error -run -target app/collector/collector_test
 $BTOOL -loglevel error -run -target app/collector/store_test
+$BTOOL -loglevel error -run -target app/collector/cc/exe_test
 $BTOOL -loglevel error -run -target app/collector/cc/inc_test
 $BTOOL -loglevel error -run -target app/collector/cc/includes_parser_impl_test
 $BTOOL -loglevel error -run -target app/collector/cc/obj_test

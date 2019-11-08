@@ -7,6 +7,8 @@
 - Ability to select multiple targets at once
 - Run a debugger with -debug
 - Targets are per-os/arch
+- Cache registry data
+- Run tests as a single linked executable
 
 # Chores
 
@@ -22,3 +24,5 @@
   updated by the inc consumer yet, so it is missing include paths...
 
 ### 01: Can't put comments to the right of headers
+
+### 02: Transient header dependencies' source objects are not brought in to build

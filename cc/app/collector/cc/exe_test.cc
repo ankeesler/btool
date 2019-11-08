@@ -3,6 +3,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+// workaround for bug-02
+#include "app/collector/base_collectini.h"
 #include "app/collector/cc/properties.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
@@ -10,6 +12,7 @@
 #include "core/err.h"
 #include "node/testing/node.h"
 
+using ::testing::ElementsAre;
 using ::testing::Return;
 
 class ExeTest : public ::testing::Test {
@@ -27,7 +30,7 @@ void BuildGraph(::btool::app::collector::Store *s, const std::string ext);
 
 TEST_F(ExeTest, BadFileExtension) {
   s_.Put("tuna.go");
-  e_.OnSet(&s_, "tuna.go");
+  e_.OnNotify(&s_, "tuna.go");
   EXPECT_EQ(1UL, s_.Size());
 }
 
@@ -38,7 +41,9 @@ TEST_F(ExeTest, C) {
 
   BuildGraph(&s_, ".c");
 
-  e_.OnSet(&s_, "tuna");
+  ::btool::app::collector::testing::SpyCollectini sc;
+
+  e_.OnNotify(&s_, "tuna");
   EXPECT_EQ(13UL, s_.Size());
 
   auto n = s_.Get("tuna");
@@ -49,6 +54,12 @@ TEST_F(ExeTest, C) {
   EXPECT_EQ("marlin.o", n->dependencies()->at(3)->name());
   EXPECT_EQ("lib.a", n->dependencies()->at(4)->name());
   EXPECT_EQ(&mr_, n->resolver());
+
+  EXPECT_THAT(
+      sc.on_notify_calls_,
+      ElementsAre(
+          std::pair<::btool::app::collector::Store *, const std::string &>(
+              &s_, n->name())));
 }
 
 TEST_F(ExeTest, CC) {
@@ -58,7 +69,9 @@ TEST_F(ExeTest, CC) {
 
   BuildGraph(&s_, ".cc");
 
-  e_.OnSet(&s_, "tuna");
+  ::btool::app::collector::testing::SpyCollectini sc;
+
+  e_.OnNotify(&s_, "tuna");
   EXPECT_EQ(13UL, s_.Size());
 
   auto n = s_.Get("tuna");
@@ -69,6 +82,12 @@ TEST_F(ExeTest, CC) {
   EXPECT_EQ("marlin.o", n->dependencies()->at(3)->name());
   EXPECT_EQ("lib.a", n->dependencies()->at(4)->name());
   EXPECT_EQ(&mr_, n->resolver());
+
+  EXPECT_THAT(
+      sc.on_notify_calls_,
+      ElementsAre(
+          std::pair<::btool::app::collector::Store *, const std::string &>(
+              &s_, n->name())));
 }
 
 void BuildGraph(::btool::app::collector::Store *s, const std::string ext) {

@@ -12,6 +12,7 @@
 #include "node/node.h"
 #include "util/fs/fs.h"
 #include "util/string/string.h"
+#include "util/util.h"
 
 namespace btool::app::collector::cc {
 
@@ -21,10 +22,8 @@ void CollectObjects(::btool::app::collector::Store *s, ::btool::node::Node *n,
 void CollectLibraries(::btool::app::collector::Store *s, ::btool::node::Node *n,
                       std::vector<::btool::node::Node *> *libs);
 void CollectLinkFlags(::btool::node::Node *n, std::vector<std::string> *flags);
-bool Contains(const std::vector<::btool::node::Node *> &objs,
-              const ::btool::node::Node *obj);
 
-void Exe::OnSet(::btool::app::collector::Store *s, const std::string &name) {
+void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   if (::btool::util::fs::Ext(name) != "") {
     return;
   }
@@ -62,6 +61,8 @@ void Exe::OnSet(::btool::app::collector::Store *s, const std::string &name) {
 
   auto r = (ext == ".cc" ? rf_->NewLinkCC(flags) : rf_->NewLinkC(flags));
   n->set_resolver(r);
+
+  Notify(s, n->name());
 }
 
 void CollectObjects(::btool::app::collector::Store *s, ::btool::node::Node *n,
@@ -75,7 +76,7 @@ void CollectObjects(::btool::app::collector::Store *s, ::btool::node::Node *n,
     DEBUG("cannot find obj for obj name %s\n", obj_name.c_str());
     assert(0);
   }
-  if (Contains(*objs, obj)) {
+  if (::btool::util::Contains(*objs, obj)) {
     return;
   }
   objs->push_back(obj);
@@ -124,14 +125,4 @@ void CollectLinkFlags(::btool::node::Node *n, std::vector<std::string> *flags) {
       });
 }
 
-bool Contains(const std::vector<::btool::node::Node *> &objs,
-              const ::btool::node::Node *obj) {
-  for (auto o : objs) {
-    if (o == obj) {
-      return true;
-    }
-  }
-  return false;
-}
-
-};  // namespace btool::app::collector::cc
+}  // namespace btool::app::collector::cc

@@ -3,17 +3,17 @@
 
 #include <string>
 
-#include "app/collector/collector.h"
+#include "app/collector/base_collectini.h"
 #include "app/collector/store.h"
 #include "node/node.h"
 
 namespace btool::app::collector::fs {
 
-class FSCollectini : public ::btool::app::collector::Collector::Collectini {
+class FSCollectini : public ::btool::app::collector::BaseCollectini {
  public:
   FSCollectini(const std::string &root) : root_(root) {}
 
-  ::btool::core::VoidErr Collect(::btool::app::collector::Store *) override;
+  void Collect(::btool::app::collector::Store *) override;
 
  private:
   std::string root_;
