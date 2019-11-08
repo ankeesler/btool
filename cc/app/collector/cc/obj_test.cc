@@ -10,6 +10,7 @@
 // workaround for bug-02
 #include "app/collector/base_collectini.h"
 #include "app/collector/cc/properties.h"
+#include "app/collector/cc/testing/cc.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
@@ -52,7 +53,8 @@ class ObjTest : public ::testing::Test {
   }
 
   ::testing::StrictMock<::btool::node::testing::MockResolver> mr_;
-  ::testing::StrictMock<::btool::app::collector::testing::MockResolverFactory>
+  ::testing::StrictMock<
+      ::btool::app::collector::cc::testing::MockResolverFactory>
       mrf_;
   ::btool::app::collector::cc::Obj o_;
   ::btool::app::collector::Store s_;

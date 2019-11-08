@@ -13,9 +13,9 @@
 #include "app/collector/cc/inc.h"
 #include "app/collector/cc/includes_parser_impl.h"
 #include "app/collector/cc/obj.h"
+#include "app/collector/cc/resolver_factory_impl.h"
 #include "app/collector/collector.h"
 #include "app/collector/fs/fs_collectini.h"
-#include "app/collector/resolver_factory_impl.h"
 #include "app/collector/store.h"
 #include "app/collector/trivial_collectini.h"
 #include "app/lister/lister.h"
@@ -55,7 +55,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::collector::cc::IncludesParserImpl ipi;
   ::btool::app::collector::cc::Inc i(&ipi);
 
-  ::btool::app::collector::ResolverFactoryImpl rfi;
+  ::btool::app::collector::cc::ResolverFactoryImpl rfi;
   ::btool::app::collector::cc::Obj o(&rfi);
   ::btool::app::collector::cc::Exe e(&rfi);
 

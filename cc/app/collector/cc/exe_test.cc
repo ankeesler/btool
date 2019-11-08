@@ -6,6 +6,7 @@
 // workaround for bug-02
 #include "app/collector/base_collectini.h"
 #include "app/collector/cc/properties.h"
+#include "app/collector/cc/testing/cc.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
@@ -20,7 +21,8 @@ class ExeTest : public ::testing::Test {
   ExeTest() : e_(&mrf_) {}
 
   ::testing::StrictMock<::btool::node::testing::MockResolver> mr_;
-  ::testing::StrictMock<::btool::app::collector::testing::MockResolverFactory>
+  ::testing::StrictMock<
+      ::btool::app::collector::cc::testing::MockResolverFactory>
       mrf_;
   ::btool::app::collector::cc::Exe e_;
   ::btool::app::collector::Store s_;
