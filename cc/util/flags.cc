@@ -1,8 +1,8 @@
-#include "flags.h"
+#include "util/flags.h"
 
 #include <string>
 
-#include "log.h"
+#include "core/log.h"
 
 namespace btool::util {
 
