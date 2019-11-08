@@ -31,13 +31,13 @@ TEST(PropertyStore, Strings) {
 
   ps.Append("some-property", "tuna");
   ps.Read("some-property", &s);
-  EXPECT_EQ(1, s->size());
+  EXPECT_EQ(1UL, s->size());
   EXPECT_EQ("tuna", s->at(0));
 
   ps.Append("some-property", "fish");
   ps.Append("some-property", "marlin");
   ps.Read("some-property", &s);
-  EXPECT_EQ(3, s->size());
+  EXPECT_EQ(3UL, s->size());
   EXPECT_EQ("tuna", s->at(0));
   EXPECT_EQ("fish", s->at(1));
   EXPECT_EQ("marlin", s->at(2));
