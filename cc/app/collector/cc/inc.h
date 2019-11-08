@@ -30,7 +30,6 @@ class Inc : public ::btool::app::collector::BaseCollectini {
 
  private:
   IncludesParser *ip_;
-  std::map<std::string, std::vector<::btool::node::Node *>> includes_;
 };
 
 };  // namespace btool::app::collector::cc

@@ -29,8 +29,29 @@
 // workaround for bug-02
 #include "app/collector/base_collectini.h"
 
+const static std::string version_string = "0.0.2";
+
+#ifdef __linux__
+const std::string compiler_c = "gcc";
+const std::string compiler_cc = "g++";
+const std::string archiver = "ar";
+const std::string linker_c = "gcc";
+const std::string linker_cc = "g++";
+#elif __APPLE__
+const std::string compiler_c = "clang";
+const std::string compiler_cc = "clang++";
+const std::string archiver = "ar";
+const std::string linker_c = "clang";
+const std::string linker_cc = "clang++";
+#else
+#error "unknown platform"
+#endif
+
 int main(int argc, const char *argv[]) {
   ::btool::util::Flags f;
+
+  bool version = false;
+  f.Bool("version", &version);
 
   bool debug = false;
   f.Bool("debug", &debug);
@@ -47,7 +68,12 @@ int main(int argc, const char *argv[]) {
   bool success = f.Parse(argc, argv, &err_s);
   if (!success) {
     ERROR("parse flags: %s\n", err_s.c_str());
-    exit(1);
+    return 1;
+  }
+
+  if (version) {
+    INFO("version %s\n", version_string.c_str());
+    return 0;
   }
 
   ::btool::ui::UI ui;
@@ -55,7 +81,10 @@ int main(int argc, const char *argv[]) {
   ::btool::app::collector::cc::IncludesParserImpl ipi;
   ::btool::app::collector::cc::Inc i(&ipi);
 
-  ::btool::app::collector::cc::ResolverFactoryImpl rfi;
+  ::btool::app::collector::cc::ResolverFactoryImpl rfi(
+      compiler_c, compiler_cc, archiver, linker_c, linker_cc,
+      {"-Wall", "-Werror", "-g", "-O0", "--std=c17"},
+      {"-Wall", "-Werror", "-g", "-O0", "--std=c++17"});
   ::btool::app::collector::cc::Obj o(&rfi);
   ::btool::app::collector::cc::Exe e(&rfi);
 

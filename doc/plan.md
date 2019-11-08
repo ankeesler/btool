@@ -9,6 +9,7 @@
 - Targets are per-os/arch
 - Cache registry data
 - Run tests as a single linked executable
+- Parallel builds
 
 # Chores
 
@@ -16,6 +17,7 @@
 - Is it cool to pass strings in by value to copy them over in constructors?
 - Error handling is terrible.
 - How do we throw errors in an OnSet call?
+- Profile - where are the bottle necks?
 
 # Bugs
 

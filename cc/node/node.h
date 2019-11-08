@@ -17,7 +17,7 @@ class Node {
  public:
   class Resolver {
    public:
-    ~Resolver() {}
+    virtual ~Resolver() {}
     virtual ::btool::core::VoidErr Resolve(const Node &node) = 0;
   };
 
@@ -25,6 +25,7 @@ class Node {
 
   const std::string &name() const { return name_; }
   std::vector<Node *> *dependencies() { return &dependencies_; }
+  const std::vector<Node *> *dependencies() const { return &dependencies_; }
   Resolver *resolver() const { return resolver_; }
   void set_resolver(Resolver *resolver) { resolver_ = resolver; }
   const PropertyStore *property_store() const { return &property_store_; }
