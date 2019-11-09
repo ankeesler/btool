@@ -23,3 +23,10 @@ jobs:
 
       # specify any bash command here prefixed with `run: `
       - run: ./script/really-test.sh
+
+      - setup_remote_docker
+      - run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+      - run: ./script/build-container.sh btool
+      - run: ./script/build-container.sh btoolregistry
+      - run: ./script/push-container.sh btool
+      - run: ./script/push-container.sh btoolregistry
