@@ -10,9 +10,9 @@ namespace btool::util {
 
 class Cmd {
  public:
-  Cmd(const char *path) : path_(path), out_(&std::cout), err_(&std::cerr) {}
+  Cmd(std::string path) : path_(path), out_(&std::cout), err_(&std::cerr) {}
 
-  void Arg(const char *arg) { args_.push_back(arg); }
+  void Arg(std::string arg) { args_.push_back(arg); }
 
   void Stdout(std::ostream *out) { out_ = out; }
   void Stderr(std::ostream *err) { err_ = err; }
@@ -24,8 +24,8 @@ class Cmd {
   int RunParent(int child_pid, int child_stdout_fds[2],
                 int child_stderr_fds[2]);
 
-  const char *path_;
-  std::vector<const char *> args_;
+  std::string path_;
+  std::vector<std::string> args_;
   std::ostream *out_, *err_;
 };
 

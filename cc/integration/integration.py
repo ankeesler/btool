@@ -19,10 +19,11 @@ class TestBtool(unittest.TestCase):
         subprocess.check_call(["./script/clean.sh"])
 
         subprocess.check_call(["/tmp/btool-from-cc", "-target", "btool"])
+        subprocess.check_call(["mv", "btool", "/tmp/btool-from-cc-from-cc"])
+        subprocess.check_call(["./script/clean.sh"])
 
-        cs0 = subprocess.check_output(["md5", "-q", "/tmp/btool-from-cc"])
-        cs1 = subprocess.check_output(["md5", "-q", "btool"])
-        self.assertEqual(cs0, cs1)
+        subprocess.check_call(["/tmp/btool-from-cc-from-cc", "-target", "btool"])
+        subprocess.check_call(["ls", "btool"])
 
 if __name__ == '__main__':
     unittest.main()
