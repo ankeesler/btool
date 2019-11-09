@@ -39,5 +39,6 @@ jobs:
             # ...then, update your local package index, then finally install the cf CLI
             sudo apt-get update
             sudo apt-get install cf-cli
-      - run: cf login --username $CF_USERNAME --password $CF_PASSWORD --api api.run.pivotal.io
+            cf --version
+      - run: cf login -u $CF_USERNAME -p $CF_PASSWORD -a api.run.pivotal.io
       - run: ./script/cf-push.sh
