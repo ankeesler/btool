@@ -1,27 +1,44 @@
 # What's the plan?
 
-## Feature Requests
+## Features
+
+### Need
+
+- Ability to run tests
+
+### Pain
 
 - Targets are per-os/arch
-- Timing numbers for the resolution of each node
-- Single line UI for collecting and resolving nodes
 - Ability to select multiple targets at once
 - Run a debugger with -debug
+
+### Want
+
 - Cache registry data
-- Run tests as a single linked executable
 - Parallel builds
+- Single line UI for collecting and resolving nodes
+- Timing numbers for the resolution of each node
+- Run tests as a single linked executable
 
-# Chores
+## Chores
 
-- Fix for-loop usage to use for_each if possible.
-- Use valgrind to check memory leaks (or -fsanitize= with clang?)
-- Is it cool to pass strings in by value to copy them over in constructors?
+### Need
+
+- Fix for-loop usage to use for_each if possible
+
+### Pain
+
 - Error handling is terrible.
-- How do we throw errors in an OnSet call?
-- Profile - where are the bottle necks?
 - Logging is annoying to have to do printf style.
+- How do we throw errors in an OnSet call?
+- Is it cool to pass strings in by value to copy them over in constructors?
 
-# Bugs
+### Want
+
+- Profile - where are the bottle necks?
+- Use valgrind to check memory leaks (or -fsanitize= with clang?)
+
+## Bugs
 
 ### 00: Including header doesn't bring that header's include paths
 - This is because the exe consumer is pulling in a .o file that has not been
