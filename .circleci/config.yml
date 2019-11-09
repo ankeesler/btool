@@ -40,5 +40,5 @@ jobs:
             sudo apt-get update
             sudo apt-get install cf-cli
             cf --version
-      - run: cf login -u $CF_USERNAME -p $CF_PASSWORD -a api.run.pivotal.io
+      - run: cf login -u $CF_USERNAME -p $CF_PASSWORD -a api.run.pivotal.io -o akeesler-org -s development
       - run: ./script/cf-push.sh
