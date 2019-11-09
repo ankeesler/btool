@@ -3,6 +3,8 @@
 package cc
 
 import (
+	"strings"
+
 	"github.com/ankeesler/btool/app/collector"
 	"github.com/ankeesler/btool/node"
 	"github.com/pkg/errors"
@@ -40,4 +42,13 @@ func collectLabels(
 	}
 
 	return l, nil
+}
+
+func replaceExt(s, old, new string) string {
+	i := strings.LastIndex(s, old)
+	if i == -1 {
+		return s
+	}
+
+	return s[:i] + new
 }

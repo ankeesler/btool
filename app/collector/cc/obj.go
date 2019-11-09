@@ -2,7 +2,6 @@ package cc
 
 import (
 	"path/filepath"
-	"strings"
 
 	"github.com/ankeesler/btool/app/collector"
 	"github.com/ankeesler/btool/log"
@@ -45,7 +44,7 @@ func (o *Obj) Consume(s collector.Store, n *node.Node) error {
 		r = o.rf.NewCompileC(includePaths)
 	}
 
-	on := node.New(strings.ReplaceAll(n.Name, ext, ".o"))
+	on := node.New(replaceExt(n.Name, ext, ".o"))
 	on.Dependency(n)
 	on.Resolver = r
 

@@ -98,4 +98,22 @@ func TestObj(t *testing.T) {
 		assert.Equal(t, 0, rf.NewCompileCCallCount())
 		assert.Equal(t, 0, s.SetCallCount())
 	})
+
+	t.Run("FileWithDotC", func(t *testing.T) {
+		r := &nodefakes.FakeResolver{}
+
+		rf := &collectorfakes.FakeResolverFactory{}
+		rf.NewCompileCReturnsOnCall(0, r)
+		o := cc.NewObj(rf)
+
+		mainc := node.New("github.com/ankeesler/btool/example/BasicC/main.c")
+		s := testutil.FakeStore(mainc)
+		require.Nil(t, o.Consume(s, mainc))
+
+		assert.Equal(t, 1, s.SetCallCount())
+		maino := node.New("github.com/ankeesler/btool/example/BasicC/main.o")
+		maino.Dependency(mainc)
+		maino.Resolver = r
+		assert.Equal(t, maino, s.SetArgsForCall(0))
+	})
 }

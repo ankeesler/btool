@@ -91,7 +91,7 @@ func collectObjs(
 	ext string,
 	objs *[]*node.Node,
 ) error {
-	obj := s.Get(strings.ReplaceAll(n.Name, ext, ".o"))
+	obj := s.Get(replaceExt(n.Name, ext, ".o"))
 	if obj == nil {
 		return fmt.Errorf("no know object for %s", n)
 	}
