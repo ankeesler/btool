@@ -2,6 +2,9 @@
 
 The simplest C/C++ build tool.
 
+[![CircleCI](https://circleci.com/gh/ankeesler/btool/tree/master.svg?style=svg)](https://circleci.com/gh/ankeesler/btool/tree/master)
+
+
 ```
 $ ./btool -root /tmp/BasicC -target main
 $ /tmp/BasicC/main
