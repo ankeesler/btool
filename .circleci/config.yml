@@ -22,10 +22,10 @@ jobs:
       - checkout
 
       # specify any bash command here prefixed with `run: `
-      - run: ./script/really-test.sh
+      #- run: ./script/really-test.sh
 
       - setup_remote_docker
-      - run: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+      - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
       - run: ./script/build-container.sh btool
       - run: ./script/build-container.sh btoolregistry
       - run: ./script/push-container.sh btool
