@@ -90,7 +90,7 @@ int Cmd::RunChild(int stdout_fds[2], int stderr_fds[2]) {
   std::vector<const char *> args;
 
   args.push_back(path_.c_str());
-  for (auto &arg : args_) {
+  for (const auto &arg : args_) {
     args.push_back(arg.c_str());
   }
 

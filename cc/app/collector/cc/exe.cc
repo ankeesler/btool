@@ -105,7 +105,7 @@ void CollectLibraries(::btool::app::collector::Store *s, ::btool::node::Node *n,
         return Properties::Libraries(ps);
       });
 
-  for (auto lib_name : lib_names) {
+  for (const auto &lib_name : lib_names) {
     auto lib = s->Get(lib_name);
     if (lib == nullptr) {
       DEBUG("unknown lib for lib_name %s\n", lib_name.c_str());

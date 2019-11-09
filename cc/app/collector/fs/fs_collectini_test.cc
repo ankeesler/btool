@@ -37,8 +37,8 @@ class FSCollectiniTest : public ::testing::Test {
         "c.c",
         "d.go",
     };
-    for (auto dir : dirs) {
-      for (auto file : files) {
+    for (const auto &dir : dirs) {
+      for (const auto &file : files) {
         auto err = ::btool::util::fs::Exists(dir);
         ASSERT_FALSE(err) << err;
         if (!err.Ret()) {
@@ -92,7 +92,7 @@ TEST_F(FSCollectiniTest, Yeah) {
 
   };
 
-  for (auto f : yes) {
+  for (const auto &f : yes) {
     auto n = s.Get(::btool::util::fs::Join(Root(), f));
     EXPECT_TRUE(n != nullptr);
     EXPECT_TRUE(
@@ -104,7 +104,7 @@ TEST_F(FSCollectiniTest, Yeah) {
                 &s, n->name())));
   }
 
-  for (auto f : no) {
+  for (const auto &f : no) {
     auto n = s.Get(::btool::util::fs::Join(Root(), f));
     EXPECT_TRUE(n == nullptr);
   }

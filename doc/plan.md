@@ -24,8 +24,6 @@
 
 ### Need
 
-- Fix for-loop usage to use for_each if possible
-
 ### Pain
 
 - Error handling is terrible.

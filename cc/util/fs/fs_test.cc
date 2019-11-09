@@ -86,7 +86,7 @@ TEST(FS, Walk) {
       ::btool::util::fs::Join(dir, "dir1/dir1/a.c"),
       ::btool::util::fs::Join(dir, "dir1/dir1/b.h"),
   };
-  for (auto path : paths) {
+  for (const auto &path : paths) {
     auto dir = ::btool::util::fs::Dir(path);
     auto err = ::btool::util::fs::Exists(dir);
     ASSERT_FALSE(err) << err;

@@ -36,7 +36,7 @@ class FakeIncludesParser
   ::btool::core::VoidErr ParseIncludes(
       const std::string &name,
       std::function<void(const std::string &)> f) override {
-    for (auto include : includes_) {
+    for (const auto &include : includes_) {
       f(include);
     }
     return ::btool::core::VoidErr::Success();

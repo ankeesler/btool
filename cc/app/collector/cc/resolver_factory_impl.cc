@@ -33,14 +33,14 @@ class CompileResolver : public ::btool::node::Node::Resolver {
     cmd.Arg(n.name().c_str());
     cmd.Arg("-c");
     cmd.Arg(n.dependencies()->at(0)->name().c_str());
-    for (auto id : include_dirs_) {
+    for (const auto &id : include_dirs_) {
       std::string flag("-I" + id);
       cmd.Arg(flag.c_str());
     }
-    for (auto f : flags_) {
+    for (const auto &f : flags_) {
       cmd.Arg(f.c_str());
     }
-    for (auto f : more_flags_) {
+    for (const auto &f : more_flags_) {
       cmd.Arg(f.c_str());
     }
 
@@ -75,10 +75,10 @@ class LinkResolver : public ::btool::node::Node::Resolver {
     ::btool::util::Cmd cmd(linker_.c_str());
     cmd.Arg("-o");
     cmd.Arg(n.name().c_str());
-    for (auto d : *n.dependencies()) {
+    for (const auto &d : *n.dependencies()) {
       cmd.Arg(d->name().c_str());
     }
-    for (auto f : flags_) {
+    for (const auto &f : flags_) {
       cmd.Arg(f.c_str());
     }
 

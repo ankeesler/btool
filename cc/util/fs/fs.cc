@@ -171,7 +171,7 @@ std::string Ext(const std::string &path) {
   }
 
   dir_children.sort();
-  for (auto child : dir_children) {
+  for (const auto &child : dir_children) {
     auto err = Walk(Join(root, child), f);
     if (err) {
       return err;
@@ -179,7 +179,7 @@ std::string Ext(const std::string &path) {
   }
 
   file_children.sort();
-  for (auto child : file_children) {
+  for (const auto &child : file_children) {
     auto err = f(Join(root, child));
     if (err) {
       return err;
