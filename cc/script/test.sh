@@ -32,4 +32,4 @@ $BTOOL -loglevel error -run -target app/collector/fs/fs_collectini_test
 $BTOOL -loglevel error -run -target app/lister/lister_test
 $BTOOL -loglevel error -run -target app/runner/runner_test
 
-python integration/integration.py
+python integration/integration.py $BTOOL

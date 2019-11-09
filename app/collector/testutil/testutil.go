@@ -15,7 +15,6 @@ func FakeStore(initNodes ...*node.Node) *collectorfakes.FakeStore {
 	s := &collectorfakes.FakeStore{}
 	s.GetStub = func(name string) *node.Node {
 		return nodes[name]
-		return nil
 	}
 	s.ForEachStub = func(f func(*node.Node)) {
 		for _, n := range nodes {
