@@ -24,9 +24,20 @@ jobs:
       # specify any bash command here prefixed with `run: `
       #- run: ./script/really-test.sh
 
-      - setup_remote_docker
-      - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-      - run: ./script/build-container.sh btool
-      - run: ./script/build-container.sh btoolregistry
-      - run: ./script/push-container.sh btool
-      - run: ./script/push-container.sh btoolregistry
+     # - setup_remote_docker
+     # - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+     # - run: ./script/build-container.sh btool
+     # - run: ./script/build-container.sh btoolregistry
+     # - run: ./script/push-container.sh btool
+     # - run: ./script/push-container.sh btoolregistry
+      - run:
+          name: Install CF CLI
+          command: |
+            # ...first add the Cloud Foundry Foundation public key and package repository to your system
+            wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+            echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+            # ...then, update your local package index, then finally install the cf CLI
+            sudo apt-get update
+            sudo apt-get install cf-cli
+      - run: cf login --username $CF_USERNAME --password $CF_PASSWORD --api api.run.pivotal.io
+      - run: ./script/cf-push.sh
