@@ -15,15 +15,15 @@ class TestBtool(unittest.TestCase):
     def test_build(self):
         subprocess.check_call([btool, "-target", "btool"])
         subprocess.check_call(["mv", "btool", "/tmp/btool-from-go"])
-        subprocess.check_call(["./script/clean.sh"])
+        subprocess.check_call([btool, "-target", "btool", "-clean"])
 
         subprocess.check_call(["/tmp/btool-from-go", "-target", "btool"])
         subprocess.check_call(["mv", "btool", "/tmp/btool-from-cc"])
-        subprocess.check_call(["./script/clean.sh"])
+        subprocess.check_call(["/tmp/btool-from-go", "-target", "btool", "-clean"])
 
         subprocess.check_call(["/tmp/btool-from-cc", "-target", "btool"])
         subprocess.check_call(["mv", "btool", "/tmp/btool-from-cc-from-cc"])
-        subprocess.check_call(["./script/clean.sh"])
+        subprocess.check_call(["/tmp/btool-from-cc", "-target", "btool", "-clean"])
 
         subprocess.check_call(["/tmp/btool-from-cc-from-cc", "-target", "btool"])
         subprocess.check_call(["ls", "btool"])
