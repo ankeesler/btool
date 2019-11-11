@@ -13,8 +13,7 @@ namespace btool::app::collector::cc {
 
 class CompileResolver : public ::btool::node::Node::Resolver {
  public:
-  CompileResolver(const std::string &compiler,
-                  const std::vector<std::string> &flags,
+  CompileResolver(std::string compiler, std::vector<std::string> flags,
                   std::vector<std::string> include_dirs,
                   std::vector<std::string> more_flags)
       : compiler_(compiler),
@@ -35,13 +34,13 @@ class CompileResolver : public ::btool::node::Node::Resolver {
     cmd.Arg(n.dependencies()->at(0)->name().c_str());
     for (const auto &id : include_dirs_) {
       std::string flag("-I" + id);
-      cmd.Arg(flag.c_str());
+      cmd.Arg(flag);
     }
     for (const auto &f : flags_) {
-      cmd.Arg(f.c_str());
+      cmd.Arg(f);
     }
     for (const auto &f : more_flags_) {
-      cmd.Arg(f.c_str());
+      cmd.Arg(f);
     }
 
     std::ostringstream out;
@@ -60,26 +59,26 @@ class CompileResolver : public ::btool::node::Node::Resolver {
   }
 
  private:
-  const std::string &compiler_;
-  const std::vector<std::string> &flags_;
+  std::string compiler_;
+  std::vector<std::string> flags_;
   std::vector<std::string> include_dirs_;
   std::vector<std::string> more_flags_;
 };
 
 class LinkResolver : public ::btool::node::Node::Resolver {
  public:
-  LinkResolver(const std::string &linker, std::vector<std::string> flags)
+  LinkResolver(std::string linker, std::vector<std::string> flags)
       : linker_(linker), flags_(flags) {}
 
   ::btool::core::VoidErr Resolve(const ::btool::node::Node &n) override {
     ::btool::util::Cmd cmd(linker_.c_str());
     cmd.Arg("-o");
-    cmd.Arg(n.name().c_str());
+    cmd.Arg(n.name());
     for (const auto &d : *n.dependencies()) {
-      cmd.Arg(d->name().c_str());
+      cmd.Arg(d->name());
     }
     for (const auto &f : flags_) {
-      cmd.Arg(f.c_str());
+      cmd.Arg(f);
     }
 
     std::ostringstream out;
@@ -98,7 +97,7 @@ class LinkResolver : public ::btool::node::Node::Resolver {
   }
 
  private:
-  const std::string &linker_;
+  std::string linker_;
   std::vector<std::string> flags_;
 };
 
