@@ -3,4 +3,7 @@
 set -eou pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-docker run --rm -it -v "$PWD:/etc/btool-mount" -w /etc/btool-mount ankeesler/btool ./script/really-test.sh
+go vet ./...
+go test ./...
+go build -o /tmp/btool ./cmd/btool
+BTOOL=/tmp/btool ./cc/script/test.sh
