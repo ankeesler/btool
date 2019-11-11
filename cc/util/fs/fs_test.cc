@@ -147,3 +147,23 @@ TEST(FS, Walk) {
   void_err = ::btool::util::fs::RemoveAll(dir);
   EXPECT_FALSE(void_err) << void_err;
 }
+
+TEST(FS, Is) {
+  auto err = ::btool::util::fs::TempDir();
+  EXPECT_FALSE(err);
+
+  auto dir = err.Ret();
+  auto file = ::btool::util::fs::Join(dir, "a");
+  auto void_err = ::btool::util::fs::WriteFile(file, "hey\n");
+  ASSERT_FALSE(void_err) << void_err;
+
+  EXPECT_EQ(::btool::core::Err<bool>::Success(true),
+            ::btool::util::fs::IsDir(dir));
+  // EXPECT_FALSE(::btool::util::fs::IsFile(dir));
+
+  EXPECT_EQ(::btool::core::Err<bool>::Success(false),
+            ::btool::util::fs::IsDir(file));
+  // EXPECT_TRUE(::btool::util::fs::IsFile(file));
+
+  EXPECT_FALSE(::btool::util::fs::RemoveAll(dir));
+}

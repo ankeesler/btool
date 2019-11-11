@@ -22,12 +22,12 @@ void FSCollectini::Collect(::btool::app::collector::Store *s) {
 
   ::btool::util::fs::Walk(
       root_, [&](const std::string &path) -> ::btool::core::VoidErr {
-        auto err = ::btool::util::fs::IsFile(path);
+        auto err = ::btool::util::fs::IsDir(path);
         if (err) {
           return ::btool::core::VoidErr::Failure(err.Msg());
         }
 
-        if (err.Ret() &&
+        if (!err.Ret() &&
             (::btool::util::string::HasSuffix(path.c_str(), ".c") ||
              ::btool::util::string::HasSuffix(path.c_str(), ".cc") ||
              ::btool::util::string::HasSuffix(path.c_str(), ".h"))) {

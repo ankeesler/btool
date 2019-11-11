@@ -61,6 +61,8 @@ int main(int argc, const char *argv[]) {
   std::string target = "main";
   f.String("target", &target);
 
+  bool clean = false;
+  f.Bool("clean", &clean);
   bool list = false;
   f.Bool("list", &list);
 
@@ -112,7 +114,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::runner::Runner runner(&ui);
 
   ::btool::app::App a(&collector, &cleaner, &lister, &builder, &runner);
-  auto err = a.Run(root_target, false, list, false);
+  auto err = a.Run(root_target, clean, list, false);
   if (err) {
     ERROR("%s\n", err.Msg());
     return 1;

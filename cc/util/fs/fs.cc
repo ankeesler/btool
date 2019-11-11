@@ -98,6 +98,18 @@ std::string Ext(const std::string &path) {
 }
 
 ::btool::core::VoidErr RemoveAll(const std::string &path) {
+  auto err = IsDir(path);
+  if (err) {
+    return ::btool::core::VoidErr::Failure(err.Msg());
+  }
+
+  if (!err.Ret()) {
+    if (::remove(path.c_str()) == -1) {
+      return ::btool::core::VoidErr::Failure(strerror(errno));
+    }
+    return ::btool::core::VoidErr::Success();
+  }
+
   return Walk(path, [](const std::string &path) -> ::btool::core::VoidErr {
     if (::remove(path.c_str()) == -1) {
       return ::btool::core::VoidErr::Failure(strerror(errno));
@@ -126,19 +138,17 @@ std::string Ext(const std::string &path) {
   return ::btool::core::Err<bool>::Success(exists);
 }
 
-::btool::core::Err<bool> IsFile(const std::string &path) {
-  bool is_file = true;
+::btool::core::Err<bool> IsDir(const std::string &path) {
+  bool is_dir = false;
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
-    if (errno == ENOENT) {
-      is_file = false;
-    } else {
+    if (errno != ENOENT) {
       return ::btool::core::Err<bool>::Failure(strerror(errno));
     }
   } else {
-    is_file = (((s.st_mode & S_IFMT) & S_IFREG) != 0);
+    is_dir = (((s.st_mode & S_IFMT) & S_IFDIR) != 0);
   }
-  return ::btool::core::Err<bool>::Success(is_file);
+  return ::btool::core::Err<bool>::Success(is_dir);
 }
 
 ::btool::core::VoidErr Walk(

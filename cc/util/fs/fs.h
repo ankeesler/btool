@@ -24,7 +24,7 @@ std::string Ext(const std::string &path);
 ::btool::core::VoidErr Mkdir(const std::string &path);
 
 ::btool::core::Err<bool> Exists(const std::string &path);
-::btool::core::Err<bool> IsFile(const std::string &path);
+::btool::core::Err<bool> IsDir(const std::string &path);
 
 // Walk
 //
@@ -32,6 +32,8 @@ std::string Ext(const std::string &path);
 //
 // Walk will return any error it encounters when reading filesystem nodes, or
 // the error that is returned from the provided handler function, f.
+//
+// Walk must be provided a directory as a root!
 ::btool::core::VoidErr Walk(
     const std::string &root,
     std::function<::btool::core::VoidErr(const std::string &)> f);
