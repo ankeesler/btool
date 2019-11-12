@@ -50,7 +50,7 @@ TEST(FS, File) {
   auto dir = err.Ret();
   auto file = ::btool::util::fs::Join(dir, "a");
   EXPECT_TRUE(::btool::util::fs::ReadFile(file));
-  EXPECT_TRUE(::btool::util::fs::RemoveAll(file));
+  EXPECT_FALSE(::btool::util::fs::RemoveAll(file));
 
   auto void_err =
       ::btool::util::fs::WriteFile(file, "this is text\nwith multiple lines\n");

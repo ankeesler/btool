@@ -98,12 +98,17 @@ std::string Ext(const std::string &path) {
 }
 
 ::btool::core::VoidErr RemoveAll(const std::string &path) {
-  auto err = IsDir(path);
+  auto err = Exists(path);
   if (err) {
     return ::btool::core::VoidErr::Failure(err.Msg());
+  } else if (!err.Ret()) {
+    return ::btool::core::VoidErr::Success();
   }
 
-  if (!err.Ret()) {
+  err = IsDir(path);
+  if (err) {
+    return ::btool::core::VoidErr::Failure(err.Msg());
+  } else if (!err.Ret()) {
     if (::remove(path.c_str()) == -1) {
       return ::btool::core::VoidErr::Failure(strerror(errno));
     }
