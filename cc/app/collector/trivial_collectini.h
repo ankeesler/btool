@@ -12,7 +12,7 @@ namespace btool::app::collector {
 
 class TrivialCollectini : public BaseCollectini {
  public:
-  TrivialCollectini(const std::string &name) : name_(name) {}
+  TrivialCollectini(std::string name) : name_(name) {}
 
   void Collect(Store *s) override {
     s->Put(name_);
@@ -20,7 +20,7 @@ class TrivialCollectini : public BaseCollectini {
   }
 
  private:
-  const std::string &name_;
+  std::string name_;
 };
 
 };  // namespace btool::app::collector

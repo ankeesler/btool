@@ -11,7 +11,7 @@ namespace btool::app::collector::fs {
 
 class FSCollectini : public ::btool::app::collector::BaseCollectini {
  public:
-  FSCollectini(const std::string &root) : root_(root) {}
+  FSCollectini(std::string root) : root_(root) {}
 
   void Collect(::btool::app::collector::Store *) override;
 

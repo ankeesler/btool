@@ -10,20 +10,15 @@ namespace btool::util {
 
 class Flags {
  public:
-  void Bool(const char *name, bool *value) { bools_[name] = value; }
-  void String(const char *name, std::string *value) { strings_[name] = value; }
+  void Bool(std::string name, bool *value) { bools_[name] = value; }
+  void String(std::string name, std::string *value) { strings_[name] = value; }
 
   // Returns true on success.
   bool Parse(int argc, const char *argv[], std::string *err);
 
  private:
-  struct cmp_str {
-    bool operator()(const char *a, const char *b) const {
-      return ::strcmp(a, b) < 0;
-    }
-  };
-  std::map<const char *, bool *, cmp_str> bools_;
-  std::map<const char *, std::string *, cmp_str> strings_;
+  std::map<std::string, bool *> bools_;
+  std::map<std::string, std::string *> strings_;
 };
 
 };  // namespace btool::util

@@ -31,7 +31,7 @@ class MockIncludesParser
 class FakeIncludesParser
     : public ::btool::app::collector::cc::Inc::IncludesParser {
  public:
-  void AddInclude(const std::string &include) { includes_.push_back(include); }
+  void AddInclude(std::string include) { includes_.push_back(include); }
 
   ::btool::core::VoidErr ParseIncludes(
       const std::string &name,

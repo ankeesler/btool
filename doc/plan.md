@@ -29,12 +29,13 @@
 - Error handling is terrible.
 - Logging is annoying to have to do printf style.
 - How do we throw errors in an OnSet call?
-- Is it cool to pass strings in by value to copy them over in constructors?
 
 ### Want
 
 - Profile - where are the bottle necks?
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
+- Constant strings should be const char *?
+- CollectStringsProperties should return a list of references to original string data?
 
 ## Bugs
 
