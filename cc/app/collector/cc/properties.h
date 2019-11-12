@@ -42,9 +42,9 @@ class Properties {
   }
 
  private:
-  static const std::string kIncludePaths;
-  static const std::string kLinkFlags;
-  static const std::string kLibraries;
+  static const char *kIncludePaths;
+  static const char *kLinkFlags;
+  static const char *kLibraries;
 };
 
 };  // namespace btool::app::collector::cc

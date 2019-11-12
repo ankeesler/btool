@@ -32,17 +32,17 @@
 const static std::string version_string = "0.0.2";
 
 #ifdef __linux__
-const std::string compiler_c = "gcc";
-const std::string compiler_cc = "g++";
-const std::string archiver = "ar";
-const std::string linker_c = "gcc";
-const std::string linker_cc = "g++";
+static const char *compiler_c = "gcc";
+static const char *compiler_cc = "g++";
+static const char *archiver = "ar";
+static const char *linker_c = "gcc";
+static const char *linker_cc = "g++";
 #elif __APPLE__
-const std::string compiler_c = "clang";
-const std::string compiler_cc = "clang++";
-const std::string archiver = "ar";
-const std::string linker_c = "clang";
-const std::string linker_cc = "clang++";
+static const char *compiler_c = "clang";
+static const char *compiler_cc = "clang++";
+static const char *archiver = "ar";
+static const char *linker_c = "clang";
+static const char *linker_cc = "clang++";
 #else
 #error "unknown platform"
 #endif

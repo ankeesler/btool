@@ -22,7 +22,7 @@ class Properties {
   }
 
  private:
-  static const std::string kLocal;
+  static const char *kLocal;
 };
 
 const std::vector<std::string> *ReadStringsProperty(

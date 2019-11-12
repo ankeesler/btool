@@ -34,8 +34,6 @@
 
 - Profile - where are the bottle necks?
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
-- Constant strings should be const char *?
-- CollectStringsProperties should return a list of references to original string data?
 
 ## Bugs
 
