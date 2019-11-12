@@ -9,7 +9,7 @@ jobs:
     working_directory: /go/src/github.com/ankeesler/btool
     steps:
       - checkout
-      - run: ./script/really-test.sh
+      - run: ./script/test.sh
       - setup_remote_docker
       - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
       - run: ./script/build-container.sh btool
