@@ -4,13 +4,13 @@
 #include <string>
 
 #include "cleaner.h"
-#include "core/err.h"
+#include "err.h"
 
 namespace btool::app::cleaner {
 
 class RemoveAllerImpl : public Cleaner::RemoveAller {
  public:
-  ::btool::core::VoidErr RemoveAll(const std::string &path) override;
+  ::btool::VoidErr RemoveAll(const std::string &path) override;
 };
 
 };  // namespace btool::app::cleaner

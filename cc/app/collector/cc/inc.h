@@ -8,7 +8,7 @@
 
 #include "app/collector/base_collectini.h"
 #include "app/collector/store.h"
-#include "core/err.h"
+#include "err.h"
 
 namespace btool::app::collector::cc {
 
@@ -17,7 +17,7 @@ class Inc : public ::btool::app::collector::BaseCollectini {
   class IncludesParser {
    public:
     virtual ~IncludesParser() {}
-    virtual ::btool::core::VoidErr ParseIncludes(
+    virtual ::btool::VoidErr ParseIncludes(
         const std::string &path,
         std::function<void(const std::string &)> callback) = 0;
   };

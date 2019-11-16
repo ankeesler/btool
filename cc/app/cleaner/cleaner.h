@@ -4,7 +4,7 @@
 #include <string>
 
 #include "app/app.h"
-#include "core/err.h"
+#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::cleaner {
@@ -14,12 +14,12 @@ class Cleaner : public ::btool::app::App::Cleaner {
   class RemoveAller {
    public:
     virtual ~RemoveAller() {}
-    virtual ::btool::core::VoidErr RemoveAll(const std::string &path) = 0;
+    virtual ::btool::VoidErr RemoveAll(const std::string &path) = 0;
   };
 
   Cleaner(RemoveAller *ra) : ra_(ra){};
 
-  ::btool::core::VoidErr Clean(const ::btool::node::Node &node) override;
+  ::btool::VoidErr Clean(const ::btool::node::Node &node) override;
 
  private:
   RemoveAller *ra_;

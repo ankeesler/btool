@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-namespace btool::core {
+namespace btool {
 
 std::ostream &operator<<(std::ostream &os, const VoidErr &err) {
   if (err) {
@@ -13,4 +13,4 @@ std::ostream &operator<<(std::ostream &os, const VoidErr &err) {
   return os;
 }
 
-};  // namespace btool::core
+};  // namespace btool

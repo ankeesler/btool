@@ -7,7 +7,7 @@ if [[ -z "$BTOOL" ]]; then
 fi 
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-$BTOOL -loglevel error -run -target core/err_test
+$BTOOL -loglevel error -run -target err_test
 
 $BTOOL -loglevel error -run -target util/cmd_test
 $BTOOL -loglevel error -run -target util/flags_test

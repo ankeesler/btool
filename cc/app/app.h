@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "core/err.h"
+#include "err.h"
 #include "node/node.h"
 
 namespace btool::app {
@@ -13,32 +13,32 @@ class App {
   class Collector {
    public:
     virtual ~Collector() {}
-    virtual ::btool::core::Err<::btool::node::Node *> Collect(
+    virtual ::btool::Err<::btool::node::Node *> Collect(
         const std::string &name) = 0;
   };
 
   class Cleaner {
    public:
     virtual ~Cleaner() {}
-    virtual ::btool::core::VoidErr Clean(const ::btool::node::Node &) = 0;
+    virtual ::btool::VoidErr Clean(const ::btool::node::Node &) = 0;
   };
 
   class Lister {
    public:
     virtual ~Lister() {}
-    virtual ::btool::core::VoidErr List(const ::btool::node::Node &) = 0;
+    virtual ::btool::VoidErr List(const ::btool::node::Node &) = 0;
   };
 
   class Builder {
    public:
     virtual ~Builder() {}
-    virtual ::btool::core::VoidErr Build(const ::btool::node::Node &) = 0;
+    virtual ::btool::VoidErr Build(const ::btool::node::Node &) = 0;
   };
 
   class Runner {
    public:
     virtual ~Runner() {}
-    virtual ::btool::core::VoidErr Run(const ::btool::node::Node &) = 0;
+    virtual ::btool::VoidErr Run(const ::btool::node::Node &) = 0;
   };
 
   App(Collector *collector, Cleaner *cleaner, Lister *lister, Builder *builder,
@@ -49,7 +49,7 @@ class App {
         builder_(builder),
         runner_(runner) {}
 
-  ::btool::core::VoidErr Run(const std::string &target, bool clean, bool list,
+  ::btool::VoidErr Run(const std::string &target, bool clean, bool list,
                              bool run);
 
  private:

@@ -20,7 +20,7 @@
 #include "app/collector/trivial_collectini.h"
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
-#include "core/err.h"
+#include "err.h"
 #include "core/log.h"
 #include "ui/ui.h"
 #include "util/flags.h"

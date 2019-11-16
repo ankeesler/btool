@@ -14,7 +14,7 @@
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
-#include "core/err.h"
+#include "err.h"
 #include "node/testing/node.h"
 
 using ::testing::ElementsAre;

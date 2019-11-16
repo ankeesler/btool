@@ -2,14 +2,14 @@
 
 #include <string>
 
-#include "core/err.h"
+#include "err.h"
 #include "core/log.h"
 #include "node/node.h"
 
 namespace btool::app::cleaner {
 
-::btool::core::VoidErr Cleaner::Clean(const ::btool::node::Node& node) {
-  ::btool::core::VoidErr err;
+::btool::VoidErr Cleaner::Clean(const ::btool::node::Node& node) {
+  ::btool::VoidErr err;
 
   node.Visit([&](const ::btool::node::Node* n) {
     if (!err && n->resolver() != nullptr) {

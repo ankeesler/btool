@@ -27,6 +27,19 @@
 ### Pain
 
 - Error handling is terrible.
+  - Pains:
+    - Too many lines of code to get return value from
+    - Hard to see exactly where an error came from...
+    - Annoying to have to declare multiple variable names to just hold err's
+    - VoidErr is misleading - what is "void" about it?
+  - Solutions:
+    - Offer Wrap utility to add on context where error came from
+    - VoidErr
+      - bool w/ err pointer parameter output value
+      - std::unique_ptr<std::string>
+      - Err class with no copy constructor, but instead Wrap
+    - Err
+      - bool with err pointer and return parameter output value
 - Logging is annoying to have to do printf style.
 - How do we throw errors in an OnSet call?
 

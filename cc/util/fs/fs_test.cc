@@ -5,7 +5,7 @@
 
 #include "gtest/gtest.h"
 
-#include "core/err.h"
+#include "err.h"
 
 TEST(FS, Base) {
   EXPECT_EQ("", ::btool::util::fs::Base(""));
@@ -139,7 +139,7 @@ TEST(FS, Walk) {
   auto void_err =
       ::btool::util::fs::Walk(dir, [&ac_visits](const std::string &path) {
         ac_visits.push_back(path);
-        return ::btool::core::VoidErr::Success();
+        return ::btool::VoidErr::Success();
       });
   EXPECT_FALSE(void_err) << void_err;
   EXPECT_EQ(ex_visits, ac_visits);
@@ -157,11 +157,11 @@ TEST(FS, Is) {
   auto void_err = ::btool::util::fs::WriteFile(file, "hey\n");
   ASSERT_FALSE(void_err) << void_err;
 
-  EXPECT_EQ(::btool::core::Err<bool>::Success(true),
+  EXPECT_EQ(::btool::Err<bool>::Success(true),
             ::btool::util::fs::IsDir(dir));
   // EXPECT_FALSE(::btool::util::fs::IsFile(dir));
 
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false),
+  EXPECT_EQ(::btool::Err<bool>::Success(false),
             ::btool::util::fs::IsDir(file));
   // EXPECT_TRUE(::btool::util::fs::IsFile(file));
 

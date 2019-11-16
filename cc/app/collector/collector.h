@@ -6,7 +6,7 @@
 
 #include "app/app.h"
 #include "app/collector/store.h"
-#include "core/err.h"
+#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::collector {
@@ -22,7 +22,7 @@ class Collector : public ::btool::app::App::Collector {
   Collector(Store *s) : s_(s) {}
 
   void AddCollectini(Collectini *c) { cs_.push_back(c); }
-  ::btool::core::Err<::btool::node::Node *> Collect(
+  ::btool::Err<::btool::node::Node *> Collect(
       const std::string &target) override;
 
  private:

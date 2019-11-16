@@ -6,7 +6,7 @@
 #include "app/collector/base_collectini.h"
 #include "app/collector/collector.h"
 #include "app/collector/store.h"
-#include "core/err.h"
+#include "err.h"
 
 namespace btool::app::collector {
 

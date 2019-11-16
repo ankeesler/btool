@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "app/collector/store.h"
-#include "core/err.h"
+#include "err.h"
 
 using ::testing::_;
 

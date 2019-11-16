@@ -6,7 +6,7 @@
 
 namespace btool::app::cleaner {
 
-::btool::core::VoidErr RemoveAllerImpl::RemoveAll(const std::string &path) {
+::btool::VoidErr RemoveAllerImpl::RemoveAll(const std::string &path) {
   return ::btool::util::fs::RemoveAll(path);
 }
 

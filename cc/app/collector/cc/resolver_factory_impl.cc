@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "core/err.h"
+#include "err.h"
 #include "core/log.h"
 #include "node/node.h"
 #include "util/cmd.h"
@@ -21,9 +21,9 @@ class CompileResolver : public ::btool::node::Node::Resolver {
         include_dirs_(include_dirs),
         more_flags_(more_flags) {}
 
-  ::btool::core::VoidErr Resolve(const ::btool::node::Node &n) override {
+  ::btool::VoidErr Resolve(const ::btool::node::Node &n) override {
     if (n.dependencies()->empty()) {
-      return ::btool::core::VoidErr::Failure(
+      return ::btool::VoidErr::Failure(
           "must have at least one dependency");
     }
 
@@ -54,8 +54,8 @@ class CompileResolver : public ::btool::node::Node::Resolver {
     DEBUG("err: %s\n", err.str().c_str());
 
     return (ec == 0
-                ? ::btool::core::VoidErr::Success()
-                : ::btool::core::VoidErr::Failure("failed to run compiler"));
+                ? ::btool::VoidErr::Success()
+                : ::btool::VoidErr::Failure("failed to run compiler"));
   }
 
  private:
@@ -70,7 +70,7 @@ class LinkResolver : public ::btool::node::Node::Resolver {
   LinkResolver(std::string linker, std::vector<std::string> flags)
       : linker_(linker), flags_(flags) {}
 
-  ::btool::core::VoidErr Resolve(const ::btool::node::Node &n) override {
+  ::btool::VoidErr Resolve(const ::btool::node::Node &n) override {
     ::btool::util::Cmd cmd(linker_.c_str());
     cmd.Arg("-o");
     cmd.Arg(n.name());
@@ -92,8 +92,8 @@ class LinkResolver : public ::btool::node::Node::Resolver {
     DEBUG("err: %s\n", err.str().c_str());
 
     return (ec == 0
-                ? ::btool::core::VoidErr::Success()
-                : ::btool::core::VoidErr::Failure("failed to run compiler"));
+                ? ::btool::VoidErr::Success()
+                : ::btool::VoidErr::Failure("failed to run compiler"));
   }
 
  private:

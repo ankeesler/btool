@@ -2,14 +2,14 @@
 #define BTOOL_APP_BUILDER_CURRENTERIMPL_H_
 
 #include "builder.h"
-#include "core/err.h"
+#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::builder {
 
 class CurrenterImpl : public Builder::Currenter {
  public:
-  ::btool::core::Err<bool> Current(const ::btool::node::Node &node) override;
+  ::btool::Err<bool> Current(const ::btool::node::Node &node) override;
 };
 
 };  // namespace btool::app::builder

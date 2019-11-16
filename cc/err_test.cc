@@ -5,20 +5,20 @@
 
 #include "gtest/gtest.h"
 
-static ::btool::core::Err<int> IntSuccess() {
-  return ::btool::core::Err<int>::Success(5);
+static ::btool::Err<int> IntSuccess() {
+  return ::btool::Err<int>::Success(5);
 }
 
-static ::btool::core::Err<int> IntFailure() {
-  return ::btool::core::Err<int>::Failure("oh no");
+static ::btool::Err<int> IntFailure() {
+  return ::btool::Err<int>::Failure("oh no");
 }
 
-static ::btool::core::VoidErr VoidSuccess() {
-  return ::btool::core::VoidErr::Success();
+static ::btool::VoidErr VoidSuccess() {
+  return ::btool::VoidErr::Success();
 }
 
-static ::btool::core::VoidErr VoidFailure() {
-  return ::btool::core::VoidErr::Failure("bummer");
+static ::btool::VoidErr VoidFailure() {
+  return ::btool::VoidErr::Failure("bummer");
 }
 
 class Tuna {
@@ -33,13 +33,13 @@ std::ostream &operator<<(std::ostream &os, const Tuna &tuna) {
   return os;
 }
 
-static ::btool::core::Err<Tuna> TunaSuccess() {
+static ::btool::Err<Tuna> TunaSuccess() {
   Tuna t;
-  return ::btool::core::Err<Tuna>::Success(t);
+  return ::btool::Err<Tuna>::Success(t);
 }
 
-static ::btool::core::Err<Tuna> TunaFailure() {
-  return ::btool::core::Err<Tuna>::Failure("no bueno");
+static ::btool::Err<Tuna> TunaFailure() {
+  return ::btool::Err<Tuna>::Failure("no bueno");
 }
 
 TEST(Err, Int) {
@@ -55,15 +55,15 @@ TEST(Err, Int) {
 
   EXPECT_NE(s, f);
 
-  auto fa0 = ::btool::core::Err<int>::Failure("nope-0");
-  auto fb0 = ::btool::core::Err<int>::Failure("nope-0");
-  auto fa1 = ::btool::core::Err<int>::Failure("nope-1");
+  auto fa0 = ::btool::Err<int>::Failure("nope-0");
+  auto fb0 = ::btool::Err<int>::Failure("nope-0");
+  auto fa1 = ::btool::Err<int>::Failure("nope-1");
   EXPECT_EQ(fa0, fb0);
   EXPECT_NE(fa0, fa1);
 
-  auto sa0 = ::btool::core::Err<int>::Success(0);
-  auto sb0 = ::btool::core::Err<int>::Success(0);
-  auto sa1 = ::btool::core::Err<int>::Success(1);
+  auto sa0 = ::btool::Err<int>::Success(0);
+  auto sb0 = ::btool::Err<int>::Success(0);
+  auto sa1 = ::btool::Err<int>::Success(1);
   EXPECT_EQ(sa0, sb0);
   EXPECT_NE(sa0, sa1);
 }
@@ -80,8 +80,8 @@ TEST(Err, Void) {
 
   EXPECT_NE(s, f);
 
-  ::btool::core::VoidErr err;
-  EXPECT_EQ(err, ::btool::core::VoidErr::Success());
+  ::btool::VoidErr err;
+  EXPECT_EQ(err, ::btool::VoidErr::Success());
   EXPECT_EQ(err, s);
 }
 

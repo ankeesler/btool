@@ -2,23 +2,23 @@
 
 #include <string>
 
-#include "core/err.h"
+#include "err.h"
 #include "core/log.h"
 #include "node/node.h"
 
 namespace btool::app {
 
-::btool::core::VoidErr App::Run(const std::string &target, bool clean,
+::btool::VoidErr App::Run(const std::string &target, bool clean,
                                 bool list, bool run) {
   auto collect_err = collector_->Collect(target);
   if (collect_err) {
-    return ::btool::core::VoidErr::Failure(collect_err.Msg());
+    return ::btool::VoidErr::Failure(collect_err.Msg());
   }
 
   ::btool::node::Node *n = collect_err.Ret();
   DEBUG("collected graph from root %s\n", n->name().c_str());
 
-  ::btool::core::VoidErr err;
+  ::btool::VoidErr err;
   if (clean) {
     err = cleaner_->Clean(*n);
     if (err) {

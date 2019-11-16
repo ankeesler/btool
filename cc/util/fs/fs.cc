@@ -48,20 +48,20 @@ std::string Ext(const std::string &path) {
   return "";
 }
 
-::btool::core::Err<std::string> TempDir() {
+::btool::Err<std::string> TempDir() {
   char s[] = "/tmp/btool_XXXXXX";
   char *dir = ::mkdtemp(s);
   if (dir == NULL) {
-    return ::btool::core::Err<std::string>::Failure("mkdtemp");
+    return ::btool::Err<std::string>::Failure("mkdtemp");
   } else {
-    return ::btool::core::Err<std::string>::Success(dir);
+    return ::btool::Err<std::string>::Success(dir);
   }
 }
 
-::btool::core::Err<std::string> ReadFile(const std::string &path) {
+::btool::Err<std::string> ReadFile(const std::string &path) {
   FILE *f = ::fopen(path.c_str(), "r");
   if (f == nullptr) {
-    return ::btool::core::Err<std::string>::Failure(strerror(errno));
+    return ::btool::Err<std::string>::Failure(strerror(errno));
   }
 
   std::string content;
@@ -71,7 +71,7 @@ std::string Ext(const std::string &path) {
     ::size_t count = ::fread(buf, 1, buf_size, f);
     content.append(buf, count);
     if (ferror(f)) {
-      return ::btool::core::Err<std::string>::Failure(strerror(errno));
+      return ::btool::Err<std::string>::Failure(strerror(errno));
     } else if (feof(f)) {
       break;
     }
@@ -79,92 +79,92 @@ std::string Ext(const std::string &path) {
 
   fclose(f);
 
-  return ::btool::core::Err<std::string>::Success(content);
+  return ::btool::Err<std::string>::Success(content);
 }
 
-::btool::core::VoidErr WriteFile(const std::string &path,
+::btool::VoidErr WriteFile(const std::string &path,
                                  const std::string &content) {
   std::ofstream ofs(path);
   if (!ofs) {
-    return ::btool::core::VoidErr::Failure(strerror(errno));
+    return ::btool::VoidErr::Failure(strerror(errno));
   }
 
   ofs << content;
   if (!ofs) {
-    return ::btool::core::VoidErr::Failure(strerror(errno));
+    return ::btool::VoidErr::Failure(strerror(errno));
   }
 
-  return ::btool::core::VoidErr::Success();
+  return ::btool::VoidErr::Success();
 }
 
-::btool::core::VoidErr RemoveAll(const std::string &path) {
+::btool::VoidErr RemoveAll(const std::string &path) {
   auto err = Exists(path);
   if (err) {
-    return ::btool::core::VoidErr::Failure(err.Msg());
+    return ::btool::VoidErr::Failure(err.Msg());
   } else if (!err.Ret()) {
-    return ::btool::core::VoidErr::Success();
+    return ::btool::VoidErr::Success();
   }
 
   err = IsDir(path);
   if (err) {
-    return ::btool::core::VoidErr::Failure(err.Msg());
+    return ::btool::VoidErr::Failure(err.Msg());
   } else if (!err.Ret()) {
     if (::remove(path.c_str()) == -1) {
-      return ::btool::core::VoidErr::Failure(strerror(errno));
+      return ::btool::VoidErr::Failure(strerror(errno));
     }
-    return ::btool::core::VoidErr::Success();
+    return ::btool::VoidErr::Success();
   }
 
-  return Walk(path, [](const std::string &path) -> ::btool::core::VoidErr {
+  return Walk(path, [](const std::string &path) -> ::btool::VoidErr {
     if (::remove(path.c_str()) == -1) {
-      return ::btool::core::VoidErr::Failure(strerror(errno));
+      return ::btool::VoidErr::Failure(strerror(errno));
     }
-    return ::btool::core::VoidErr::Success();
+    return ::btool::VoidErr::Success();
   });
 }
 
-::btool::core::VoidErr Mkdir(const std::string &path) {
+::btool::VoidErr Mkdir(const std::string &path) {
   if (::mkdir(path.c_str(), 0700) == -1) {
-    return ::btool::core::VoidErr::Failure(strerror(errno));
+    return ::btool::VoidErr::Failure(strerror(errno));
   }
-  return ::btool::core::VoidErr::Success();
+  return ::btool::VoidErr::Success();
 }
 
-::btool::core::Err<bool> Exists(const std::string &path) {
+::btool::Err<bool> Exists(const std::string &path) {
   bool exists = true;
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
     if (errno == ENOENT) {
       exists = false;
     } else {
-      return ::btool::core::Err<bool>::Failure(strerror(errno));
+      return ::btool::Err<bool>::Failure(strerror(errno));
     }
   }
-  return ::btool::core::Err<bool>::Success(exists);
+  return ::btool::Err<bool>::Success(exists);
 }
 
-::btool::core::Err<bool> IsDir(const std::string &path) {
+::btool::Err<bool> IsDir(const std::string &path) {
   bool is_dir = false;
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
     if (errno != ENOENT) {
-      return ::btool::core::Err<bool>::Failure(strerror(errno));
+      return ::btool::Err<bool>::Failure(strerror(errno));
     }
   } else {
     is_dir = (((s.st_mode & S_IFMT) & S_IFDIR) != 0);
   }
-  return ::btool::core::Err<bool>::Success(is_dir);
+  return ::btool::Err<bool>::Success(is_dir);
 }
 
-::btool::core::VoidErr Walk(
+::btool::VoidErr Walk(
     const std::string &root,
-    std::function<::btool::core::VoidErr(const std::string &)> f) {
+    std::function<::btool::VoidErr(const std::string &)> f) {
   DEBUG("walk %s\n", root.c_str());
 
   ::DIR *dir = ::opendir(root.c_str());
   if (dir == nullptr) {
     DEBUG("opendir: %s\n", ::strerror(errno));
-    return ::btool::core::VoidErr::Failure("opendir");
+    return ::btool::VoidErr::Failure("opendir");
   }
 
   std::list<std::string> dir_children, file_children;
@@ -182,7 +182,7 @@ std::string Ext(const std::string &path) {
 
   if (::closedir(dir) == -1) {
     DEBUG("closedir: %s\n", ::strerror(errno));
-    return ::btool::core::VoidErr::Failure("closedir");
+    return ::btool::VoidErr::Failure("closedir");
   }
 
   dir_children.sort();
@@ -206,6 +206,6 @@ std::string Ext(const std::string &path) {
     return err;
   }
 
-  return ::btool::core::VoidErr::Success();
+  return ::btool::VoidErr::Success();
 }
 };  // namespace btool::util::fs

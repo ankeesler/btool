@@ -1,12 +1,12 @@
-#ifndef BTOOL_CORE_ERR_H_
-#define BTOOL_CORE_ERR_H_
+#ifndef BTOOL_ERR_H_
+#define BTOOL_ERR_H_
 
 #include <cstring>
 
 #include <iostream>
 #include <string>
 
-namespace btool::core {
+namespace btool {
 
 // Err
 //
@@ -117,6 +117,6 @@ class VoidErr {
 
 std::ostream &operator<<(std::ostream &os, const VoidErr &err);
 
-};  // namespace btool::core
+};  // namespace btool
 
-#endif  // BTOOL_CORE_ERR_H_
+#endif  // BTOOL_ERR_H_

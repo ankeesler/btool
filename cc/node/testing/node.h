@@ -8,14 +8,14 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "core/err.h"
+#include "err.h"
 #include "node/node.h"
 
 namespace btool::node::testing {
 
 class MockResolver : public ::btool::node::Node::Resolver {
  public:
-  MOCK_METHOD1(Resolve, ::btool::core::VoidErr(const ::btool::node::Node &));
+  MOCK_METHOD1(Resolve, ::btool::VoidErr(const ::btool::node::Node &));
 };
 
 class NodeTest : public ::testing::Test {

@@ -4,7 +4,7 @@
 #include <string>
 
 #include "app/app.h"
-#include "core/err.h"
+#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::runner {
@@ -19,7 +19,7 @@ class Runner : public ::btool::app::App::Runner {
 
   Runner(Callback *cb) : cb_(cb) {}
 
-  ::btool::core::VoidErr Run(const ::btool::node::Node &node) override;
+  ::btool::VoidErr Run(const ::btool::node::Node &node) override;
 
  private:
   Callback *cb_;

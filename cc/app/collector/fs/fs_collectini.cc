@@ -9,7 +9,7 @@
 
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
-#include "core/err.h"
+#include "err.h"
 #include "core/log.h"
 #include "node/node.h"
 #include "util/fs/fs.h"
@@ -21,10 +21,10 @@ void FSCollectini::Collect(::btool::app::collector::Store *s) {
   std::vector<::btool::node::Node *> nodes;
 
   ::btool::util::fs::Walk(
-      root_, [&](const std::string &path) -> ::btool::core::VoidErr {
+      root_, [&](const std::string &path) -> ::btool::VoidErr {
         auto err = ::btool::util::fs::IsDir(path);
         if (err) {
-          return ::btool::core::VoidErr::Failure(err.Msg());
+          return ::btool::VoidErr::Failure(err.Msg());
         }
 
         if (!err.Ret() &&
@@ -37,7 +37,7 @@ void FSCollectini::Collect(::btool::app::collector::Store *s) {
           nodes.push_back(n);
         }
 
-        return ::btool::core::VoidErr::Success();
+        return ::btool::VoidErr::Success();
       });
 
   for (auto n : nodes) {

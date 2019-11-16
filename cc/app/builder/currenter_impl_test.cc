@@ -46,62 +46,62 @@ TEST_F(CurrenterTest, NoDeps) {
   ::btool::app::builder::CurrenterImpl ci;
 
   auto err = ci.Current(tmpd_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   NodeFile nf(tmpd_);
   nf.Modify();
 
   err = ci.Current(tmpd_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
 }
 
 TEST_F(CurrenterTest, AdjacentDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
   auto err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   NodeFile nfd(tmpd_);
   err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   NodeFile nfc(tmpc_);
   err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
 
   nfd.Modify();
   err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   nfc.Modify();
   err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
 }
 
 TEST_F(CurrenterTest, AncestorDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
   auto err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   NodeFile nfd(tmpd_);
   NodeFile nfc(tmpc_);
   err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   NodeFile nfb(tmpb_);
   err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
 
   nfd.Modify();
   err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   nfc.Modify();
   err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(false), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
 
   nfb.Modify();
   err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::core::Err<bool>::Success(true), err);
+  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
 }
