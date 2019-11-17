@@ -1,7 +1,9 @@
 #ifndef BTOOL_LOG_H_
 #define BTOOL_LOG_H_
 
+#include <iostream>
 #include <ostream>
+#include <string>
 
 namespace btool {
 
@@ -15,13 +17,27 @@ void Errorf(const char *, int, const char *, ...);
 
 class Log {
  public:
+  enum Level {
+    kUnknown,
+    kDebug,
+    kInfo,
+    kError,
+  };
+
   static std::ostream *Debug;
   static std::ostream *Info;
   static std::ostream *Error;
+
+  static Level ParseLevel(const std::string &loglevel);
+  static void SetCurrentLevel(Level level);
+  static bool IsLevelEnabled(Level level) { return level >= CurrentLevel; }
+
+ private:
+  static Level CurrentLevel;
 };
 
-#define LOGS(s, area) \
-  (s) << "btool | " << area << " | " << __FILE__ << ':' << __LINE__ << " | "
+#define LOGS(log, area) \
+  (log) << "btool | " << (area) << " | " << __FILE__ << ':' << __LINE__ << " | "
 
 #define DEBUGS() LOGS(*::btool::Log::Debug, "debug")
 #define INFOS() LOGS(*::btool::Log::Info, "info")

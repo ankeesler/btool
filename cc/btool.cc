@@ -53,8 +53,8 @@ int main(int argc, const char *argv[]) {
   bool version = false;
   f.Bool("version", &version);
 
-  bool debug = false;
-  f.Bool("debug", &debug);
+  std::string loglevel = "info";
+  f.String("loglevel", &loglevel);
 
   std::string root = ".";
   f.String("root", &root);
@@ -72,6 +72,13 @@ int main(int argc, const char *argv[]) {
     ERROR("parse flags: %s\n", err_s.c_str());
     return 1;
   }
+
+  ::btool::Log::Level l = ::btool::Log::ParseLevel(loglevel);
+  if (l == ::btool::Log::kUnknown) {
+    ERRORS() << "couldn't parse log level: " << loglevel << std::endl;
+    return 1;
+  }
+  ::btool::Log::SetCurrentLevel(l);
 
   if (version) {
     INFO("version %s\n", version_string.c_str());
