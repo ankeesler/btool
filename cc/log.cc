@@ -1,9 +1,9 @@
-#include "core/log.h"
+#include "log.h"
 
 #include <cstdarg>
 #include <cstdio>
 
-namespace btool::core {
+namespace btool {
 
 static void logf(const char *file, int line, const char *area,
                  const char *format, va_list args);
@@ -39,4 +39,4 @@ static void logf(const char *file, int line, const char *area,
   ::fflush(stderr);
 }
 
-};  // namespace btool::core
+};  // namespace btool

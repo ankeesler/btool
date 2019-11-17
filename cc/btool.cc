@@ -21,7 +21,7 @@
 #include "app/lister/lister.h"
 #include "app/runner/runner.h"
 #include "err.h"
-#include "core/log.h"
+#include "log.h"
 #include "ui/ui.h"
 #include "util/flags.h"
 #include "util/fs/fs.h"

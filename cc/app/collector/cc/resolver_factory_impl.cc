@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "err.h"
-#include "core/log.h"
+#include "log.h"
 #include "node/node.h"
 #include "util/cmd.h"
 

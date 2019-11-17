@@ -8,7 +8,7 @@
 #include "app/collector/cc/properties.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
-#include "core/log.h"
+#include "log.h"
 #include "node/node.h"
 #include "util/fs/fs.h"
 #include "util/string/string.h"

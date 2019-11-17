@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "core/log.h"
+#include "log.h"
 
 namespace btool::util {
 

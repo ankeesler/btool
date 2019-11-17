@@ -7,7 +7,7 @@
 #include <cstring>
 #include <ostream>
 
-#include "core/log.h"
+#include "log.h"
 
 namespace btool::util {
 
