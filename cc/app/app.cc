@@ -16,7 +16,7 @@ namespace btool::app {
   }
 
   ::btool::node::Node *n = collect_err.Ret();
-  DEBUG("collected graph from root %s\n", n->name().c_str());
+  DEBUGS() << "collected graph from root " << n->name() << std::endl;
 
   ::btool::VoidErr err;
   if (clean) {

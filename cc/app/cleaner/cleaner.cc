@@ -13,7 +13,7 @@ namespace btool::app::cleaner {
 
   node.Visit([&](const ::btool::node::Node* n) {
     if (!err && n->resolver() != nullptr) {
-      DEBUG("cleaning %s\n", n->name().c_str());
+      DEBUGS() << "cleaning " << n->name() << std::endl;
       err = ra_->RemoveAll(n->name());
     }
   });

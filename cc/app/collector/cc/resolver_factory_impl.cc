@@ -49,8 +49,8 @@ class CompileResolver : public ::btool::node::Node::Resolver {
 
     int ec = cmd.Run();
 
-    DEBUG("out: %s\n", out.str().c_str());
-    DEBUG("err: %s\n", err.str().c_str());
+    DEBUGS() << "out: " << out.str() << std::endl;
+    DEBUGS() << "err: " << err.str() << std::endl;
 
     return (ec == 0 ? ::btool::VoidErr::Success()
                     : ::btool::VoidErr::Failure("failed to run compiler"));

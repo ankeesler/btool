@@ -12,25 +12,28 @@
 
 namespace btool::app::collector::cc {
 
+#define DROP(name, reason) \
+  DEBUGS() << "obj: drop " << (name) << " (" << reason << ")" << std::endl
+
 void CollectIncludePaths(::btool::node::Node *n,
                          std::vector<std::string> *include_paths);
 
 void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   auto d = s->Get(name);
   if (d == nullptr) {
-    DEBUG("obj: drop %s (unknown name)\n", name.c_str());
+    DROP(name, "unknown name");
     return;
   }
 
   if (!::btool::app::collector::Properties::Local(d->property_store())) {
-    DEBUG("obj: drop %s (not local)\n", name.c_str());
+    DROP(name, "not local");
     return;
   }
 
   bool c = ::btool::util::string::HasSuffix(name.c_str(), ".c");
   bool cc = ::btool::util::string::HasSuffix(name.c_str(), ".cc");
   if (!c && !cc) {
-    DEBUG("obj: drop %s (not .c/.cc)\n", name.c_str());
+    DROP(name, "not .c/.cc");
     return;
   }
 

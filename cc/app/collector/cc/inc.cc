@@ -42,7 +42,7 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
         updated = updated || new_stuff;
       });
   if (err) {
-    DEBUG("failed to parse includes %s\n", err.Msg());
+    DEBUGS() << "failed to parse includes " << err.Msg() << std::endl;
     assert(0);
   }
 
@@ -53,15 +53,15 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
 
 static bool HandleInclude(::btool::app::collector::Store *s,
                           ::btool::node::Node *n, const std::string &include) {
-  DEBUG("handling include %s\n", include.c_str());
+  DEBUGS() << "handling include " << include << std::endl;
 
   ::btool::node::Node *d = nullptr;
   std::string include_path;
 
   for (auto it : *s) {
     auto sn = it.second;
-    DEBUG("does node %s end in include %s\n", sn->name().c_str(),
-          include.c_str());
+    DEBUGS() << "does node " << sn->name() << "end in include " << include
+             << "? " << std::endl;
     if (::btool::util::string::HasSuffix(sn->name().c_str(), include.c_str())) {
       d = sn;
 
@@ -71,14 +71,15 @@ static bool HandleInclude(::btool::app::collector::Store *s,
       } else {
         include_path = sn->name().substr(0, index);
       }
-      DEBUG("yes, and the include path is %s\n", include_path.c_str());
+      DEBUGS() << "yes, and the include path is" << include_path << std::endl;
       break;
     }
+    DEBUGS() << "nope" << std::endl;
   }
 
   if (d == nullptr) {
-    DEBUG("cannot resolve include %s for node %s\n", include.c_str(),
-          n->name().c_str());
+    DEBUGS() << "cannot resolve include " << include << "for node " << n->name()
+             << std::endl;
     return false;
   }
 

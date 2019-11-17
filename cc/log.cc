@@ -3,7 +3,14 @@
 #include <cstdarg>
 #include <cstdio>
 
+#include <iostream>
+#include <ostream>
+
 namespace btool {
+
+std::ostream *Log::Debug = &std::cerr;
+std::ostream *Log::Info = &std::cerr;
+std::ostream *Log::Error = &std::cerr;
 
 static void logf(const char *file, int line, const char *area,
                  const char *format, va_list args);
