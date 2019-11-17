@@ -23,8 +23,7 @@ class CompileResolver : public ::btool::node::Node::Resolver {
 
   ::btool::VoidErr Resolve(const ::btool::node::Node &n) override {
     if (n.dependencies()->empty()) {
-      return ::btool::VoidErr::Failure(
-          "must have at least one dependency");
+      return ::btool::VoidErr::Failure("must have at least one dependency");
     }
 
     ::btool::util::Cmd cmd(compiler_.c_str());
@@ -53,9 +52,8 @@ class CompileResolver : public ::btool::node::Node::Resolver {
     DEBUG("out: %s\n", out.str().c_str());
     DEBUG("err: %s\n", err.str().c_str());
 
-    return (ec == 0
-                ? ::btool::VoidErr::Success()
-                : ::btool::VoidErr::Failure("failed to run compiler"));
+    return (ec == 0 ? ::btool::VoidErr::Success()
+                    : ::btool::VoidErr::Failure("failed to run compiler"));
   }
 
  private:
@@ -91,9 +89,8 @@ class LinkResolver : public ::btool::node::Node::Resolver {
     DEBUG("out: %s\n", out.str().c_str());
     DEBUG("err: %s\n", err.str().c_str());
 
-    return (ec == 0
-                ? ::btool::VoidErr::Success()
-                : ::btool::VoidErr::Failure("failed to run compiler"));
+    return (ec == 0 ? ::btool::VoidErr::Success()
+                    : ::btool::VoidErr::Failure("failed to run compiler"));
   }
 
  private:

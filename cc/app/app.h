@@ -50,7 +50,7 @@ class App {
         runner_(runner) {}
 
   ::btool::VoidErr Run(const std::string &target, bool clean, bool list,
-                             bool run);
+                       bool run);
 
  private:
   Collector *collector_;

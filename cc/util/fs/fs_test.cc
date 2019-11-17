@@ -157,12 +157,10 @@ TEST(FS, Is) {
   auto void_err = ::btool::util::fs::WriteFile(file, "hey\n");
   ASSERT_FALSE(void_err) << void_err;
 
-  EXPECT_EQ(::btool::Err<bool>::Success(true),
-            ::btool::util::fs::IsDir(dir));
+  EXPECT_EQ(::btool::Err<bool>::Success(true), ::btool::util::fs::IsDir(dir));
   // EXPECT_FALSE(::btool::util::fs::IsFile(dir));
 
-  EXPECT_EQ(::btool::Err<bool>::Success(false),
-            ::btool::util::fs::IsDir(file));
+  EXPECT_EQ(::btool::Err<bool>::Success(false), ::btool::util::fs::IsDir(file));
   // EXPECT_TRUE(::btool::util::fs::IsFile(file));
 
   EXPECT_FALSE(::btool::util::fs::RemoveAll(dir));

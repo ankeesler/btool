@@ -14,8 +14,7 @@ class Builder : public ::btool::app::App::Builder {
   class Currenter {
    public:
     virtual ~Currenter() {}
-    virtual ::btool::Err<bool> Current(
-        const ::btool::node::Node &node) = 0;
+    virtual ::btool::Err<bool> Current(const ::btool::node::Node &node) = 0;
   };
 
   Builder(Currenter *c) : c_(c) {}

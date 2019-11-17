@@ -18,8 +18,7 @@ namespace btool::app::builder {
 static ::btool::Err<ssize_t> GetModTime(const ::btool::node::Node &node);
 static ssize_t ComputeModTimeNS(struct ::timespec *ts);
 
-::btool::Err<bool> CurrenterImpl::Current(
-    const ::btool::node::Node &node) {
+::btool::Err<bool> CurrenterImpl::Current(const ::btool::node::Node &node) {
   auto node_mod_time_err = GetModTime(node);
   if (node_mod_time_err) {
     return ::btool::Err<bool>::Failure(node_mod_time_err.Msg());

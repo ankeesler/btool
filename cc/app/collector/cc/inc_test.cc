@@ -23,9 +23,9 @@ using ::testing::StrictMock;
 class MockIncludesParser
     : public ::btool::app::collector::cc::Inc::IncludesParser {
  public:
-  MOCK_METHOD2(ParseIncludes, ::btool::VoidErr(
-                                  const std::string &,
-                                  std::function<void(const std::string &)>));
+  MOCK_METHOD2(ParseIncludes,
+               ::btool::VoidErr(const std::string &,
+                                std::function<void(const std::string &)>));
 };
 
 class FakeIncludesParser

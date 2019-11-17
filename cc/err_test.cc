@@ -5,17 +5,13 @@
 
 #include "gtest/gtest.h"
 
-static ::btool::Err<int> IntSuccess() {
-  return ::btool::Err<int>::Success(5);
-}
+static ::btool::Err<int> IntSuccess() { return ::btool::Err<int>::Success(5); }
 
 static ::btool::Err<int> IntFailure() {
   return ::btool::Err<int>::Failure("oh no");
 }
 
-static ::btool::VoidErr VoidSuccess() {
-  return ::btool::VoidErr::Success();
-}
+static ::btool::VoidErr VoidSuccess() { return ::btool::VoidErr::Success(); }
 
 static ::btool::VoidErr VoidFailure() {
   return ::btool::VoidErr::Failure("bummer");

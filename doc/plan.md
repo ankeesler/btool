@@ -47,6 +47,7 @@
 
 - Profile - where are the bottle necks?
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
+- Check that files are linted in ci.
 
 ## Bugs
 

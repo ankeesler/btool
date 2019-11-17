@@ -8,8 +8,8 @@
 
 namespace btool::app {
 
-::btool::VoidErr App::Run(const std::string &target, bool clean,
-                                bool list, bool run) {
+::btool::VoidErr App::Run(const std::string &target, bool clean, bool list,
+                          bool run) {
   auto collect_err = collector_->Collect(target);
   if (collect_err) {
     return ::btool::VoidErr::Failure(collect_err.Msg());

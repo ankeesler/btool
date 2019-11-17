@@ -83,7 +83,7 @@ std::string Ext(const std::string &path) {
 }
 
 ::btool::VoidErr WriteFile(const std::string &path,
-                                 const std::string &content) {
+                           const std::string &content) {
   std::ofstream ofs(path);
   if (!ofs) {
     return ::btool::VoidErr::Failure(strerror(errno));
@@ -156,9 +156,8 @@ std::string Ext(const std::string &path) {
   return ::btool::Err<bool>::Success(is_dir);
 }
 
-::btool::VoidErr Walk(
-    const std::string &root,
-    std::function<::btool::VoidErr(const std::string &)> f) {
+::btool::VoidErr Walk(const std::string &root,
+                      std::function<::btool::VoidErr(const std::string &)> f) {
   DEBUG("walk %s\n", root.c_str());
 
   ::DIR *dir = ::opendir(root.c_str());

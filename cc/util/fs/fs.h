@@ -16,8 +16,7 @@ std::string Ext(const std::string &path);
 ::btool::Err<std::string> TempDir();
 
 ::btool::Err<std::string> ReadFile(const std::string &path);
-::btool::VoidErr WriteFile(const std::string &path,
-                                 const std::string &content);
+::btool::VoidErr WriteFile(const std::string &path, const std::string &content);
 
 ::btool::VoidErr RemoveAll(const std::string &path);
 
@@ -34,9 +33,8 @@ std::string Ext(const std::string &path);
 // the error that is returned from the provided handler function, f.
 //
 // Walk must be provided a directory as a root!
-::btool::VoidErr Walk(
-    const std::string &root,
-    std::function<::btool::VoidErr(const std::string &)> f);
+::btool::VoidErr Walk(const std::string &root,
+                      std::function<::btool::VoidErr(const std::string &)> f);
 
 };  // namespace btool::util::fs
 
