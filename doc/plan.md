@@ -40,8 +40,6 @@
       - Err class with no copy constructor, but instead Wrap
     - Err
       - bool with err pointer and return parameter output value
-- Logging is annoying to have to do printf style.
-- How do we throw errors in an OnSet call?
 
 ### Want
 

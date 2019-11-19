@@ -24,7 +24,6 @@ class Inc : public ::btool::app::collector::BaseCollectini {
 
   Inc(IncludesParser *ip) : ip_(ip) {}
 
-  void Collect(::btool::app::collector::Store *) override {}
   void OnNotify(::btool::app::collector::Store *s,
                 const std::string &name) override;
 

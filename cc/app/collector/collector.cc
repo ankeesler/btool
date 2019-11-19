@@ -1,6 +1,10 @@
 #include "collector.h"
 
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 
 #include "app/collector/store.h"
 #include "err.h"
@@ -13,6 +17,15 @@ namespace btool::app::collector {
     const std::string &target) {
   for (auto c : cs_) {
     c->Collect(s_);
+
+    auto errors = c->Errors();
+    if (!errors.empty()) {
+      std::stringstream ss{"collect errors:"};
+      std::for_each(errors.begin(), errors.end(), [&ss](const std::string &s) {
+        ss << std::endl << s;
+      });
+      return ::btool::Err<::btool::node::Node *>::Failure(ss.str().c_str());
+    }
   }
 
   auto n = s_->Get(target);

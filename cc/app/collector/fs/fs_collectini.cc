@@ -20,7 +20,7 @@ namespace btool::app::collector::fs {
 void FSCollectini::Collect(::btool::app::collector::Store *s) {
   std::vector<::btool::node::Node *> nodes;
 
-  ::btool::util::fs::Walk(
+  auto err = ::btool::util::fs::Walk(
       root_, [&](const std::string &path) -> ::btool::VoidErr {
         auto err = ::btool::util::fs::IsDir(path);
         if (err) {
@@ -39,6 +39,11 @@ void FSCollectini::Collect(::btool::app::collector::Store *s) {
 
         return ::btool::VoidErr::Success();
       });
+
+  if (err) {
+    AddError(err.Msg());
+    return;
+  }
 
   for (auto n : nodes) {
     Notify(s, n->name());

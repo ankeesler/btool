@@ -13,7 +13,6 @@ class Obj : public ::btool::app::collector::BaseCollectini {
  public:
   Obj(::btool::app::collector::cc::ResolverFactory *rf) : rf_(rf) {}
 
-  void Collect(::btool::app::collector::Store *s) override {}
   void OnNotify(::btool::app::collector::Store *s,
                 const std::string &name) override;
 

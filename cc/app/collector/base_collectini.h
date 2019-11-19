@@ -2,6 +2,7 @@
 #define BTOOL_APP_COLLECTOR_BASECOLLECTINI_H_
 
 #include <algorithm>
+#include <string>
 #include <vector>
 
 #include "app/collector/collector.h"
@@ -20,8 +21,13 @@ class BaseCollectini : public Collector::Collectini {
     }
   }
 
+  virtual void Collect(Store *) override {}
+  std::vector<std::string> Errors() override { return errors_; }
+
  protected:
   virtual void OnNotify(Store *s, const std::string &name) {}
+
+  void AddError(std::string error) { errors_.push_back(error); }
 
   void Notify(Store *s, const std::string &name) {
     for (auto c : collectinis) {
@@ -33,6 +39,8 @@ class BaseCollectini : public Collector::Collectini {
 
  private:
   static std::vector<BaseCollectini *> collectinis;
+
+  std::vector<std::string> errors_;
 };
 
 };  // namespace btool::app::collector

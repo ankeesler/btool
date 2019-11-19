@@ -17,6 +17,7 @@ class Collector : public ::btool::app::App::Collector {
    public:
     virtual ~Collectini() {}
     virtual void Collect(Store *) = 0;
+    virtual std::vector<std::string> Errors() = 0;
   };
 
   Collector(Store *s) : s_(s) {}

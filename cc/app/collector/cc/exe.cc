@@ -1,7 +1,5 @@
 #include "app/collector/cc/exe.h"
 
-#include <cassert>
-
 #include <string>
 #include <vector>
 
@@ -16,11 +14,6 @@
 
 namespace btool::app::collector::cc {
 
-void CollectObjects(::btool::app::collector::Store *s, ::btool::node::Node *n,
-                    const std::string &ext,
-                    std::vector<::btool::node::Node *> *objs);
-void CollectLibraries(::btool::app::collector::Store *s, ::btool::node::Node *n,
-                      std::vector<::btool::node::Node *> *libs);
 void CollectLinkFlags(::btool::node::Node *n, std::vector<std::string> *flags);
 
 void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
@@ -39,19 +32,23 @@ void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
     ext = ".cc";
     src = s->Get(name + ext);
     if (src == nullptr) {
-      DEBUGS() << "cannot find source for exe " << name << std::endl;
-      assert(0);
+      AddError("cannot find source for exe " + name);
+      return;
     }
   }
 
   std::vector<::btool::node::Node *> objs;
-  CollectObjects(s, src, ext, &objs);
+  if (!CollectObjects(s, src, ext, &objs)) {
+    return;
+  }
   for (auto obj : objs) {
     n->dependencies()->push_back(obj);
   }
 
   std::vector<::btool::node::Node *> libs;
-  CollectLibraries(s, n, &libs);
+  if (!CollectLibraries(s, n, &libs)) {
+    return;
+  }
   for (auto lib : libs) {
     n->dependencies()->push_back(lib);
   }
@@ -65,19 +62,19 @@ void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   Notify(s, n->name());
 }
 
-void CollectObjects(::btool::app::collector::Store *s, ::btool::node::Node *n,
-                    const std::string &ext,
-                    std::vector<::btool::node::Node *> *objs) {
+bool Exe::CollectObjects(::btool::app::collector::Store *s,
+                         ::btool::node::Node *n, const std::string &ext,
+                         std::vector<::btool::node::Node *> *objs) {
   DEBUGS() << "collect from src " << n->name() << std::endl;
 
   auto obj_name = ::btool::util::string::Replace(n->name(), ext, ".o");
   auto obj = s->Get(obj_name);
   if (obj == nullptr) {
-    DEBUGS() << "cannot find obj for obj name " << obj_name << std::endl;
-    assert(0);
+    AddError("cannot find obj for obj name " + obj_name);
+    return false;
   }
   if (::btool::util::Contains(*objs, obj)) {
-    return;
+    return true;
   }
   objs->push_back(obj);
 
@@ -89,14 +86,20 @@ void CollectObjects(::btool::app::collector::Store *s, ::btool::node::Node *n,
       if (src == nullptr) {
         DEBUGS() << "no src for src_name " << src_name << std::endl;
       } else {
-        CollectObjects(s, src, ext, objs);
+        bool success = CollectObjects(s, src, ext, objs);
+        if (!success) {
+          return false;
+        }
       }
     }
   }
+
+  return true;
 }
 
-void CollectLibraries(::btool::app::collector::Store *s, ::btool::node::Node *n,
-                      std::vector<::btool::node::Node *> *libs) {
+bool Exe::CollectLibraries(::btool::app::collector::Store *s,
+                           ::btool::node::Node *n,
+                           std::vector<::btool::node::Node *> *libs) {
   std::vector<std::string> lib_names;
   ::btool::app::collector::CollectStringsProperties(
       n, &lib_names,
@@ -108,12 +111,14 @@ void CollectLibraries(::btool::app::collector::Store *s, ::btool::node::Node *n,
   for (const auto &lib_name : lib_names) {
     auto lib = s->Get(lib_name);
     if (lib == nullptr) {
-      DEBUGS() << "unknown lib for lib_name " << lib_name << std::endl;
-      assert(0);
+      AddError("unknown lib for lib_name " + lib_name);
+      return false;
     }
 
     libs->push_back(lib);
   }
+
+  return true;
 }
 
 void CollectLinkFlags(::btool::node::Node *n, std::vector<std::string> *flags) {

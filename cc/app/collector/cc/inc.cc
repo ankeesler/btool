@@ -1,7 +1,5 @@
 #include "app/collector/cc/inc.h"
 
-#include <cassert>
-
 #include <algorithm>
 #include <string>
 
@@ -42,8 +40,9 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
         updated = updated || new_stuff;
       });
   if (err) {
-    DEBUGS() << "failed to parse includes " << err.Msg() << std::endl;
-    assert(0);
+    std::string error = "failed to parse includes " + std::string(err.Msg());
+    AddError(error);
+    return;
   }
 
   if (updated) {
