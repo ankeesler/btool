@@ -1,9 +1,8 @@
 #ifndef BTOOL_ERR_H_
 #define BTOOL_ERR_H_
 
-#include <cstring>
-
 #include <iostream>
+#include <optional>
 #include <string>
 
 namespace btool {
@@ -19,16 +18,16 @@ namespace btool {
 template <typename T>
 class Err {
  public:
-  Err<T>(T ret) : ret_(ret), msg_(nullptr) {}
+  Err<T>(T ret) : ret_(ret), msg_(std::nullopt) {}
 
   static Err<T> Success(T ret) {
     Err<T> err;
     err.ret_ = ret;
-    err.msg_ = nullptr;
+    err.msg_ = std::nullopt;
     return err;
   }
 
-  static Err<T> Failure(const char *msg) {
+  static Err<T> Failure(std::string msg) {
     Err<T> err;
     err.msg_ = msg;
     return err;
@@ -42,7 +41,7 @@ class Err {
 
   bool operator==(const Err<T> &err) const {
     if (*this) {
-      return err && (::strcmp(msg_, err.msg_) == 0);
+      return err && msg_ == err.msg_;
     } else {
       return !err && ret_ == err.ret_;
     }
@@ -50,16 +49,16 @@ class Err {
 
   bool operator!=(const Err<T> &err) const { return !(*this == err); }
 
-  operator bool() const { return msg_ != nullptr; }
+  operator bool() const { return msg_.has_value(); }
 
   T Ret() const { return ret_; }
-  const char *Msg() const { return msg_; }
+  std::string Msg() const { return msg_.value(); }
 
  private:
   Err<T>() {}
 
   T ret_;
-  const char *msg_;
+  std::optional<std::string> msg_;
 };
 
 template <typename T>
@@ -79,17 +78,17 @@ class VoidErr {
  public:
   static VoidErr Success() {
     VoidErr err;
-    err.msg_ = nullptr;
+    err.msg_ = std::nullopt;
     return err;
   }
 
-  static VoidErr Failure(const char *msg) {
+  static VoidErr Failure(std::string msg) {
     VoidErr err;
     err.msg_ = msg;
     return err;
   }
 
-  VoidErr() : msg_(nullptr) {}
+  VoidErr() : msg_(std::nullopt) {}
 
   VoidErr(VoidErr &err) = default;
   VoidErr &operator=(VoidErr &err) = default;
@@ -99,7 +98,7 @@ class VoidErr {
 
   bool operator==(const VoidErr &err) const {
     if (*this) {
-      return err && (::strcmp(msg_, err.msg_) == 0);
+      return err && msg_ == err.msg_;
     } else {
       return !err;
     }
@@ -107,12 +106,12 @@ class VoidErr {
 
   bool operator!=(const VoidErr &err) const { return !(*this == err); }
 
-  operator bool() const { return msg_ != nullptr; }
+  operator bool() const { return msg_.has_value(); }
 
-  const char *Msg() const { return msg_; }
+  std::string Msg() const { return msg_.value(); }
 
  private:
-  const char *msg_;
+  std::optional<std::string> msg_;
 };
 
 std::ostream &operator<<(std::ostream &os, const VoidErr &err);

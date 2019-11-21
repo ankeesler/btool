@@ -32,6 +32,7 @@
     - Hard to see exactly where an error came from...
     - Annoying to have to declare multiple variable names to just hold err's
     - VoidErr is misleading - what is "void" about it?
+    - Every time we update one class, we have to update the other.
   - Solutions:
     - Offer Wrap utility to add on context where error came from
     - VoidErr
