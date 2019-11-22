@@ -4,7 +4,6 @@
 #include <string>
 
 #include "app/app.h"
-#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::builder {
@@ -14,12 +13,13 @@ class Builder : public ::btool::app::App::Builder {
   class Currenter {
    public:
     virtual ~Currenter() {}
-    virtual ::btool::Err<bool> Current(const ::btool::node::Node &node) = 0;
+    virtual bool Current(const ::btool::node::Node &node, bool *ret_current,
+                         std::string *ret_err) = 0;
   };
 
   Builder(Currenter *c) : c_(c) {}
 
-  ::btool::VoidErr Build(const ::btool::node::Node &node) override;
+  bool Build(const ::btool::node::Node &node, std::string *ret_err) override;
 
  private:
   Currenter *c_;

@@ -8,42 +8,42 @@
 
 namespace btool::app {
 
-::btool::VoidErr App::Run(const std::string &target, bool clean, bool list,
-                          bool run) {
-  auto collect_err = collector_->Collect(target);
-  if (collect_err) {
-    return ::btool::VoidErr::Failure(collect_err.Msg());
+bool App::Run(const std::string &target, bool clean, bool list, bool run,
+              std::string *ret_err) {
+  ::btool::node::Node *n = nullptr;
+  std::string err;
+  if (!collector_->Collect(target, &n, &err)) {
+    *ret_err = ::btool::WrapErr(err, "collect");
+    return true;
   }
 
-  ::btool::node::Node *n = collect_err.Ret();
   DEBUGS() << "collected graph from root " << n->name() << std::endl;
 
-  ::btool::VoidErr err;
   if (clean) {
-    err = cleaner_->Clean(*n);
-    if (err) {
-      return err;
+    if (!cleaner_->Clean(*n, &err)) {
+      *ret_err = ::btool::WrapErr(err, "clean");
+      return false;
     }
   } else if (list) {
-    err = lister_->List(*n);
-    if (err) {
-      return err;
+    if (!lister_->List(*n, &err)) {
+      *ret_err = ::btool::WrapErr(err, "list");
+      return false;
     }
   } else {
-    err = builder_->Build(*n);
-    if (err) {
-      return err;
+    if (!builder_->Build(*n, &err)) {
+      *ret_err = ::btool::WrapErr(err, "build");
+      return false;
     }
 
     if (run) {
-      err = runner_->Run(*n);
-      if (err) {
-        return err;
+      if (!runner_->Run(*n, &err)) {
+        *ret_err = ::btool::WrapErr(err, "run");
+        return false;
       }
     }
   }
 
-  return err;
+  return true;
 }
 
 };  // namespace btool::app

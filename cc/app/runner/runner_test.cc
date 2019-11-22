@@ -1,5 +1,7 @@
 #include "runner.h"
 
+#include <string>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -18,7 +20,8 @@ TEST(Runner, Success) {
   EXPECT_CALL(mcb, OnRun(Ref(n)));
 
   ::btool::app::runner::Runner r(&mcb);
-  EXPECT_FALSE(r.Run(n));
+  std::string err;
+  EXPECT_TRUE(r.Run(n, &err)) << "error: " << err;
 }
 
 TEST(Runner, Failure) {
@@ -32,5 +35,6 @@ TEST(Runner, Failure) {
   EXPECT_CALL(mcb, OnRun(Ref(n)));
 
   ::btool::app::runner::Runner r(&mcb);
-  EXPECT_TRUE(r.Run(n));
+  std::string err;
+  EXPECT_FALSE(r.Run(n, &err));
 }

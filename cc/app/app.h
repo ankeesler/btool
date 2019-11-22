@@ -13,32 +13,32 @@ class App {
   class Collector {
    public:
     virtual ~Collector() {}
-    virtual ::btool::Err<::btool::node::Node *> Collect(
-        const std::string &name) = 0;
+    virtual bool Collect(const std::string &name, ::btool::node::Node **ret_n,
+                         std::string *ret_err) = 0;
   };
 
   class Cleaner {
    public:
     virtual ~Cleaner() {}
-    virtual ::btool::VoidErr Clean(const ::btool::node::Node &) = 0;
+    virtual bool Clean(const ::btool::node::Node &, std::string *ret_err) = 0;
   };
 
   class Lister {
    public:
     virtual ~Lister() {}
-    virtual ::btool::VoidErr List(const ::btool::node::Node &) = 0;
+    virtual bool List(const ::btool::node::Node &, std::string *ret_err) = 0;
   };
 
   class Builder {
    public:
     virtual ~Builder() {}
-    virtual ::btool::VoidErr Build(const ::btool::node::Node &) = 0;
+    virtual bool Build(const ::btool::node::Node &, std::string *ret_err) = 0;
   };
 
   class Runner {
    public:
     virtual ~Runner() {}
-    virtual ::btool::VoidErr Run(const ::btool::node::Node &) = 0;
+    virtual bool Run(const ::btool::node::Node &, std::string *ret_err) = 0;
   };
 
   App(Collector *collector, Cleaner *cleaner, Lister *lister, Builder *builder,
@@ -49,8 +49,8 @@ class App {
         builder_(builder),
         runner_(runner) {}
 
-  ::btool::VoidErr Run(const std::string &target, bool clean, bool list,
-                       bool run);
+  bool Run(const std::string &target, bool clean, bool list, bool run,
+           std::string *ret_err);
 
  private:
   Collector *collector_;

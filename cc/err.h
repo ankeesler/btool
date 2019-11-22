@@ -7,6 +7,10 @@
 
 namespace btool {
 
+inline std::string WrapErr(std::string wrapped, std::string wrapper) {
+  return wrapper + std::string(": ") + wrapped;
+}
+
 // Err
 //
 // Err is an error message + return value pair. Only one of these is active at

@@ -7,7 +7,6 @@
 #include "gtest/gtest.h"
 
 #include "app/collector/store.h"
-#include "err.h"
 
 using ::testing::_;
 using ::testing::HasSubstr;
@@ -38,9 +37,10 @@ TEST(Collector, Pass) {
   c.AddCollectini(&c1);
   c.AddCollectini(&c2);
 
-  auto err = c.Collect("some/node");
-  EXPECT_FALSE(err);
-  EXPECT_EQ(n, err.Ret());
+  ::btool::node::Node *ret_n;
+  std::string ret_err;
+  EXPECT_TRUE(c.Collect("some/node", &ret_n, &ret_err)) << "error: " << ret_err;
+  EXPECT_EQ(n, ret_n);
 }
 
 TEST(Collector, Fail) {
@@ -62,7 +62,9 @@ TEST(Collector, Fail) {
   c.AddCollectini(&c1);
   c.AddCollectini(&c2);
 
-  auto err = c.Collect("some/node");
-  EXPECT_TRUE(err);
-  EXPECT_THAT(err.Msg(), HasSubstr("some error"));
+  ::btool::node::Node *ret_n;
+  std::string ret_err;
+  EXPECT_FALSE(c.Collect("some/node", &ret_n, &ret_err))
+      << "error: " << ret_err;
+  EXPECT_THAT(ret_err, HasSubstr("collect errors:\nsome error"));
 }

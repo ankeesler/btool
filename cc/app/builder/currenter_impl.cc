@@ -15,49 +15,54 @@
 
 namespace btool::app::builder {
 
-static ::btool::Err<ssize_t> GetModTime(const ::btool::node::Node &node);
+static bool GetModTime(const ::btool::node::Node &node, ssize_t *ret_mod_time,
+                       std::string *ret_err);
 static ssize_t ComputeModTimeNS(struct ::timespec *ts);
 
-::btool::Err<bool> CurrenterImpl::Current(const ::btool::node::Node &node) {
-  auto node_mod_time_err = GetModTime(node);
-  if (node_mod_time_err) {
-    return ::btool::Err<bool>::Failure(node_mod_time_err.Msg());
-  } else if (node_mod_time_err.Ret() == -1) {
-    return ::btool::Err<bool>::Success(false);
+bool CurrenterImpl::Current(const ::btool::node::Node &node, bool *ret_current,
+                            std::string *ret_err) {
+  ssize_t node_mod_time;
+  std::string err;
+  if (!GetModTime(node, &node_mod_time, &err)) {
+    *ret_err = ::btool::WrapErr(err, "get mod time");
+    return false;
+  } else if (node_mod_time == -1) {
+    *ret_current = false;
+    return true;
   }
-  DEBUG("node %s mod time = %ld\n", node.name().c_str(),
-        node_mod_time_err.Ret());
+  DEBUGS() << "node " << node.name() << " mod time = " << node_mod_time
+           << std::endl;
 
-  ::btool::Err<bool> err(true);
-  ssize_t latest_mod_time_ns = 0;
-  const ::btool::node::Node *latest_mod_time_node = nullptr;
+  bool success = true;
+  ssize_t latest_mod_time = node_mod_time;
+  const ::btool::node::Node *latest_mod_time_node = &node;
   node.Visit([&](const ::btool::node::Node *dep) {
-    if (err) {
+    if (!success) {
       return;
     }
 
-    auto dep_mod_time_err = GetModTime(*dep);
-    if (dep_mod_time_err) {
-      err = ::btool::Err<bool>::Failure(dep_mod_time_err.Msg());
+    ssize_t dep_mod_time;
+    if (!GetModTime(*dep, &dep_mod_time, &err)) {
+      success = false;
+      *ret_err = ::btool::WrapErr(err, "get mod time");
+      return;
     }
 
-    ssize_t mod_time_ns = dep_mod_time_err.Ret();
-    DEBUG("dep %s mod time = %ld\n", dep->name().c_str(), mod_time_ns);
-    if (mod_time_ns > latest_mod_time_ns) {
-      latest_mod_time_ns = mod_time_ns;
+    DEBUGS() << "dep " << dep->name() << " mod time = " << dep_mod_time
+             << std::endl;
+    if (dep_mod_time > latest_mod_time) {
+      latest_mod_time = dep_mod_time;
       latest_mod_time_node = dep;
     }
   });
 
-  if (err) {
-    return err;
-  } else if (latest_mod_time_ns > node_mod_time_err.Ret()) {
-    DEBUG("dep %s is newer than node %s\n",
-          latest_mod_time_node->name().c_str(), node.name().c_str());
-    return ::btool::Err<bool>::Success(false);
-  } else {
-    return ::btool::Err<bool>::Success(true);
+  *ret_current = latest_mod_time <= node_mod_time;
+  if (*ret_current) {
+    DEBUGS() << "dep " << latest_mod_time_node->name() << " is newer than node "
+             << node.name() << std::endl;
   }
+
+  return success;
 }
 
 #ifdef __linux__
@@ -68,18 +73,20 @@ static ssize_t ComputeModTimeNS(struct ::timespec *ts);
 #error "unknown platform"
 #endif
 
-static ::btool::Err<ssize_t> GetModTime(const ::btool::node::Node &node) {
+static bool GetModTime(const ::btool::node::Node &node, ssize_t *ret_mod_time,
+                       std::string *ret_err) {
   struct ::stat s;
   if (::lstat(node.name().c_str(), &s) == -1) {
     if (errno == ENOENT) {
-      return ::btool::Err<ssize_t>::Success(-1);
+      *ret_mod_time = -1;
+      return true;
     } else {
-      DEBUG("lstat: %s\n", strerror(errno));
-      return ::btool::Err<ssize_t>::Failure("couldn't lstat node");
+      *ret_err = ::btool::WrapErr(::strerror(errno), "lstat");
+      return false;
     }
   }
-
-  return ::btool::Err<ssize_t>::Success(ComputeModTimeNS(&s.modtime));
+  *ret_mod_time = ComputeModTimeNS(&s.modtime);
+  return true;
 }
 
 static ssize_t ComputeModTimeNS(struct ::timespec *ts) {

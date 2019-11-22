@@ -9,34 +9,37 @@
 #include "node/node.h"
 
 using ::testing::_;
+using ::testing::DoAll;
 using ::testing::InSequence;
+using ::testing::Ref;
 using ::testing::Return;
+using ::testing::SetArgPointee;
 using ::testing::StrictMock;
 
 class MockCollector : public ::btool::app::App::Collector {
  public:
-  MOCK_METHOD1(Collect,
-               ::btool::Err<::btool::node::Node *>(const std::string &));
+  MOCK_METHOD3(Collect, bool(const std::string &, ::btool::node::Node **,
+                             std::string *));
 };
 
 class MockCleaner : public ::btool::app::App::Cleaner {
  public:
-  MOCK_METHOD1(Clean, ::btool::VoidErr(const ::btool::node::Node &));
+  MOCK_METHOD2(Clean, bool(const ::btool::node::Node &, std::string *));
 };
 
 class MockLister : public ::btool::app::App::Lister {
  public:
-  MOCK_METHOD1(List, ::btool::VoidErr(const ::btool::node::Node &));
+  MOCK_METHOD2(List, bool(const ::btool::node::Node &, std::string *));
 };
 
 class MockBuilder : public ::btool::app::App::Builder {
  public:
-  MOCK_METHOD1(Build, ::btool::VoidErr(const ::btool::node::Node &));
+  MOCK_METHOD2(Build, bool(const ::btool::node::Node &, std::string *));
 };
 
 class MockRunner : public ::btool::app::App::Runner {
  public:
-  MOCK_METHOD1(Run, ::btool::VoidErr(const ::btool::node::Node &));
+  MOCK_METHOD2(Run, bool(const ::btool::node::Node &, std::string *));
 };
 
 class AppTest : public ::testing::Test {
@@ -54,40 +57,44 @@ class AppTest : public ::testing::Test {
 TEST_F(AppTest, Build) {
   InSequence s;
   auto n = new ::btool::node::Node("a");
-  EXPECT_CALL(mcollector_, Collect(_))
-      .WillOnce(Return(::btool::Err<::btool::node::Node *>::Success(n)));
-  EXPECT_CALL(mbuilder_, Build(_));
+  EXPECT_CALL(mcollector_, Collect(_, _, _))
+      .WillOnce(DoAll(SetArgPointee<1>(n), Return(true)));
+  EXPECT_CALL(mbuilder_, Build(Ref(*n), _)).WillOnce(Return(true));
 
-  EXPECT_FALSE(a_.Run("", false, false, false));
+  std::string err;
+  EXPECT_TRUE(a_.Run("", false, false, false, &err)) << "error: " << err;
 }
 
 TEST_F(AppTest, Clean) {
   InSequence s;
   auto n = new ::btool::node::Node("a");
-  EXPECT_CALL(mcollector_, Collect(_))
-      .WillOnce(Return(::btool::Err<::btool::node::Node *>::Success(n)));
-  EXPECT_CALL(mcleaner_, Clean(_));
+  EXPECT_CALL(mcollector_, Collect(_, _, _))
+      .WillOnce(DoAll(SetArgPointee<1>(n), Return(true)));
+  EXPECT_CALL(mcleaner_, Clean(Ref(*n), _)).WillOnce(Return(true));
 
-  EXPECT_FALSE(a_.Run("", true, false, false));
+  std::string err;
+  EXPECT_TRUE(a_.Run("", true, false, false, &err)) << "error: " << err;
 }
 
 TEST_F(AppTest, List) {
   InSequence s;
   auto n = new ::btool::node::Node("a");
-  EXPECT_CALL(mcollector_, Collect(_))
-      .WillOnce(Return(::btool::Err<::btool::node::Node *>::Success(n)));
-  EXPECT_CALL(mlister_, List(_));
+  EXPECT_CALL(mcollector_, Collect(_, _, _))
+      .WillOnce(DoAll(SetArgPointee<1>(n), Return(true)));
+  EXPECT_CALL(mlister_, List(Ref(*n), _)).WillOnce(Return(true));
 
-  EXPECT_FALSE(a_.Run("", false, true, false));
+  std::string err;
+  EXPECT_TRUE(a_.Run("", false, true, false, &err)) << "error: " << err;
 }
 
 TEST_F(AppTest, Run) {
   InSequence s;
   auto n = new ::btool::node::Node("a");
-  EXPECT_CALL(mcollector_, Collect(_))
-      .WillOnce(Return(::btool::Err<::btool::node::Node *>::Success(n)));
-  EXPECT_CALL(mbuilder_, Build(_));
-  EXPECT_CALL(mrunner_, Run(_));
+  EXPECT_CALL(mcollector_, Collect(_, _, _))
+      .WillOnce(DoAll(SetArgPointee<1>(n), Return(true)));
+  EXPECT_CALL(mbuilder_, Build(Ref(*n), _)).WillOnce(Return(true));
+  EXPECT_CALL(mrunner_, Run(Ref(*n), _)).WillOnce(Return(true));
 
-  EXPECT_FALSE(a_.Run("", false, false, true));
+  std::string err;
+  EXPECT_TRUE(a_.Run("", false, false, true, &err)) << "error: " << err;
 }

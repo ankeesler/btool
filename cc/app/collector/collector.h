@@ -6,7 +6,6 @@
 
 #include "app/app.h"
 #include "app/collector/store.h"
-#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::collector {
@@ -23,8 +22,8 @@ class Collector : public ::btool::app::App::Collector {
   Collector(Store *s) : s_(s) {}
 
   void AddCollectini(Collectini *c) { cs_.push_back(c); }
-  ::btool::Err<::btool::node::Node *> Collect(
-      const std::string &target) override;
+  bool Collect(const std::string &target, ::btool::node::Node **ret_n,
+               std::string *ret_err) override;
 
  private:
   Store *s_;

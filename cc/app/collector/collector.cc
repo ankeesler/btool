@@ -7,33 +7,32 @@
 #include <vector>
 
 #include "app/collector/store.h"
-#include "err.h"
 #include "log.h"
 #include "node/node.h"
 
 namespace btool::app::collector {
 
-::btool::Err<::btool::node::Node *> Collector::Collect(
-    const std::string &target) {
+bool Collector::Collect(const std::string &target, ::btool::node::Node **ret_n,
+                        std::string *ret_err) {
   for (auto c : cs_) {
     c->Collect(s_);
 
     auto errors = c->Errors();
     if (!errors.empty()) {
-      std::stringstream ss{"collect errors:"};
-      std::for_each(errors.begin(), errors.end(), [&ss](const std::string &s) {
-        ss << std::endl << s;
-      });
-      return ::btool::Err<::btool::node::Node *>::Failure(ss.str().c_str());
+      *ret_err = "collect errors:";
+      std::for_each(errors.begin(), errors.end(),
+                    [ret_err](const std::string &s) { *ret_err += "\n" + s; });
+      return false;
     }
   }
 
-  auto n = s_->Get(target);
-  if (n == nullptr) {
-    return ::btool::Err<::btool::node::Node *>::Failure("unknown target");
+  *ret_n = s_->Get(target);
+  if (*ret_n == nullptr) {
+    *ret_err = "unknown target";
+    return false;
   }
 
-  return ::btool::Err<::btool::node::Node *>::Success(n);
+  return true;
 }
 
 };  // namespace btool::app::collector

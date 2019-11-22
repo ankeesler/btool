@@ -10,12 +10,13 @@
 #include "node/node.h"
 #include "node/testing/node.h"
 
+using ::testing::_;
 using ::testing::InSequence;
 using ::testing::Return;
 
 class MockRemoveAller : public ::btool::app::cleaner::Cleaner::RemoveAller {
  public:
-  MOCK_METHOD1(RemoveAll, ::btool::VoidErr(const std::string &));
+  MOCK_METHOD2(RemoveAll, bool(const std::string &, std::string *));
 };
 
 class CleanerTest : public ::btool::node::testing::NodeTest {};
@@ -24,30 +25,26 @@ TEST_F(CleanerTest, Success) {
   InSequence s;
 
   MockRemoveAller mra;
-  EXPECT_CALL(mra, RemoveAll("d"))
-      .WillOnce(Return(::btool::VoidErr::Success()));
-  EXPECT_CALL(mra, RemoveAll("c"))
-      .WillOnce(Return(::btool::VoidErr::Success()));
-  EXPECT_CALL(mra, RemoveAll("b"))
-      .WillOnce(Return(::btool::VoidErr::Success()));
-  EXPECT_CALL(mra, RemoveAll("a"))
-      .WillOnce(Return(::btool::VoidErr::Success()));
+  EXPECT_CALL(mra, RemoveAll("d", _)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("c", _)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("b", _)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("a", _)).WillOnce(Return(true));
 
   ::btool::app::cleaner::Cleaner cleaner(&mra);
 
-  EXPECT_FALSE(cleaner.Clean(a_));
+  std::string err;
+  EXPECT_TRUE(cleaner.Clean(a_, &err)) << "error: " << err;
 }
 
 TEST_F(CleanerTest, Failure) {
   InSequence s;
 
   MockRemoveAller mra;
-  EXPECT_CALL(mra, RemoveAll("d"))
-      .WillOnce(Return(::btool::VoidErr::Success()));
-  EXPECT_CALL(mra, RemoveAll("c"))
-      .WillOnce(Return(::btool::VoidErr::Failure("eh")));
+  EXPECT_CALL(mra, RemoveAll("d", _)).WillOnce(Return(true));
+  EXPECT_CALL(mra, RemoveAll("c", _)).WillOnce(Return(false));
 
   ::btool::app::cleaner::Cleaner cleaner(&mra);
 
-  EXPECT_TRUE(cleaner.Clean(a_));
+  std::string err;
+  EXPECT_FALSE(cleaner.Clean(a_, &err));
 }

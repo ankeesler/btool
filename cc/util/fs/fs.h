@@ -13,17 +13,19 @@ std::string Dir(const std::string &path);
 std::string Join(const std::string &one, const std::string &two);
 std::string Ext(const std::string &path);
 
-::btool::Err<std::string> TempDir();
+bool TempDir(std::string *ret_dir, std::string *ret_err);
 
-::btool::Err<std::string> ReadFile(const std::string &path);
-::btool::VoidErr WriteFile(const std::string &path, const std::string &content);
+bool ReadFile(const std::string &path, std::string *ret_content,
+              std::string *ret_err);
+bool WriteFile(const std::string &path, const std::string &content,
+               std::string *ret_err);
 
-::btool::VoidErr RemoveAll(const std::string &path);
+bool RemoveAll(const std::string &path, std::string *ret_err);
 
-::btool::VoidErr Mkdir(const std::string &path);
+bool Mkdir(const std::string &path, std::string *ret_err);
 
-::btool::Err<bool> Exists(const std::string &path);
-::btool::Err<bool> IsDir(const std::string &path);
+bool Exists(const std::string &path, bool *ret_exists, std::string *ret_err);
+bool IsDir(const std::string &path, bool *ret_is, std::string *ret_err);
 
 // Walk
 //
@@ -33,8 +35,9 @@ std::string Ext(const std::string &path);
 // the error that is returned from the provided handler function, f.
 //
 // Walk must be provided a directory as a root!
-::btool::VoidErr Walk(const std::string &root,
-                      std::function<::btool::VoidErr(const std::string &)> f);
+bool Walk(const std::string &root,
+          std::function<bool(const std::string &, std::string *)> f,
+          std::string *ret_err);
 
 };  // namespace btool::util::fs
 

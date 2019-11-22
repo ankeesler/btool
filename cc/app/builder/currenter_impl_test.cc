@@ -45,63 +45,69 @@ class NodeFile {
 TEST_F(CurrenterTest, NoDeps) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(tmpd_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  bool current;
+  std::string err;
+  EXPECT_TRUE(ci.Current(tmpd_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   NodeFile nf(tmpd_);
   nf.Modify();
 
-  err = ci.Current(tmpd_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpd_, &current, &err)) << "error: " << err;
+  EXPECT_TRUE(current);
 }
 
 TEST_F(CurrenterTest, AdjacentDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  bool current;
+  std::string err;
+  EXPECT_TRUE(ci.Current(tmpc_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   NodeFile nfd(tmpd_);
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_TRUE(ci.Current(tmpc_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   NodeFile nfc(tmpc_);
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpc_, &current, &err)) << "error: " << err;
+  EXPECT_TRUE(current);
 
   nfd.Modify();
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_TRUE(ci.Current(tmpc_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   nfc.Modify();
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpc_, &current, &err)) << "error: " << err;
+  EXPECT_TRUE(current);
 }
 
 TEST_F(CurrenterTest, AncestorDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  bool current;
+  std::string err;
+  EXPECT_TRUE(ci.Current(tmpb_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   NodeFile nfd(tmpd_);
   NodeFile nfc(tmpc_);
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_TRUE(ci.Current(tmpb_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   NodeFile nfb(tmpb_);
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpb_, &current, &err)) << "error: " << err;
+  EXPECT_TRUE(current);
 
   nfd.Modify();
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_TRUE(ci.Current(tmpb_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   nfc.Modify();
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_TRUE(ci.Current(tmpb_, &current, &err)) << "error: " << err;
+  EXPECT_FALSE(current);
 
   nfb.Modify();
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpb_, &current, &err)) << "error: " << err;
+  EXPECT_TRUE(current);
 }

@@ -8,17 +8,22 @@
 
 namespace btool::app::cleaner {
 
-::btool::VoidErr Cleaner::Clean(const ::btool::node::Node& node) {
-  ::btool::VoidErr err;
+bool Cleaner::Clean(const ::btool::node::Node& node, std::string* ret_err) {
+  bool success = true;
 
   node.Visit([&](const ::btool::node::Node* n) {
-    if (!err && n->resolver() != nullptr) {
+    if (success && n->resolver() != nullptr) {
       DEBUGS() << "cleaning " << n->name() << std::endl;
-      err = ra_->RemoveAll(n->name());
+
+      std::string err;
+      if (!ra_->RemoveAll(n->name(), &err)) {
+        *ret_err = ::btool::WrapErr(err, "remove all");
+        success = false;
+      }
     }
   });
 
-  return err;
+  return success;
 }
 
 };  // namespace btool::app::cleaner

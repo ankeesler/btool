@@ -4,7 +4,6 @@
 #include <ostream>
 
 #include "app/app.h"
-#include "err.h"
 #include "node/node.h"
 
 namespace btool::app::lister {
@@ -13,7 +12,7 @@ class Lister : public ::btool::app::App::Lister {
  public:
   Lister(std::ostream *os) : os_(os) {}
 
-  ::btool::VoidErr List(const ::btool::node::Node &node) override;
+  bool List(const ::btool::node::Node &node, std::string *ret_err) override;
 
  private:
   std::ostream *os_;
