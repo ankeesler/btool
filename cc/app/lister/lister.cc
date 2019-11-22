@@ -5,9 +5,6 @@
 
 namespace btool::app::lister {
 
-::btool::VoidErr Lister::List(const ::btool::node::Node &node) {
-  node.String(os_);
-  return ::btool::VoidErr::Success();
-}
+void Lister::List(const ::btool::node::Node &node) { node.String(os_); }
 
 };  // namespace btool::app::lister

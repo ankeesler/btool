@@ -4,8 +4,6 @@
 #include <functional>
 #include <string>
 
-#include "err.h"
-
 namespace btool::util::fs {
 
 std::string Base(const std::string &path);
@@ -13,28 +11,27 @@ std::string Dir(const std::string &path);
 std::string Join(const std::string &one, const std::string &two);
 std::string Ext(const std::string &path);
 
-::btool::Err<std::string> TempDir();
+std::string TempDir();
 
-::btool::Err<std::string> ReadFile(const std::string &path);
-::btool::VoidErr WriteFile(const std::string &path, const std::string &content);
+std::string ReadFile(const std::string &path);
+void WriteFile(const std::string &path, const std::string &content);
 
-::btool::VoidErr RemoveAll(const std::string &path);
+void RemoveAll(const std::string &path);
 
-::btool::VoidErr Mkdir(const std::string &path);
+void Mkdir(const std::string &path);
 
-::btool::Err<bool> Exists(const std::string &path);
-::btool::Err<bool> IsDir(const std::string &path);
+bool Exists(const std::string &path);
+bool IsDir(const std::string &path);
 
 // Walk
 //
 // Walk performs a depth-first walk on the filesystem at the provided root.
 //
-// Walk will return any error it encounters when reading filesystem nodes, or
-// the error that is returned from the provided handler function, f.
+// Walk will throw any error it encounters when reading filesystem nodes, or
+// the error that is thrown from the provided handler function, f.
 //
 // Walk must be provided a directory as a root!
-::btool::VoidErr Walk(const std::string &root,
-                      std::function<::btool::VoidErr(const std::string &)> f);
+void Walk(const std::string &root, std::function<void(const std::string &)> f);
 
 };  // namespace btool::util::fs
 

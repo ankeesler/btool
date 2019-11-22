@@ -21,9 +21,9 @@ class CompileResolver : public ::btool::node::Node::Resolver {
         include_dirs_(include_dirs),
         more_flags_(more_flags) {}
 
-  ::btool::VoidErr Resolve(const ::btool::node::Node &n) override {
+  void Resolve(const ::btool::node::Node &n) override {
     if (n.dependencies()->empty()) {
-      return ::btool::VoidErr::Failure("must have at least one dependency");
+      THROW_ERR("node " + n.name() + "must have at least one dependency");
     }
 
     ::btool::util::Cmd cmd(compiler_.c_str());
@@ -52,8 +52,9 @@ class CompileResolver : public ::btool::node::Node::Resolver {
     DEBUGS() << "out: " << out.str() << std::endl;
     DEBUGS() << "err: " << err.str() << std::endl;
 
-    return (ec == 0 ? ::btool::VoidErr::Success()
-                    : ::btool::VoidErr::Failure("failed to run compiler"));
+    if (ec != 0) {
+      THROW_ERR("compiler exit code = " + std::to_string(ec));
+    }
   }
 
  private:
@@ -68,7 +69,7 @@ class LinkResolver : public ::btool::node::Node::Resolver {
   LinkResolver(std::string linker, std::vector<std::string> flags)
       : linker_(linker), flags_(flags) {}
 
-  ::btool::VoidErr Resolve(const ::btool::node::Node &n) override {
+  void Resolve(const ::btool::node::Node &n) override {
     ::btool::util::Cmd cmd(linker_.c_str());
     cmd.Arg("-o");
     cmd.Arg(n.name());
@@ -89,8 +90,9 @@ class LinkResolver : public ::btool::node::Node::Resolver {
     DEBUG("out: %s\n", out.str().c_str());
     DEBUG("err: %s\n", err.str().c_str());
 
-    return (ec == 0 ? ::btool::VoidErr::Success()
-                    : ::btool::VoidErr::Failure("failed to run compiler"));
+    if (ec != 0) {
+      THROW_ERR("linker exit code = " + std::to_string(ec));
+    }
   }
 
  private:

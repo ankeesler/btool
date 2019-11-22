@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-#include "err.h"
 #include "node/property_store.h"
 
 namespace btool::node {
@@ -18,7 +17,7 @@ class Node {
   class Resolver {
    public:
     virtual ~Resolver() {}
-    virtual ::btool::VoidErr Resolve(const Node &node) = 0;
+    virtual void Resolve(const Node &node) = 0;
   };
 
   Node(std::string name) : name_(name), resolver_(nullptr) {}

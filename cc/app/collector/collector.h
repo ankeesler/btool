@@ -23,8 +23,7 @@ class Collector : public ::btool::app::App::Collector {
   Collector(Store *s) : s_(s) {}
 
   void AddCollectini(Collectini *c) { cs_.push_back(c); }
-  ::btool::Err<::btool::node::Node *> Collect(
-      const std::string &target) override;
+  ::btool::node::Node *Collect(const std::string &target) override;
 
  private:
   Store *s_;

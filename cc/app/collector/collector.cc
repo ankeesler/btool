@@ -13,8 +13,7 @@
 
 namespace btool::app::collector {
 
-::btool::Err<::btool::node::Node *> Collector::Collect(
-    const std::string &target) {
+::btool::node::Node *Collector::Collect(const std::string &target) {
   for (auto c : cs_) {
     c->Collect(s_);
 
@@ -24,16 +23,16 @@ namespace btool::app::collector {
       std::for_each(errors.begin(), errors.end(), [&ss](const std::string &s) {
         ss << std::endl << s;
       });
-      return ::btool::Err<::btool::node::Node *>::Failure(ss.str().c_str());
+      THROW_ERR(ss.str());
     }
   }
 
   auto n = s_->Get(target);
   if (n == nullptr) {
-    return ::btool::Err<::btool::node::Node *>::Failure("unknown target");
+    THROW_ERR("unknown target");
   }
 
-  return ::btool::Err<::btool::node::Node *>::Success(n);
+  return n;
 }
 
 };  // namespace btool::app::collector

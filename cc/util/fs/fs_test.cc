@@ -44,29 +44,21 @@ TEST(FS, Ext) {
 }
 
 TEST(FS, File) {
-  auto err = ::btool::util::fs::TempDir();
-  EXPECT_FALSE(err);
+  auto dir = ::btool::util::fs::TempDir();
 
-  auto dir = err.Ret();
   auto file = ::btool::util::fs::Join(dir, "a");
-  EXPECT_TRUE(::btool::util::fs::ReadFile(file));
-  EXPECT_FALSE(::btool::util::fs::RemoveAll(file));
+  EXPECT_THROW(::btool::util::fs::ReadFile(file), ::btool::Err);
+  ::btool::util::fs::RemoveAll(file);
 
-  auto void_err =
-      ::btool::util::fs::WriteFile(file, "this is text\nwith multiple lines\n");
-  EXPECT_FALSE(void_err) << void_err;
-  err = ::btool::util::fs::ReadFile(file);
-  EXPECT_FALSE(err) << err;
-  EXPECT_EQ("this is text\nwith multiple lines\n", err.Ret());
+  ::btool::util::fs::WriteFile(file, "this is text\nwith multiple lines\n");
+  auto content = ::btool::util::fs::ReadFile(file);
+  EXPECT_EQ("this is text\nwith multiple lines\n", content);
 
-  void_err = ::btool::util::fs::RemoveAll(dir);
-  EXPECT_FALSE(void_err) << void_err;
+  ::btool::util::fs::RemoveAll(dir);
 }
 
 TEST(FS, Walk) {
-  auto err = ::btool::util::fs::TempDir();
-  EXPECT_FALSE(err) << err;
-  auto dir = err.Ret();
+  auto dir = ::btool::util::fs::TempDir();
 
   std::vector<std::string> paths{
       ::btool::util::fs::Join(dir, "a.c"),
@@ -88,15 +80,12 @@ TEST(FS, Walk) {
   };
   for (const auto &path : paths) {
     auto dir = ::btool::util::fs::Dir(path);
-    auto err = ::btool::util::fs::Exists(dir);
-    ASSERT_FALSE(err) << err;
-    if (!err.Ret()) {
-      auto void_err = ::btool::util::fs::Mkdir(dir);
-      ASSERT_FALSE(void_err) << "mkdir " << dir << ": " << void_err;
+    auto exists = ::btool::util::fs::Exists(dir);
+    if (!exists) {
+      ::btool::util::fs::Mkdir(dir);
     }
 
-    auto void_err = ::btool::util::fs::WriteFile(path, "hey\n");
-    ASSERT_FALSE(void_err) << void_err;
+    ::btool::util::fs::WriteFile(path, "hey\n");
   }
 
   std::vector<std::string> ex_visits{
@@ -136,32 +125,24 @@ TEST(FS, Walk) {
       dir,
   };
   std::vector<std::string> ac_visits;
-  auto void_err =
-      ::btool::util::fs::Walk(dir, [&ac_visits](const std::string &path) {
-        ac_visits.push_back(path);
-        return ::btool::VoidErr::Success();
-      });
-  EXPECT_FALSE(void_err) << void_err;
+  ::btool::util::fs::Walk(dir, [&ac_visits](const std::string &path) {
+    ac_visits.push_back(path);
+  });
   EXPECT_EQ(ex_visits, ac_visits);
 
-  void_err = ::btool::util::fs::RemoveAll(dir);
-  EXPECT_FALSE(void_err) << void_err;
+  ::btool::util::fs::RemoveAll(dir);
 }
 
 TEST(FS, Is) {
-  auto err = ::btool::util::fs::TempDir();
-  EXPECT_FALSE(err);
-
-  auto dir = err.Ret();
+  auto dir = ::btool::util::fs::TempDir();
   auto file = ::btool::util::fs::Join(dir, "a");
-  auto void_err = ::btool::util::fs::WriteFile(file, "hey\n");
-  ASSERT_FALSE(void_err) << void_err;
+  ::btool::util::fs::WriteFile(file, "hey\n");
 
-  EXPECT_EQ(::btool::Err<bool>::Success(true), ::btool::util::fs::IsDir(dir));
+  EXPECT_TRUE(::btool::util::fs::IsDir(dir));
   // EXPECT_FALSE(::btool::util::fs::IsFile(dir));
 
-  EXPECT_EQ(::btool::Err<bool>::Success(false), ::btool::util::fs::IsDir(file));
+  EXPECT_FALSE(::btool::util::fs::IsDir(file));
   // EXPECT_TRUE(::btool::util::fs::IsFile(file));
 
-  EXPECT_FALSE(::btool::util::fs::RemoveAll(dir));
+  ::btool::util::fs::RemoveAll(dir);
 }

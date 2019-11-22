@@ -14,12 +14,12 @@ class Cleaner : public ::btool::app::App::Cleaner {
   class RemoveAller {
    public:
     virtual ~RemoveAller() {}
-    virtual ::btool::VoidErr RemoveAll(const std::string &path) = 0;
+    virtual void RemoveAll(const std::string &path) = 0;
   };
 
   Cleaner(RemoveAller *ra) : ra_(ra){};
 
-  ::btool::VoidErr Clean(const ::btool::node::Node &node) override;
+  void Clean(const ::btool::node::Node &node) override;
 
  private:
   RemoveAller *ra_;

@@ -1,4 +1,4 @@
-#include "util/fs/fs.h"
+#include "fs.h"
 
 #include <dirent.h>
 #include <errno.h>
@@ -11,6 +11,7 @@
 #include <functional>
 #include <list>
 
+#include "err.h"
 #include "log.h"
 
 namespace btool::util::fs {
@@ -49,20 +50,20 @@ std::string Ext(const std::string &path) {
   return "";
 }
 
-::btool::Err<std::string> TempDir() {
+std::string TempDir() {
   char s[] = "/tmp/btool_XXXXXX";
   char *dir = ::mkdtemp(s);
   if (dir == NULL) {
-    return ::btool::Err<std::string>::Failure("mkdtemp");
+    THROW_ERR("mkdtmp: " + std::string(::strerror(errno)));
   } else {
-    return ::btool::Err<std::string>::Success(dir);
+    return dir;
   }
 }
 
-::btool::Err<std::string> ReadFile(const std::string &path) {
+std::string ReadFile(const std::string &path) {
   FILE *f = ::fopen(path.c_str(), "r");
   if (f == nullptr) {
-    return ::btool::Err<std::string>::Failure(strerror(errno));
+    THROW_ERR("fopen: " + std::string(::strerror(errno)));
   }
 
   std::string content;
@@ -71,100 +72,89 @@ std::string Ext(const std::string &path) {
     char buf[buf_size];
     ::size_t count = ::fread(buf, 1, buf_size, f);
     content.append(buf, count);
-    if (ferror(f)) {
-      return ::btool::Err<std::string>::Failure(strerror(errno));
-    } else if (feof(f)) {
+    if (::ferror(f)) {
+      THROW_ERR("fread: " + std::string(::strerror(errno)));
+    } else if (::feof(f)) {
       break;
     }
   }
 
-  fclose(f);
+  ::fclose(f);
 
-  return ::btool::Err<std::string>::Success(content);
+  return content;
 }
 
-::btool::VoidErr WriteFile(const std::string &path,
-                           const std::string &content) {
+void WriteFile(const std::string &path, const std::string &content) {
   std::ofstream ofs(path);
   if (!ofs) {
-    return ::btool::VoidErr::Failure(strerror(errno));
+    THROW_ERR("open: " + std::string(::strerror(errno)));
   }
 
   ofs << content;
   if (!ofs) {
-    return ::btool::VoidErr::Failure(strerror(errno));
+    THROW_ERR("write: " + std::string(::strerror(errno)));
   }
-
-  return ::btool::VoidErr::Success();
 }
 
-::btool::VoidErr RemoveAll(const std::string &path) {
-  auto err = Exists(path);
-  if (err) {
-    return ::btool::VoidErr::Failure(err.Msg());
-  } else if (!err.Ret()) {
-    return ::btool::VoidErr::Success();
+void RemoveAll(const std::string &path) {
+  auto exists = Exists(path);
+  if (!exists) {
+    return;
   }
 
-  err = IsDir(path);
-  if (err) {
-    return ::btool::VoidErr::Failure(err.Msg());
-  } else if (!err.Ret()) {
+  auto is_dir = IsDir(path);
+  if (!is_dir) {
     if (::remove(path.c_str()) == -1) {
-      return ::btool::VoidErr::Failure(strerror(errno));
+      THROW_ERR("remove: " + std::string(::strerror(errno)));
     }
-    return ::btool::VoidErr::Success();
+    return;
   }
 
-  return Walk(path, [](const std::string &path) -> ::btool::VoidErr {
+  Walk(path, [](const std::string &path) {
     if (::remove(path.c_str()) == -1) {
-      return ::btool::VoidErr::Failure(strerror(errno));
+      THROW_ERR("remove: " + std::string(::strerror(errno)));
     }
-    return ::btool::VoidErr::Success();
   });
 }
 
-::btool::VoidErr Mkdir(const std::string &path) {
+void Mkdir(const std::string &path) {
   if (::mkdir(path.c_str(), 0700) == -1) {
-    return ::btool::VoidErr::Failure(strerror(errno));
+    THROW_ERR("mkdir: " + std::string(::strerror(errno)));
   }
-  return ::btool::VoidErr::Success();
 }
 
-::btool::Err<bool> Exists(const std::string &path) {
+bool Exists(const std::string &path) {
   bool exists = true;
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
     if (errno == ENOENT) {
       exists = false;
     } else {
-      return ::btool::Err<bool>::Failure(strerror(errno));
+      THROW_ERR("stat: " + std::string(::strerror(errno)));
     }
   }
-  return ::btool::Err<bool>::Success(exists);
+  return exists;
 }
 
-::btool::Err<bool> IsDir(const std::string &path) {
+bool IsDir(const std::string &path) {
   bool is_dir = false;
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
     if (errno != ENOENT) {
-      return ::btool::Err<bool>::Failure(strerror(errno));
+      THROW_ERR("stat: " + std::string(::strerror(errno)));
     }
   } else {
     is_dir = (((s.st_mode & S_IFMT) & S_IFDIR) != 0);
   }
-  return ::btool::Err<bool>::Success(is_dir);
+  return is_dir;
 }
 
-::btool::VoidErr Walk(const std::string &root,
-                      std::function<::btool::VoidErr(const std::string &)> f) {
+void Walk(const std::string &root, std::function<void(const std::string &)> f) {
   DEBUG("walk %s\n", root.c_str());
 
   ::DIR *dir = ::opendir(root.c_str());
   if (dir == nullptr) {
-    DEBUG("opendir: %s\n", ::strerror(errno));
-    return ::btool::VoidErr::Failure("opendir");
+    THROW_ERR("opendir '" + root + "': " + std::string(::strerror(errno)));
   }
 
   std::list<std::string> dir_children, file_children;
@@ -181,31 +171,20 @@ std::string Ext(const std::string &path) {
   }
 
   if (::closedir(dir) == -1) {
-    DEBUG("closedir: %s\n", ::strerror(errno));
-    return ::btool::VoidErr::Failure("closedir");
+    THROW_ERR("closedir: " + std::string(::strerror(errno)));
   }
 
   dir_children.sort();
   for (const auto &child : dir_children) {
-    auto err = Walk(Join(root, child), f);
-    if (err) {
-      return err;
-    }
+    Walk(Join(root, child), f);
   }
 
   file_children.sort();
   for (const auto &child : file_children) {
-    auto err = f(Join(root, child));
-    if (err) {
-      return err;
-    }
+    f(Join(root, child));
   }
 
-  auto err = f(root);
-  if (err) {
-    return err;
-  }
-
-  return ::btool::VoidErr::Success();
+  f(root);
 }
-};  // namespace btool::util::fs
+
+}  // namespace btool::util::fs

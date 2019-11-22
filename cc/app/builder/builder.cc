@@ -8,26 +8,16 @@
 
 namespace btool::app::builder {
 
-::btool::VoidErr Builder::Build(const ::btool::node::Node &node) {
-  ::btool::VoidErr err;
-
+void Builder::Build(const ::btool::node::Node &node) {
   node.Visit([&](const ::btool::node::Node *n) {
-    if (!err) {
-      auto current_err = c_->Current(*n);
-      DEBUG("builder visiting %s, current: %s, resolver = %s\n",
-            n->name().c_str(),
-            (current_err ? current_err.Msg()
-                         : (current_err.Ret() ? "true" : "false")),
-            (n->resolver() == nullptr ? "null" : "something"));
-      if (current_err) {
-        err = ::btool::VoidErr::Failure(current_err.Msg());
-      } else if (!current_err.Ret() && n->resolver() != nullptr) {
-        err = n->resolver()->Resolve(*n);
-      }
+    bool current = c_->Current(*n);
+    DEBUG("builder visiting %s, current: %s, resolver = %s\n",
+          n->name().c_str(), (current ? "true" : "false"),
+          (n->resolver() == nullptr ? "null" : "something"));
+    if (!current && n->resolver() != nullptr) {
+      n->resolver()->Resolve(*n);
     }
   });
-
-  return err;
 }
 
-};  // namespace btool::app::builder
+}  // namespace btool::app::builder

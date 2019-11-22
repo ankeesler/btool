@@ -15,7 +15,7 @@ namespace btool::node::testing {
 
 class MockResolver : public ::btool::node::Node::Resolver {
  public:
-  MOCK_METHOD1(Resolve, ::btool::VoidErr(const ::btool::node::Node &));
+  MOCK_METHOD1(Resolve, void(const ::btool::node::Node &));
 };
 
 class NodeTest : public ::testing::Test {

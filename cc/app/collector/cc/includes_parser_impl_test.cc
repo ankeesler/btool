@@ -9,13 +9,9 @@
 
 class IncludesParserImplTest : public ::testing::Test {
  protected:
-  void SetUp() override {
-    auto err = ::btool::util::fs::TempDir();
-    EXPECT_FALSE(err);
-    dir_ = err.Ret();
-  }
+  void SetUp() override { dir_ = ::btool::util::fs::TempDir(); }
 
-  void TearDown() override { ASSERT_FALSE(::btool::util::fs::RemoveAll(dir_)); }
+  void TearDown() override { ::btool::util::fs::RemoveAll(dir_); }
 
   std::string dir_;
 };
@@ -28,7 +24,7 @@ TEST_F(IncludesParserImplTest, Yeah) {
       "#include <cstdio>\n\n"
       "#include \"some/path/to/bar.h\"\n\n"
       "#define IGNORE_THIS\n\n";
-  ASSERT_FALSE(::btool::util::fs::WriteFile(file, content));
+  ::btool::util::fs::WriteFile(file, content);
 
   std::vector<std::string> calls;
   ::btool::app::collector::cc::IncludesParserImpl ipi;

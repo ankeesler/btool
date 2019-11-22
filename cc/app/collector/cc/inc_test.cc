@@ -13,7 +13,6 @@
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
-#include "err.h"
 
 using ::testing::_;
 using ::testing::ElementsAre;
@@ -23,9 +22,8 @@ using ::testing::StrictMock;
 class MockIncludesParser
     : public ::btool::app::collector::cc::Inc::IncludesParser {
  public:
-  MOCK_METHOD2(ParseIncludes,
-               ::btool::VoidErr(const std::string &,
-                                std::function<void(const std::string &)>));
+  MOCK_METHOD2(ParseIncludes, void(const std::string &,
+                                   std::function<void(const std::string &)>));
 };
 
 class FakeIncludesParser
@@ -33,13 +31,11 @@ class FakeIncludesParser
  public:
   void AddInclude(std::string include) { includes_.push_back(include); }
 
-  ::btool::VoidErr ParseIncludes(
-      const std::string &name,
-      std::function<void(const std::string &)> f) override {
+  void ParseIncludes(const std::string &name,
+                     std::function<void(const std::string &)> f) override {
     for (const auto &include : includes_) {
       f(include);
     }
-    return ::btool::VoidErr::Success();
   }
 
  private:

@@ -10,7 +10,7 @@ namespace btool::app::cleaner {
 
 class RemoveAllerImpl : public Cleaner::RemoveAller {
  public:
-  ::btool::VoidErr RemoveAll(const std::string &path) override;
+  void RemoveAll(const std::string &path) override;
 };
 
 };  // namespace btool::app::cleaner

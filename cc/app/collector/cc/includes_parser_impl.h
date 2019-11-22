@@ -5,13 +5,12 @@
 #include <string>
 
 #include "app/collector/cc/inc.h"
-#include "err.h"
 
 namespace btool::app::collector::cc {
 
 class IncludesParserImpl : public Inc::IncludesParser {
  public:
-  ::btool::VoidErr ParseIncludes(
+  void ParseIncludes(
       const std::string &path,
       std::function<void(const std::string &)> callback) override;
 };

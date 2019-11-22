@@ -13,7 +13,7 @@ class Lister : public ::btool::app::App::Lister {
  public:
   Lister(std::ostream *os) : os_(os) {}
 
-  ::btool::VoidErr List(const ::btool::node::Node &node) override;
+  void List(const ::btool::node::Node &node) override;
 
  private:
   std::ostream *os_;

@@ -18,9 +18,7 @@ using ::testing::Contains;
 class FSCollectiniTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    auto err = ::btool::util::fs::TempDir();
-    ASSERT_FALSE(err) << err;
-    root_ = err.Ret();
+    root_ = ::btool::util::fs::TempDir();
 
     const std::vector<std::string> dirs{
         root_,
@@ -39,24 +37,18 @@ class FSCollectiniTest : public ::testing::Test {
     };
     for (const auto &dir : dirs) {
       for (const auto &file : files) {
-        auto err = ::btool::util::fs::Exists(dir);
-        ASSERT_FALSE(err) << err;
-        if (!err.Ret()) {
-          auto void_err = ::btool::util::fs::Mkdir(dir);
-          ASSERT_FALSE(void_err) << void_err;
+        auto exists = ::btool::util::fs::Exists(dir);
+        if (!exists) {
+          ::btool::util::fs::Mkdir(dir);
         }
 
         auto path = ::btool::util::fs::Join(dir, file);
-        auto void_err = ::btool::util::fs::WriteFile(path, "hey\n");
-        ASSERT_FALSE(void_err) << void_err;
+        ::btool::util::fs::WriteFile(path, "hey\n");
       }
     }
   }
 
-  void TearDown() override {
-    auto err = ::btool::util::fs::RemoveAll(root_);
-    ASSERT_FALSE(err) << err;
-  }
+  void TearDown() override { ::btool::util::fs::RemoveAll(root_); }
 
   const std::string &Root() const { return root_; };
 

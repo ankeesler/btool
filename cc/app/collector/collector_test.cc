@@ -38,9 +38,7 @@ TEST(Collector, Pass) {
   c.AddCollectini(&c1);
   c.AddCollectini(&c2);
 
-  auto err = c.Collect("some/node");
-  EXPECT_FALSE(err);
-  EXPECT_EQ(n, err.Ret());
+  EXPECT_EQ(n, c.Collect("some/node"));
 }
 
 TEST(Collector, Fail) {
@@ -62,7 +60,5 @@ TEST(Collector, Fail) {
   c.AddCollectini(&c1);
   c.AddCollectini(&c2);
 
-  auto err = c.Collect("some/node");
-  EXPECT_TRUE(err);
-  EXPECT_THAT(err.Msg(), HasSubstr("some error"));
+  EXPECT_THROW(c.Collect("some/node"), ::btool::Err);
 }

@@ -13,32 +13,31 @@ class App {
   class Collector {
    public:
     virtual ~Collector() {}
-    virtual ::btool::Err<::btool::node::Node *> Collect(
-        const std::string &name) = 0;
+    virtual ::btool::node::Node *Collect(const std::string &name) = 0;
   };
 
   class Cleaner {
    public:
     virtual ~Cleaner() {}
-    virtual ::btool::VoidErr Clean(const ::btool::node::Node &) = 0;
+    virtual void Clean(const ::btool::node::Node &) = 0;
   };
 
   class Lister {
    public:
     virtual ~Lister() {}
-    virtual ::btool::VoidErr List(const ::btool::node::Node &) = 0;
+    virtual void List(const ::btool::node::Node &) = 0;
   };
 
   class Builder {
    public:
     virtual ~Builder() {}
-    virtual ::btool::VoidErr Build(const ::btool::node::Node &) = 0;
+    virtual void Build(const ::btool::node::Node &) = 0;
   };
 
   class Runner {
    public:
     virtual ~Runner() {}
-    virtual ::btool::VoidErr Run(const ::btool::node::Node &) = 0;
+    virtual void Run(const ::btool::node::Node &) = 0;
   };
 
   App(Collector *collector, Cleaner *cleaner, Lister *lister, Builder *builder,
@@ -49,8 +48,7 @@ class App {
         builder_(builder),
         runner_(runner) {}
 
-  ::btool::VoidErr Run(const std::string &target, bool clean, bool list,
-                       bool run);
+  void Run(const std::string &target, bool clean, bool list, bool run);
 
  private:
   Collector *collector_;

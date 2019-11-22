@@ -19,7 +19,7 @@ class Runner : public ::btool::app::App::Runner {
 
   Runner(Callback *cb) : cb_(cb) {}
 
-  ::btool::VoidErr Run(const ::btool::node::Node &node) override;
+  void Run(const ::btool::node::Node &node) override;
 
  private:
   Callback *cb_;

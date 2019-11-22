@@ -121,9 +121,10 @@ int main(int argc, const char *argv[]) {
   ::btool::app::runner::Runner runner(&ui);
 
   ::btool::app::App a(&collector, &cleaner, &lister, &builder, &runner);
-  auto err = a.Run(root_target, clean, list, false);
-  if (err) {
-    ERROR("%s\n", err.Msg());
+  try {
+    a.Run(root_target, clean, list, false);
+  } catch (const ::btool::Err &e) {
+    ERRORS() << e.what() << std::endl;
     return 1;
   }
 

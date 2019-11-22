@@ -3,19 +3,14 @@
 #include <functional>
 #include <string>
 
-#include "err.h"
 #include "util/fs/fs.h"
 
 namespace btool::app::collector::cc {
 
-::btool::VoidErr IncludesParserImpl::ParseIncludes(
+void IncludesParserImpl::ParseIncludes(
     const std::string &path,
     std::function<void(const std::string &)> callback) {
-  auto err = ::btool::util::fs::ReadFile(path);
-  if (err) {
-    return ::btool::VoidErr::Failure(err.Msg());
-  }
-  auto content = err.Ret();
+  auto content = ::btool::util::fs::ReadFile(path);
 
   std::size_t index = 0;
   while (true) {
@@ -38,8 +33,6 @@ namespace btool::app::collector::cc {
 
     index = end + 1;
   }
-
-  return ::btool::VoidErr::Success();
 }
 
 };  // namespace btool::app::collector::cc

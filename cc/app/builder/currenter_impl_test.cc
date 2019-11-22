@@ -45,63 +45,50 @@ class NodeFile {
 TEST_F(CurrenterTest, NoDeps) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(tmpd_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpd_));
 
   NodeFile nf(tmpd_);
   nf.Modify();
 
-  err = ci.Current(tmpd_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpd_));
 }
 
 TEST_F(CurrenterTest, AdjacentDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpc_));
 
   NodeFile nfd(tmpd_);
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpc_));
 
   NodeFile nfc(tmpc_);
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpc_));
 
   nfd.Modify();
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpc_));
 
   nfc.Modify();
-  err = ci.Current(tmpc_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpc_));
 }
 
 TEST_F(CurrenterTest, AncestorDep) {
   ::btool::app::builder::CurrenterImpl ci;
 
-  auto err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpb_));
 
   NodeFile nfd(tmpd_);
   NodeFile nfc(tmpc_);
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpb_));
 
   NodeFile nfb(tmpb_);
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpb_));
 
   nfd.Modify();
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpb_));
 
   nfc.Modify();
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(false), err);
+  EXPECT_FALSE(ci.Current(tmpb_));
 
   nfb.Modify();
-  err = ci.Current(tmpb_);
-  EXPECT_EQ(::btool::Err<bool>::Success(true), err);
+  EXPECT_TRUE(ci.Current(tmpb_));
 }

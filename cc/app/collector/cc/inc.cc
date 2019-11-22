@@ -6,6 +6,7 @@
 #include "app/collector/cc/properties.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
+#include "err.h"
 #include "log.h"
 #include "node/node.h"
 #include "util/string/string.h"
@@ -34,16 +35,10 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   }
 
   bool updated = false;
-  auto err =
-      ip_->ParseIncludes(name, [s, n, &updated](const std::string &include) {
-        bool new_stuff = HandleInclude(s, n, include);
-        updated = updated || new_stuff;
-      });
-  if (err) {
-    std::string error = "failed to parse includes " + std::string(err.Msg());
-    AddError(error);
-    return;
-  }
+  ip_->ParseIncludes(name, [s, n, &updated](const std::string &include) {
+    bool new_stuff = HandleInclude(s, n, include);
+    updated = updated || new_stuff;
+  });
 
   if (updated) {
     Notify(s, name);

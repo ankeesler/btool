@@ -9,7 +9,7 @@ namespace btool::app::builder {
 
 class CurrenterImpl : public Builder::Currenter {
  public:
-  ::btool::Err<bool> Current(const ::btool::node::Node &node) override;
+  bool Current(const ::btool::node::Node &node) override;
 };
 
 };  // namespace btool::app::builder

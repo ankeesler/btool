@@ -14,12 +14,12 @@ class Builder : public ::btool::app::App::Builder {
   class Currenter {
    public:
     virtual ~Currenter() {}
-    virtual ::btool::Err<bool> Current(const ::btool::node::Node &node) = 0;
+    virtual bool Current(const ::btool::node::Node &node) = 0;
   };
 
   Builder(Currenter *c) : c_(c) {}
 
-  ::btool::VoidErr Build(const ::btool::node::Node &node) override;
+  void Build(const ::btool::node::Node &node) override;
 
  private:
   Currenter *c_;

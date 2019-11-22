@@ -8,42 +8,21 @@
 
 namespace btool::app {
 
-::btool::VoidErr App::Run(const std::string &target, bool clean, bool list,
-                          bool run) {
-  auto collect_err = collector_->Collect(target);
-  if (collect_err) {
-    return ::btool::VoidErr::Failure(collect_err.Msg());
-  }
-
-  ::btool::node::Node *n = collect_err.Ret();
+void App::Run(const std::string &target, bool clean, bool list, bool run) {
+  auto n = collector_->Collect(target);
   DEBUGS() << "collected graph from root " << n->name() << std::endl;
 
-  ::btool::VoidErr err;
   if (clean) {
-    err = cleaner_->Clean(*n);
-    if (err) {
-      return err;
-    }
+    cleaner_->Clean(*n);
   } else if (list) {
-    err = lister_->List(*n);
-    if (err) {
-      return err;
-    }
+    lister_->List(*n);
   } else {
-    err = builder_->Build(*n);
-    if (err) {
-      return err;
-    }
+    builder_->Build(*n);
 
     if (run) {
-      err = runner_->Run(*n);
-      if (err) {
-        return err;
-      }
+      runner_->Run(*n);
     }
   }
-
-  return err;
 }
 
 };  // namespace btool::app
