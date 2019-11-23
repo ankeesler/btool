@@ -14,6 +14,11 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
     auto n_n = s->Put(name);
 
     for (const auto &d : n.dependencies) {
+      if (d == "$this") {
+        // TODO: handle me!
+        continue;
+      }
+
       name = ::btool::util::fs::Join(root, d);
       auto d_n = s->Get(name);
       if (d_n == nullptr) {

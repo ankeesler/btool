@@ -8,7 +8,7 @@
 
 namespace btool::app::collector::registry {
 
-class GaggleCollectorImpl : RegistryCollectini::GaggleCollector {
+class GaggleCollectorImpl : public RegistryCollectini::GaggleCollector {
  public:
   void Collect(::btool::app::collector::Store *s, Gaggle *g,
                std::string root) override;

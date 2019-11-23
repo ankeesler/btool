@@ -1,5 +1,7 @@
 #include "app/collector/registry/yaml_serializer.h"
 
+#include <vector>
+
 #include "yaml-cpp/yaml.h"
 
 #include "err.h"
@@ -25,13 +27,13 @@ template <>
 struct convert<::btool::app::collector::registry::Index> {
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::Index &i) {
-    if (!node.IsSequence()) {
+    if (!node.IsMap()) {
       return false;
     }
 
-    for (const auto &f : node) {
-      i.files.push_back(f.as<::btool::app::collector::registry::IndexFile>());
-    }
+    i.files =
+        node["files"]
+            .as<std::vector<::btool::app::collector::registry::IndexFile>>();
 
     return true;
   }
@@ -121,13 +123,12 @@ template <>
 struct convert<::btool::app::collector::registry::Gaggle> {
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::Gaggle &g) {
-    if (!node.IsSequence()) {
+    if (!node.IsMap()) {
       return false;
     }
 
-    for (const auto &n : node) {
-      g.nodes.push_back(n.as<::btool::app::collector::registry::Node>());
-    }
+    g.nodes = node["nodes"]
+                  .as<std::vector<::btool::app::collector::registry::Node>>();
 
     return true;
   }
@@ -138,11 +139,19 @@ struct convert<::btool::app::collector::registry::Gaggle> {
 namespace btool::app::collector::registry {
 
 void YamlSerializer::UnmarshalIndex(std::istream *is, Index *i) {
-  *i = YAML::Load(*is).as<Index>();
+  try {
+    *i = YAML::Load(*is).as<Index>();
+  } catch (const YAML::Exception &e) {
+    THROW_ERR("could not unmarshal index: " + std::string(e.what()));
+  }
 }
 
 void YamlSerializer::UnmarshalGaggle(std::istream *is, Gaggle *g) {
-  *g = YAML::Load(*is).as<Gaggle>();
+  try {
+    *g = YAML::Load(*is).as<Gaggle>();
+  } catch (const YAML::Exception &e) {
+    THROW_ERR("could not unmarshal gaggle: " + std::string(e.what()));
+  }
 }
 
 };  // namespace btool::app::collector::registry

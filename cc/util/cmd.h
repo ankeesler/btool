@@ -21,7 +21,8 @@ class Cmd {
   int Run(void);
 
   std::string String() const {
-    std::stringstream ss{path_};
+    std::stringstream ss;
+    ss << path_;
     for (const auto arg : args_) {
       ss << " " << arg;
     }

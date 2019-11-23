@@ -13,6 +13,7 @@ TEST(YamlSerializer, UnmarshalIndex) {
 
   std::string content =
       "---\n"
+      "files:\n"
       "- path: some/path0.yml\n"
       "  sha256: sha0\n"
       "- path: some/path1.yml\n"
@@ -48,6 +49,7 @@ TEST(YamlSerializer, UnmarshalGaggle) {
 
   std::string content =
       "---\n"
+      "nodes:\n"
       "- name: tuna\n"
       "  dependencies: [fish, marlin]\n"
       "  resolver:\n"
