@@ -28,6 +28,7 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
     }
 
     n_n->set_property_store(n.labels);
+    n_n->set_resolver(rf_->New(n.resolver));
   }
 }
 

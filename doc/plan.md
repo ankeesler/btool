@@ -28,6 +28,7 @@
 
 ### Want
 
+- Where are we copying that we don't need to? More pass-by-reference?
 - Profile - where are the bottle necks?
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
 - Check that files are linted in ci.

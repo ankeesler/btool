@@ -8,6 +8,7 @@ fi
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 $BTOOL -loglevel error -run -target util/cmd_test
+$BTOOL -loglevel error -run -target util/download_test
 $BTOOL -loglevel error -run -target util/flags_test
 $BTOOL -loglevel error -run -target util/fs/fs_test
 $BTOOL -loglevel error -run -target util/string/string_test
