@@ -25,17 +25,28 @@ struct Index {
 struct Resolver {
   std::string name;
   ::btool::node::PropertyStore config;
+
+  bool operator==(const Resolver &r0) const {
+    return r0.name == name && r0.config == config;
+  }
 };
 
 struct Node {
   std::string name;
   std::vector<std::string> dependencies;
-  ::btool::node::PropertyStore property_store;
+  ::btool::node::PropertyStore labels;
   Resolver resolver;
+
+  bool operator==(const Node &n0) const {
+    return n0.name == name && n0.dependencies == dependencies &&
+           n0.labels == labels && n0.resolver == resolver;
+  }
 };
 
 struct Gaggle {
   std::vector<Node> nodes;
+
+  bool operator==(const Gaggle &g0) const { return g0.nodes == nodes; }
 };
 
 class Registry {

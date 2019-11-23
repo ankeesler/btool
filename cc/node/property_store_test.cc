@@ -27,6 +27,28 @@ TEST(PropertyStore, Bool) {
   EXPECT_EQ(false, *b);
 }
 
+TEST(PropertyStore, String) {
+  ::btool::node::PropertyStore ps;
+
+  const std::string *s;
+  ps.Read("some-property", &s);
+  EXPECT_EQ(nullptr, s);
+
+  ps.Write("some-property", "tuna");
+  ps.Read("some-property", &s);
+  EXPECT_EQ("tuna", *s);
+
+  ps.Write("some-other-property", "fish");
+  ps.Read("some-property", &s);
+  EXPECT_EQ("tuna", *s);
+  ps.Read("some-other-property", &s);
+  EXPECT_EQ("fish", *s);
+
+  ::btool::node::PropertyStore copy = ps;
+  copy.Read("some-property", &s);
+  EXPECT_EQ("tuna", *s);
+}
+
 TEST(PropertyStore, Strings) {
   ::btool::node::PropertyStore ps;
 

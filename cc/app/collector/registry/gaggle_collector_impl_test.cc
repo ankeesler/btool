@@ -11,8 +11,8 @@ using ::testing::ElementsAre;
 class GaggleCollectorImplTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    n0_.property_store.Write("bool-property", true);
-    n0_.property_store.Append("strings-property", "some-string");
+    n0_.labels.Write("bool-property", true);
+    n0_.labels.Append("strings-property", "some-string");
     g_.nodes = {n0_, n1_};
   }
 

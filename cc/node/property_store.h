@@ -20,7 +20,20 @@ class PropertyStore {
   PropertyStore(const PropertyStore &ps) = default;
   PropertyStore &operator=(const PropertyStore &ps) = default;
 
+  bool operator==(const PropertyStore &ps) const {
+    return ps.bool_store_ == bool_store_ && ps.string_store_ == string_store_ &&
+           ps.strings_store_ == strings_store_;
+  };
+
   void Write(const std::string &name, bool b) { bool_store_[name] = b; }
+
+  void Write(const std::string &name, std::string s) {
+    string_store_[name] = s;
+  }
+
+  void Write(const std::string &name, const char *s) {
+    string_store_[name] = s;
+  }
 
   void Append(const std::string &name, const std::string &value) {
     strings_store_[name].push_back(value);
@@ -29,6 +42,15 @@ class PropertyStore {
   void Read(const std::string &name, const bool **value) const {
     auto it = bool_store_.find(name);
     if (it == bool_store_.end()) {
+      *value = nullptr;
+    } else {
+      *value = &it->second;
+    }
+  }
+
+  void Read(const std::string &name, const std::string **value) const {
+    auto it = string_store_.find(name);
+    if (it == string_store_.end()) {
       *value = nullptr;
     } else {
       *value = &it->second;
@@ -47,6 +69,7 @@ class PropertyStore {
 
  private:
   std::map<std::string, bool> bool_store_;
+  std::map<std::string, std::string> string_store_;
   std::map<std::string, std::vector<std::string>> strings_store_;
 };
 

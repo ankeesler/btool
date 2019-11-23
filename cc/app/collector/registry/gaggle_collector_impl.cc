@@ -22,7 +22,7 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
       n_n->dependencies()->push_back(d_n);
     }
 
-    n_n->set_property_store(n.property_store);
+    n_n->set_property_store(n.labels);
   }
 }
 
