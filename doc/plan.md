@@ -41,3 +41,6 @@
 ### 01: Can't put comments to the right of headers
 
 ### 02: Transient header dependencies' source objects are not brought in to build
+
+### 03: The way we find include paths is terribly fraught with peril. :(
+- A file including `node/node.h` brought in the `node/node.h` from yaml-cpp.
