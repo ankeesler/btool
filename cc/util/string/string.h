@@ -5,7 +5,8 @@
 
 namespace btool::util::string {
 
-bool HasSuffix(const char *s, const char *suffix);
+bool HasPrefix(const std::string &s, const std::string &prefix);
+bool HasSuffix(const std::string &s, const std::string &suffix);
 std::string Replace(const std::string &s, const std::string &from,
                     const std::string &to);
 
