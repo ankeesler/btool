@@ -53,7 +53,8 @@ class CompileResolver : public ::btool::node::Node::Resolver {
     DEBUGS() << "err: " << err.str() << std::endl;
 
     if (ec != 0) {
-      THROW_ERR("compiler exit code = " + std::to_string(ec));
+      THROW_ERR("compiler exit code = " + std::to_string(ec) +
+                ", err: " + err.str());
     }
   }
 
@@ -91,7 +92,8 @@ class LinkResolver : public ::btool::node::Node::Resolver {
     DEBUG("err: %s\n", err.str().c_str());
 
     if (ec != 0) {
-      THROW_ERR("linker exit code = " + std::to_string(ec));
+      THROW_ERR("linker exit code = " + std::to_string(ec) +
+                ", err: " + err.str());
     }
   }
 
