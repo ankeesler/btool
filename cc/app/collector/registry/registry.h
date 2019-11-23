@@ -10,10 +10,16 @@ namespace btool::app::collector::registry {
 struct IndexFile {
   std::string path;
   std::string sha256;
+
+  bool operator==(const IndexFile &if0) const {
+    return if0.path == path && if0.sha256 == sha256;
+  }
 };
 
 struct Index {
   std::vector<IndexFile> files;
+
+  bool operator==(const Index &i0) const { return i0.files == files; }
 };
 
 struct Resolver {
@@ -35,7 +41,7 @@ struct Gaggle {
 class Registry {
  public:
   virtual void GetIndex(Index *i) = 0;
-  virtual bool GetGaggle(std::string path, Gaggle *g) = 0;
+  virtual void GetGaggle(std::string path, Gaggle *g) = 0;
 };
 
 };  // namespace btool::app::collector::registry
