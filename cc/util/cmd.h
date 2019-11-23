@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,14 @@ class Cmd {
   void Stderr(std::ostream *err) { err_ = err; }
 
   int Run(void);
+
+  std::string String() const {
+    std::stringstream ss{path_};
+    for (const auto arg : args_) {
+      ss << " " << arg;
+    }
+    return ss.str();
+  }
 
  private:
   int RunChild(int stdout_fds[2], int stderr_fds[2]);
