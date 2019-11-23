@@ -1,0 +1,689 @@
+---
+nodes:
+# Archives
+- name: yaml-cpp-yaml-cpp-0.6.3.zip
+  dependencies:
+    - $this
+  resolver:
+    name: download
+    config:
+      url: https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.6.3.zip
+      sha256: 7c0ddc08a99655508ae110ba48726c67e4a10b290c214aed866ce4bbcbe3e84c
+
+# Headers
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/traits.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/eventhandler.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/emitter.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/anchor.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/mark.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/emitterdef.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/parser.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/null.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/exceptions.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/emitterstyle.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/emittermanip.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/emitfromevents.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/dll.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/yaml.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/type.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/parse.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/node.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/node_data.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/node_ref.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/node.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/bool_type.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/memory.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/node_iterator.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/impl.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/iterator_fwd.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/detail/iterator.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/ptr.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/convert.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/impl.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/emit.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/node/iterator.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/ostream_wrapper.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/stlemitter.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/include/yaml-cpp/binary.h
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.libraries:
+      - yaml-cpp.a
+  resolver:
+    name: unzip
+
+# Sources
+- name: yaml-cpp-yaml-cpp-0.6.3/src/exceptions.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/memory.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/ostream_wrapper.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitfromevents.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/simplekey.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/parse.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitter.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/convert.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/regex_yaml.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scanscalar.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/exp.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/null.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/node.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/singledocparser.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/binary.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/nodeevents.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scanner.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emit.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/tag.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitterutils.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/stream.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scantag.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scantoken.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/nodebuilder.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/directives.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/node_data.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitterstate.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+- name: yaml-cpp-yaml-cpp-0.6.3/src/parser.cpp
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3.zip
+  labels:
+    io.btool.collector.cc.includePaths:
+      - yaml-cpp-yaml-cpp-0.6.3/include
+  resolver:
+    name: unzip
+
+# Objects
+- name: yaml-cpp-yaml-cpp-0.6.3/src/exceptions.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/exceptions.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/memory.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/memory.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/ostream_wrapper.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/ostream_wrapper.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitfromevents.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitfromevents.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/simplekey.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/simplekey.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/parse.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/parse.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitter.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitter.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/convert.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/convert.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/regex_yaml.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/regex_yaml.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scanscalar.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/scanscalar.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/exp.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/exp.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/null.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/null.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/node.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/node.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/singledocparser.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/singledocparser.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/binary.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/binary.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/nodeevents.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/nodeevents.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scanner.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/scanner.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emit.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/emit.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/tag.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/tag.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitterutils.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitterutils.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/stream.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/stream.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scantag.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/scantag.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/scantoken.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/scantoken.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/nodebuilder.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/nodebuilder.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/directives.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/directives.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/node_data.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/node_data.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/emitterstate.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitterstate.cpp
+  resolver:
+    name: compileCC
+- name: yaml-cpp-yaml-cpp-0.6.3/src/parser.o
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/parser.cpp
+  resolver:
+    name: compileCC
+
+# Libraries
+- name: yaml-cpp.a
+  dependencies:
+    - yaml-cpp-yaml-cpp-0.6.3/src/exceptions.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/memory.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/ostream_wrapper.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitfromevents.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/simplekey.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/parse.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitter.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/convert.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/regex_yaml.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/scanscalar.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/exp.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/null.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/node.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/singledocparser.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/binary.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/nodeevents.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/scanner.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/emit.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/tag.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitterutils.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/stream.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/scantag.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/scantoken.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/nodebuilder.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/directives.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/node_data.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/emitterstate.o
+    - yaml-cpp-yaml-cpp-0.6.3/src/parser.o
+  resolver:
+    name: archive

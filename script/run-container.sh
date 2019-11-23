@@ -10,4 +10,4 @@ fi
 shift
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
-docker run -v "$PWD:/etc/btool-mount" -w /etc/btool-mount --rm -it -p 8080:8080 "ankeesler/$image" "$@"
+docker run -v "$PWD:/etc/btool-mount" -w /etc/btool-mount --rm -it -p 80:80 "ankeesler/$image" "$@"
