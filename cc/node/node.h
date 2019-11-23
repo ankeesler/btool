@@ -29,6 +29,7 @@ class Node {
   void set_resolver(Resolver *resolver) { resolver_ = resolver; }
   const PropertyStore *property_store() const { return &property_store_; }
   PropertyStore *property_store() { return &property_store_; }
+  void set_property_store(PropertyStore ps) { property_store_ = ps; }
 
   void String(std::ostream *os) const;
   void Visit(std::function<void(const Node *)>) const;

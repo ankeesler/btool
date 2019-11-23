@@ -20,6 +20,11 @@ TEST(PropertyStore, Bool) {
   ps.Write("some-other-property", true);
   ps.Read("some-other-property", &b);
   EXPECT_EQ(true, *b);
+
+  ::btool::node::PropertyStore copy = ps;
+  copy.Read("some-property", &b);
+  ASSERT_TRUE(b != nullptr);
+  EXPECT_EQ(false, *b);
 }
 
 TEST(PropertyStore, Strings) {
@@ -38,6 +43,13 @@ TEST(PropertyStore, Strings) {
   ps.Append("some-property", "marlin");
   ps.Read("some-property", &s);
   EXPECT_EQ(3UL, s->size());
+  EXPECT_EQ("tuna", s->at(0));
+  EXPECT_EQ("fish", s->at(1));
+  EXPECT_EQ("marlin", s->at(2));
+
+  ::btool::node::PropertyStore copy = ps;
+  copy.Read("some-property", &s);
+  ASSERT_EQ(3UL, s->size());
   EXPECT_EQ("tuna", s->at(0));
   EXPECT_EQ("fish", s->at(1));
   EXPECT_EQ("marlin", s->at(2));

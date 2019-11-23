@@ -15,6 +15,11 @@ namespace btool::node {
 //   bool
 class PropertyStore {
  public:
+  PropertyStore() = default;
+
+  PropertyStore(const PropertyStore &ps) = default;
+  PropertyStore &operator=(const PropertyStore &ps) = default;
+
   void Write(const std::string &name, bool b) { bool_store_[name] = b; }
 
   void Append(const std::string &name, const std::string &value) {
