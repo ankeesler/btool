@@ -111,6 +111,8 @@ func (c *Collector) newResolver(
 		if err != nil {
 			err = errors.Wrap(err, "create download")
 		}
+	case "script":
+		nodeR = c.rf.NewScript(config["script"].(string))
 	case "":
 		nodeR = nil
 	default:

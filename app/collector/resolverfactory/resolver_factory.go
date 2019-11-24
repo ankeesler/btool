@@ -76,3 +76,8 @@ func (rf *ResolverFactory) NewDownload(url, sha256 string) node.Resolver {
 func (rf *ResolverFactory) NewUnzip(outputDir string) node.Resolver {
 	return resolvers.NewUnzip(outputDir)
 }
+
+// NewScript returns a node.Resolver that runs a script.
+func (rf *ResolverFactory) NewScript(script string) node.Resolver {
+	return resolvers.NewScript(script)
+}

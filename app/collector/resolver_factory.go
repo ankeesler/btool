@@ -15,4 +15,5 @@ type ResolverFactory interface {
 
 	NewDownload(url, sha256 string) node.Resolver
 	NewUnzip(outputDir string) node.Resolver
+	NewScript(script string) node.Resolver
 }
