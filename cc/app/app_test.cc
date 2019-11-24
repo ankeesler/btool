@@ -1,6 +1,5 @@
 #include "app.h"
 
-#include <memory>
 #include <string>
 
 #include "gmock/gmock.h"
@@ -53,8 +52,8 @@ class AppTest : public ::testing::Test {
 
 TEST_F(AppTest, Build) {
   InSequence s;
-  auto n = std::make_unique<::btool::node::Node>("a");
-  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(n.get()));
+  ::btool::node::Node n("a");
+  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(&n));
   EXPECT_CALL(mbuilder_, Build(_));
 
   a_.Run("", false, false, false);
@@ -62,8 +61,8 @@ TEST_F(AppTest, Build) {
 
 TEST_F(AppTest, Clean) {
   InSequence s;
-  auto n = std::make_unique<::btool::node::Node>("a");
-  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(n.get()));
+  ::btool::node::Node n("a");
+  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(&n));
   EXPECT_CALL(mcleaner_, Clean(_));
 
   a_.Run("", true, false, false);
@@ -71,8 +70,8 @@ TEST_F(AppTest, Clean) {
 
 TEST_F(AppTest, List) {
   InSequence s;
-  auto n = std::make_unique<::btool::node::Node>("a");
-  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(n.get()));
+  ::btool::node::Node n("a");
+  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(&n));
   EXPECT_CALL(mlister_, List(_));
 
   a_.Run("", false, true, false);
@@ -80,8 +79,8 @@ TEST_F(AppTest, List) {
 
 TEST_F(AppTest, Run) {
   InSequence s;
-  auto n = std::make_unique<::btool::node::Node>("a");
-  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(n.get()));
+  ::btool::node::Node n("a");
+  EXPECT_CALL(mcollector_, Collect(_)).WillOnce(Return(&n));
   EXPECT_CALL(mbuilder_, Build(_));
   EXPECT_CALL(mrunner_, Run(_));
 
