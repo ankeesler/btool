@@ -5,33 +5,40 @@
 
 #include "app/collector/registry/registry.h"
 #include "app/collector/store.h"
+#include "app/collector/testing/collector.h"
 #include "node/node.h"
 #include "node/testing/node.h"
 
+using ::testing::_;
 using ::testing::ElementsAre;
 using ::testing::InSequence;
 using ::testing::Ref;
 using ::testing::Return;
 using ::testing::StrictMock;
 
-class MockResolverFactory : public ::btool::app::collector::registry::
-                                GaggleCollectorImpl::ResolverFactory {
- public:
-  MOCK_METHOD1(New, ::btool::node::Node::Resolver *(
-                        const ::btool::app::collector::registry::Resolver &));
-};
+// class MockResolverFactory : public ::btool::app::collector::registry::
+//                                GaggleCollectorImpl::ResolverFactory {
+// public:
+//  MOCK_METHOD1(New, ::btool::node::Node::Resolver *(
+//                        const ::btool::app::collector::registry::Resolver &));
+//};
 
 class GaggleCollectorImplTest : public ::testing::Test {
  protected:
-  GaggleCollectorImplTest() : gci_(&mrf_) {}
-
   void SetUp() override {
+    gci_.AddResolverFactoryDelegate(&mrfd0_);
+    gci_.AddResolverFactoryDelegate(&mrfd1_);
+
     n0_.labels.Write("bool-property", true);
     n0_.labels.Append("strings-property", "some-string");
     g_.nodes = {n0_, n1_};
   }
 
-  StrictMock<MockResolverFactory> mrf_;
+  // StrictMock<MockResolverFactory> mrf_;
+  StrictMock<::btool::app::collector::testing::MockResolverFactoryDelegate>
+      mrfd0_;
+  StrictMock<::btool::app::collector::testing::MockResolverFactoryDelegate>
+      mrfd1_;
   ::btool::app::collector::registry::GaggleCollectorImpl gci_;
   ::btool::app::collector::registry::Resolver r0_{.name = "r0"};
   ::btool::app::collector::registry::Resolver r1_{.name = "r1"};
@@ -46,10 +53,14 @@ class GaggleCollectorImplTest : public ::testing::Test {
 TEST_F(GaggleCollectorImplTest, Success) {
   InSequence s;
 
-  ::btool::node::testing::MockResolver mr0;
-  ::btool::node::testing::MockResolver mr1;
-  EXPECT_CALL(mrf_, New(r0_)).WillOnce(Return(&mr0));
-  EXPECT_CALL(mrf_, New(r1_)).WillOnce(Return(&mr1));
+  StrictMock<::btool::node::testing::MockResolver> mr0;
+  StrictMock<::btool::node::testing::MockResolver> mr1;
+  EXPECT_CALL(mrfd0_, NewResolver(r0_.name, r0_.config, root_, _))
+      .WillOnce(Return(&mr0));
+  EXPECT_CALL(mrfd0_, NewResolver(r1_.name, r1_.config, root_, _))
+      .WillOnce(Return(nullptr));
+  EXPECT_CALL(mrfd1_, NewResolver(r1_.name, r1_.config, root_, _))
+      .WillOnce(Return(&mr1));
 
   gci_.Collect(&s_, &g_, root_);
 
