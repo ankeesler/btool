@@ -12,6 +12,7 @@ $BTOOL -loglevel error -run -target util/download_test
 $BTOOL -loglevel error -run -target util/flags_test
 $BTOOL -loglevel error -run -target util/fs/fs_test
 $BTOOL -loglevel error -run -target util/string/string_test
+$BTOOL -loglevel error -run -target util/unzip_test
 
 $BTOOL -loglevel error -run -target node/node_test
 $BTOOL -loglevel error -run -target node/property_store_test
@@ -30,6 +31,7 @@ $BTOOL -loglevel error -run -target app/collector/cc/obj_test
 $BTOOL -loglevel error -run -target app/collector/fs/fs_collectini_test
 $BTOOL -loglevel error -run -target app/collector/registry/registry_collectini_test
 $BTOOL -loglevel error -run -target app/collector/registry/gaggle_collector_impl_test
+$BTOOL -loglevel error -run -target app/collector/registry/resolver_factory_delegate_test
 $BTOOL -loglevel error -run -target app/collector/registry/fs_registry_test
 $BTOOL -loglevel error -run -target app/collector/registry/yaml_serializer_test
 $BTOOL -loglevel error -run -target app/lister/lister_test
