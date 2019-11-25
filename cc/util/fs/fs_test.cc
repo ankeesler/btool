@@ -17,12 +17,18 @@ TEST(FS, Base) {
 }
 
 TEST(FS, Dir) {
-  EXPECT_EQ("", ::btool::util::fs::Dir(""));
-  EXPECT_EQ("a", ::btool::util::fs::Dir("a"));
+  EXPECT_EQ(".", ::btool::util::fs::Dir(""));
+  EXPECT_EQ(".", ::btool::util::fs::Dir("a"));
   EXPECT_EQ(".", ::btool::util::fs::Dir("."));
   EXPECT_EQ("a", ::btool::util::fs::Dir("a/b"));
   EXPECT_EQ("a/b", ::btool::util::fs::Dir("a/b/c.c"));
   EXPECT_EQ("./a/b", ::btool::util::fs::Dir("./a/b/c.c"));
+
+  EXPECT_EQ(".", ::btool::util::fs::Dir("c.c"));
+  EXPECT_EQ(".", ::btool::util::fs::Dir("./c.c"));
+
+  EXPECT_EQ("/", ::btool::util::fs::Dir("/tmp"));
+  EXPECT_EQ("/", ::btool::util::fs::Dir("/"));
 }
 
 TEST(FS, Join) {
@@ -54,6 +60,16 @@ TEST(FS, File) {
   auto content = ::btool::util::fs::ReadFile(file);
   EXPECT_EQ("this is text\nwith multiple lines\n", content);
 
+  ::btool::util::fs::RemoveAll(dir);
+}
+
+TEST(FS, MkdirAll) {
+  auto dir = ::btool::util::fs::TempDir();
+  auto a = ::btool::util::fs::Join(dir, "a");
+  auto b = ::btool::util::fs::Join(a, "b");
+  auto c = ::btool::util::fs::Join(b, "c");
+  ::btool::util::fs::MkdirAll(c);
+  EXPECT_TRUE(::btool::util::fs::Exists(c));
   ::btool::util::fs::RemoveAll(dir);
 }
 

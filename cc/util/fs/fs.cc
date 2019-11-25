@@ -10,6 +10,7 @@
 #include <fstream>
 #include <functional>
 #include <list>
+#include <stack>
 
 #include "err.h"
 #include "log.h"
@@ -30,7 +31,9 @@ std::string Base(const std::string &path) {
 std::string Dir(const std::string &path) {
   std::size_t found = path.rfind('/');
   if (found == std::string::npos) {
-    return path;
+    return ".";
+  } else if (found == 0) {
+    return "/";
   } else {
     return std::string(path.c_str(), found);
   }
@@ -120,6 +123,21 @@ void RemoveAll(const std::string &path) {
 void Mkdir(const std::string &path) {
   if (::mkdir(path.c_str(), 0700) == -1) {
     THROW_ERR("mkdir: " + std::string(::strerror(errno)));
+  }
+}
+
+void MkdirAll(const std::string &path) {
+  std::stack<std::string> dirs;
+  dirs.push(path);
+  while (dirs.top() != "." && dirs.top() != "/") {
+    dirs.push(Dir(dirs.top()));
+  }
+
+  while (!dirs.empty()) {
+    if (!Exists(dirs.top())) {
+      Mkdir(dirs.top());
+    }
+    dirs.pop();
   }
 }
 

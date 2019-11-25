@@ -19,6 +19,7 @@ void WriteFile(const std::string &path, const std::string &content);
 void RemoveAll(const std::string &path);
 
 void Mkdir(const std::string &path);
+void MkdirAll(const std::string &path);
 
 bool Exists(const std::string &path);
 bool IsDir(const std::string &path);
