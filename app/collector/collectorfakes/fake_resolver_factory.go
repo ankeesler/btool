@@ -75,6 +75,17 @@ type FakeResolverFactory struct {
 	newLinkCCReturnsOnCall map[int]struct {
 		result1 node.Resolver
 	}
+	NewScriptStub        func(string) node.Resolver
+	newScriptMutex       sync.RWMutex
+	newScriptArgsForCall []struct {
+		arg1 string
+	}
+	newScriptReturns struct {
+		result1 node.Resolver
+	}
+	newScriptReturnsOnCall map[int]struct {
+		result1 node.Resolver
+	}
 	NewSymlinkStub        func() node.Resolver
 	newSymlinkMutex       sync.RWMutex
 	newSymlinkArgsForCall []struct {
@@ -473,6 +484,66 @@ func (fake *FakeResolverFactory) NewLinkCCReturnsOnCall(i int, result1 node.Reso
 	}{result1}
 }
 
+func (fake *FakeResolverFactory) NewScript(arg1 string) node.Resolver {
+	fake.newScriptMutex.Lock()
+	ret, specificReturn := fake.newScriptReturnsOnCall[len(fake.newScriptArgsForCall)]
+	fake.newScriptArgsForCall = append(fake.newScriptArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	fake.recordInvocation("NewScript", []interface{}{arg1})
+	fake.newScriptMutex.Unlock()
+	if fake.NewScriptStub != nil {
+		return fake.NewScriptStub(arg1)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newScriptReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeResolverFactory) NewScriptCallCount() int {
+	fake.newScriptMutex.RLock()
+	defer fake.newScriptMutex.RUnlock()
+	return len(fake.newScriptArgsForCall)
+}
+
+func (fake *FakeResolverFactory) NewScriptCalls(stub func(string) node.Resolver) {
+	fake.newScriptMutex.Lock()
+	defer fake.newScriptMutex.Unlock()
+	fake.NewScriptStub = stub
+}
+
+func (fake *FakeResolverFactory) NewScriptArgsForCall(i int) string {
+	fake.newScriptMutex.RLock()
+	defer fake.newScriptMutex.RUnlock()
+	argsForCall := fake.newScriptArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeResolverFactory) NewScriptReturns(result1 node.Resolver) {
+	fake.newScriptMutex.Lock()
+	defer fake.newScriptMutex.Unlock()
+	fake.NewScriptStub = nil
+	fake.newScriptReturns = struct {
+		result1 node.Resolver
+	}{result1}
+}
+
+func (fake *FakeResolverFactory) NewScriptReturnsOnCall(i int, result1 node.Resolver) {
+	fake.newScriptMutex.Lock()
+	defer fake.newScriptMutex.Unlock()
+	fake.NewScriptStub = nil
+	if fake.newScriptReturnsOnCall == nil {
+		fake.newScriptReturnsOnCall = make(map[int]struct {
+			result1 node.Resolver
+		})
+	}
+	fake.newScriptReturnsOnCall[i] = struct {
+		result1 node.Resolver
+	}{result1}
+}
+
 func (fake *FakeResolverFactory) NewSymlink() node.Resolver {
 	fake.newSymlinkMutex.Lock()
 	ret, specificReturn := fake.newSymlinkReturnsOnCall[len(fake.newSymlinkArgsForCall)]
@@ -600,6 +671,8 @@ func (fake *FakeResolverFactory) Invocations() map[string][][]interface{} {
 	defer fake.newLinkCMutex.RUnlock()
 	fake.newLinkCCMutex.RLock()
 	defer fake.newLinkCCMutex.RUnlock()
+	fake.newScriptMutex.RLock()
+	defer fake.newScriptMutex.RUnlock()
 	fake.newSymlinkMutex.RLock()
 	defer fake.newSymlinkMutex.RUnlock()
 	fake.newUnzipMutex.RLock()

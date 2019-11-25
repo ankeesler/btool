@@ -3,7 +3,6 @@ package resolvers
 import (
 	"archive/zip"
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"path/filepath"
@@ -26,8 +25,8 @@ func NewUnzip(outputDir string) node.Resolver {
 }
 
 func (u *unzip) Resolve(n *node.Node) error {
-	if ex, ac := 1, len(n.Dependencies); ex != ac {
-		return fmt.Errorf("expected %d dependency, got %d", ex, ac)
+	if len(n.Dependencies) == 0 {
+		return errors.New("expected at least one dependency")
 	}
 
 	zipData, err := ioutil.ReadFile(n.Dependencies[0].Name)
