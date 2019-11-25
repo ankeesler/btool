@@ -1,15 +1,27 @@
 #ifndef BTOOL_APP_COLLECTOR_REGISTRY_RESOLVERFACTORYIMPL_H_
 #define BTOOL_APP_COLLECTOR_REGISTRY_RESOLVERFACTORYIMPL_H_
 
-#include "app/collector/registry/gaggle_collector_impl.h"
-#include "app/collector/registry/registry.h"
+#include <string>
+
+#include "app/collector/registry/resolver_factory_delegate.h"
 #include "node/node.h"
 
 namespace btool::app::collector::registry {
 
-class ResolverFactoryImpl : public GaggleCollectorImpl::ResolverFactory {
+class ResolverFactoryImpl : public ResolverFactoryDelegate::ResolverFactory {
  public:
-  ::btool::node::Node::Resolver *New(const Resolver &r) override;
+  ~ResolverFactoryImpl() {
+    for (auto a : allocations_) {
+      delete a;
+    }
+  }
+
+  ::btool::node::Node::Resolver *NewDownload(
+      const std::string &url, const std::string &sha256) override;
+  ::btool::node::Node::Resolver *NewUnzip() override;
+
+ private:
+  std::vector<::btool::node::Node::Resolver *> allocations_;
 };
 
 };  // namespace btool::app::collector::registry
