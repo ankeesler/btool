@@ -25,8 +25,8 @@ TEST(Unzip, Success) {
           file_size_count += content.size();
         }
       });
-  EXPECT_EQ(26, dir_count);
-  EXPECT_EQ(337994 /* archive file sizes */ + 102844 /* archive size */,
+  EXPECT_EQ(26UL, dir_count);
+  EXPECT_EQ(337994UL /* archive file sizes */ + 102844UL /* archive size */,
             file_size_count);
 
   ::btool::util::fs::RemoveAll(dir);
