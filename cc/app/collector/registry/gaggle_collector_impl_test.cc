@@ -47,7 +47,6 @@ class GaggleCollectorImplTest : public ::testing::Test {
       .name = "n1", .dependencies = {"n0"}, .resolver = r1_};
   ::btool::app::collector::registry::Gaggle g_;
   ::btool::app::collector::Store s_;
-  std::string root_ = "some-root";
 };
 
 TEST_F(GaggleCollectorImplTest, Success) {
@@ -55,14 +54,14 @@ TEST_F(GaggleCollectorImplTest, Success) {
 
   StrictMock<::btool::node::testing::MockResolver> mr0;
   StrictMock<::btool::node::testing::MockResolver> mr1;
-  EXPECT_CALL(mrfd0_, NewResolver(r0_.name, r0_.config, root_, _))
+  EXPECT_CALL(mrfd0_, NewResolver(r0_.name, r0_.config, _))
       .WillOnce(Return(&mr0));
-  EXPECT_CALL(mrfd0_, NewResolver(r1_.name, r1_.config, root_, _))
+  EXPECT_CALL(mrfd0_, NewResolver(r1_.name, r1_.config, _))
       .WillOnce(Return(nullptr));
-  EXPECT_CALL(mrfd1_, NewResolver(r1_.name, r1_.config, root_, _))
+  EXPECT_CALL(mrfd1_, NewResolver(r1_.name, r1_.config, _))
       .WillOnce(Return(&mr1));
 
-  gci_.Collect(&s_, &g_, root_);
+  gci_.Collect(&s_, &g_, "some-root");
 
   auto n0 = s_.Get("some-root/n0");
   ASSERT_TRUE(n0 != nullptr);

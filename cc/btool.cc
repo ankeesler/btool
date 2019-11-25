@@ -22,7 +22,7 @@
 //#include "app/collector/registry/gaggle_collector_impl.h"
 //#include "app/collector/registry/http_registry.h"
 //#include "app/collector/registry/registry_collectini.h"
-//#include "app/collector/registry/resolver_factory_impl.h"
+// resolver_factory_impl.h
 // yaml_serializer.h
 #include "app/collector/store.h"
 #include "app/collector/trivial_collectini.h"

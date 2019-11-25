@@ -16,14 +16,13 @@ class ResolverFactoryDelegate
    public:
     virtual ::btool::node::Node::Resolver *NewDownload(
         const std::string &url, const std::string &sha256) = 0;
-    virtual ::btool::node::Node::Resolver *NewUnzip(
-        const std::string &output_dir) = 0;
+    virtual ::btool::node::Node::Resolver *NewUnzip() = 0;
   };
 
   ResolverFactoryDelegate(ResolverFactory *rf) : rf_(rf) {}
   ::btool::node::Node::Resolver *NewResolver(
       const std::string &name, const ::btool::node::PropertyStore &config,
-      const std::string &root, const ::btool::node::Node &n) override;
+      const ::btool::node::Node &n) override;
 
  private:
   ResolverFactory *rf_;

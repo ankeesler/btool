@@ -33,10 +33,10 @@ class SpyCollectini : public ::btool::app::collector::BaseCollectini {
 class MockResolverFactoryDelegate
     : public ::btool::app::collector::ResolverFactoryDelegate {
  public:
-  MOCK_METHOD4(NewResolver,
+  MOCK_METHOD3(NewResolver,
                ::btool::node::Node::Resolver *(
                    const std::string &, const ::btool::node::PropertyStore &,
-                   const std::string &, const ::btool::node::Node &));
+                   const ::btool::node::Node &));
 };
 
 };  // namespace btool::app::collector::testing

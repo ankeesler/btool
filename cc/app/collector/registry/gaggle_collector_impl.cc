@@ -30,7 +30,7 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
     n_n->set_property_store(n.labels);
 
     for (auto rfd : rfds_) {
-      auto r = rfd->NewResolver(n.resolver.name, n.resolver.config, root, *n_n);
+      auto r = rfd->NewResolver(n.resolver.name, n.resolver.config, *n_n);
       if (r != nullptr) {
         n_n->set_resolver(r);
         break;

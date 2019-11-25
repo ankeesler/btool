@@ -12,7 +12,7 @@ class ResolverFactoryDelegate {
  public:
   virtual ::btool::node::Node::Resolver *NewResolver(
       const std::string &name, const ::btool::node::PropertyStore &config,
-      const std::string &root, const ::btool::node::Node &n) = 0;
+      const ::btool::node::Node &n) = 0;
 };
 
 };  // namespace btool::app::collector

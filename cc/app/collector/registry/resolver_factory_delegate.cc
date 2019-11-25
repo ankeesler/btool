@@ -10,9 +10,9 @@ namespace btool::app::collector::registry {
 
 ::btool::node::Node::Resolver *ResolverFactoryDelegate::NewResolver(
     const std::string &name, const ::btool::node::PropertyStore &config,
-    const std::string &root, const ::btool::node::Node &n) {
+    const ::btool::node::Node &n) {
   if (name == "unzip") {
-    return rf_->NewUnzip(root);
+    return rf_->NewUnzip();
   } else if (name == "download") {
     const std::string *url = nullptr;
     const std::string *sha256 = nullptr;
