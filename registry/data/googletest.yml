@@ -1,62 +1,62 @@
 ---
 nodes:
 # Archives
-- name: googletest-release-1.8.1.zip
+- name: googletest-release-1.8.1.tar.gz
   dependencies:
     - $this
   resolver:
     name: download
     config:
-      url: https://github.com/google/googletest/archive/release-1.8.1.zip
-      sha256: 927827c183d01734cc5cfef85e0ff3f5a92ffe6188e0d18e909c5efebf28a0c7
+      url: https://github.com/google/googletest/archive/release-1.8.1.tar.gz
+      sha256: 9bf1fe5182a604b4135edc1a425ae356c9ad15e9b23f9f12a02e80184c3a249c
 
 # Headers
 - name: googletest-release-1.8.1/googletest/include/gtest/gtest.h
   dependencies:
-    - googletest-release-1.8.1.zip
+    - googletest-release-1.8.1.tar.gz
   labels:
     io.btool.collector.cc.libraries:
       - gtest_main.a
   resolver:
-    name: unzip
+    name: untar
 - name: googletest-release-1.8.1/googlemock/include/gmock/gmock.h
   dependencies:
-    - googletest-release-1.8.1.zip
+    - googletest-release-1.8.1.tar.gz
   labels:
     io.btool.collector.cc.libraries:
       - gmock.a
   resolver:
-    name: unzip
+    name: untar
 
 # Sources
 - name: googletest-release-1.8.1/googletest/src/gtest-all.cc
   dependencies:
-    - googletest-release-1.8.1.zip
+    - googletest-release-1.8.1.tar.gz
   labels:
     io.btool.collector.cc.includePaths:
       - googletest-release-1.8.1/googletest/include
       - googletest-release-1.8.1/googletest
   resolver:
-    name: unzip
+    name: untar
 - name: googletest-release-1.8.1/googlemock/src/gmock-all.cc
   dependencies:
-    - googletest-release-1.8.1.zip
+    - googletest-release-1.8.1.tar.gz
   labels:
     io.btool.collector.cc.includePaths:
       - googletest-release-1.8.1/googlemock/include
       - googletest-release-1.8.1/googlemock
       - googletest-release-1.8.1/googletest/include
   resolver:
-    name: unzip
+    name: untar
 - name: googletest-release-1.8.1/googletest/src/gtest_main.cc
   dependencies:
-    - googletest-release-1.8.1.zip
+    - googletest-release-1.8.1.tar.gz
   labels:
     io.btool.collector.cc.includePaths:
       - googletest-release-1.8.1/googletest/include
       - googletest-release-1.8.1/googletest
   resolver:
-    name: unzip
+    name: untar
 
 # Objects
 - name: googletest-release-1.8.1/googletest/src/gtest-all.o

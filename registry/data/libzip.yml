@@ -49,6 +49,8 @@ nodes:
         echo "#define HAVE_FSEEKO"
         echo "#define HAVE_FTELLO"
         echo "#define HAVE_MKSTEMP"
+        if [[ \"$(uname)\" == \"Linux\" ]]; then echo "#define _Nullable"; fi
+        if [[ \"$(uname)\" == \"Linux\" ]]; then echo "#define _Nonnull"; fi
 - name: libzip-rel-1-5-2/lib/zip.h
   dependencies:
     - libzip-rel-1-5-2.zip

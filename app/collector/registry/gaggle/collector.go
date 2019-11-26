@@ -113,6 +113,8 @@ func (c *Collector) newResolver(
 		}
 	case "script":
 		nodeR = c.rf.NewScript(config["script"].(string))
+	case "untar":
+		nodeR = c.rf.NewUntar()
 	case "":
 		nodeR = nil
 	default:

@@ -81,3 +81,8 @@ func (rf *ResolverFactory) NewUnzip(outputDir string) node.Resolver {
 func (rf *ResolverFactory) NewScript(script string) node.Resolver {
 	return resolvers.NewScript(script)
 }
+
+// NewUntar returns a node.Resolver that untars a file.
+func (rf *ResolverFactory) NewUntar() node.Resolver {
+	return resolvers.NewUntar()
+}

@@ -96,6 +96,16 @@ type FakeResolverFactory struct {
 	newSymlinkReturnsOnCall map[int]struct {
 		result1 node.Resolver
 	}
+	NewUntarStub        func() node.Resolver
+	newUntarMutex       sync.RWMutex
+	newUntarArgsForCall []struct {
+	}
+	newUntarReturns struct {
+		result1 node.Resolver
+	}
+	newUntarReturnsOnCall map[int]struct {
+		result1 node.Resolver
+	}
 	NewUnzipStub        func(string) node.Resolver
 	newUnzipMutex       sync.RWMutex
 	newUnzipArgsForCall []struct {
@@ -596,6 +606,58 @@ func (fake *FakeResolverFactory) NewSymlinkReturnsOnCall(i int, result1 node.Res
 	}{result1}
 }
 
+func (fake *FakeResolverFactory) NewUntar() node.Resolver {
+	fake.newUntarMutex.Lock()
+	ret, specificReturn := fake.newUntarReturnsOnCall[len(fake.newUntarArgsForCall)]
+	fake.newUntarArgsForCall = append(fake.newUntarArgsForCall, struct {
+	}{})
+	fake.recordInvocation("NewUntar", []interface{}{})
+	fake.newUntarMutex.Unlock()
+	if fake.NewUntarStub != nil {
+		return fake.NewUntarStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.newUntarReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakeResolverFactory) NewUntarCallCount() int {
+	fake.newUntarMutex.RLock()
+	defer fake.newUntarMutex.RUnlock()
+	return len(fake.newUntarArgsForCall)
+}
+
+func (fake *FakeResolverFactory) NewUntarCalls(stub func() node.Resolver) {
+	fake.newUntarMutex.Lock()
+	defer fake.newUntarMutex.Unlock()
+	fake.NewUntarStub = stub
+}
+
+func (fake *FakeResolverFactory) NewUntarReturns(result1 node.Resolver) {
+	fake.newUntarMutex.Lock()
+	defer fake.newUntarMutex.Unlock()
+	fake.NewUntarStub = nil
+	fake.newUntarReturns = struct {
+		result1 node.Resolver
+	}{result1}
+}
+
+func (fake *FakeResolverFactory) NewUntarReturnsOnCall(i int, result1 node.Resolver) {
+	fake.newUntarMutex.Lock()
+	defer fake.newUntarMutex.Unlock()
+	fake.NewUntarStub = nil
+	if fake.newUntarReturnsOnCall == nil {
+		fake.newUntarReturnsOnCall = make(map[int]struct {
+			result1 node.Resolver
+		})
+	}
+	fake.newUntarReturnsOnCall[i] = struct {
+		result1 node.Resolver
+	}{result1}
+}
+
 func (fake *FakeResolverFactory) NewUnzip(arg1 string) node.Resolver {
 	fake.newUnzipMutex.Lock()
 	ret, specificReturn := fake.newUnzipReturnsOnCall[len(fake.newUnzipArgsForCall)]
@@ -675,6 +737,8 @@ func (fake *FakeResolverFactory) Invocations() map[string][][]interface{} {
 	defer fake.newScriptMutex.RUnlock()
 	fake.newSymlinkMutex.RLock()
 	defer fake.newSymlinkMutex.RUnlock()
+	fake.newUntarMutex.RLock()
+	defer fake.newUntarMutex.RUnlock()
 	fake.newUnzipMutex.RLock()
 	defer fake.newUnzipMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
