@@ -1,4 +1,4 @@
-#include "node.h"
+#include "node/node.h"
 
 // workaround for bug-00
 #include "gmock/gmock.h"

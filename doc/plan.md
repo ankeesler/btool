@@ -4,8 +4,6 @@
 
 ### Need
 
-- Ability to run tests
-
 ### Pain
 
 - Targets are per-os/arch

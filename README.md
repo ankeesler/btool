@@ -4,10 +4,9 @@ The simplest C/C++ build tool.
 
 [![CircleCI](https://circleci.com/gh/ankeesler/btool/tree/master.svg?style=svg)](https://circleci.com/gh/ankeesler/btool/tree/master)
 
-
 ```
-$ ./btool -root /tmp/BasicC -target main
-$ /tmp/BasicC/main
+$ ./btool -root ./BasicC -target main
+$ ./BasicC/main
 hey! i am running!
 ```
 
@@ -16,21 +15,22 @@ hey! i am running!
 ### To try out `btool`...
 
 ```
-$ docker run -it ankeesler/btool btool -root example/BasicCC -target main -run -loglevel error
-hey!
+$ docker run -it ankeesler/btool
+$ btool -root BasicC -target btool
+$ ./cc/btool
+hey! i am running!
 ```
 
-#### OR
+## To build `btool`...
 
 ```
-$ go run ./cmd/btool -root example/BasicCC -target main -loglevel error
-hey!
+$ btool -root cc -target btool
 ```
 
 ## To run the tests...
 
 ```
-$ go test ./...
+$ ./script/test.sh
 ```
 
 ## Guiding Principles

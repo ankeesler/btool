@@ -5,8 +5,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.13
-    working_directory: /go/src/github.com/ankeesler/btool
+      - image: ankeesler/btool
+    working_directory: /etc/ci
     steps:
       - checkout
       - run: ./script/test.sh

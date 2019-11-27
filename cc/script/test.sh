@@ -43,8 +43,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 "$BTOOL" -registry "$REGISTRY" -loglevel error -run -target app/runner/runner_test
 
 python integration/integration.py \
-       "$BTOOL" /tmp/btool-from-go "$REGISTRY"
+       "$BTOOL" /tmp/btool-new "$REGISTRY"
 python integration/integration.py \
-       /tmp/btool-from-go /tmp/btool-from-cc "$REGISTRY"
-python integration/integration.py \
-       /tmp/btool-from-cc /tmp/btool-from-cc-from-cc "$REGISTRY"
+       /tmp/btool-new /tmp/btool-new-new "$REGISTRY"
