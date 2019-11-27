@@ -18,6 +18,7 @@ class DownloadResolver : public ::btool::node::Node::Resolver {
       : url_(url), sha256_(sha256) {}
 
   void Resolve(const ::btool::node::Node &n) override {
+    ::btool::util::fs::MkdirAll(::btool::util::fs::Dir(n.name()));
     ::btool::util::Download(url_, n.name());
     (void)sha256_;  // TODO: check sha256!
   }

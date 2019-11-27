@@ -41,6 +41,7 @@
 - Cmd should really be printed to stream instead of calling .String()
 - Add a README to the example directory to show how to run btool to build examples.
 - Add a -help flag to show btool flags.
+- Grep for TODOs!
 
 ## Bugs
 
