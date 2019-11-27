@@ -13,6 +13,8 @@ namespace btool::app::collector::registry {
     const ::btool::node::Node &n) {
   if (name == "unzip") {
     return rf_->NewUnzip();
+  } else if (name == "untar") {
+    return rf_->NewUntar();
   } else if (name == "download") {
     const std::string *url = nullptr;
     const std::string *sha256 = nullptr;

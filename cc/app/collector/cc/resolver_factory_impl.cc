@@ -65,6 +65,38 @@ class CompileResolver : public ::btool::node::Node::Resolver {
   std::vector<std::string> more_flags_;
 };
 
+class ArchiveResolver : public ::btool::node::Node::Resolver {
+ public:
+  ArchiveResolver(std::string archiver) : archiver_(archiver) {}
+
+  void Resolve(const ::btool::node::Node &n) override {
+    ::btool::util::Cmd cmd(archiver_);
+    cmd.Arg("rcs");
+    cmd.Arg(n.name());
+    for (const auto &d : *n.dependencies()) {
+      cmd.Arg(d->name());
+    }
+
+    std::ostringstream out;
+    std::ostringstream err;
+    cmd.Stdout(&out);
+    cmd.Stderr(&err);
+
+    int ec = cmd.Run();
+
+    DEBUGS() << "out: " << out.str() << std::endl;
+    DEBUGS() << "err: " << err.str() << std::endl;
+
+    if (ec != 0) {
+      THROW_ERR("archiver exit code = " + std::to_string(ec) +
+                ", err: " + err.str());
+    }
+  }
+
+ private:
+  std::string archiver_;
+};
+
 class LinkResolver : public ::btool::node::Node::Resolver {
  public:
   LinkResolver(std::string linker, std::vector<std::string> flags)
@@ -121,7 +153,9 @@ class LinkResolver : public ::btool::node::Node::Resolver {
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewArchive() {
-  return nullptr;
+  auto ar = new ArchiveResolver(archiver_);
+  allocations_.push_back(ar);
+  return ar;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkC(

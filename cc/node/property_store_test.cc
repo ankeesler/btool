@@ -69,10 +69,16 @@ TEST(PropertyStore, Strings) {
   EXPECT_EQ("fish", s->at(1));
   EXPECT_EQ("marlin", s->at(2));
 
+  ps.ForEach("some-property", [](std::string *v) { v->insert(0, "a-"); });
+  EXPECT_EQ(3UL, s->size());
+  EXPECT_EQ("a-tuna", s->at(0));
+  EXPECT_EQ("a-fish", s->at(1));
+  EXPECT_EQ("a-marlin", s->at(2));
+
   ::btool::node::PropertyStore copy = ps;
   copy.Read("some-property", &s);
   ASSERT_EQ(3UL, s->size());
-  EXPECT_EQ("tuna", s->at(0));
-  EXPECT_EQ("fish", s->at(1));
-  EXPECT_EQ("marlin", s->at(2));
+  EXPECT_EQ("a-tuna", s->at(0));
+  EXPECT_EQ("a-fish", s->at(1));
+  EXPECT_EQ("a-marlin", s->at(2));
 }

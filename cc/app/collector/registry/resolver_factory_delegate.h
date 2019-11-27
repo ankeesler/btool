@@ -17,6 +17,7 @@ class ResolverFactoryDelegate
     virtual ::btool::node::Node::Resolver *NewDownload(
         const std::string &url, const std::string &sha256) = 0;
     virtual ::btool::node::Node::Resolver *NewUnzip() = 0;
+    virtual ::btool::node::Node::Resolver *NewUntar() = 0;
   };
 
   ResolverFactoryDelegate(ResolverFactory *rf) : rf_(rf) {}

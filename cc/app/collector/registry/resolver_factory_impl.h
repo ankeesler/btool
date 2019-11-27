@@ -19,6 +19,7 @@ class ResolverFactoryImpl : public ResolverFactoryDelegate::ResolverFactory {
   ::btool::node::Node::Resolver *NewDownload(
       const std::string &url, const std::string &sha256) override;
   ::btool::node::Node::Resolver *NewUnzip() override;
+  ::btool::node::Node::Resolver *NewUntar() override;
 
  private:
   std::vector<::btool::node::Node::Resolver *> allocations_;

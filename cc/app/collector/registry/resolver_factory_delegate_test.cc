@@ -16,6 +16,7 @@ class MockResolverFactory : public ::btool::app::collector::registry::
                ::btool::node::Node::Resolver *(const std::string &,
                                                const std::string &));
   MOCK_METHOD0(NewUnzip, ::btool::node::Node::Resolver *());
+  MOCK_METHOD0(NewUntar, ::btool::node::Node::Resolver *());
 };
 
 TEST(ResolverFactoryDelegate, Download) {

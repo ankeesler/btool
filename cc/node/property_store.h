@@ -12,6 +12,7 @@ namespace btool::node {
 // PropertyStore is a generic map from a string to value. The value can be of
 // the following types:
 //   std::vector<std::string>
+//   std::string
 //   bool
 class PropertyStore {
  public:
@@ -37,6 +38,17 @@ class PropertyStore {
 
   void Append(const std::string &name, const std::string &value) {
     strings_store_[name].push_back(value);
+  }
+
+  void ForEach(const std::string &name, std::function<void(std::string *)> f) {
+    auto it = strings_store_.find(name);
+    if (it == strings_store_.end()) {
+      return;
+    }
+
+    for (std::size_t i = 0; i < it->second.size(); ++i) {
+      f(it->second.data() + i);
+    }
   }
 
   void Read(const std::string &name, const bool **value) const {
