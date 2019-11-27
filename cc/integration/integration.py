@@ -2,34 +2,37 @@ import subprocess
 import sys
 import unittest
 
-btool = "btool"
+registry = "http://btoolregistry.cfapps.io"
+btool_in = "btool"
+btool_out = "/tmp/btool"
 
 class TestBtool(unittest.TestCase):
     def test_list(self):
-        subprocess.check_call([btool, "-target", "btool"])
-
-        ac_output = subprocess.check_output(["./btool", "-target", "btool", "-list"])
-        self.assertTrue(". ./btool.o" in ac_output)
-        self.assertTrue(". ./app/app.o" in ac_output)
+        ac_output = subprocess.check_output([btool_in, "-registry", registry, "-target", "btool", "-list", "-loglevel", "debug"])
+        self.assertTrue(". btool.o" in ac_output or ". ./btool.o" in ac_output)
+        self.assertTrue(". app/app.o" in ac_output or ". ./app/app.o" in ac_output)
 
     def test_build(self):
-        subprocess.check_call([btool, "-target", "btool"])
-        subprocess.check_call(["mv", "btool", "/tmp/btool-from-go"])
-        subprocess.check_call([btool, "-target", "btool", "-clean"])
+        subprocess.check_call([btool_in, "-registry", registry, "-target", "btool", "-loglevel", "debug"])
+        subprocess.check_call(["mv", "btool", btool_out])
+        subprocess.check_call([btool_in, "-registry", registry, "-target", "btool", "-loglevel", "debug", "-clean"])
 
-        subprocess.check_call(["/tmp/btool-from-go", "-target", "btool", "-loglevel", "debug"])
-        subprocess.check_call(["mv", "btool", "/tmp/btool-from-cc"])
-        subprocess.check_call(["/tmp/btool-from-go", "-target", "btool", "-loglevel", "debug", "-clean"])
-
-        subprocess.check_call(["/tmp/btool-from-cc", "-target", "btool", "-loglevel", "debug"])
-        subprocess.check_call(["mv", "btool", "/tmp/btool-from-cc-from-cc"])
-        subprocess.check_call(["/tmp/btool-from-cc", "-target", "btool", "-loglevel", "debug", "-clean"])
-
-        subprocess.check_call(["/tmp/btool-from-cc-from-cc", "-target", "btool", "-loglevel", "debug"])
-        subprocess.check_call(["ls", "btool"])
+    def test_test(self):
+        subprocess.check_call([btool_in, "-registry", registry, "-root", "../example/BasicCC", "-target", "dep-1/dep-1-test", "-loglevel", "debug", "-run"])
+        subprocess.check_call(["../example/BasicCC/dep-1/dep-1-test"])
+        subprocess.check_call([btool_in, "-registry", registry, "-root", "../example/BasicCC", "-target", "dep-1/dep-1-test", "-loglevel", "debug", "-clean"])
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        btool = sys.argv[1]
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestBtool)
-    unittest.TextTestRunner().run(suite)
+        btool_in = sys.argv[1]
+    if len(sys.argv) > 2:
+        btool_out = sys.argv[2]
+    if len(sys.argv) > 3:
+        registry = sys.argv[3]
+
+    try:
+        suite = unittest.TestLoader().loadTestsFromTestCase(TestBtool)
+        unittest.TextTestRunner().run(suite)
+    except e:
+        print "config: btool_in=%s, btool_out=%s, registry=%s" % (btool_in, btool_out, registry)
+        raise e

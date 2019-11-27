@@ -49,6 +49,7 @@ class CompileResolver : public ::btool::node::Node::Resolver {
 
     int ec = cmd.Run();
 
+    DEBUGS() << "running linker invocation: " << cmd.String() << std::endl;
     DEBUGS() << "out: " << out.str() << std::endl;
     DEBUGS() << "err: " << err.str() << std::endl;
 
@@ -84,6 +85,7 @@ class ArchiveResolver : public ::btool::node::Node::Resolver {
 
     int ec = cmd.Run();
 
+    DEBUGS() << "running archiver invocation: " << cmd.String() << std::endl;
     DEBUGS() << "out: " << out.str() << std::endl;
     DEBUGS() << "err: " << err.str() << std::endl;
 
@@ -120,6 +122,7 @@ class LinkResolver : public ::btool::node::Node::Resolver {
 
     int ec = cmd.Run();
 
+    DEBUGS() << "running linker invocation: " << cmd.String() << std::endl;
     DEBUG("out: %s\n", out.str().c_str());
     DEBUG("err: %s\n", err.str().c_str());
 

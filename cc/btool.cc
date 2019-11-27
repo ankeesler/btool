@@ -15,15 +15,17 @@
 #include "app/collector/cc/inc.h"
 #include "app/collector/cc/includes_parser_impl.h"
 #include "app/collector/cc/obj.h"
+#include "app/collector/cc/resolver_factory_delegate.h"
 #include "app/collector/cc/resolver_factory_impl.h"
 #include "app/collector/collector.h"
 #include "app/collector/fs/fs_collectini.h"
-//#include "app/collector/registry/fs_registry.h"
-//#include "app/collector/registry/gaggle_collector_impl.h"
-//#include "app/collector/registry/http_registry.h"
-//#include "app/collector/registry/registry_collectini.h"
-// resolver_factory_impl.h
-// yaml_serializer.h
+#include "app/collector/registry/fs_registry.h"
+#include "app/collector/registry/gaggle_collector_impl.h"
+#include "app/collector/registry/http_registry.h"
+#include "app/collector/registry/registry_collectini.h"
+#include "app/collector/registry/resolver_factory_delegate.h"
+#include "app/collector/registry/resolver_factory_impl.h"
+#include "app/collector/registry/yaml_serializer.h"
 #include "app/collector/store.h"
 #include "app/collector/trivial_collectini.h"
 #include "app/lister/lister.h"
@@ -81,6 +83,8 @@ int main(int argc, const char *argv[]) {
   f.Bool("clean", &clean);
   bool list = false;
   f.Bool("list", &list);
+  bool run = false;
+  f.Bool("run", &run);
 
   std::string err_s;
   bool success = f.Parse(argc, argv, &err_s);
@@ -105,27 +109,34 @@ int main(int argc, const char *argv[]) {
 
   ::btool::app::collector::Store s;
 
-  //::btool::app::collector::registry::YamlSerializer ys;
-  //::btool::app::collector::registry::FsRegistry fr(registry, &ys);
-  //::btool::app::collector::registry::HttpRegistry hr(registry, &ys);
-  //::btool::app::collector::registry::Registry *r;
-  // if (::btool::util::string::HasPrefix(registry, "http")) {
-  //  r = &hr;
-  //} else {
-  //  r = &fr;
-  //}
+  ::btool::app::collector::registry::YamlSerializer ys;
+  ::btool::app::collector::registry::FsRegistry fr(registry, &ys);
+  ::btool::app::collector::registry::HttpRegistry hr(registry, &ys);
+  ::btool::app::collector::registry::Registry *r;
+  if (::btool::util::string::HasPrefix(registry, "http")) {
+    r = &hr;
+  } else {
+    r = &fr;
+  }
 
-  //::btool::app::collector::registry::ResolverFactoryImpl r_rfi;
-  //::btool::app::collector::registry::GaggleCollectorImpl gci(&r_rfi);
-  //::btool::app::collector::registry::RegistryCollectini rc(r, cache, &gci);
-
-  ::btool::app::collector::cc::IncludesParserImpl ipi;
-  ::btool::app::collector::cc::Inc i(&ipi);
+  ::btool::app::collector::registry::ResolverFactoryImpl r_rfi;
+  ::btool::app::collector::registry::ResolverFactoryDelegate r_rfd(&r_rfi);
 
   ::btool::app::collector::cc::ResolverFactoryImpl c_rfi(
       compiler_c, compiler_cc, archiver, linker_c, linker_cc,
       {"-Wall", "-Werror", "-g", "-O0", "--std=c17"},
       {"-Wall", "-Werror", "-g", "-O0", "--std=c++17"});
+  ::btool::app::collector::cc::ResolverFactoryDelegate c_rfd(&c_rfi);
+
+  ::btool::app::collector::registry::GaggleCollectorImpl gci;
+  gci.AddResolverFactoryDelegate(&r_rfd);
+  gci.AddResolverFactoryDelegate(&c_rfd);
+
+  ::btool::app::collector::registry::RegistryCollectini rc(r, cache, &gci);
+
+  ::btool::app::collector::cc::IncludesParserImpl ipi;
+  ::btool::app::collector::cc::Inc i(&ipi);
+
   ::btool::app::collector::cc::Obj o(&c_rfi);
   ::btool::app::collector::cc::Exe e(&c_rfi);
 
@@ -135,7 +146,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::collector::TrivialCollectini tc(root_target);
 
   ::btool::app::collector::Collector collector(&s);
-  // collector.AddCollectini(&rc);
+  collector.AddCollectini(&rc);
   collector.AddCollectini(&i);
   collector.AddCollectini(&o);
   collector.AddCollectini(&e);
@@ -154,7 +165,7 @@ int main(int argc, const char *argv[]) {
 
   ::btool::app::App a(&collector, &cleaner, &lister, &builder, &runner);
   try {
-    a.Run(root_target, clean, list, false);
+    a.Run(root_target, clean, list, run);
   } catch (const std::exception &e) {
     ERRORS() << e.what() << std::endl;
     return 1;

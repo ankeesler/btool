@@ -9,7 +9,7 @@
 
 namespace btool::app::collector {
 
-const char *Properties::kLocal = "io.btool.app.collector.local";
+const char *Properties::kLocal = "io.btool.collector.local";
 
 const std::vector<std::string> *ReadStringsProperty(
     const ::btool::node::PropertyStore *ps, const std::string &key) {
