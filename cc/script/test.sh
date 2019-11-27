@@ -28,6 +28,7 @@ $BTOOL -loglevel error -run -target app/collector/cc/exe_test
 $BTOOL -loglevel error -run -target app/collector/cc/inc_test
 $BTOOL -loglevel error -run -target app/collector/cc/includes_parser_impl_test
 $BTOOL -loglevel error -run -target app/collector/cc/obj_test
+$BTOOL -loglevel error -run -target app/collector/cc/resolver_factory_delegate_test
 $BTOOL -loglevel error -run -target app/collector/fs/fs_collectini_test
 $BTOOL -loglevel error -run -target app/collector/registry/registry_collectini_test
 $BTOOL -loglevel error -run -target app/collector/registry/gaggle_collector_impl_test

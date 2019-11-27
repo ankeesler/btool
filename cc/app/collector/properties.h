@@ -28,7 +28,7 @@ class Properties {
 const std::vector<std::string> *ReadStringsProperty(
     const ::btool::node::PropertyStore *ps, const std::string &key);
 
-void CollectStringsProperties(::btool::node::Node *n,
+void CollectStringsProperties(const ::btool::node::Node &n,
                               std::vector<std::string> *accumulator,
                               std::function<const std::vector<std::string> *(
                                   const ::btool::node::PropertyStore *)>

@@ -25,7 +25,7 @@ class Exe : public ::btool::app::collector::BaseCollectini {
                       const std::string &ext,
                       std::vector<::btool::node::Node *> *objs);
   bool CollectLibraries(::btool::app::collector::Store *s,
-                        ::btool::node::Node *n,
+                        const ::btool::node::Node &n,
                         std::vector<::btool::node::Node *> *libs);
 };
 

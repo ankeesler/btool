@@ -18,12 +18,12 @@ const std::vector<std::string> *ReadStringsProperty(
   return strings;
 }
 
-void CollectStringsProperties(::btool::node::Node *n,
+void CollectStringsProperties(const ::btool::node::Node &n,
                               std::vector<std::string> *accumulator,
                               std::function<const std::vector<std::string> *(
                                   const ::btool::node::PropertyStore *)>
                                   f) {
-  n->Visit([accumulator, f](const ::btool::node::Node *vn) {
+  n.Visit([accumulator, f](const ::btool::node::Node *vn) {
     const std::vector<std::string> *accs = f(vn->property_store());
     if (accs != nullptr) {
       accumulator->insert(accumulator->end(), accs->begin(), accs->end());

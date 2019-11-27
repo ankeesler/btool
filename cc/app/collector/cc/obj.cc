@@ -15,7 +15,7 @@ namespace btool::app::collector::cc {
 #define DROP(name, reason) \
   DEBUGS() << "obj: drop " << (name) << " (" << reason << ")" << std::endl
 
-void CollectIncludePaths(::btool::node::Node *n,
+void CollectIncludePaths(const ::btool::node::Node &n,
                          std::vector<std::string> *include_paths);
 
 void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
@@ -47,7 +47,7 @@ void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   ::btool::node::Node *n = s->Put(obj_name);
 
   std::vector<std::string> include_paths;
-  CollectIncludePaths(d, &include_paths);
+  CollectIncludePaths(*d, &include_paths);
   std::vector<std::string> flags;
   class ::btool::node::Node::Resolver *r;
   if (c) {
@@ -60,7 +60,7 @@ void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   Notify(s, n->name());
 }
 
-void CollectIncludePaths(::btool::node::Node *n,
+void CollectIncludePaths(const ::btool::node::Node &n,
                          std::vector<std::string> *include_paths) {
   ::btool::app::collector::CollectStringsProperties(
       n, include_paths,

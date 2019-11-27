@@ -14,7 +14,8 @@
 
 namespace btool::app::collector::cc {
 
-void CollectLinkFlags(::btool::node::Node *n, std::vector<std::string> *flags);
+void CollectLinkFlags(const ::btool::node::Node &n,
+                      std::vector<std::string> *flags);
 
 void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   if (::btool::util::fs::Ext(name) != "") {
@@ -46,7 +47,7 @@ void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   }
 
   std::vector<::btool::node::Node *> libs;
-  if (!CollectLibraries(s, n, &libs)) {
+  if (!CollectLibraries(s, *n, &libs)) {
     return;
   }
   for (auto lib : libs) {
@@ -54,7 +55,7 @@ void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   }
 
   std::vector<std::string> flags;
-  CollectLinkFlags(n, &flags);
+  CollectLinkFlags(*n, &flags);
 
   auto r = (ext == ".cc" ? rf_->NewLinkCC(flags) : rf_->NewLinkC(flags));
   n->set_resolver(r);
@@ -98,7 +99,7 @@ bool Exe::CollectObjects(::btool::app::collector::Store *s,
 }
 
 bool Exe::CollectLibraries(::btool::app::collector::Store *s,
-                           ::btool::node::Node *n,
+                           const ::btool::node::Node &n,
                            std::vector<::btool::node::Node *> *libs) {
   std::vector<std::string> lib_names;
   ::btool::app::collector::CollectStringsProperties(
@@ -121,7 +122,8 @@ bool Exe::CollectLibraries(::btool::app::collector::Store *s,
   return true;
 }
 
-void CollectLinkFlags(::btool::node::Node *n, std::vector<std::string> *flags) {
+void CollectLinkFlags(const ::btool::node::Node &n,
+                      std::vector<std::string> *flags) {
   ::btool::app::collector::CollectStringsProperties(
       n, flags,
       [](const ::btool::node::PropertyStore *ps)
