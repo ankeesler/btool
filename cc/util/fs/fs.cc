@@ -44,11 +44,12 @@ std::string Join(const std::string &one, const std::string &two) {
 }
 
 std::string Ext(const std::string &path) {
-  std::size_t index = path.rfind('.');
+  auto path_base = Base(path);
+  std::size_t index = path_base.rfind('.');
   if (index == std::string::npos || index == 0) {
     return "";
   } else {
-    return path.substr(index);
+    return path_base.substr(index);
   }
   return "";
 }

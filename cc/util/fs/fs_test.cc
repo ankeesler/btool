@@ -14,6 +14,7 @@ TEST(FS, Base) {
   EXPECT_EQ("b", ::btool::util::fs::Base("a/b"));
   EXPECT_EQ("c.c", ::btool::util::fs::Base("a/b/c.c"));
   EXPECT_EQ("c.c", ::btool::util::fs::Base("./a/b/c.c"));
+  EXPECT_EQ("c.c", ::btool::util::fs::Base("../a/b/c.c"));
 }
 
 TEST(FS, Dir) {
@@ -47,6 +48,8 @@ TEST(FS, Ext) {
 
   EXPECT_EQ(".o", ::btool::util::fs::Ext("tuna.cc.o"));
   EXPECT_EQ(".o", ::btool::util::fs::Ext("some/path/to/tuna.cc.o"));
+
+  EXPECT_EQ("", ::btool::util::fs::Ext("../some-path"));
 }
 
 TEST(FS, File) {
