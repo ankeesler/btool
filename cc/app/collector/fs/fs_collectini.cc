@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include <functional>
+#include <iostream>
 #include <vector>
 
 #include "app/collector/properties.h"
@@ -32,6 +33,7 @@ void FSCollectini::Collect(::btool::app::collector::Store *s) {
     }
   });
 
+  DEBUGS() << "collected " << nodes.size() << " files" << std::endl;
   for (auto n : nodes) {
     Notify(s, n->name());
   }

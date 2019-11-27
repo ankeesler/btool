@@ -30,9 +30,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 3:
         registry = sys.argv[3]
 
-    try:
-        suite = unittest.TestLoader().loadTestsFromTestCase(TestBtool)
-        unittest.TextTestRunner().run(suite)
-    except e:
-        print "config: btool_in=%s, btool_out=%s, registry=%s" % (btool_in, btool_out, registry)
-        raise e
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestBtool)
+    unittest.TextTestRunner().run(suite)

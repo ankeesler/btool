@@ -7,7 +7,7 @@ if [[ -z "$BTOOL" ]]; then
 fi 
 
 if [[ -z "$REGISTRY" ]]; then
-  REGISTRY="btoolregistry.cfapps.io"
+  REGISTRY="https://btoolregistry.cfapps.io"
 fi 
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."

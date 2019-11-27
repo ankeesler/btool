@@ -1,4 +1,4 @@
-#include "dep-1.h"
+#include "dep-1/dep-1.h"
 
 #include "gtest/gtest.h"
 

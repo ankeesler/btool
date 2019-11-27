@@ -28,6 +28,8 @@
 
 ### Pain
 
+- The output of the integration tests is so hard to get the actual error from
+
 ### Want
 
 - Where are we copying that we don't need to? More pass-by-reference?
@@ -35,6 +37,10 @@
 - Profile - where are the bottle necks?
 - Use valgrind to check memory leaks (or -fsanitize= with clang?)
 - Check that files are linted in ci.
+- Can the string manipulation in these fs functions be cleaned up at all?
+- Cmd should really be printed to stream instead of calling .String()
+- Add a README to the example directory to show how to run btool to build examples.
+- Add a -help flag to show btool flags.
 
 ## Bugs
 

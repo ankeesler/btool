@@ -54,7 +54,7 @@ static bool HandleInclude(::btool::app::collector::Store *s,
 
   for (auto it : *s) {
     auto sn = it.second;
-    DEBUGS() << "does node " << sn->name() << "end in include " << include
+    DEBUGS() << "does node " << sn->name() << " end in include " << include
              << "? " << std::endl;
     if (::btool::util::string::HasSuffix(sn->name().c_str(), include.c_str())) {
       d = sn;

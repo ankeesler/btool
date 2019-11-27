@@ -1,5 +1,6 @@
-#include "obj.h"
+#include "app/collector/cc/obj.h"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -45,6 +46,8 @@ void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
     obj_name.erase(obj_name.size() - 1, 1);
   }
   ::btool::node::Node *n = s->Put(obj_name);
+
+  DEBUGS() << "added new object " << obj_name << std::endl;
 
   std::vector<std::string> include_paths;
   CollectIncludePaths(*d, &include_paths);
