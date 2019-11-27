@@ -1,6 +1,7 @@
 #ifndef BTOOL_NODE_PROPERTYSTORE_H_
 #define BTOOL_NODE_PROPERTYSTORE_H_
 
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
