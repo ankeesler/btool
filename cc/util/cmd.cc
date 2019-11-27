@@ -24,7 +24,9 @@ static bool Read(std::ostream *os, int fd) {
     switch (count) {
       case -1:
         DEBUG("read: %s\n", strerror(errno));
-        return false;
+        if (errno != EINTR) {
+          return false;
+        }
       case 0:
         return true;
       default:

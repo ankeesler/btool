@@ -24,7 +24,7 @@ class Cmd {
     std::stringstream ss;
     ss << path_;
     for (const auto arg : args_) {
-      ss << " " << arg;
+      ss << "\n  " << arg;
     }
     return ss.str();
   }
