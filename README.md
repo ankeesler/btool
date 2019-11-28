@@ -17,14 +17,14 @@ hey! i am running!
 ```
 $ docker run -it ankeesler/btool
 $ btool -root BasicC -target btool
-$ ./cc/btool
+$ ./BasicC/main
 hey! i am running!
 ```
 
 ## To build `btool`...
 
 ```
-$ btool -root cc -target btool
+$ btool -root source -target btool
 ```
 
 ## To run the tests...
