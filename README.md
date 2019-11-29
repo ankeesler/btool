@@ -16,12 +16,12 @@ hey! i am running!
 
 ```
 $ docker run -it ankeesler/btool
-$ btool -root example/BasicC -target btool
+$ btool -root BasicC -target main
 $ ./BasicC/main
-hey! i am running!
+hey!
 ```
 
-Run `cat example/README.md` for more information about the examples.
+Run `cat README.md` for more information about the examples.
 
 ## To build `btool`...
 
