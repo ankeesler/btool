@@ -37,7 +37,6 @@
 - Check that files are linted in ci.
 - Can the string manipulation in these fs functions be cleaned up at all?
 - Cmd should really be printed to stream instead of calling .String()
-- Add a README to the example directory to show how to run btool to build examples.
 - Add a -help flag to show btool flags.
 - Grep for TODOs!
 
