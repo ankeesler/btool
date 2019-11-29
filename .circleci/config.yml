@@ -12,9 +12,7 @@ jobs:
       - run: ./script/test.sh
       - setup_remote_docker
       - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-      - run: ./script/build-container.sh btool
       - run: ./script/build-container.sh btoolregistry
-      - run: ./script/push-container.sh btool
       - run: ./script/push-container.sh btoolregistry
       - run:
           name: Install CF CLI
