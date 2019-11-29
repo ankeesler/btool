@@ -5,14 +5,15 @@ version: 2
 jobs:
   build:
     docker:
-      - image: ankeesler/btool
-    working_directory: /etc/ci
+      - image: circleci:3.8.0-buster
     steps:
       - checkout
       - run: ./script/test.sh
       - setup_remote_docker
       - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+      - run: ./script/build-container.sh btool
       - run: ./script/build-container.sh btoolregistry
+      - run: ./script/push-container.sh btool
       - run: ./script/push-container.sh btoolregistry
       - run:
           name: Install CF CLI
