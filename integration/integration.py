@@ -12,10 +12,20 @@ class TestBtool(unittest.TestCase):
         self.assertTrue(". source/btool.o" in ac_output)
         self.assertTrue(". source/app/app.o" in ac_output)
 
-    def test_build(self):
+    def test_build_btool(self):
         subprocess.check_call([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-loglevel", "debug"])
         subprocess.check_call(["mv", "source/btool", btool_out])
         subprocess.check_call([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-loglevel", "debug", "-clean"])
+
+    def test_build_example_basic_c(self):
+        subprocess.check_call([btool_in, "-root", "example/BasicC", "-registry", registry, "-target", "main", "-loglevel", "debug"])
+        subprocess.check_call(["example/BasicC/main"])
+        subprocess.check_call([btool_in, "-root", "example/BasicC", "-registry", registry, "-target", "main", "-loglevel", "debug", "-clean"])
+
+    def test_build_example_basic_cc(self):
+        subprocess.check_call([btool_in, "-root", "example/BasicCC", "-registry", registry, "-target", "main", "-loglevel", "debug"])
+        subprocess.check_call(["example/BasicCC/main"])
+        subprocess.check_call([btool_in, "-root", "example/BasicCC", "-registry", registry, "-target", "main", "-loglevel", "debug", "-clean"])
 
     def test_test(self):
         subprocess.check_call([btool_in, "-registry", registry, "-root", "example/BasicCC", "-target", "dep-1/dep-1-test", "-loglevel", "debug", "-run"])
