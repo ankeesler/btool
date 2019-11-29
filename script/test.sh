@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+set -exo pipefail
 
 if [[ -z "$BTOOL" ]]; then
   BTOOL="$(which btool)"

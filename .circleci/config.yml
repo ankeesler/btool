@@ -8,6 +8,7 @@ jobs:
       - image: circleci/python:3.8.0-buster
     steps:
       - checkout
+      - run: sudo ./script/install-btool.sh
       - run: ./script/test.sh
       - setup_remote_docker
       - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
