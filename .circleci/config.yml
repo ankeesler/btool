@@ -5,7 +5,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci:3.8.0-buster
+      - image: circleci/python:3.8.0-buster
     steps:
       - checkout
       - run: ./script/test.sh
