@@ -14,7 +14,6 @@ Store::~Store() {
 }
 
 ::btool::node::Node *Store::Put(std::string name) {
-  // TODO: this performance is bad?
   auto node = nodes_[name];
   if (node == nullptr) {
     node = new ::btool::node::Node(name);
@@ -24,7 +23,6 @@ Store::~Store() {
 }
 
 ::btool::node::Node *Store::Get(const std::string &name) const {
-  // TODO: this performance is bad?
   auto it = nodes_.find(name);
   if (it == nodes_.end()) {
     return nullptr;

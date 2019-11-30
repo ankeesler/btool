@@ -19,6 +19,8 @@
 - Single line UI for collecting and resolving nodes
 - Timing numbers for the resolution of each node
 - Run tests as a single linked executable
+- Check sha256 of downloaded thing
+- Ensure that downloaded .tar.gz depends on gaggle.yml (i.e., $this)
 
 ## Chores
 
@@ -36,7 +38,6 @@
 - Can the string manipulation in these fs functions be cleaned up at all?
 - Cmd should really be printed to stream instead of calling .String()
 - Add a -help flag to show btool flags.
-- Grep for TODOs!
 
 ## Bugs
 
