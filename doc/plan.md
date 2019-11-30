@@ -43,7 +43,7 @@
 - This is because the exe consumer is pulling in a .o file that has not been
   updated by the inc consumer yet, so it is missing include paths...
 
-### 01: Can't put comments to the right of headers
+### 01: ~~Can't put comments to the right of headers~~
 
 ### 02: Transient header dependencies' source objects are not brought in to build
 
