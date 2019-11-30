@@ -61,30 +61,38 @@ static const char *linker_cc = "clang++";
 static std::string GetDefaultCache();
 
 int main(int argc, const char *argv[]) {
+  ::btool::Log::SetCurrentLevel(::btool::Log::kInfo);
+
   ::btool::util::Flags f;
 
   bool version = false;
-  f.Bool("version", &version);
+  f.Bool("version", "Print btool version and exit", &version);
+
+  bool help = false;
+  f.Bool("help", "Print btool usage", &help);
 
   std::string loglevel = "info";
-  f.String("loglevel", &loglevel);
+  f.String("loglevel",
+           "Select logging verbosity (debug, info, error) (default: info)",
+           &loglevel);
 
   std::string root = ".";
-  f.String("root", &root);
-  std::string target = "main";
-  f.String("target", &target);
+  f.String("root", "Specify project root", &root);
+  std::string target = "";
+  f.String("target", "Specify build target", &target);
   std::string cache = GetDefaultCache();
-  f.String("cache", &cache);
+  f.String("cache", "Specify build cache (default: " + cache + ")", &cache);
 
   std::string registry = "https://btoolregistry.cfapps.io";
-  f.String("registry", &registry);
+  f.String("registry", "Specify registry URI (default: " + registry + ")",
+           &registry);
 
   bool clean = false;
-  f.Bool("clean", &clean);
+  f.Bool("clean", "Perform clean of target graph", &clean);
   bool list = false;
-  f.Bool("list", &list);
+  f.Bool("list", "Show target graph", &list);
   bool run = false;
-  f.Bool("run", &run);
+  f.Bool("run", "Execute target after building", &run);
 
   std::string err_s;
   bool success = f.Parse(argc, argv, &err_s);
@@ -103,6 +111,12 @@ int main(int argc, const char *argv[]) {
   if (version) {
     INFO("version %s\n", version_string.c_str());
     return 0;
+  }
+
+  if (help || target.empty()) {
+    std::cout << "btool" << std::endl;
+    f.Usage(&std::cout);
+    return 1;
   }
 
   ::btool::ui::UI ui;
