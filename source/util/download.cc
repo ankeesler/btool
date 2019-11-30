@@ -24,7 +24,7 @@ void Download(const std::string &url, const std::string &file) {
   int ec = cmd.Run();
   if (ec != 0) {
     std::stringstream ss;
-    ss << "failed to run curl command: " << cmd.String() << std::endl;
+    ss << "failed to run curl command: " << cmd << std::endl;
     ss << "exit code: " << ec << std::endl;
     ss << "stdout: " << out.str() << std::endl;
     ss << "stderr: " << err.str() << std::endl;

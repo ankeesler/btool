@@ -20,14 +20,7 @@ class Cmd {
 
   int Run(void);
 
-  std::string String() const {
-    std::stringstream ss;
-    ss << path_;
-    for (const auto arg : args_) {
-      ss << "\n  " << arg;
-    }
-    return ss.str();
-  }
+  friend std::ostream &operator<<(std::ostream &os, const Cmd &cmd);
 
  private:
   int RunChild(int stdout_fds[2], int stderr_fds[2]);
@@ -38,6 +31,8 @@ class Cmd {
   std::vector<std::string> args_;
   std::ostream *out_, *err_;
 };
+
+std::ostream &operator<<(std::ostream &os, const Cmd &cmd);
 
 };  // namespace btool::util
 

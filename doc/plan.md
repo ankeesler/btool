@@ -36,7 +36,6 @@
 - It is bad that we are calling out to cc package stuff from registry package stuff
 - Profile - where are the bottle necks?
 - Can the string manipulation in these fs functions be cleaned up at all?
-- Cmd should really be printed to stream instead of calling .String()
 - Add a -help flag to show btool flags.
 
 ## Bugs

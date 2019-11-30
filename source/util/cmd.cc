@@ -161,4 +161,12 @@ int Cmd::RunParent(int child_pid, int child_stdout_fds[2],
   return WEXITSTATUS(stat);
 }
 
+std::ostream &operator<<(std::ostream &os, const Cmd &cmd) {
+  os << cmd.path_;
+  for (const auto arg : cmd.args_) {
+    os << "\n  " << arg;
+  }
+  return os;
+}
+
 };  // namespace btool::util
