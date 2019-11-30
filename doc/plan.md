@@ -33,7 +33,6 @@
 - Where are we copying that we don't need to? More pass-by-reference?
 - It is bad that we are calling out to cc package stuff from registry package stuff
 - Profile - where are the bottle necks?
-- Use valgrind to check memory leaks (or -fsanitize= with clang?)
 - Check that files are linted in ci.
 - Can the string manipulation in these fs functions be cleaned up at all?
 - Cmd should really be printed to stream instead of calling .String()

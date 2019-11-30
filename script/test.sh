@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exo pipefail
+set -eo pipefail
 
 if [[ -z "$BTOOL" ]]; then
   BTOOL="$(which btool)"
@@ -11,7 +11,7 @@ if [[ -z "$REGISTRY" ]]; then
 fi 
 
 run_test() {
-  "$BTOOL" -root source -registry "$REGISTRY" -loglevel error -run -target "$1"
+  valgrind "$BTOOL" -root source -registry "$REGISTRY" -loglevel error -run -target "$1"
 }
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -35,3 +35,7 @@ python integration/integration.py \
        "$BTOOL" /tmp/btool-new "$REGISTRY"
 python integration/integration.py \
        /tmp/btool-new /tmp/btool-new-new "$REGISTRY"
+
+if which valgrind; then
+  valgrind /tmp/btool-new -root source -target btool
+fi
