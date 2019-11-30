@@ -7,7 +7,7 @@ install_clang_format_brew() {
 }
 
 install_clang_format_linux() {
-  apt-get update && apt-get install clang-format
+  apt-get update && apt-get install clang-format -y
 }
 
 install_clang_format() {

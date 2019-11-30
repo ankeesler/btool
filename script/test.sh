@@ -11,7 +11,7 @@ if [[ -z "$REGISTRY" ]]; then
 fi 
 
 run_test() {
-  valgrind "$BTOOL" -root source -registry "$REGISTRY" -loglevel error -run -target "$1"
+  "$BTOOL" -root source -registry "$REGISTRY" -loglevel error -run -target "$1"
 }
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -36,6 +36,9 @@ python integration/integration.py \
 python integration/integration.py \
        /tmp/btool-new /tmp/btool-new-new "$REGISTRY"
 
-if which valgrind; then
+if [[ "$(uname)" == "Linux" ]]; then
+  if ! which valgrind; then
+    apt-get update && apt-get install valgrind -y
+  fi
   valgrind /tmp/btool-new -root source -target btool
 fi

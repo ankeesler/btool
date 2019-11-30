@@ -10,7 +10,7 @@ jobs:
       - checkout
       - run: sudo ./script/lint.sh
       - run: sudo ./script/install-btool.sh
-      - run: ./script/test.sh
+      - run: sudo ./script/test.sh
       - setup_remote_docker
       - run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
       - run: ./script/build-container.sh btool
