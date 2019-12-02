@@ -2,7 +2,7 @@ import subprocess
 import sys
 import unittest
 
-registry = "http://btoolregistry.cfapps.io"
+registry = "https://btoolregistry.cfapps.io"
 btool_in = "btool"
 btool_out = "/tmp/btool"
 
