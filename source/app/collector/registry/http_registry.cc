@@ -37,6 +37,9 @@ static void Get(const std::string &url,
   if (!ifs) {
     THROW_ERR("cannot open downloaded file " + file);
   }
+  if (ifs.sync() != 0) {
+    THROW_ERR("cannot sync downloaded file " + file);
+  }
 
   unmarshal(&ifs);
 
