@@ -8,29 +8,29 @@ btool_out = "/tmp/btool"
 
 class TestBtool(unittest.TestCase):
     def test_list(self):
-        ac_output = subprocess.check_output([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-list", "-loglevel", "debug"])
+        ac_output = subprocess.check_output([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-list"])
         self.assertTrue(". source/btool.o" in ac_output)
         self.assertTrue(". source/app/app.o" in ac_output)
 
     def test_build_btool(self):
-        subprocess.check_call([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-loglevel", "debug"])
+        subprocess.check_call([btool_in, "-root", "source", "-registry", registry, "-target", "btool"])
         subprocess.check_call(["mv", "source/btool", btool_out])
-        subprocess.check_call([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-loglevel", "debug", "-clean"])
+        subprocess.check_call([btool_in, "-root", "source", "-registry", registry, "-target", "btool", "-clean"])
 
     def test_build_example_basic_c(self):
-        subprocess.check_call([btool_in, "-root", "example/BasicC", "-registry", registry, "-target", "main", "-loglevel", "debug"])
+        subprocess.check_call([btool_in, "-root", "example/BasicC", "-registry", registry, "-target", "main"])
         subprocess.check_call(["example/BasicC/main"])
-        subprocess.check_call([btool_in, "-root", "example/BasicC", "-registry", registry, "-target", "main", "-loglevel", "debug", "-clean"])
+        subprocess.check_call([btool_in, "-root", "example/BasicC", "-registry", registry, "-target", "main", "-clean"])
 
     def test_build_example_basic_cc(self):
-        subprocess.check_call([btool_in, "-root", "example/BasicCC", "-registry", registry, "-target", "main", "-loglevel", "debug"])
+        subprocess.check_call([btool_in, "-root", "example/BasicCC", "-registry", registry, "-target", "main"])
         subprocess.check_call(["example/BasicCC/main"])
-        subprocess.check_call([btool_in, "-root", "example/BasicCC", "-registry", registry, "-target", "main", "-loglevel", "debug", "-clean"])
+        subprocess.check_call([btool_in, "-root", "example/BasicCC", "-registry", registry, "-target", "main", "-clean"])
 
     def test_test(self):
-        subprocess.check_call([btool_in, "-registry", registry, "-root", "example/BasicCC", "-target", "dep-1/dep-1-test", "-loglevel", "debug", "-run"])
+        subprocess.check_call([btool_in, "-registry", registry, "-root", "example/BasicCC", "-target", "dep-1/dep-1-test", "-run"])
         subprocess.check_call(["example/BasicCC/dep-1/dep-1-test"])
-        subprocess.check_call([btool_in, "-registry", registry, "-root", "example/BasicCC", "-target", "dep-1/dep-1-test", "-loglevel", "debug", "-clean"])
+        subprocess.check_call([btool_in, "-registry", registry, "-root", "example/BasicCC", "-target", "dep-1/dep-1-test", "-clean"])
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

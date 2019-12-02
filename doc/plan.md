@@ -28,8 +28,6 @@
 
 ### Pain
 
-- The output of the integration tests is so hard to get the actual error from
-
 ### Want
 
 - Where are we copying that we don't need to? More pass-by-reference?
