@@ -2,38 +2,25 @@
 
 ## Features
 
-### Need
-
-### Pain
-
-- Targets are per-os/arch
-- Ability to select multiple targets at once
-- Run a debugger with -debug
 - After switching to tar-ed archives, the source files are never up to date :(
-
-### Want
-
 - Cache registry data
+- Targets are per-os/arch
 - When I clean, I don't want to delete the stuff in the cache
 - Parallel builds
 - Single line UI for collecting and resolving nodes
 - Timing numbers for the resolution of each node
+- Ability to select multiple targets at once
+- Run a debugger with -debug
 - Run tests as a single linked executable
 - Check sha256 of downloaded thing
 - Ensure that downloaded .tar.gz depends on gaggle.yml (i.e., $this)
 
 ## Chores
 
-### Need
-
-### Pain
-
-### Want
-
 - Where are we copying that we don't need to? More pass-by-reference?
-- It is bad that we are calling out to cc package stuff from registry package stuff
+  - Can the string manipulation in these fs functions be cleaned up at all?
 - Profile - where are the bottle necks?
-- Can the string manipulation in these fs functions be cleaned up at all?
+- It is bad that we are calling out to cc package stuff from registry package stuff
 
 ## Bugs
 
