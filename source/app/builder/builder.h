@@ -17,12 +17,19 @@ class Builder : public ::btool::app::App::Builder {
     virtual bool Current(const ::btool::node::Node &node) = 0;
   };
 
-  Builder(Currenter *c) : c_(c) {}
+  class Callback {
+   public:
+    virtual ~Callback() {}
+    virtual void OnResolve(const ::btool::node::Node &node, bool current) = 0;
+  };
+
+  Builder(Currenter *cu, Callback *ca) : cu_(cu), ca_(ca) {}
 
   void Build(const ::btool::node::Node &node) override;
 
  private:
-  Currenter *c_;
+  Currenter *cu_;
+  Callback *ca_;
 };
 
 };  // namespace btool::app::builder

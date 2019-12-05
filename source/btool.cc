@@ -119,7 +119,7 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
-  ::btool::ui::UI ui;
+  ::btool::ui::UI ui(cache);
 
   ::btool::app::collector::Store s;
 
@@ -173,7 +173,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::lister::Lister lister(&std::cout);
 
   ::btool::app::builder::CurrenterImpl ci;
-  ::btool::app::builder::Builder builder(&ci);
+  ::btool::app::builder::Builder builder(&ci, &ui);
 
   ::btool::app::runner::Runner runner(&ui);
 

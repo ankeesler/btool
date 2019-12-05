@@ -10,12 +10,15 @@ namespace btool::app::builder {
 
 void Builder::Build(const ::btool::node::Node &node) {
   node.Visit([&](const ::btool::node::Node *n) {
-    bool current = c_->Current(*n);
+    bool current = cu_->Current(*n);
     DEBUG("builder visiting %s, current: %s, resolver = %s\n",
           n->name().c_str(), (current ? "true" : "false"),
           (n->resolver() == nullptr ? "null" : "something"));
-    if (!current && n->resolver() != nullptr) {
-      n->resolver()->Resolve(*n);
+    if (n->resolver() != nullptr) {
+      ca_->OnResolve(*n, current);
+      if (!current) {
+        n->resolver()->Resolve(*n);
+      }
     }
   });
 }
