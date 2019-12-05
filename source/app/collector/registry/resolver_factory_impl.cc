@@ -51,7 +51,7 @@ class UntarResolver : public ::btool::node::Node::Resolver {
     auto tarfile = n.dependencies()->at(0)->name();
     auto dir = ::btool::util::fs::Dir(tarfile);
     ::btool::util::Cmd cmd("tar");
-    cmd.Arg("xzf");
+    cmd.Arg("mxzf");
     cmd.Arg(tarfile);
     cmd.Arg("-C");
     cmd.Arg(dir);

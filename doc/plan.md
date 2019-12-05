@@ -2,7 +2,6 @@
 
 ## Features
 
-- After switching to tar-ed archives, the source files are never up to date :(
 - Cache registry data
 - Targets are per-os/arch
 - When I clean, I don't want to delete the stuff in the cache
