@@ -36,10 +36,12 @@ class Log {
   static Level CurrentLevel;
 };
 
-#define LOGS(log, area) \
+#define LOGS(log, area) (log) << "btool | " << (area) << " | "
+
+#define LOGS_WITH_FILE_AND_LINE(log, area) \
   (log) << "btool | " << (area) << " | " << __FILE__ << ':' << __LINE__ << " | "
 
-#define DEBUGS() LOGS(*::btool::Log::Debug, "debug")
+#define DEBUGS() LOGS_WITH_FILE_AND_LINE(*::btool::Log::Debug, "debug")
 #define INFOS() LOGS(*::btool::Log::Info, "info")
 #define ERRORS() LOGS(*::btool::Log::Error, "error")
 
