@@ -88,6 +88,10 @@ int main(int argc, const char *argv[]) {
   std::string registry = "https://btoolregistry.cfapps.io";
   f.String("registry", "Specify registry URI (default: " + registry + ")",
            &registry);
+  int registry_cache_timeout_s = 1 * 60 * 60;  // 1 hr
+  f.Int("registrycachetimeout",
+        "Specify registry cache timeout (seconds); set to 0 to disable caching",
+        &registry_cache_timeout_s);
 
   bool clean = false;
   f.Bool("clean", "Perform clean of target graph", &clean);
@@ -155,10 +159,10 @@ int main(int argc, const char *argv[]) {
 
   ::btool::app::collector::registry::YamlFileCache<
       ::btool::app::collector::registry::Index>
-      yfc_i(&ys_i, cache);
+      yfc_i(&ys_i, cache, std::chrono::seconds(registry_cache_timeout_s));
   ::btool::app::collector::registry::YamlFileCache<
       ::btool::app::collector::registry::Gaggle>
-      yfc_g(&ys_g, cache);
+      yfc_g(&ys_g, cache, std::chrono::seconds(registry_cache_timeout_s));
   ::btool::app::collector::registry::RegistryCollectini rc(r, cache, &yfc_i,
                                                            &yfc_g, &gci);
 

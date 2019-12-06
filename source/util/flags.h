@@ -19,6 +19,9 @@ class Flags {
   void String(std::string name, std::string description, std::string *value) {
     string_flags_.push_back(Flag(name, description, value));
   }
+  void Int(std::string name, std::string description, int *value) {
+    int_flags_.push_back(Flag(name, description, value));
+  }
 
   // Returns true on success.
   bool Parse(int argc, const char *argv[], std::string *err);
@@ -57,6 +60,7 @@ class Flags {
 
   std::vector<Flag<bool>> bool_flags_;
   std::vector<Flag<std::string>> string_flags_;
+  std::vector<Flag<int>> int_flags_;
 };
 
 };  // namespace btool::util

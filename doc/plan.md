@@ -2,7 +2,6 @@
 
 ## Features
 
-- Cache registry data
 - Targets are per-os/arch
 - When I clean, I don't want to delete the stuff in the cache
 - Parallel builds
@@ -16,6 +15,7 @@
 
 ## Chores
 
+- Use a SHA instead of a hex string for the registry name cache entry
 - Where are we copying that we don't need to? More pass-by-reference?
   - Can the string manipulation in these fs functions be cleaned up at all?
 - Profile - where are the bottle necks?

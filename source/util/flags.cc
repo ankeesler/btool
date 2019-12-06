@@ -31,6 +31,15 @@ bool Flags::Parse(int argc, const char *argv[], std::string *err) {
       *fs->value_ = value;
       continue;
     }
+
+    Flags::Flag<int> *fi = Find(&int_flags_, name);
+    if (fi != nullptr) {
+      const char *value = argv[++i];
+      DEBUGS() << "found int flag named " << name << " with value " << value
+               << std::endl;
+      *fi->value_ = std::stoi(value);
+      continue;
+    }
   }
   return true;
 }
@@ -41,6 +50,10 @@ void Flags::Usage(std::ostream *os) {
   }
 
   for (const auto &f : string_flags_) {
+    Usage(os, f);
+  }
+
+  for (const auto &f : int_flags_) {
     Usage(os, f);
   }
 }

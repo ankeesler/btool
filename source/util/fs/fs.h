@@ -1,8 +1,14 @@
 #ifndef BTOOL_UTIL_FS_FS_H_
 #define BTOOL_UTIL_FS_FS_H_
 
+#include <errno.h>
+#include <sys/stat.h>
+
+#include <chrono>
 #include <functional>
 #include <string>
+
+#include "err.h"
 
 namespace btool::util::fs {
 
@@ -23,6 +29,26 @@ void MkdirAll(const std::string &path);
 
 bool Exists(const std::string &path);
 bool IsDir(const std::string &path);
+
+#ifdef __linux__
+#define modtime st_mtim
+#elif __APPLE__
+#define modtime st_mtimespec
+#else
+#error "unknown platform"
+#endif
+
+template <typename Clock, typename Duration>
+std::chrono::time_point<Clock, Duration> ModTime(const std::string &path) {
+  struct ::stat s;
+  if (::stat(path.c_str(), &s) == -1) {
+    THROW_ERR("stat: " + std::string(::strerror(errno)));
+  }
+  Duration d = std::chrono::duration_cast<Duration>(
+      std::chrono::seconds(s.modtime.tv_sec) +
+      std::chrono::nanoseconds(s.modtime.tv_nsec));
+  return std::chrono::time_point<Clock, Duration>(d);
+}
 
 // Walk
 //

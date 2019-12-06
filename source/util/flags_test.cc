@@ -15,13 +15,12 @@ TEST(Flags, Yeah) {
   std::string as = "a", bs = "b";
   f.String("as", "some-as-description", &as);
   f.String("bs", "some-bs-description", &bs);
+  int n = 0;
+  f.Int("n", "some-n-description", &n);
 
   std::string err;
   const char *argv[] = {
-      "-a",
-      "-c",
-      "-as",
-      "tuna",
+      "-a", "-c", "-as", "tuna", "-n", "5",
   };
   int argc = sizeof(argv) / sizeof(argv[0]);
   bool success = f.Parse(argc, argv, &err);
@@ -31,6 +30,7 @@ TEST(Flags, Yeah) {
   EXPECT_TRUE(c);
   EXPECT_EQ("tuna", as);
   EXPECT_EQ("b", bs);
+  EXPECT_EQ(5, n);
 
   std::stringstream ss;
   f.Usage(&ss);
@@ -44,6 +44,8 @@ TEST(Flags, Yeah) {
       "  -as\n"
       "    some-as-description\n"
       "  -bs\n"
-      "    some-bs-description\n";
+      "    some-bs-description\n"
+      "  -n\n"
+      "    some-n-description\n";
   EXPECT_EQ(ex, ss.str());
 }

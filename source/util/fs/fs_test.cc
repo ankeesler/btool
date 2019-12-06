@@ -1,11 +1,16 @@
 #include "fs.h"
 
+#include <chrono>
 #include <string>
 #include <vector>
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "err.h"
+
+using ::testing::Gt;
+using ::testing::Lt;
 
 TEST(FS, Base) {
   EXPECT_EQ("", ::btool::util::fs::Base(""));
@@ -162,6 +167,26 @@ TEST(FS, Is) {
 
   EXPECT_FALSE(::btool::util::fs::IsDir(file));
   // EXPECT_TRUE(::btool::util::fs::IsFile(file));
+
+  ::btool::util::fs::RemoveAll(dir);
+}
+
+TEST(FS, ModTime) {
+  auto dir = ::btool::util::fs::TempDir();
+  auto file = ::btool::util::fs::Join(dir, "a");
+  ::btool::util::fs::WriteFile(file, "hey\n");
+
+  auto mod_time = ::btool::util::fs::ModTime<std::chrono::system_clock,
+                                             std::chrono::nanoseconds>(file);
+  auto now = std::chrono::system_clock::now();
+  EXPECT_THAT(mod_time, Lt(now))
+      << "mod_time = " << mod_time.time_since_epoch().count()
+      << " and now = " << now.time_since_epoch().count();
+
+  auto delta =
+      std::chrono::duration_cast<std::chrono::nanoseconds>(now - mod_time);
+  EXPECT_THAT(delta, Gt(std::chrono::nanoseconds(0)))
+      << " delta = " << delta.count();
 
   ::btool::util::fs::RemoveAll(dir);
 }
