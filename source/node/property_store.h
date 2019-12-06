@@ -17,6 +17,12 @@ namespace btool::node {
 //   bool
 class PropertyStore {
  public:
+  enum Type {
+    kBool,
+    kString,
+    kStrings,
+  };
+
   PropertyStore() = default;
 
   PropertyStore(const PropertyStore &ps) = default;
@@ -39,6 +45,18 @@ class PropertyStore {
 
   void Append(const std::string &name, const std::string &value) {
     strings_store_[name].push_back(value);
+  }
+
+  void ForEach(std::function<void(const std::string &, Type type)> f) const {
+    for (auto it : bool_store_) {
+      f(it.first, kBool);
+    }
+    for (auto it : string_store_) {
+      f(it.first, kString);
+    }
+    for (auto it : strings_store_) {
+      f(it.first, kStrings);
+    }
   }
 
   void ForEach(const std::string &name, std::function<void(std::string *)> f) {

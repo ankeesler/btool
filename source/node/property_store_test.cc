@@ -1,6 +1,11 @@
 #include "node/property_store.h"
 
+#include <vector>
+
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+using ::testing::Contains;
 
 TEST(PropertyStore, Bool) {
   ::btool::node::PropertyStore ps;
@@ -25,6 +30,21 @@ TEST(PropertyStore, Bool) {
   copy.Read("some-property", &b);
   ASSERT_TRUE(b != nullptr);
   EXPECT_EQ(false, *b);
+
+  std::vector<std::pair<std::string, ::btool::node::PropertyStore::Type>> stuff;
+  ps.ForEach([&stuff](const std::string &name,
+                      ::btool::node::PropertyStore::Type type) {
+    stuff.push_back(
+        std::pair<std::string, ::btool::node::PropertyStore::Type>(name, type));
+  });
+  EXPECT_THAT(
+      stuff,
+      Contains(std::pair<std::string, ::btool::node::PropertyStore::Type>(
+          "some-property", ::btool::node::PropertyStore::kBool)));
+  EXPECT_THAT(
+      stuff,
+      Contains(std::pair<std::string, ::btool::node::PropertyStore::Type>(
+          "some-other-property", ::btool::node::PropertyStore::kBool)));
 }
 
 TEST(PropertyStore, String) {
