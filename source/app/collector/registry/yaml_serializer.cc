@@ -1,5 +1,7 @@
 #include "app/collector/registry/yaml_serializer.h"
 
+#include <istream>
+#include <ostream>
 #include <vector>
 
 #include "yaml-cpp/yaml.h"
@@ -10,6 +12,13 @@ namespace YAML {
 
 template <>
 struct convert<::btool::app::collector::registry::IndexFile> {
+  static Node encode(const ::btool::app::collector::registry::IndexFile &f) {
+    Node node;
+    node["path"] = f.path;
+    node["sha256"] = f.sha256;
+    return node;
+  }
+
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::IndexFile &f) {
     if (!node.IsMap()) {
@@ -25,6 +34,12 @@ struct convert<::btool::app::collector::registry::IndexFile> {
 
 template <>
 struct convert<::btool::app::collector::registry::Index> {
+  static Node encode(const ::btool::app::collector::registry::Index &i) {
+    Node node;
+    node["files"] = i.files;
+    return node;
+  }
+
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::Index &i) {
     if (!node.IsMap()) {
@@ -41,6 +56,34 @@ struct convert<::btool::app::collector::registry::Index> {
 
 template <>
 struct convert<::btool::node::PropertyStore> {
+  static Node encode(const ::btool::node::PropertyStore &ps) {
+    Node node;
+    ps.ForEach([&node, ps](const std::string &name,
+                           ::btool::node::PropertyStore::Type type) {
+      switch (type) {
+        case ::btool::node::PropertyStore::kBool: {
+          const bool *b = nullptr;
+          ps.Read(name, &b);
+          node[name] = *b;
+          break;
+        }
+        case ::btool::node::PropertyStore::kString: {
+          const std::string *s = nullptr;
+          ps.Read(name, &s);
+          node[name] = *s;
+          break;
+        }
+        case ::btool::node::PropertyStore::kStrings: {
+          const std::vector<std::string> *ss = nullptr;
+          ps.Read(name, &ss);
+          node[name] = *ss;
+          break;
+        }
+      }
+    });
+    return node;
+  }
+
   static bool decode(const Node &node, ::btool::node::PropertyStore &ps) {
     if (!node.IsMap()) {
       return false;
@@ -80,6 +123,13 @@ struct convert<::btool::node::PropertyStore> {
 
 template <>
 struct convert<::btool::app::collector::registry::Resolver> {
+  static Node encode(const ::btool::app::collector::registry::Resolver &r) {
+    Node node;
+    node["name"] = r.name;
+    node["config"] = r.config;
+    return node;
+  }
+
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::Resolver &r) {
     if (!node.IsMap()) {
@@ -87,7 +137,7 @@ struct convert<::btool::app::collector::registry::Resolver> {
     }
 
     r.name = node["name"].as<std::string>();
-    if (node["config"]) {
+    if (node["config"] && node["config"].Type() != NodeType::Null) {
       r.config = node["config"].as<::btool::node::PropertyStore>();
     }
 
@@ -97,6 +147,15 @@ struct convert<::btool::app::collector::registry::Resolver> {
 
 template <>
 struct convert<::btool::app::collector::registry::Node> {
+  static Node encode(const ::btool::app::collector::registry::Node &n) {
+    Node node;
+    node["name"] = n.name;
+    node["dependencies"] = n.dependencies;
+    node["labels"] = n.labels;
+    node["resolver"] = n.resolver;
+    return node;
+  }
+
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::Node &n) {
     if (!node.IsMap()) {
@@ -104,13 +163,13 @@ struct convert<::btool::app::collector::registry::Node> {
     }
 
     n.name = node["name"].as<std::string>();
-    if (node["dependencies"]) {
+    if (node["dependencies"] && node["dependencies"].Type() != NodeType::Null) {
       n.dependencies = node["dependencies"].as<std::vector<std::string>>();
     }
-    if (node["labels"]) {
+    if (node["labels"] && node["labels"].Type() != NodeType::Null) {
       n.labels = node["labels"].as<::btool::node::PropertyStore>();
     }
-    if (node["resolver"]) {
+    if (node["resolver"] && node["resolver"].Type() != NodeType::Null) {
       n.resolver =
           node["resolver"].as<::btool::app::collector::registry::Resolver>();
     }
@@ -121,6 +180,12 @@ struct convert<::btool::app::collector::registry::Node> {
 
 template <>
 struct convert<::btool::app::collector::registry::Gaggle> {
+  static Node encode(const ::btool::app::collector::registry::Gaggle &g) {
+    Node node;
+    node["nodes"] = g.nodes;
+    return node;
+  }
+
   static bool decode(const Node &node,
                      ::btool::app::collector::registry::Gaggle &g) {
     if (!node.IsMap()) {
@@ -138,15 +203,23 @@ struct convert<::btool::app::collector::registry::Gaggle> {
 
 namespace btool::app::collector::registry {
 
-void YamlSerializer::UnmarshalIndex(std::istream *is, Index *i) {
+template <>
+void YamlSerializer<Index>::Unmarshal(std::istream *is, Index *i) {
   try {
     *i = YAML::Load(*is).as<Index>();
-  } catch (const YAML::Exception &e) {
+  }  // namespace YAML
+  catch (const YAML::Exception &e) {
     THROW_ERR("could not unmarshal index: " + std::string(e.what()));
   }
 }
 
-void YamlSerializer::UnmarshalGaggle(std::istream *is, Gaggle *g) {
+template <>
+void YamlSerializer<Index>::Marshal(std::ostream *os, const Index &i) {
+  *os << YAML::Node(i);
+}
+
+template <>
+void YamlSerializer<Gaggle>::Unmarshal(std::istream *is, Gaggle *g) {
   try {
     *g = YAML::Load(*is).as<Gaggle>();
   } catch (const YAML::Exception &e) {
@@ -154,4 +227,8 @@ void YamlSerializer::UnmarshalGaggle(std::istream *is, Gaggle *g) {
   }
 }
 
+template <>
+void YamlSerializer<Gaggle>::Marshal(std::ostream *os, const Gaggle &g) {
+  *os << YAML::Node(g);
+}
 };  // namespace btool::app::collector::registry

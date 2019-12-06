@@ -13,7 +13,7 @@ void FsRegistry::Initialize() {
   if (!index_ifs) {
     THROW_ERR("could not open " + index_yml);
   }
-  s_->UnmarshalIndex(&index_ifs, &i_);
+  s_i_->Unmarshal(&index_ifs, &i_);
 
   for (const auto &f : i_.files) {
     auto gaggle_yml = ::btool::util::fs::Join(root_, f.path);
@@ -23,7 +23,7 @@ void FsRegistry::Initialize() {
     }
 
     Gaggle g;
-    s_->UnmarshalGaggle(&gaggle_ifs, &g);
+    s_g_->Unmarshal(&gaggle_ifs, &g);
     gs_[f.path] = g;
   }
 

@@ -57,12 +57,17 @@ TEST_F(FsRegistryTest, Success) {
   ::btool::app::collector::registry::Gaggle ex_g0{.nodes = {a, b}};
   ::btool::app::collector::registry::Gaggle ex_g1{.nodes = {c, d}};
 
-  StrictMock<::btool::app::collector::registry::testing::MockSerializer> ms;
-  EXPECT_CALL(ms, UnmarshalIndex).WillOnce(SetArgPointee<1>(ex_i));
-  EXPECT_CALL(ms, UnmarshalGaggle).WillOnce(SetArgPointee<1>(ex_g0));
-  EXPECT_CALL(ms, UnmarshalGaggle).WillOnce(SetArgPointee<1>(ex_g1));
+  StrictMock<::btool::app::collector::registry::testing::MockSerializer<
+      ::btool::app::collector::registry::Index>>
+      ms_i;
+  StrictMock<::btool::app::collector::registry::testing::MockSerializer<
+      ::btool::app::collector::registry::Gaggle>>
+      ms_g;
+  EXPECT_CALL(ms_i, Unmarshal).WillOnce(SetArgPointee<1>(ex_i));
+  EXPECT_CALL(ms_g, Unmarshal).WillOnce(SetArgPointee<1>(ex_g0));
+  EXPECT_CALL(ms_g, Unmarshal).WillOnce(SetArgPointee<1>(ex_g1));
 
-  ::btool::app::collector::registry::FsRegistry fr(root_, &ms);
+  ::btool::app::collector::registry::FsRegistry fr(root_, &ms_i, &ms_g);
 
   ::btool::app::collector::registry::Index ac_i;
   fr.GetIndex(&ac_i);

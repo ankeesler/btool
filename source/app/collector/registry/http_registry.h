@@ -10,14 +10,17 @@ namespace btool::app::collector::registry {
 
 class HttpRegistry : public Registry {
  public:
-  HttpRegistry(std::string url, Serializer *s) : url_(url), s_(s) {}
+  HttpRegistry(std::string url, Serializer<Index> *s_i, Serializer<Gaggle> *s_g)
+      : url_(url), s_i_(s_i), s_g_(s_g) {}
 
+  std::string GetName() override { return url_; }
   void GetIndex(Index *i) override;
   void GetGaggle(std::string name, Gaggle *i) override;
 
  private:
   std::string url_;
-  Serializer *s_;
+  Serializer<Index> *s_i_;
+  Serializer<Gaggle> *s_g_;
 };
 
 };  // namespace btool::app::collector::registry

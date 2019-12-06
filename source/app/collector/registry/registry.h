@@ -51,6 +51,7 @@ struct Gaggle {
 
 class Registry {
  public:
+  virtual std::string GetName() = 0;
   virtual void GetIndex(Index *i) = 0;
   virtual void GetGaggle(std::string path, Gaggle *g) = 0;
 };

@@ -16,12 +16,12 @@ static void Get(const std::string &url,
                 std::function<void(std::istream *)> unmarshal);
 
 void HttpRegistry::GetIndex(Index *i) {
-  Get(url_, [this, i](std::istream *is) { s_->UnmarshalIndex(is, i); });
+  Get(url_, [this, i](std::istream *is) { s_i_->Unmarshal(is, i); });
 }
 
 void HttpRegistry::GetGaggle(std::string name, Gaggle *g) {
   Get(url_ + "/" + name,
-      [this, g](std::istream *is) { s_->UnmarshalGaggle(is, g); });
+      [this, g](std::istream *is) { s_g_->Unmarshal(is, g); });
 }
 
 static void Get(const std::string &url,

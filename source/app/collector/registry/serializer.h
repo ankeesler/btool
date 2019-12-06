@@ -8,10 +8,11 @@
 
 namespace btool::app::collector::registry {
 
+template <typename T>
 class Serializer {
  public:
-  virtual void UnmarshalIndex(std::istream *is, Index *i) = 0;
-  virtual void UnmarshalGaggle(std::istream *is, Gaggle *g) = 0;
+  virtual void Unmarshal(std::istream *is, T *t) = 0;
+  virtual void Marshal(std::ostream *is, const T &t) = 0;
 };
 
 }  // namespace btool::app::collector::registry

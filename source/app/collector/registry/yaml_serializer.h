@@ -1,14 +1,19 @@
 #ifndef BTOOL_APP_COLLECTOR_REGISTRY_YAMLSERIALIZER_H_
 #define BTOOL_APP_COLLECTOR_REGISTRY_YAMLSERIALIZER_H_
 
+#include <istream>
+#include <ostream>
+
 #include "app/collector/registry/serializer.h"
+#include "err.h"
 
 namespace btool::app::collector::registry {
 
-class YamlSerializer : public Serializer {
+template <typename T>
+class YamlSerializer : public Serializer<T> {
  public:
-  void UnmarshalIndex(std::istream *is, Index *i) override;
-  void UnmarshalGaggle(std::istream *is, Gaggle *g) override;
+  void Unmarshal(std::istream *is, T *t) override;
+  void Marshal(std::ostream *os, const T &t) override;
 };
 
 };  // namespace btool::app::collector::registry

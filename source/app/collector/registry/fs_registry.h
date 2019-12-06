@@ -12,8 +12,10 @@ namespace btool::app::collector::registry {
 
 class FsRegistry : public Registry {
  public:
-  FsRegistry(std::string root, Serializer *s)
-      : root_(root), s_(s), initialized_(false) {}
+  FsRegistry(std::string root, Serializer<Index> *s_i, Serializer<Gaggle> *s_g)
+      : root_(root), s_i_(s_i), s_g_(s_g), initialized_(false) {}
+
+  std::string GetName() override { return root_; }
 
   void GetIndex(Index *i) override {
     if (!initialized_) {
@@ -40,7 +42,8 @@ class FsRegistry : public Registry {
   void Initialize();
 
   std::string root_;
-  Serializer *s_;
+  Serializer<Index> *s_i_;
+  Serializer<Gaggle> *s_g_;
 
   bool initialized_;
   Index i_;

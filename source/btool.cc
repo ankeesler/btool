@@ -22,9 +22,11 @@
 #include "app/collector/registry/fs_registry.h"
 #include "app/collector/registry/gaggle_collector_impl.h"
 #include "app/collector/registry/http_registry.h"
+#include "app/collector/registry/registry.h"
 #include "app/collector/registry/registry_collectini.h"
 #include "app/collector/registry/resolver_factory_delegate.h"
 #include "app/collector/registry/resolver_factory_impl.h"
+#include "app/collector/registry/yaml_file_cache.h"
 #include "app/collector/registry/yaml_serializer.h"
 #include "app/collector/store.h"
 #include "app/collector/trivial_collectini.h"
@@ -123,9 +125,14 @@ int main(int argc, const char *argv[]) {
 
   ::btool::app::collector::Store s;
 
-  ::btool::app::collector::registry::YamlSerializer ys;
-  ::btool::app::collector::registry::FsRegistry fr(registry, &ys);
-  ::btool::app::collector::registry::HttpRegistry hr(registry, &ys);
+  ::btool::app::collector::registry::YamlSerializer<
+      ::btool::app::collector::registry::Index>
+      ys_i;
+  ::btool::app::collector::registry::YamlSerializer<
+      ::btool::app::collector::registry::Gaggle>
+      ys_g;
+  ::btool::app::collector::registry::FsRegistry fr(registry, &ys_i, &ys_g);
+  ::btool::app::collector::registry::HttpRegistry hr(registry, &ys_i, &ys_g);
   ::btool::app::collector::registry::Registry *r;
   if (::btool::util::string::HasPrefix(registry, "http")) {
     r = &hr;
@@ -146,7 +153,14 @@ int main(int argc, const char *argv[]) {
   gci.AddResolverFactoryDelegate(&r_rfd);
   gci.AddResolverFactoryDelegate(&c_rfd);
 
-  ::btool::app::collector::registry::RegistryCollectini rc(r, cache, &gci);
+  ::btool::app::collector::registry::YamlFileCache<
+      ::btool::app::collector::registry::Index>
+      yfc_i(&ys_i, cache);
+  ::btool::app::collector::registry::YamlFileCache<
+      ::btool::app::collector::registry::Gaggle>
+      yfc_g(&ys_g, cache);
+  ::btool::app::collector::registry::RegistryCollectini rc(r, cache, &yfc_i,
+                                                           &yfc_g, &gci);
 
   ::btool::app::collector::cc::IncludesParserImpl ipi;
   ::btool::app::collector::cc::Inc i(&ipi);

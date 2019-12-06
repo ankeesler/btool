@@ -4,6 +4,7 @@
 #include "app/collector/base_collectini.h"
 #include "app/collector/registry/registry.h"
 #include "app/collector/store.h"
+#include "util/cache.h"
 
 namespace btool::app::collector::registry {
 
@@ -15,14 +16,18 @@ class RegistryCollectini : public ::btool::app::collector::BaseCollectini {
                          std::string root) = 0;
   };
 
-  RegistryCollectini(Registry *r, std::string cache, GaggleCollector *gc)
-      : r_(r), cache_(cache), gc_(gc) {}
+  RegistryCollectini(Registry *r, std::string cache,
+                     ::btool::util::Cache<Index> *c_i,
+                     ::btool::util::Cache<Gaggle> *c_g, GaggleCollector *gc)
+      : r_(r), cache_(cache), c_i_(c_i), c_g_(c_g), gc_(gc) {}
 
   void Collect(::btool::app::collector::Store *s) override;
 
  private:
   Registry *r_;
   std::string cache_;
+  ::btool::util::Cache<Index> *c_i_;
+  ::btool::util::Cache<Gaggle> *c_g_;
   GaggleCollector *gc_;
 };
 

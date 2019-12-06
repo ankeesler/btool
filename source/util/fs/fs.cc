@@ -67,7 +67,7 @@ std::string TempDir() {
 std::string ReadFile(const std::string &path) {
   FILE *f = ::fopen(path.c_str(), "r");
   if (f == nullptr) {
-    THROW_ERR("fopen: " + std::string(::strerror(errno)));
+    THROW_ERR("fopen " + path + ": " + std::string(::strerror(errno)));
   }
 
   std::string content;
