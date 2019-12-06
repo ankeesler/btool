@@ -11,6 +11,7 @@ if [[ -z "$REGISTRY" ]]; then
 fi 
 
 run_test() {
+  echo "running test $1"
   "$BTOOL" -root source -registry "$REGISTRY" -loglevel error -run -target "$1"
 }
 

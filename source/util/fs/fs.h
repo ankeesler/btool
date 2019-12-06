@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <sys/stat.h>
+#include <cstring>
 
 #include <chrono>
 #include <functional>
