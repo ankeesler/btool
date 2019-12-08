@@ -61,32 +61,39 @@ int Cmd::Run(void) {
 }
 
 int Cmd::RunChild(int stdout_fds[2], int stderr_fds[2]) {
+  if (dir_ != "") {
+    if (::chdir(dir_.c_str()) == -1) {
+      DEBUG("chdir %s: %s\n", dir_.c_str(), ::strerror(errno));
+      ::exit(-2);
+    }
+  }
+
   // stdout
   if (close(stdout_fds[kPipeRead]) == -1) {
-    DEBUG("close: %s\n", strerror(errno));
-    return -1;
+    DEBUG("close: %s\n", ::strerror(errno));
+    ::exit(-3);
   }
   if (dup2(stdout_fds[kPipeWrite], STDOUT_FILENO) == -1) {
-    DEBUG("dup2: %s\n", strerror(errno));
-    return -1;
+    DEBUG("dup2: %s\n", ::strerror(errno));
+    ::exit(-4);
   }
   if (close(stdout_fds[kPipeWrite]) == -1) {
-    DEBUG("close: %s\n", strerror(errno));
-    return -1;
+    DEBUG("close: %s\n", ::strerror(errno));
+    ::exit(-5);
   }
 
   // stderr
   if (close(stderr_fds[kPipeRead]) == -1) {
-    DEBUG("close: %s\n", strerror(errno));
-    return -1;
+    DEBUG("close: %s\n", ::strerror(errno));
+    ::exit(-6);
   }
   if (dup2(stderr_fds[kPipeWrite], STDERR_FILENO) == -1) {
-    DEBUG("dup2: %s\n", strerror(errno));
-    return -1;
+    DEBUG("dup2: %s\n", ::strerror(errno));
+    ::exit(-7);
   }
   if (close(stderr_fds[kPipeWrite]) == -1) {
-    DEBUG("close: %s\n", strerror(errno));
-    return -1;
+    DEBUG("close: %s\n", ::strerror(errno));
+    ::exit(-8);
   }
 
   std::vector<const char *> args;
