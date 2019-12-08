@@ -2,6 +2,7 @@
 #define BTOOL_APP_COLLECTOR_REGISTRY_RESOLVERFACTORYIMPL_H_
 
 #include <string>
+#include <vector>
 
 #include "app/collector/registry/resolver_factory_delegate.h"
 #include "node/node.h"
@@ -20,6 +21,9 @@ class ResolverFactoryImpl : public ResolverFactoryDelegate::ResolverFactory {
       const std::string &url, const std::string &sha256) override;
   ::btool::node::Node::Resolver *NewUnzip() override;
   ::btool::node::Node::Resolver *NewUntar() override;
+  ::btool::node::Node::Resolver *NewCmd(const std::string &path,
+                                        const std::vector<std::string> &args,
+                                        const std::string &dir) override;
 
  private:
   std::vector<::btool::node::Node::Resolver *> allocations_;

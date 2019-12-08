@@ -1,5 +1,6 @@
 #include "app/collector/registry/gaggle_collector_impl.h"
 
+#include "app/collector/properties.h"
 #include "app/collector/registry/registry.h"
 #include "app/collector/store.h"
 #include "err.h"
@@ -31,6 +32,7 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
     }
 
     n_n->set_property_store(n.labels);
+    ::btool::app::collector::Properties::SetRoot(n_n->property_store(), root);
 
     PrependRoot(n_n, root);  // this is bad! see TODO below!
 

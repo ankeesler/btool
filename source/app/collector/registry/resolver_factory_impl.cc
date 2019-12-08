@@ -1,6 +1,7 @@
 #include "app/collector/registry/resolver_factory_impl.h"
 
 #include <string>
+#include <vector>
 
 #include "app/collector/registry/registry.h"
 #include "err.h"
@@ -73,6 +74,41 @@ class UntarResolver : public ::btool::node::Node::Resolver {
   }
 };
 
+class CmdResolver : public ::btool::node::Node::Resolver {
+ public:
+  CmdResolver(std::string path, std::vector<std::string> args, std::string dir)
+      : path_(path), args_(args), dir_(dir) {}
+
+  void Resolve(const ::btool::node::Node &n) override {
+    ::btool::util::Cmd cmd(path_);
+    for (const auto &arg : args_) {
+      cmd.Arg(arg);
+    }
+    cmd.Dir(dir_);
+
+    std::ostringstream out;
+    std::ostringstream err;
+    cmd.Stdout(&out);
+    cmd.Stderr(&err);
+
+    int ec = cmd.Run();
+
+    DEBUGS() << path_ << " dir: " << cmd.Dir() << std::endl;
+    DEBUGS() << path_ << " out: " << out.str() << std::endl;
+    DEBUGS() << path_ << " err: " << err.str() << std::endl;
+
+    if (ec != 0) {
+      THROW_ERR(path_ + " exit code = " + std::to_string(ec) +
+                ", err: " + err.str());
+    }
+  }
+
+ private:
+  std::string path_;
+  std::vector<std::string> args_;
+  std::string dir_;
+};
+
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewDownload(
     const std::string &url, const std::string &sha256) {
   auto r = new DownloadResolver(url, sha256);
@@ -88,6 +124,14 @@ class UntarResolver : public ::btool::node::Node::Resolver {
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewUntar() {
   auto r = new UntarResolver();
+  allocations_.push_back(r);
+  return r;
+}
+
+::btool::node::Node::Resolver *ResolverFactoryImpl::NewCmd(
+    const std::string &path, const std::vector<std::string> &args,
+    const std::string &dir) {
+  auto r = new CmdResolver(path, args, dir);
   allocations_.push_back(r);
   return r;
 }

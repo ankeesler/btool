@@ -3,6 +3,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "app/collector/properties.h"
 #include "app/collector/registry/registry.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
@@ -66,6 +67,8 @@ TEST_F(GaggleCollectorImplTest, Success) {
   auto n0 = s_.Get("some-root/n0");
   ASSERT_TRUE(n0 != nullptr);
   EXPECT_TRUE(n0->dependencies()->empty());
+  EXPECT_EQ("some-root",
+            ::btool::app::collector::Properties::Root(n0->property_store()));
   EXPECT_EQ(&mr0, n0->resolver());
 
   const bool *b;
@@ -81,5 +84,7 @@ TEST_F(GaggleCollectorImplTest, Success) {
   auto n1 = s_.Get("some-root/n1");
   EXPECT_TRUE(n1 != nullptr);
   EXPECT_THAT(*n1->dependencies(), ElementsAre(n0));
+  EXPECT_EQ("some-root",
+            ::btool::app::collector::Properties::Root(n1->property_store()));
   EXPECT_EQ(&mr1, n1->resolver());
 }

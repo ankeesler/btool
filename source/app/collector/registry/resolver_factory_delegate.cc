@@ -1,10 +1,13 @@
 #include "app/collector/registry/resolver_factory_delegate.h"
 
 #include <string>
+#include <vector>
 
+#include "app/collector/properties.h"
 #include "err.h"
 #include "node/node.h"
 #include "node/property_store.h"
+#include "util/fs/fs.h"
 
 namespace btool::app::collector::registry {
 
@@ -32,6 +35,31 @@ namespace btool::app::collector::registry {
     }
 
     return rf_->NewDownload(*url, *sha256);
+  } else if (name == "cmd") {
+    const std::string *path = nullptr;
+    const std::vector<std::string> *args = nullptr;
+    const std::string *dir = nullptr;
+
+    config.Read("path", &path);
+    if (path == nullptr) {
+      THROW_ERR("missing path key in cmd resolver config for node " + n.name());
+    }
+
+    config.Read("args", &args);
+
+    std::string root =
+        ::btool::app::collector::Properties::Root(n.property_store());
+    std::string actual_dir;
+    config.Read("dir", &dir);
+    if (dir == nullptr) {
+      actual_dir = root;
+    } else {
+      actual_dir = ::btool::util::fs::Join(root, *dir);
+    }
+
+    return rf_->NewCmd(*path,
+                       args == nullptr ? std::vector<std::string>() : *args,
+                       actual_dir);
   } else {
     return nullptr;
   }

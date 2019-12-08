@@ -11,13 +11,13 @@ namespace btool::app::collector::cc {
 
 class Obj : public ::btool::app::collector::BaseCollectini {
  public:
-  Obj(::btool::app::collector::cc::ResolverFactory *rf) : rf_(rf) {}
+  Obj(ResolverFactory *rf) : rf_(rf) {}
 
   void OnNotify(::btool::app::collector::Store *s,
                 const std::string &name) override;
 
  private:
-  ::btool::app::collector::cc::ResolverFactory *rf_;
+  ResolverFactory *rf_;
 };
 
 };  // namespace btool::app::collector::cc
