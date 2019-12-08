@@ -42,8 +42,8 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
       }
     }
     if (n_n->resolver() == nullptr) {
-      THROW_ERR("no known resolver for node " + n.name + " with resolver " +
-                n.resolver.name);
+      DEBUGS() << "no known resolver for node " << n.name << " with resolver "
+               << n.resolver.name;
     }
   }
 }
