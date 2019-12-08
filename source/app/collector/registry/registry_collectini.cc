@@ -1,15 +1,19 @@
 #include "app/collector/registry/registry_collectini.h"
 
+#include <sstream>
+#include <string>
+
 #include "app/collector/base_collectini.h"
 #include "app/collector/registry/registry.h"
 #include "util/fs/fs.h"
-#include "util/util.h"
+#include "util/sha256.h"
 
 namespace btool::app::collector::registry {
 
 void RegistryCollectini::Collect(::btool::app::collector::Store *s) {
   Index i;
-  std::string cache_dir = ::btool::util::Hex(r_->GetName());
+  std::stringstream ss{r_->GetName()};
+  std::string cache_dir = ::btool::util::SHA256(&ss);
   std::string key = ::btool::util::fs::Join(cache_dir, "index");
   if (!c_i_->Get(key, &i)) {
     r_->GetIndex(&i);

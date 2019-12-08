@@ -1,5 +1,6 @@
 #include "app/collector/registry/resolver_factory_impl.h"
 
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -10,6 +11,7 @@
 #include "util/cmd.h"
 #include "util/download.h"
 #include "util/fs/fs.h"
+#include "util/sha256.h"
 
 namespace btool::app::collector::registry {
 
@@ -21,7 +23,12 @@ class DownloadResolver : public ::btool::node::Node::Resolver {
   void Resolve(const ::btool::node::Node &n) override {
     ::btool::util::fs::MkdirAll(::btool::util::fs::Dir(n.name()));
     ::btool::util::Download(url_, n.name());
-    (void)sha256_;  // TODO: check sha256!
+    std::ifstream ifs(n.name());
+    std::string actual_sha256 = ::btool::util::SHA256(&ifs);
+    if (sha256_ != actual_sha256) {
+      THROW_ERR("sha256 mismatch for node " + n.name() + " ex=" + sha256_ +
+                " != ac=" + actual_sha256);
+    }
   }
 
  private:

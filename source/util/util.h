@@ -12,7 +12,7 @@ bool Contains(const std::vector<T> &v, T t) {
   return std::find(v.begin(), v.end(), t) != v.end();
 }
 
-std::string Hex(const std::string &s);
+std::string Hex(unsigned char *data, std::size_t data_size);
 
 };  // namespace btool::util
 

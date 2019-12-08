@@ -6,10 +6,11 @@
 
 namespace btool::util {
 
-std::string Hex(const std::string &s) {
-  std::string hex(s.size() * 2, '\0');
-  for (std::size_t i = 0; i < s.size(); ++i) {
-    ::sprintf(hex.data() + (i * 2), "%x", s[i]);
+std::string Hex(unsigned char *data, std::size_t data_size) {
+  std::string hex(data_size * 2, '\0');
+  for (std::size_t i = 0; i < data_size; ++i) {
+    ::sprintf(hex.data() + (i * 2), "%x%x", (data[i] & 0xF0) >> 4,
+              data[i] & 0x0F);
   }
   return hex;
 }

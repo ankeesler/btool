@@ -10,14 +10,13 @@
 - Ability to select multiple targets at once
 - Run a debugger with -debug
 - Run tests as a single linked executable
-- Check sha256 of downloaded thing
 - Ensure that downloaded .tar.gz depends on gaggle.yml (i.e., $this)
 
 ## Chores
 
-- Use a SHA instead of a hex string for the registry name cache entry
 - Resolvers should be namespaced in yml files
 - Print out stats of collection, building, running, etc.
+- We could use meta-programming to make currenter cache build up-to-date-ness
 - Where are we copying that we don't need to? More pass-by-reference?
   - Can the string manipulation in these fs functions be cleaned up at all?
 - Profile - where are the bottle necks?

@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include <chrono>
+#include <iostream>
 #include <string>
 
 #include "err.h"
@@ -19,6 +20,8 @@ namespace btool::app::builder {
 
 bool CurrenterImpl::Current(const ::btool::node::Node &node) {
   if (!::btool::util::fs::Exists(node.name())) {
+    DEBUGS() << node.name() << " does not exist, so it is not current"
+             << std::endl;
     return false;
   }
 
@@ -39,6 +42,10 @@ bool CurrenterImpl::Current(const ::btool::node::Node &node) {
     }
   });
 
+  if (latest_mod_time_node != nullptr) {
+    DEBUGS() << node.name() << " has latest modified ancestor "
+             << latest_mod_time_node->name() << std::endl;
+  }
   return latest_mod_time <= node_mod_time;
 }
 

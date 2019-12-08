@@ -54,8 +54,6 @@ static bool HandleInclude(::btool::app::collector::Store *s,
 
   for (auto it : *s) {
     auto sn = it.second;
-    DEBUGS() << "does node " << sn->name() << " end in include " << include
-             << "? " << std::endl;
     if (::btool::util::string::HasSuffix(sn->name().c_str(), include.c_str())) {
       d = sn;
 
@@ -65,10 +63,11 @@ static bool HandleInclude(::btool::app::collector::Store *s,
       } else {
         include_path = sn->name().substr(0, index);
       }
-      DEBUGS() << "yes, and the include path is" << include_path << std::endl;
+      DEBUGS() << "resolved include " << include << " to dependency "
+               << d->name() << " and include path " << include_path
+               << std::endl;
       break;
     }
-    DEBUGS() << "nope" << std::endl;
   }
 
   if (d == nullptr) {
