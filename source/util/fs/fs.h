@@ -43,7 +43,7 @@ template <typename Clock, typename Duration>
 std::chrono::time_point<Clock, Duration> ModTime(const std::string &path) {
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
-    THROW_ERR("stat: " + std::string(::strerror(errno)));
+    THROW_ERR("ModTime " + path + ": stat: " + std::string(::strerror(errno)));
   }
   Duration d = std::chrono::duration_cast<Duration>(
       std::chrono::seconds(s.modtime.tv_sec) +

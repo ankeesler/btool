@@ -149,7 +149,7 @@ bool Exists(const std::string &path) {
     if (errno == ENOENT) {
       exists = false;
     } else {
-      THROW_ERR("stat: " + std::string(::strerror(errno)));
+      THROW_ERR("Exists " + path + ": stat: " + std::string(::strerror(errno)));
     }
   }
   return exists;
@@ -160,7 +160,7 @@ bool IsDir(const std::string &path) {
   struct ::stat s;
   if (::stat(path.c_str(), &s) == -1) {
     if (errno != ENOENT) {
-      THROW_ERR("stat: " + std::string(::strerror(errno)));
+      THROW_ERR("IsDir " + path + ": stat: " + std::string(::strerror(errno)));
     }
   } else {
     is_dir = (((s.st_mode & S_IFMT) & S_IFDIR) != 0);

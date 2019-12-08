@@ -16,6 +16,7 @@
 ## Chores
 
 - Use a SHA instead of a hex string for the registry name cache entry
+- Resolvers should be namespaced in yml files
 - Where are we copying that we don't need to? More pass-by-reference?
   - Can the string manipulation in these fs functions be cleaned up at all?
 - Profile - where are the bottle necks?
