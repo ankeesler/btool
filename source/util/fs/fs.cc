@@ -22,20 +22,36 @@ const int kIFBufSizeLog = 10;  // 1KB
 std::string Base(const std::string &path) {
   std::size_t found = path.rfind('/');
   if (found == std::string::npos) {
+    // single-name-directory-or-file.c
     return path;
+  } else if (found == 0) {
+    // /some-root-directory-or-file.c
+    return "/";
+  } else if (found == path.size() - 1) {
+    // path/to/directory-with-slash/
+    found = path.rfind('/', found - 1);
+    return path.substr(found + 1, path.size() - 1 - found - 1);
   } else {
-    return std::string(path.c_str() + found + 1, path.size() - found - 1);
+    // path/to/directory-or-file-without-slash.c
+    return path.substr(found + 1, path.size() - found - 1);
   }
 }
 
 std::string Dir(const std::string &path) {
   std::size_t found = path.rfind('/');
   if (found == std::string::npos) {
+    // single-name-directory-or-file.c
     return ".";
   } else if (found == 0) {
+    // /some-root-directory-or-file.c
     return "/";
+  } else if (found == path.size() - 1) {
+    // path/to/directory-with-slash/
+    found = path.rfind('/', found - 1);
+    return path.substr(0, found);
   } else {
-    return std::string(path.c_str(), found);
+    // path/to/directory-or-file-without-slash.c
+    return path.substr(0, found);
   }
 }
 

@@ -14,9 +14,11 @@ using ::testing::Lt;
 
 TEST(FS, Base) {
   EXPECT_EQ("", ::btool::util::fs::Base(""));
+  EXPECT_EQ("/", ::btool::util::fs::Base("/"));
   EXPECT_EQ("a", ::btool::util::fs::Base("a"));
   EXPECT_EQ(".", ::btool::util::fs::Base("."));
   EXPECT_EQ("b", ::btool::util::fs::Base("a/b"));
+  EXPECT_EQ("c", ::btool::util::fs::Base("a/b/c/"));
   EXPECT_EQ("c.c", ::btool::util::fs::Base("a/b/c.c"));
   EXPECT_EQ("c.c", ::btool::util::fs::Base("./a/b/c.c"));
   EXPECT_EQ("c.c", ::btool::util::fs::Base("../a/b/c.c"));
@@ -27,6 +29,7 @@ TEST(FS, Dir) {
   EXPECT_EQ(".", ::btool::util::fs::Dir("a"));
   EXPECT_EQ(".", ::btool::util::fs::Dir("."));
   EXPECT_EQ("a", ::btool::util::fs::Dir("a/b"));
+  EXPECT_EQ("a", ::btool::util::fs::Dir("a/b/"));
   EXPECT_EQ("a/b", ::btool::util::fs::Dir("a/b/c.c"));
   EXPECT_EQ("./a/b", ::btool::util::fs::Dir("./a/b/c.c"));
 
