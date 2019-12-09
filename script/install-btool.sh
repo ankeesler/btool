@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-VERSION="0.3"
+VERSION="0.4"
 OS="linux"
 
 if [[ "$(uname)" == "Darwin" ]]; then
