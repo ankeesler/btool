@@ -3,6 +3,12 @@
 #include "gtest/gtest.h"
 
 TEST(Hex, Success) {
-  EXPECT_EQ("74756e61464953484d61526c496e",
-            ::btool::util::Hex("tunaFISHMaRlIn"));
+  unsigned char bytes[] = {
+      0xAB,
+      0x12,
+      0xDE,
+      0x34,
+  };
+  EXPECT_EQ("ab12de34",
+            ::btool::util::Hex(bytes, sizeof(bytes) / sizeof(bytes[0])));
 }
