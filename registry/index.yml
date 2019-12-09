@@ -1,7 +1,3 @@
 ---
 files:
 # These files are filled in by the btoolregistry Dockerfile.
-- path: googletest.yml
-  sha256: e59e771b91ec9eb06edd27d4c8e3a16c3c3b16daa962ea2f51e007ca82f1620b
-- path: yaml-cpp.yml
-  sha256: fb530e5a03fd8bb6cdda00e508b01ddf99b4f4ee38bff1a59ed80f12bb5ad810
