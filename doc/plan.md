@@ -14,7 +14,6 @@
 
 ## Chores
 
-- Resolvers should be namespaced in yml files
 - We could use meta-programming to make currenter cache build up-to-date-ness
 - Where are we copying that we don't need to? More pass-by-reference?
   - Can the string manipulation in these fs functions be cleaned up at all?

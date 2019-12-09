@@ -53,9 +53,10 @@ void GaggleCollectorImpl::Collect(::btool::app::collector::Store *s, Gaggle *g,
 static void PrependRoot(::btool::node::Node *n, const std::string &root) {
   // TODO: this is bad! we don't want to reach across to the cc package!
   auto prepend_root = [&root](std::string *s) { s->insert(0, root + "/"); };
-  n->property_store()->ForEach("io.btool.collector.cc.includePaths",
+  n->property_store()->ForEach("io.btool.collector.cc.properties/includePaths",
                                prepend_root);
-  n->property_store()->ForEach("io.btool.collector.cc.libraries", prepend_root);
+  n->property_store()->ForEach("io.btool.collector.cc.properties/libraries",
+                               prepend_root);
 }
 
 };  // namespace btool::app::collector::registry

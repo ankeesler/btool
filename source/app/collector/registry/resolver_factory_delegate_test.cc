@@ -38,7 +38,9 @@ TEST(ResolverFactoryDelegate, Download) {
   config.Write("url", "some-url");
   config.Write("sha256", "some-sha256");
   ::btool::node::Node n("n");
-  EXPECT_EQ(&mr, rfd.NewResolver("download", config, n));
+  EXPECT_EQ(&mr,
+            rfd.NewResolver("io.btool.collector.registry.resolvers/download",
+                            config, n));
 }
 
 TEST(ResolverFactoryDelegate, Unzip) {
@@ -49,7 +51,8 @@ TEST(ResolverFactoryDelegate, Unzip) {
 
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
-  EXPECT_EQ(&mr, rfd.NewResolver("unzip", config, n));
+  EXPECT_EQ(&mr, rfd.NewResolver("io.btool.collector.registry.resolvers/unzip",
+                                 config, n));
 }
 
 TEST(ResolverFactoryDelegate, Cmd) {
@@ -67,5 +70,6 @@ TEST(ResolverFactoryDelegate, Cmd) {
   config.Write("dir", "some-dir");
   ::btool::node::Node n("n");
   ::btool::app::collector::Properties::SetRoot(n.property_store(), "some-root");
-  EXPECT_EQ(&mr, rfd.NewResolver("cmd", config, n));
+  EXPECT_EQ(&mr, rfd.NewResolver("io.btool.collector.registry.resolvers/cmd",
+                                 config, n));
 }

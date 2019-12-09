@@ -4,7 +4,7 @@ nodes:
   dependencies:
     - $this
   resolver:
-    name: download
+    name: io.btool.collector.registry.resolvers/download
     config:
       url: https://github.com/openssl/openssl/archive/OpenSSL_1_1_1d.tar.gz
       sha256: 23011a5cc78e53d0dc98dfa608c51e72bcd350aa57df74c5d5574ba4ffb62e74
@@ -14,13 +14,13 @@ nodes:
   dependencies:
     - OpenSSL_1_1_1d.tar.gz
   resolver:
-    name: untar
+    name: io.btool.collector.registry.resolvers/untar
 
 - name: openssl-OpenSSL_1_1_1d/Makefile
   dependencies:
     - openssl-OpenSSL_1_1_1d/config
   resolver:
-    name: cmd
+    name: io.btool.collector.registry.resolvers/cmd
     config:
       path: ./config
       args:
@@ -31,7 +31,7 @@ nodes:
   dependencies:
     - openssl-OpenSSL_1_1_1d/Makefile
   resolver:
-    name: cmd
+    name: io.btool.collector.registry.resolvers/cmd
     config:
       path: make
       args:
@@ -43,7 +43,7 @@ nodes:
   dependencies:
     - openssl-OpenSSL_1_1_1d/Makefile
   resolver:
-    name: cmd
+    name: io.btool.collector.registry.resolvers/cmd
     config:
       path: make
       args:
@@ -58,7 +58,7 @@ nodes:
     - openssl-OpenSSL_1_1_1d/config
     - openssl-OpenSSL_1_1_1d/include/openssl/opensslconf.h
   labels:
-    io.btool.collector.cc.libraries:
+    io.btool.collector.cc.properties/libraries:
       - openssl-OpenSSL_1_1_1d/libcrypto.a
-    io.btool.collector.cc.includePaths:
+    io.btool.collector.cc.properties/includePaths:
       - openssl-OpenSSL_1_1_1d/include

@@ -14,11 +14,11 @@ namespace btool::app::collector::registry {
 ::btool::node::Node::Resolver *ResolverFactoryDelegate::NewResolver(
     const std::string &name, const ::btool::node::PropertyStore &config,
     const ::btool::node::Node &n) {
-  if (name == "unzip") {
+  if (name == "io.btool.collector.registry.resolvers/unzip") {
     return rf_->NewUnzip();
-  } else if (name == "untar") {
+  } else if (name == "io.btool.collector.registry.resolvers/untar") {
     return rf_->NewUntar();
-  } else if (name == "download") {
+  } else if (name == "io.btool.collector.registry.resolvers/download") {
     const std::string *url = nullptr;
     const std::string *sha256 = nullptr;
 
@@ -35,7 +35,7 @@ namespace btool::app::collector::registry {
     }
 
     return rf_->NewDownload(*url, *sha256);
-  } else if (name == "cmd") {
+  } else if (name == "io.btool.collector.registry.resolvers/cmd") {
     const std::string *path = nullptr;
     const std::vector<std::string> *args = nullptr;
     const std::string *dir = nullptr;

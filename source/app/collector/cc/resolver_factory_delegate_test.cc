@@ -37,7 +37,8 @@ TEST_F(ResolverFactoryDelegateTest, CompileC) {
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
-  EXPECT_EQ(&mr_, rfd_.NewResolver("compileC", config, n));
+  EXPECT_EQ(&mr_, rfd_.NewResolver("io.btool.collector.cc.resolvers/compileC",
+                                   config, n));
 }
 
 TEST_F(ResolverFactoryDelegateTest, CompileCC) {
@@ -55,7 +56,8 @@ TEST_F(ResolverFactoryDelegateTest, CompileCC) {
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
-  EXPECT_EQ(&mr_, rfd_.NewResolver("compileCC", config, n));
+  EXPECT_EQ(&mr_, rfd_.NewResolver("io.btool.collector.cc.resolvers/compileCC",
+                                   config, n));
 }
 
 TEST_F(ResolverFactoryDelegateTest, LinkC) {
@@ -72,7 +74,8 @@ TEST_F(ResolverFactoryDelegateTest, LinkC) {
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
-  EXPECT_EQ(&mr_, rfd_.NewResolver("linkC", config, n));
+  EXPECT_EQ(&mr_, rfd_.NewResolver("io.btool.collector.cc.resolvers/linkC",
+                                   config, n));
 }
 
 TEST_F(ResolverFactoryDelegateTest, LinkCC) {
@@ -89,5 +92,6 @@ TEST_F(ResolverFactoryDelegateTest, LinkCC) {
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
-  EXPECT_EQ(&mr_, rfd_.NewResolver("linkCC", config, n));
+  EXPECT_EQ(&mr_, rfd_.NewResolver("io.btool.collector.cc.resolvers/linkCC",
+                                   config, n));
 }
