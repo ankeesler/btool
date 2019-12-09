@@ -15,4 +15,14 @@ std::string Hex(unsigned char *data, std::size_t data_size) {
   return hex;
 }
 
+std::string CommaSeparatedNumber(std::size_t n) {
+  std::string s = std::to_string(n);
+  std::size_t size = s.size();
+  while (size > 3) {
+    s.insert(size - 3, ",");
+    size -= 3;
+  }
+  return s;
+}
+
 };  // namespace btool::util

@@ -15,10 +15,11 @@ void Builder::Build(const ::btool::node::Node &node) {
           n->name().c_str(), (current ? "true" : "false"),
           (n->resolver() == nullptr ? "null" : "something"));
     if (n->resolver() != nullptr) {
-      ca_->OnResolve(*n, current);
+      ca_->OnPreResolve(*n, current);
       if (!current) {
         n->resolver()->Resolve(*n);
       }
+      ca_->OnPostResolve(*n, current);
     }
   });
 }

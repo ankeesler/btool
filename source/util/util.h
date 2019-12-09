@@ -2,6 +2,7 @@
 #define BTOOL_UTIL_UTIL_H_
 
 #include <algorithm>
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -13,6 +14,8 @@ bool Contains(const std::vector<T> &v, T t) {
 }
 
 std::string Hex(unsigned char *data, std::size_t data_size);
+
+std::string CommaSeparatedNumber(std::size_t n);
 
 };  // namespace btool::util
 

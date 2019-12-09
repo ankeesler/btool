@@ -20,7 +20,10 @@ class Builder : public ::btool::app::App::Builder {
   class Callback {
    public:
     virtual ~Callback() {}
-    virtual void OnResolve(const ::btool::node::Node &node, bool current) = 0;
+    virtual void OnPreResolve(const ::btool::node::Node &node,
+                              bool current) = 0;
+    virtual void OnPostResolve(const ::btool::node::Node &node,
+                               bool current) = 0;
   };
 
   Builder(Currenter *cu, Callback *ca) : cu_(cu), ca_(ca) {}
