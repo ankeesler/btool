@@ -20,7 +20,7 @@ std::string SHA256(std::istream *is) {
   std::size_t data_size = Size(is);
   unsigned char *data = new unsigned char[data_size];
   is->read((char *)data, data_size);
-  if (is->gcount() != data_size) {
+  if (is->gcount() != static_cast<std::streamsize>(data_size)) {
     delete[] data;
     THROW_ERR("failed to read " + std::to_string(data_size) +
               " bytes from stream");

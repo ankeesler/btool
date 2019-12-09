@@ -6,6 +6,8 @@ RUN apt-get update \
     g++ \
     gcc \
     python \
+    libfindbin-libs-perl \
+    make \
     -y
 
 COPY ./script/install-btool.sh /tmp/install-btool.sh
