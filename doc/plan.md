@@ -11,6 +11,7 @@
 - Run a debugger with -debug
 - Run tests as a single linked executable
 - Ensure that downloaded .tar.gz depends on gaggle.yml (i.e., $this)
+- People shouldn't have to install transient dependencies themselves: perl, make
 
 ## Chores
 

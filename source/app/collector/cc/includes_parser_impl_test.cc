@@ -19,7 +19,7 @@ class IncludesParserImplTest : public ::testing::Test {
   std::string dir_;
 };
 
-TEST_F(IncludesParserImplTest, Yeah) {
+TEST_F(IncludesParserImplTest, Success) {
   const std::string file = ::btool::util::fs::Join(dir_, "tuna.h");
   const std::string content =
       "#include \"foo.h\"\n\n"
@@ -37,4 +37,22 @@ TEST_F(IncludesParserImplTest, Yeah) {
       file, [&calls](const std::string &include) { calls.push_back(include); });
   EXPECT_THAT(calls, ElementsAre("foo.h", "some/path/to/bar.h", "comment.h",
                                  "one/more.h"));
+}
+
+TEST_F(IncludesParserImplTest, EmptyString) {
+  const std::string file = ::btool::util::fs::Join(dir_, "tuna.h");
+  const std::string content =
+      "#include <iostream>\n"
+      "#include <ostream>\n"
+      "#include <sstream>\n"
+      "#include <string>\n"
+      "#include <vector>\n\n"
+      "const std::string empty = \"\";\n";
+  ::btool::util::fs::WriteFile(file, content);
+
+  std::vector<std::string> calls;
+  ::btool::app::collector::cc::IncludesParserImpl ipi;
+  ipi.ParseIncludes(
+      file, [&calls](const std::string &include) { calls.push_back(include); });
+  EXPECT_THAT(calls, ElementsAre());
 }

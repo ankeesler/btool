@@ -19,12 +19,16 @@ void IncludesParserImpl::ParseIncludes(
       break;
     }
 
-    size_t start = content.find('"', index);
-    if (start == std::string::npos) {
+    std::size_t newline = content.find('\n', index);
+    std::size_t start = content.find('"', index);
+    if (newline < start) {
+      index = newline + 1;
+      continue;
+    } else if (start == std::string::npos) {
       break;
     }
 
-    size_t end = content.find('"', start + 1);
+    std::size_t end = content.find('"', start + 1);
     if (end == std::string::npos) {
       break;
     }
