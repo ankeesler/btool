@@ -6,20 +6,27 @@ The simplest C/C++ build tool.
 
 ![btool](btool.png)
 
-### To try out `btool`...
+## To try out `btool`...
 
 ```
 $ docker run -it ankeesler/btool
 $ btool -root BasicC -target main
+...
 $ ./BasicC/main
 hey!
 $ cat README.md # for more information about the examples
 ```
 
-## To build `btool`...
+## To install the latest `btool` build...
 
 ```
-$ btool -root source -target btool
+$ ./script/install-btool.sh latest
+```
+
+## To install a local `btool` build...
+
+```
+$ ./script/install-btool.sh local
 ```
 
 ## To run the tests...
