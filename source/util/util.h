@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,8 @@ bool Contains(const std::vector<T> &v, T t) {
 std::string Hex(unsigned char *data, std::size_t data_size);
 
 std::string CommaSeparatedNumber(std::size_t n);
+
+std::chrono::steady_clock::duration Time(std::function<void()> f);
 
 };  // namespace btool::util
 

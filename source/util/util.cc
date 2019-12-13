@@ -2,6 +2,8 @@
 
 #include <cstdio>
 
+#include <chrono>
+#include <functional>
 #include <string>
 
 namespace btool::util {
@@ -23,6 +25,13 @@ std::string CommaSeparatedNumber(std::size_t n) {
     size -= 3;
   }
   return s;
+}
+
+std::chrono::steady_clock::duration Time(std::function<void()> f) {
+  auto start = std::chrono::steady_clock::now();
+  f();
+  auto end = std::chrono::steady_clock::now();
+  return end - start;
 }
 
 };  // namespace btool::util

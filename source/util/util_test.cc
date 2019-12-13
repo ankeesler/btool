@@ -1,5 +1,8 @@
 #include "util/util.h"
 
+#include <chrono>
+#include <thread>
+
 #include "gtest/gtest.h"
 
 TEST(Util, Hex) {
@@ -22,4 +25,11 @@ TEST(Util, CommaSeparatedNumber) {
 
   EXPECT_EQ("5,000,004", ::btool::util::CommaSeparatedNumber(5000004));
   EXPECT_EQ("50,000,000,000", ::btool::util::CommaSeparatedNumber(50000000000));
+}
+
+TEST(Util, Time) {
+  std::chrono::milliseconds sleep_dur(500);
+  auto dur = ::btool::util::Time(
+      [&sleep_dur] { std::this_thread::sleep_for(sleep_dur); });
+  EXPECT_TRUE(dur.count() >= sleep_dur.count());
 }

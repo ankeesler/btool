@@ -14,31 +14,28 @@
 
 namespace btool::app {
 
-static std::chrono::system_clock::duration Time(std::function<void(void)> f);
-
-static std::string DurationString(std::chrono::system_clock::duration d);
+static std::string DurationString(std::chrono::steady_clock::duration d);
 
 void App::Run(const std::string &target, bool clean, bool list, bool run) {
-  std::chrono::system_clock::duration collect_time;
-  std::chrono::system_clock::duration clean_time;
-  std::chrono::system_clock::duration list_time;
-  std::chrono::system_clock::duration build_time;
-  std::chrono::system_clock::duration run_time;
+  std::chrono::steady_clock::duration collect_time;
+  std::chrono::steady_clock::duration clean_time;
+  std::chrono::steady_clock::duration list_time;
+  std::chrono::steady_clock::duration build_time;
+  std::chrono::steady_clock::duration run_time;
 
-  auto collect_start = std::chrono::system_clock::now();
-  auto n = collector_->Collect(target);
-  auto collect_end = std::chrono::system_clock::now();
-  collect_time = collect_end - collect_start;
+  ::btool::node::Node const *n = nullptr;
+  collect_time = ::btool::util::Time(
+      [this, target, &n]() { n = collector_->Collect(target); });
 
   if (clean) {
-    clean_time = Time([this, n] { cleaner_->Clean(*n); });
+    clean_time = ::btool::util::Time([this, n] { cleaner_->Clean(*n); });
   } else if (list) {
-    list_time = Time([this, n] { lister_->List(*n); });
+    list_time = ::btool::util::Time([this, n] { lister_->List(*n); });
   } else {
-    build_time = Time([this, n] { builder_->Build(*n); });
+    build_time = ::btool::util::Time([this, n] { builder_->Build(*n); });
 
     if (run) {
-      run_time = Time([this, n] { runner_->Run(*n); });
+      run_time = ::btool::util::Time([this, n] { runner_->Run(*n); });
     }
   }
 
@@ -58,14 +55,7 @@ void App::Run(const std::string &target, bool clean, bool list, bool run) {
   }
 }
 
-static std::chrono::system_clock::duration Time(std::function<void(void)> f) {
-  auto start = std::chrono::system_clock::now();
-  f();
-  auto end = std::chrono::system_clock::now();
-  return end - start;
-}
-
-static std::string DurationString(std::chrono::system_clock::duration d) {
+static std::string DurationString(std::chrono::steady_clock::duration d) {
   std::stringstream ss;
   ss << ::btool::util::CommaSeparatedNumber(
             std::chrono::duration_cast<std::chrono::milliseconds>(d).count())

@@ -78,3 +78,4 @@ cat <<EOF >"$testcc"
 TEST($class, Yeah) {
 }
 EOF
+echo "wrote $testcc"
