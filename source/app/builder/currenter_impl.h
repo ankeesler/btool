@@ -1,13 +1,13 @@
 #ifndef BTOOL_APP_BUILDER_CURRENTERIMPL_H_
 #define BTOOL_APP_BUILDER_CURRENTERIMPL_H_
 
-#include "builder.h"
+#include "app/builder/parallel_builder.h"
 #include "err.h"
 #include "node/node.h"
 
 namespace btool::app::builder {
 
-class CurrenterImpl : public Builder::Currenter {
+class CurrenterImpl : public ParallelBuilder::Currenter {
  public:
   bool Current(const ::btool::node::Node &node) override;
 };

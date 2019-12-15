@@ -11,11 +11,12 @@ namespace btool {
 
 class Err : public std::runtime_error {
  public:
+  Err() : std::runtime_error("") {}
   Err(std::string what, std::string file, int line)
       : std::runtime_error(what + " @ " + file + ":" + std::to_string(line)) {}
 };
 
-#define THROW_ERR(what) throw Err((what), __FILE__, __LINE__)
+#define THROW_ERR(what) throw ::btool::Err((what), __FILE__, __LINE__)
 
 };  // namespace btool
 

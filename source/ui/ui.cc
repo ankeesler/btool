@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <ostream>
 #include <string>
 
@@ -17,25 +18,28 @@ void UI::OnRun(const ::btool::node::Node &node) {
 }
 
 void UI::OnPreResolve(const ::btool::node::Node &node, bool current) {
-  resolve_start_ = std::chrono::system_clock::now();
+  resolve_start_[node.name()] = std::chrono::system_clock::now();
 
-  INFOS() << "resolving " << MakeNamePretty(node.name(), cache_);
+  std::unique_lock<std::mutex> lock(mtx_);
+  INFOS() << "resolving " << MakeNamePretty(node.name(), cache_) << std::endl;
 }
 
 void UI::OnPostResolve(const ::btool::node::Node &node, bool current) {
+  auto resolve_end = std::chrono::system_clock::now();
+
+  std::unique_lock<std::mutex> lock(mtx_);
+  std::ostream &os = INFOS()
+                     << "resolving " << MakeNamePretty(node.name(), cache_);
   if (!current) {
-    auto resolve_end = std::chrono::system_clock::now();
     auto resolve_duration =
-        std::chrono::duration_cast<std::chrono::milliseconds>(resolve_end -
-                                                              resolve_start_);
-    *::btool::Log::Info << " ("
-                        << ::btool::util::CommaSeparatedNumber(
-                               resolve_duration.count())
-                        << " ms)";
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            resolve_end - resolve_start_[node.name()]);
+    os << " (" << ::btool::util::CommaSeparatedNumber(resolve_duration.count())
+       << " ms)";
   } else {
-    *::btool::Log::Info << " (up to date)";
+    os << " (up to date)";
   }
-  *::btool::Log::Info << std::endl;
+  os << std::endl;
 }
 
 std::string MakeNamePretty(const std::string &name, const std::string &cache) {

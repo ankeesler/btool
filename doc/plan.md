@@ -4,7 +4,6 @@
 
 - Targets are per-os/arch
 - When I clean, I don't want to delete the stuff in the cache
-- Parallel builds
 - Single line UI for collecting and resolving nodes
 - Ability to select multiple targets at once
 - Run a debugger with -debug (needs Cmd to support stdin)

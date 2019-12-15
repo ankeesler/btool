@@ -9,6 +9,8 @@
 #include "app/app.h"
 #include "app/builder/builder.h"
 #include "app/builder/currenter_impl.h"
+#include "app/builder/parallel_builder.h"
+#include "app/builder/work_pool_impl.h"
 #include "app/cleaner/cleaner.h"
 #include "app/cleaner/remove_aller_impl.h"
 #include "app/collector/cc/exe.h"
@@ -92,6 +94,11 @@ int main(int argc, const char *argv[]) {
   f.Int("registrycachetimeout",
         "Specify registry cache timeout (seconds); set to 0 to disable caching",
         &registry_cache_timeout_s);
+
+  int threads = 1;
+  f.Int("threads",
+        "Specify number of threads to use when building (default: 1)",
+        &threads);
 
   bool clean = false;
   f.Bool("clean", "Perform clean of target graph", &clean);
@@ -191,11 +198,13 @@ int main(int argc, const char *argv[]) {
   ::btool::app::lister::Lister lister(&std::cout);
 
   ::btool::app::builder::CurrenterImpl ci;
-  ::btool::app::builder::Builder builder(&ci, &ui);
+  ::btool::app::builder::WorkPoolImpl wpi(threads);
+  ::btool::app::builder::ParallelBuilder parallel_builder(&wpi, &ci, &ui);
 
   ::btool::app::runner::Runner runner(&ui);
 
-  ::btool::app::App a(&collector, &cleaner, &lister, &builder, &runner);
+  ::btool::app::App a(&collector, &cleaner, &lister, &parallel_builder,
+                      &runner);
   try {
     a.Run(root_target, clean, list, run);
   } catch (const std::exception &e) {
