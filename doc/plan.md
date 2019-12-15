@@ -30,3 +30,5 @@
 
 ### 03: The way we find include paths is terribly fraught with peril. :(
 - A file including `node/node.h` brought in the `node/node.h` from yaml-cpp.
+
+### 04: When a test seg faults, btool doesn't fail :(

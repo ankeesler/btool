@@ -50,7 +50,7 @@ void App::Run(const std::string &target, bool clean, bool list, bool run) {
   if (!clean && !list) {
     os << "  build: " << DurationString(build_time) << std::endl;
   }
-  if (run) {
+  if (!clean && !list && run) {
     os << "  run: " << DurationString(run_time) << std::endl;
   }
 }
