@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "app/app.h"
-#include "app/builder/builder.h"
 #include "app/builder/currenter_impl.h"
 #include "app/builder/parallel_builder.h"
 #include "app/builder/work_pool_impl.h"
