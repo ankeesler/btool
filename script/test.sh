@@ -56,12 +56,12 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 unit_tests=1
 integration_tests=1
-while getopts htu o; do
+while getopts hiu o; do
   case "$o" in
     u) unit_tests=1
        integration_tests=0
        ;;
-    t) unit_tests=0
+    i) unit_tests=0
        integration_tests=1
        ;;
     h) usage

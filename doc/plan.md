@@ -4,6 +4,7 @@
 
 - Targets are per-os/arch
 - When I clean, I don't want to delete the stuff in the cache
+- Add an -output flag
 - Single line UI for collecting and resolving nodes
 - Ability to select multiple targets at once
 - Run a debugger with -debug (needs Cmd to support stdin)
@@ -13,6 +14,7 @@
 
 ## Chores
 
+- How do we know when we need to inject libpthread? Look for <thread>?
 - We could use meta-programming to make currenter cache build up-to-date-ness
 - Where are we copying that we don't need to? More pass-by-reference?
   - Can the string manipulation in these fs functions be cleaned up at all?

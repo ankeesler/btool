@@ -15,14 +15,18 @@ class ResolverFactoryImpl : public ResolverFactory {
                       std::string archiver, std::string linker_c,
                       std::string linker_cc,
                       std::vector<std::string> compiler_c_flags,
-                      std::vector<std::string> compiler_cc_flags)
+                      std::vector<std::string> compiler_cc_flags,
+                      std::vector<std::string> linker_c_flags,
+                      std::vector<std::string> linker_cc_flags)
       : compiler_c_(compiler_c),
         compiler_cc_(compiler_cc),
         archiver_(archiver),
         linker_c_(linker_c),
         linker_cc_(linker_cc),
         compiler_c_flags_(compiler_c_flags),
-        compiler_cc_flags_(compiler_cc_flags) {}
+        compiler_cc_flags_(compiler_cc_flags),
+        linker_c_flags_(linker_c_flags),
+        linker_cc_flags_(linker_cc_flags) {}
 
   ~ResolverFactoryImpl() {
     for (auto a : allocations_) {
@@ -50,6 +54,8 @@ class ResolverFactoryImpl : public ResolverFactory {
   std::string linker_cc_;
   std::vector<std::string> compiler_c_flags_;
   std::vector<std::string> compiler_cc_flags_;
+  std::vector<std::string> linker_c_flags_;
+  std::vector<std::string> linker_cc_flags_;
 
   std::vector<::btool::node::Node::Resolver *> allocations_;
 };

@@ -101,8 +101,9 @@ class ArchiveResolver : public ::btool::node::Node::Resolver {
 
 class LinkResolver : public ::btool::node::Node::Resolver {
  public:
-  LinkResolver(std::string linker, std::vector<std::string> flags)
-      : linker_(linker), flags_(flags) {}
+  LinkResolver(std::string linker, std::vector<std::string> flags,
+               std::vector<std::string> more_flags)
+      : linker_(linker), flags_(flags), more_flags_(more_flags) {}
 
   void Resolve(const ::btool::node::Node &n) override {
     ::btool::util::Cmd cmd(linker_.c_str());
@@ -112,6 +113,9 @@ class LinkResolver : public ::btool::node::Node::Resolver {
       cmd.Arg(d->name());
     }
     for (const auto &f : flags_) {
+      cmd.Arg(f);
+    }
+    for (const auto &f : more_flags_) {
       cmd.Arg(f);
     }
 
@@ -135,6 +139,7 @@ class LinkResolver : public ::btool::node::Node::Resolver {
  private:
   std::string linker_;
   std::vector<std::string> flags_;
+  std::vector<std::string> more_flags_;
 };
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileC(
@@ -163,14 +168,14 @@ class LinkResolver : public ::btool::node::Node::Resolver {
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkC(
     const std::vector<std::string> &flags) {
-  auto lr = new LinkResolver(linker_c_, flags);
+  auto lr = new LinkResolver(linker_c_, linker_c_flags_, flags);
   allocations_.push_back(lr);
   return lr;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkCC(
     const std::vector<std::string> &flags) {
-  auto lr = new LinkResolver(linker_cc_, flags);
+  auto lr = new LinkResolver(linker_cc_, linker_cc_flags_, flags);
   allocations_.push_back(lr);
   return lr;
 }
