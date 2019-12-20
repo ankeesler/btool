@@ -18,7 +18,7 @@ class Inc : public ::btool::app::collector::BaseCollectini {
     virtual ~IncludesParser() {}
     virtual void ParseIncludes(
         const std::string &path,
-        std::function<void(const std::string &)> callback) = 0;
+        std::function<void(const std::string &, bool)> callback) = 0;
   };
 
   Inc(IncludesParser *ip) : ip_(ip) {}

@@ -12,7 +12,7 @@ class IncludesParserImpl : public Inc::IncludesParser {
  public:
   void ParseIncludes(
       const std::string &path,
-      std::function<void(const std::string &)> callback) override;
+      std::function<void(const std::string &, bool)> callback) override;
 };
 
 };  // namespace btool::app::collector::cc

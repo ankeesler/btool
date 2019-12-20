@@ -1,6 +1,7 @@
 #include "app/collector/cc/includes_parser_impl.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gmock/gmock.h"
@@ -31,12 +32,19 @@ TEST_F(IncludesParserImplTest, Success) {
       "#include \"one/more.h\"\n";
   ::btool::util::fs::WriteFile(file, content);
 
-  std::vector<std::string> calls;
+  std::vector<std::pair<std::string, bool>> calls;
   ::btool::app::collector::cc::IncludesParserImpl ipi;
-  ipi.ParseIncludes(
-      file, [&calls](const std::string &include) { calls.push_back(include); });
-  EXPECT_THAT(calls, ElementsAre("foo.h", "some/path/to/bar.h", "comment.h",
-                                 "one/more.h"));
+  ipi.ParseIncludes(file, [&calls](const std::string &include, bool system) {
+    calls.push_back(std::pair<std::string, bool>(include, system));
+  });
+  EXPECT_THAT(
+      calls, ElementsAre(
+                 std::make_pair<std::string, bool>("foo.h", false),
+                 std::make_pair<std::string, bool>("string", true),
+                 std::make_pair<std::string, bool>("cstdio", true),
+                 std::make_pair<std::string, bool>("some/path/to/bar.h", false),
+                 std::make_pair<std::string, bool>("comment.h", false),
+                 std::make_pair<std::string, bool>("one/more.h", false)));
 }
 
 TEST_F(IncludesParserImplTest, EmptyString) {
@@ -52,7 +60,9 @@ TEST_F(IncludesParserImplTest, EmptyString) {
 
   std::vector<std::string> calls;
   ::btool::app::collector::cc::IncludesParserImpl ipi;
-  ipi.ParseIncludes(
-      file, [&calls](const std::string &include) { calls.push_back(include); });
-  EXPECT_THAT(calls, ElementsAre());
+  ipi.ParseIncludes(file, [&calls](const std::string &include, bool system) {
+    calls.push_back(include);
+  });
+  EXPECT_THAT(
+      calls, ElementsAre("iostream", "ostream", "sstream", "string", "vector"));
 }

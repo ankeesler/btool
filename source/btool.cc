@@ -156,8 +156,7 @@ int main(int argc, const char *argv[]) {
   ::btool::app::collector::cc::ResolverFactoryImpl c_rfi(
       compiler_c, compiler_cc, archiver, linker_c, linker_cc,
       {"-Wall", "-Werror", "-g", "-O0", "--std=c17"},
-      {"-Wall", "-Werror", "-g", "-O0", "--std=c++17"}, {}, {"-lpthread"});
-  // TODO: find a nicer way to inject libpthread into build above.
+      {"-Wall", "-Werror", "-g", "-O0", "--std=c++17"}, {}, {});
   ::btool::app::collector::cc::ResolverFactoryDelegate c_rfd(&c_rfi);
 
   ::btool::app::collector::registry::GaggleCollectorImpl gci;

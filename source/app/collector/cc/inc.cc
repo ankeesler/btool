@@ -35,10 +35,20 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   }
 
   bool updated = false;
-  ip_->ParseIncludes(name, [s, n, &updated](const std::string &include) {
-    bool new_stuff = HandleInclude(s, n, include);
-    updated = updated || new_stuff;
-  });
+  ip_->ParseIncludes(
+      name, [s, n, &updated](const std::string &include, bool system) {
+        if (!system) {
+          bool new_stuff = HandleInclude(s, n, include);
+          updated = updated || new_stuff;
+        } else if (include == "thread") {
+          auto link_flags = Properties::LinkFlags(n->property_store());
+          if (link_flags == nullptr ||
+              !::btool::util::Contains(*link_flags, std::string("-lpthread"))) {
+            Properties::AddLinkFlag(n->property_store(), "-lpthread");
+            updated = true;
+          }
+        }
+      });
 
   if (updated) {
     Notify(s, name);
@@ -71,8 +81,8 @@ static bool HandleInclude(::btool::app::collector::Store *s,
   }
 
   if (d == nullptr) {
-    DEBUGS() << "cannot resolve include " << include << "for node " << n->name()
-             << std::endl;
+    DEBUGS() << "cannot resolve include " << include << " for node "
+             << n->name() << std::endl;
     return false;
   }
 
@@ -83,16 +93,8 @@ static bool HandleInclude(::btool::app::collector::Store *s,
   n->dependencies()->push_back(d);
 
   auto include_paths = Properties::IncludePaths(n->property_store());
-  bool needs_add = true;
-  if (include_paths != nullptr) {
-    auto it =
-        std::find(include_paths->begin(), include_paths->end(), include_path);
-    if (it != include_paths->end()) {
-      needs_add = false;
-    }
-  }
-
-  if (needs_add) {
+  if (include_paths == nullptr ||
+      !::btool::util::Contains(*include_paths, include_path)) {
     Properties::AddIncludePath(n->property_store(), include_path);
   }
 

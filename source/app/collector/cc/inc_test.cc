@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gmock/gmock.h"
@@ -22,24 +23,28 @@ using ::testing::StrictMock;
 class MockIncludesParser
     : public ::btool::app::collector::cc::Inc::IncludesParser {
  public:
-  MOCK_METHOD2(ParseIncludes, void(const std::string &,
-                                   std::function<void(const std::string &)>));
+  MOCK_METHOD2(ParseIncludes,
+               void(const std::string &,
+                    std::function<void(const std::string &, bool)>));
 };
 
 class FakeIncludesParser
     : public ::btool::app::collector::cc::Inc::IncludesParser {
  public:
-  void AddInclude(std::string include) { includes_.push_back(include); }
+  void AddInclude(std::string include, bool system) {
+    includes_.push_back(std::pair<std::string, bool>(include, system));
+  }
 
-  void ParseIncludes(const std::string &name,
-                     std::function<void(const std::string &)> f) override {
+  void ParseIncludes(
+      const std::string &name,
+      std::function<void(const std::string &, bool)> f) override {
     for (const auto &include : includes_) {
-      f(include);
+      f(include.first, include.second);
     }
   }
 
  private:
-  std::vector<std::string> includes_;
+  std::vector<std::pair<std::string, bool>> includes_;
 };
 
 TEST(IncTest, NotLocal) {
@@ -75,9 +80,10 @@ TEST(IncTest, C) {
 
   ::btool::app::collector::testing::SpyCollectini sc;
   FakeIncludesParser fip;
-  fip.AddInclude("some/path.h");
-  fip.AddInclude("some/other/path.h");
-  fip.AddInclude("lib/path.h");
+  fip.AddInclude("string", true);
+  fip.AddInclude("some/path.h", false);
+  fip.AddInclude("some/other/path.h", false);
+  fip.AddInclude("lib/path.h", false);
   ::btool::app::collector::cc::Inc i(&fip);
   i.OnNotify(&s, "tuna.c");
 
@@ -128,7 +134,7 @@ TEST(IncTest, EmptyIncludePath) {
 
   ::btool::app::collector::testing::SpyCollectini sc;
   FakeIncludesParser fip;
-  fip.AddInclude("some/path.h");
+  fip.AddInclude("some/path.h", false);
   ::btool::app::collector::cc::Inc i(&fip);
   i.OnNotify(&s, "tuna.c");
 
@@ -140,6 +146,35 @@ TEST(IncTest, EmptyIncludePath) {
       s.Get("tuna.c")->property_store());
   EXPECT_EQ(1UL, include_paths->size());
   EXPECT_EQ(".", include_paths->at(0));
+
+  EXPECT_THAT(
+      sc.on_notify_calls_,
+      ElementsAre(
+          std::pair<::btool::app::collector::Store *, const std::string &>(
+              &s, n->name())));
+}
+
+TEST(IncTest, Pthread) {
+  ::btool::app::collector::Store s;
+  auto n = s.Put("tuna.c");
+  ::btool::app::collector::Properties::SetLocal(n->property_store(), true);
+
+  ::btool::app::collector::testing::SpyCollectini sc;
+  FakeIncludesParser fip;
+  fip.AddInclude("thread", true);
+  ::btool::app::collector::cc::Inc i(&fip);
+  i.OnNotify(&s, "tuna.c");
+
+  auto deps = s.Get("tuna.c")->dependencies();
+  EXPECT_EQ(0UL, deps->size());
+
+  auto include_paths = ::btool::app::collector::cc::Properties::IncludePaths(
+      s.Get("tuna.c")->property_store());
+  EXPECT_EQ(nullptr, include_paths);
+
+  auto link_flags = ::btool::app::collector::cc::Properties::LinkFlags(
+      s.Get("tuna.c")->property_store());
+  EXPECT_THAT(*link_flags, ElementsAre("-lpthread"));
 
   EXPECT_THAT(
       sc.on_notify_calls_,
