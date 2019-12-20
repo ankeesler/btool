@@ -165,7 +165,14 @@ int Cmd::RunParent(int child_pid, int child_stdout_fds[2],
     }
   }
 
-  return WEXITSTATUS(stat);
+  return (
+      WIFEXITED(stat)
+          ? WEXITSTATUS(stat)
+          : (WIFSIGNALED(stat)
+                 ? (WTERMSIG(stat) == SIGSEGV
+                        ? 139 /* seg fault exit code */
+                        : 222 /* btool custom error code - idk what happened */)
+                 : 223 /* again, idk what happened */));
 }
 
 std::ostream &operator<<(std::ostream &os, const Cmd &cmd) {

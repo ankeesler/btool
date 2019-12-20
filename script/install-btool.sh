@@ -37,7 +37,7 @@ fi
 
 echo "install-btool.sh: installing version $version"
 if [[ "$version" == "local" ]]; then
-  if ! which btool; then
+  if ! which btool >/dev/null; then
     echo "install-btool.sh: error: no local btool binary"
     exit 1
   fi

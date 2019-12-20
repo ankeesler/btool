@@ -14,7 +14,6 @@
 
 ## Chores
 
-- How do we know when we need to inject libpthread? Look for <thread>?
 - We could use meta-programming to make currenter cache build up-to-date-ness
 - Where are we copying that we don't need to? More pass-by-reference?
   - Can the string manipulation in these fs functions be cleaned up at all?
@@ -31,5 +30,3 @@
 
 ### 03: The way we find include paths is terribly fraught with peril. :(
 - A file including `node/node.h` brought in the `node/node.h` from yaml-cpp.
-
-### 04: When a test seg faults, btool doesn't fail :(
