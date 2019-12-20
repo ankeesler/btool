@@ -31,8 +31,8 @@ void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
     return;
   }
 
-  bool c = ::btool::util::string::HasSuffix(name.c_str(), ".c");
-  bool cc = ::btool::util::string::HasSuffix(name.c_str(), ".cc");
+  bool c = ::btool::util::string::HasSuffix(name, ".c");
+  bool cc = ::btool::util::string::HasSuffix(name, ".cc");
   if (!c && !cc) {
     DROP(name, "not .c/.cc");
     return;

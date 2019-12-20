@@ -5,8 +5,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-// workaround for bug-00
-#include "err.h"
 #include "node/node.h"
 #include "node/testing/node.h"
 

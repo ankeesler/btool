@@ -57,8 +57,6 @@ void Inc::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
 
 static bool HandleInclude(::btool::app::collector::Store *s,
                           ::btool::node::Node *n, const std::string &include) {
-  DEBUGS() << "handling include " << include << std::endl;
-
   ::btool::node::Node *d = nullptr;
   std::string include_path;
 
@@ -75,7 +73,7 @@ static bool HandleInclude(::btool::app::collector::Store *s,
       }
       DEBUGS() << "resolved include " << include << " to dependency "
                << d->name() << " and include path " << include_path
-               << std::endl;
+               << " for node " << n->name() << std::endl;
       break;
     }
   }
