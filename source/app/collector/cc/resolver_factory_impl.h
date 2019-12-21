@@ -1,6 +1,7 @@
 #ifndef BTOOL_APP_COLLECTOR_CC_RESOLVERFACTORYIMPL_H_
 #define BTOOL_APP_COLLECTOR_CC_RESOLVERFACTORYIMPL_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -28,12 +29,6 @@ class ResolverFactoryImpl : public ResolverFactory {
         linker_c_flags_(linker_c_flags),
         linker_cc_flags_(linker_cc_flags) {}
 
-  ~ResolverFactoryImpl() {
-    for (auto a : allocations_) {
-      delete a;
-    }
-  }
-
   ::btool::node::Node::Resolver *NewCompileC() override;
   ::btool::node::Node::Resolver *NewCompileCC() override;
   ::btool::node::Node::Resolver *NewArchive() override;
@@ -51,7 +46,7 @@ class ResolverFactoryImpl : public ResolverFactory {
   std::vector<std::string> linker_c_flags_;
   std::vector<std::string> linker_cc_flags_;
 
-  std::vector<::btool::node::Node::Resolver *> allocations_;
+  std::vector<std::unique_ptr<::btool::node::Node::Resolver>> resolvers_;
 };
 
 };  // namespace btool::app::collector::cc

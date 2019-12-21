@@ -1,6 +1,7 @@
 #ifndef BTOOL_APP_COLLECTOR_REGISTRY_RESOLVERFACTORYIMPL_H_
 #define BTOOL_APP_COLLECTOR_REGISTRY_RESOLVERFACTORYIMPL_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -11,12 +12,6 @@ namespace btool::app::collector::registry {
 
 class ResolverFactoryImpl : public ResolverFactoryDelegate::ResolverFactory {
  public:
-  ~ResolverFactoryImpl() {
-    for (auto a : allocations_) {
-      delete a;
-    }
-  }
-
   ::btool::node::Node::Resolver *NewDownload(
       const std::string &url, const std::string &sha256) override;
   ::btool::node::Node::Resolver *NewUnzip() override;
@@ -26,7 +21,7 @@ class ResolverFactoryImpl : public ResolverFactoryDelegate::ResolverFactory {
                                         const std::string &dir) override;
 
  private:
-  std::vector<::btool::node::Node::Resolver *> allocations_;
+  std::vector<std::unique_ptr<::btool::node::Node::Resolver>> resolvers_;
 };
 
 };  // namespace btool::app::collector::registry

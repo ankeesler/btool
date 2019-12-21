@@ -1,6 +1,7 @@
 #include "app/collector/registry/resolver_factory_impl.h"
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -119,19 +120,19 @@ class CmdResolver : public ::btool::node::Node::Resolver {
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewDownload(
     const std::string &url, const std::string &sha256) {
   auto r = new DownloadResolver(url, sha256);
-  allocations_.push_back(r);
+  resolvers_.emplace_back(r);
   return r;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewUnzip() {
   auto r = new UnzipResolver();
-  allocations_.push_back(r);
+  resolvers_.emplace_back(r);
   return r;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewUntar() {
   auto r = new UntarResolver();
-  allocations_.push_back(r);
+  resolvers_.emplace_back(r);
   return r;
 }
 
@@ -139,7 +140,7 @@ class CmdResolver : public ::btool::node::Node::Resolver {
     const std::string &path, const std::vector<std::string> &args,
     const std::string &dir) {
   auto r = new CmdResolver(path, args, dir);
-  allocations_.push_back(r);
+  resolvers_.emplace_back(r);
   return r;
 }
 

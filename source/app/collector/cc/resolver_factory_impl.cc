@@ -1,5 +1,6 @@
 #include "app/collector/cc/resolver_factory_impl.h"
 
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -151,31 +152,31 @@ class LinkResolver : public ::btool::node::Node::Resolver {
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileC() {
   auto cr = new CompileResolver(compiler_c_, compiler_c_flags_);
-  allocations_.push_back(cr);
+  resolvers_.emplace_back(cr);
   return cr;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileCC() {
   auto cr = new CompileResolver(compiler_cc_, compiler_cc_flags_);
-  allocations_.push_back(cr);
+  resolvers_.emplace_back(cr);
   return cr;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewArchive() {
   auto ar = new ArchiveResolver(archiver_);
-  allocations_.push_back(ar);
+  resolvers_.emplace_back(ar);
   return ar;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkC() {
   auto lr = new LinkResolver(linker_c_, linker_c_flags_);
-  allocations_.push_back(lr);
+  resolvers_.emplace_back(lr);
   return lr;
 }
 
 ::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkCC() {
   auto lr = new LinkResolver(linker_cc_, linker_cc_flags_);
-  allocations_.push_back(lr);
+  resolvers_.emplace_back(lr);
   return lr;
 }
 
