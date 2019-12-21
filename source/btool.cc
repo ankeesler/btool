@@ -43,7 +43,7 @@
 // workaround for bug-02
 #include "app/collector/base_collectini.h"
 
-const static std::string version_string = "0.6";
+const static std::string version_string = "0.7";
 
 #ifdef __linux__
 static const char *compiler_c = "gcc";
