@@ -34,17 +34,11 @@ class ResolverFactoryImpl : public ResolverFactory {
     }
   }
 
-  ::btool::node::Node::Resolver *NewCompileC(
-      const std::vector<std::string> &include_dirs,
-      const std::vector<std::string> &flags) override;
-  ::btool::node::Node::Resolver *NewCompileCC(
-      const std::vector<std::string> &include_dirs,
-      const std::vector<std::string> &flags) override;
+  ::btool::node::Node::Resolver *NewCompileC() override;
+  ::btool::node::Node::Resolver *NewCompileCC() override;
   ::btool::node::Node::Resolver *NewArchive() override;
-  ::btool::node::Node::Resolver *NewLinkC(
-      const std::vector<std::string> &flags) override;
-  ::btool::node::Node::Resolver *NewLinkCC(
-      const std::vector<std::string> &flags) override;
+  ::btool::node::Node::Resolver *NewLinkC() override;
+  ::btool::node::Node::Resolver *NewLinkCC() override;
 
  private:
   std::string compiler_c_;

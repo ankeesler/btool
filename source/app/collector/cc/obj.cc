@@ -16,9 +16,6 @@ namespace btool::app::collector::cc {
 #define DROP(name, reason) \
   DEBUGS() << "obj: drop " << (name) << " (" << reason << ")" << std::endl
 
-void CollectIncludePaths(const ::btool::node::Node &n,
-                         std::vector<std::string> *include_paths);
-
 void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   auto d = s->Get(name);
   if (d == nullptr) {
@@ -49,28 +46,15 @@ void Obj::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
 
   DEBUGS() << "added new object " << obj_name << std::endl;
 
-  std::vector<std::string> include_paths;
-  CollectIncludePaths(*d, &include_paths);
-  std::vector<std::string> flags;
-  class ::btool::node::Node::Resolver *r;
+  ::btool::node::Node::Resolver *r;
   if (c) {
-    r = rf_->NewCompileC(include_paths, flags);
+    r = rf_->NewCompileC();
   } else {  // cc
-    r = rf_->NewCompileCC(include_paths, flags);
+    r = rf_->NewCompileCC();
   }
   n->set_resolver(r);
   n->dependencies()->push_back(d);
   Notify(s, n->name());
-}
-
-void CollectIncludePaths(const ::btool::node::Node &n,
-                         std::vector<std::string> *include_paths) {
-  ::btool::app::collector::CollectStringsProperties(
-      n, include_paths,
-      [](const ::btool::node::PropertyStore *ps)
-          -> const std::vector<std::string> * {
-        return Properties::IncludePaths(ps);
-      });
 }
 
 };  // namespace btool::app::collector::cc

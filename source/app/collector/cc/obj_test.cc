@@ -22,26 +22,18 @@ class ObjTest : public ::testing::Test {
  protected:
   ObjTest() : o_(&mrf_) {
     auto bh = s_.Put("b.h");
-    ::btool::app::collector::cc::Properties::AddIncludePath(
-        bh->property_store(), "bh/include/path");
 
     auto ah = s_.Put("a.h");
     ah->dependencies()->push_back(bh);
-    ::btool::app::collector::cc::Properties::AddIncludePath(
-        ah->property_store(), "ah/include/path");
 
     auto fooc = s_.Put("foo.c");
     fooc->dependencies()->push_back(ah);
     ::btool::app::collector::Properties::SetLocal(fooc->property_store(), true);
-    ::btool::app::collector::cc::Properties::AddIncludePath(
-        fooc->property_store(), "fooc/include/path");
 
     auto foocc = s_.Put("foo.cc");
     foocc->dependencies()->push_back(ah);
     ::btool::app::collector::Properties::SetLocal(foocc->property_store(),
                                                   true);
-    ::btool::app::collector::cc::Properties::AddIncludePath(
-        foocc->property_store(), "foocc/include/path");
 
     auto foogo = s_.Put("foo.go");
     ::btool::app::collector::Properties::SetLocal(foogo->property_store(),
@@ -69,10 +61,7 @@ TEST_F(ObjTest, IgnoreNotLocal) {
 }
 
 TEST_F(ObjTest, C) {
-  std::vector<std::string> include_paths{"bh/include/path", "ah/include/path",
-                                         "fooc/include/path"};
-  std::vector<std::string> flags;
-  EXPECT_CALL(mrf_, NewCompileC(include_paths, flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewCompileC()).WillOnce(Return(&mr_));
 
   ::btool::app::collector::testing::SpyCollectini sc;
 
@@ -93,10 +82,7 @@ TEST_F(ObjTest, C) {
 }
 
 TEST_F(ObjTest, CC) {
-  std::vector<std::string> include_paths{"bh/include/path", "ah/include/path",
-                                         "foocc/include/path"};
-  std::vector<std::string> flags;
-  EXPECT_CALL(mrf_, NewCompileCC(include_paths, flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewCompileCC()).WillOnce(Return(&mr_));
 
   ::btool::app::collector::testing::SpyCollectini sc;
 

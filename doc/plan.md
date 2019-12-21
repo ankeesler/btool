@@ -22,10 +22,6 @@
 
 ## Bugs
 
-### 00: Including header doesn't bring that header's include paths
-- This is because the exe consumer is pulling in a .o file that has not been
-  updated by the inc consumer yet, so it is missing include paths...
-
 ### 02: Transient header dependencies' source objects are not brought in to build
 
 ### 03: The way we find include paths is terribly fraught with peril. :(

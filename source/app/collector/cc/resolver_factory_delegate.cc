@@ -15,35 +15,15 @@ namespace btool::app::collector::cc {
     const std::string &name, const ::btool::node::PropertyStore &config,
     const ::btool::node::Node &n) {
   if (name == "io.btool.collector.cc.resolvers/compileC") {
-    std::vector<std::string> include_paths;
-    ::btool::app::collector::CollectStringsProperties(
-        n, &include_paths, [](const ::btool::node::PropertyStore *ps) {
-          return Properties::IncludePaths(ps);
-        });
-    return rf_->NewCompileC(include_paths, {});
+    return rf_->NewCompileC();
   } else if (name == "io.btool.collector.cc.resolvers/compileCC") {
-    std::vector<std::string> include_paths;
-    ::btool::app::collector::CollectStringsProperties(
-        n, &include_paths, [](const ::btool::node::PropertyStore *ps) {
-          return Properties::IncludePaths(ps);
-        });
-    return rf_->NewCompileCC(include_paths, {});
+    return rf_->NewCompileCC();
   } else if (name == "io.btool.collector.cc.resolvers/archive") {
     return rf_->NewArchive();
   } else if (name == "io.btool.collector.cc.resolvers/linkC") {
-    std::vector<std::string> flags;
-    ::btool::app::collector::CollectStringsProperties(
-        n, &flags, [](const ::btool::node::PropertyStore *ps) {
-          return Properties::LinkFlags(ps);
-        });
-    return rf_->NewLinkC(flags);
+    return rf_->NewLinkC();
   } else if (name == "io.btool.collector.cc.resolvers/linkCC") {
-    std::vector<std::string> flags;
-    ::btool::app::collector::CollectStringsProperties(
-        n, &flags, [](const ::btool::node::PropertyStore *ps) {
-          return Properties::LinkFlags(ps);
-        });
-    return rf_->NewLinkCC(flags);
+    return rf_->NewLinkCC();
   } else {
     return nullptr;
   }

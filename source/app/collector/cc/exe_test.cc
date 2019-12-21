@@ -37,9 +37,7 @@ TEST_F(ExeTest, BadFileExtension) {
 }
 
 TEST_F(ExeTest, C) {
-  std::vector<std::string> flags;
-  flags.push_back("-some-flag");
-  EXPECT_CALL(mrf_, NewLinkC(flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewLinkC()).WillOnce(Return(&mr_));
 
   BuildGraph(&s_, ".c");
 
@@ -65,9 +63,7 @@ TEST_F(ExeTest, C) {
 }
 
 TEST_F(ExeTest, CC) {
-  std::vector<std::string> flags;
-  flags.push_back("-some-flag");
-  EXPECT_CALL(mrf_, NewLinkCC(flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewLinkCC()).WillOnce(Return(&mr_));
 
   BuildGraph(&s_, ".cc");
 
@@ -96,9 +92,7 @@ void BuildGraph(::btool::app::collector::Store *s, const std::string ext) {
   // tuna -> a -> b -> marlin
   // tuna -> marlin
 
-  auto liba = s->Put("lib.a");
-  ::btool::app::collector::cc::Properties::AddLinkFlag(liba->property_store(),
-                                                       "-some-flag");
+  s->Put("lib.a");
 
   auto marlinh = s->Put("marlin.h");
   ::btool::app::collector::cc::Properties::AddLibrary(marlinh->property_store(),

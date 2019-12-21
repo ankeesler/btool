@@ -1,7 +1,5 @@
 #include "app/builder/work_pool_impl.h"
 
-// bug-00
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "err.h"

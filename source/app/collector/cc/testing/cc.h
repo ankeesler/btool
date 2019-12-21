@@ -14,17 +14,11 @@ namespace btool::app::collector::cc::testing {
 class MockResolverFactory
     : public ::btool::app::collector::cc::ResolverFactory {
  public:
-  MOCK_METHOD2(NewCompileC, class ::btool::node::Node::Resolver *(
-                                const std::vector<std::string> &,
-                                const std::vector<std::string> &));
-  MOCK_METHOD2(NewCompileCC, class ::btool::node::Node::Resolver *(
-                                 const std::vector<std::string> &,
-                                 const std::vector<std::string> &));
+  MOCK_METHOD0(NewCompileC, class ::btool::node::Node::Resolver *());
+  MOCK_METHOD0(NewCompileCC, class ::btool::node::Node::Resolver *());
   MOCK_METHOD0(NewArchive, class ::btool::node::Node::Resolver *());
-  MOCK_METHOD1(NewLinkC, class ::btool::node::Node::Resolver *(
-                             const std::vector<std::string> &));
-  MOCK_METHOD1(NewLinkCC, class ::btool::node::Node::Resolver *(
-                              const std::vector<std::string> &));
+  MOCK_METHOD0(NewLinkC, class ::btool::node::Node::Resolver *());
+  MOCK_METHOD0(NewLinkCC, class ::btool::node::Node::Resolver *());
 };
 
 };  // namespace btool::app::collector::cc::testing

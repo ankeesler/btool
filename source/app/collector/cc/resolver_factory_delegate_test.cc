@@ -6,7 +6,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#include "app/collector/cc/properties.h"
 #include "app/collector/cc/testing/cc.h"
 #include "node/testing/node.h"
 
@@ -23,17 +22,11 @@ class ResolverFactoryDelegateTest : public ::testing::Test {
 };
 
 TEST_F(ResolverFactoryDelegateTest, CompileC) {
-  std::vector<std::string> include_dirs{"include/dir1", "include/dir0"};
-  std::vector<std::string> flags{};
-  EXPECT_CALL(mrf_, NewCompileC(include_dirs, flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewCompileC()).WillOnce(Return(&mr_));
 
   ::btool::node::Node d1("d1");
-  ::btool::app::collector::cc::Properties::AddIncludePath(d1.property_store(),
-                                                          "include/dir1");
   ::btool::node::Node d0("d0");
   d0.dependencies()->push_back(&d1);
-  ::btool::app::collector::cc::Properties::AddIncludePath(d0.property_store(),
-                                                          "include/dir0");
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
@@ -42,17 +35,11 @@ TEST_F(ResolverFactoryDelegateTest, CompileC) {
 }
 
 TEST_F(ResolverFactoryDelegateTest, CompileCC) {
-  std::vector<std::string> include_dirs{"include/dir1", "include/dir0"};
-  std::vector<std::string> flags{};
-  EXPECT_CALL(mrf_, NewCompileCC(include_dirs, flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewCompileCC()).WillOnce(Return(&mr_));
 
   ::btool::node::Node d1("d1");
-  ::btool::app::collector::cc::Properties::AddIncludePath(d1.property_store(),
-                                                          "include/dir1");
   ::btool::node::Node d0("d0");
   d0.dependencies()->push_back(&d1);
-  ::btool::app::collector::cc::Properties::AddIncludePath(d0.property_store(),
-                                                          "include/dir0");
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
@@ -61,16 +48,11 @@ TEST_F(ResolverFactoryDelegateTest, CompileCC) {
 }
 
 TEST_F(ResolverFactoryDelegateTest, LinkC) {
-  std::vector<std::string> flags{"-flag1", "-flag0"};
-  EXPECT_CALL(mrf_, NewLinkC(flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewLinkC()).WillOnce(Return(&mr_));
 
   ::btool::node::Node d1("d1");
-  ::btool::app::collector::cc::Properties::AddLinkFlag(d1.property_store(),
-                                                       "-flag1");
   ::btool::node::Node d0("d0");
   d0.dependencies()->push_back(&d1);
-  ::btool::app::collector::cc::Properties::AddLinkFlag(d0.property_store(),
-                                                       "-flag0");
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);
@@ -79,16 +61,11 @@ TEST_F(ResolverFactoryDelegateTest, LinkC) {
 }
 
 TEST_F(ResolverFactoryDelegateTest, LinkCC) {
-  std::vector<std::string> flags{"-flag1", "-flag0"};
-  EXPECT_CALL(mrf_, NewLinkCC(flags)).WillOnce(Return(&mr_));
+  EXPECT_CALL(mrf_, NewLinkCC()).WillOnce(Return(&mr_));
 
   ::btool::node::Node d1("d1");
-  ::btool::app::collector::cc::Properties::AddLinkFlag(d1.property_store(),
-                                                       "-flag1");
   ::btool::node::Node d0("d0");
   d0.dependencies()->push_back(&d1);
-  ::btool::app::collector::cc::Properties::AddLinkFlag(d0.property_store(),
-                                                       "-flag0");
   ::btool::node::PropertyStore config;
   ::btool::node::Node n("n");
   n.dependencies()->push_back(&d0);

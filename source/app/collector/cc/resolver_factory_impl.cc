@@ -4,41 +4,44 @@
 #include <string>
 #include <vector>
 
+#include "app/collector/cc/properties.h"
+#include "app/collector/properties.h"
 #include "err.h"
 #include "log.h"
 #include "node/node.h"
+#include "node/property_store.h"
 #include "util/cmd.h"
 
 namespace btool::app::collector::cc {
 
 class CompileResolver : public ::btool::node::Node::Resolver {
  public:
-  CompileResolver(std::string compiler, std::vector<std::string> flags,
-                  std::vector<std::string> include_dirs,
-                  std::vector<std::string> more_flags)
-      : compiler_(compiler),
-        flags_(flags),
-        include_dirs_(include_dirs),
-        more_flags_(more_flags) {}
+  CompileResolver(std::string compiler, std::vector<std::string> flags)
+      : compiler_(compiler), flags_(flags) {}
 
   void Resolve(const ::btool::node::Node &n) override {
     if (n.dependencies()->empty()) {
       THROW_ERR("node " + n.name() + "must have at least one dependency");
     }
 
+    std::vector<std::string> include_dirs;
+    ::btool::app::collector::CollectStringsProperties(
+        n, &include_dirs,
+        [](const ::btool::node::PropertyStore *ps)
+            -> const std::vector<std::string> * {
+          return Properties::IncludePaths(ps);
+        });
+
     ::btool::util::Cmd cmd(compiler_.c_str());
     cmd.Arg("-o");
     cmd.Arg(n.name().c_str());
     cmd.Arg("-c");
     cmd.Arg(n.dependencies()->at(0)->name().c_str());
-    for (const auto &id : include_dirs_) {
+    for (const auto &id : include_dirs) {
       std::string flag("-I" + id);
       cmd.Arg(flag);
     }
     for (const auto &f : flags_) {
-      cmd.Arg(f);
-    }
-    for (const auto &f : more_flags_) {
       cmd.Arg(f);
     }
 
@@ -62,8 +65,6 @@ class CompileResolver : public ::btool::node::Node::Resolver {
  private:
   std::string compiler_;
   std::vector<std::string> flags_;
-  std::vector<std::string> include_dirs_;
-  std::vector<std::string> more_flags_;
 };
 
 class ArchiveResolver : public ::btool::node::Node::Resolver {
@@ -101,11 +102,18 @@ class ArchiveResolver : public ::btool::node::Node::Resolver {
 
 class LinkResolver : public ::btool::node::Node::Resolver {
  public:
-  LinkResolver(std::string linker, std::vector<std::string> flags,
-               std::vector<std::string> more_flags)
-      : linker_(linker), flags_(flags), more_flags_(more_flags) {}
+  LinkResolver(std::string linker, std::vector<std::string> flags)
+      : linker_(linker), flags_(flags) {}
 
   void Resolve(const ::btool::node::Node &n) override {
+    std::vector<std::string> more_flags;
+    ::btool::app::collector::CollectStringsProperties(
+        n, &more_flags,
+        [](const ::btool::node::PropertyStore *ps)
+            -> const std::vector<std::string> * {
+          return Properties::LinkFlags(ps);
+        });
+
     ::btool::util::Cmd cmd(linker_.c_str());
     cmd.Arg("-o");
     cmd.Arg(n.name());
@@ -115,7 +123,7 @@ class LinkResolver : public ::btool::node::Node::Resolver {
     for (const auto &f : flags_) {
       cmd.Arg(f);
     }
-    for (const auto &f : more_flags_) {
+    for (const auto &f : more_flags) {
       cmd.Arg(f);
     }
 
@@ -139,23 +147,16 @@ class LinkResolver : public ::btool::node::Node::Resolver {
  private:
   std::string linker_;
   std::vector<std::string> flags_;
-  std::vector<std::string> more_flags_;
 };
 
-::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileC(
-    const std::vector<std::string> &include_dirs,
-    const std::vector<std::string> &flags) {
-  auto cr =
-      new CompileResolver(compiler_c_, compiler_c_flags_, include_dirs, flags);
+::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileC() {
+  auto cr = new CompileResolver(compiler_c_, compiler_c_flags_);
   allocations_.push_back(cr);
   return cr;
 }
 
-::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileCC(
-    const std::vector<std::string> &include_dirs,
-    const std::vector<std::string> &flags) {
-  auto cr = new CompileResolver(compiler_cc_, compiler_cc_flags_, include_dirs,
-                                flags);
+::btool::node::Node::Resolver *ResolverFactoryImpl::NewCompileCC() {
+  auto cr = new CompileResolver(compiler_cc_, compiler_cc_flags_);
   allocations_.push_back(cr);
   return cr;
 }
@@ -166,16 +167,14 @@ class LinkResolver : public ::btool::node::Node::Resolver {
   return ar;
 }
 
-::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkC(
-    const std::vector<std::string> &flags) {
-  auto lr = new LinkResolver(linker_c_, linker_c_flags_, flags);
+::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkC() {
+  auto lr = new LinkResolver(linker_c_, linker_c_flags_);
   allocations_.push_back(lr);
   return lr;
 }
 
-::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkCC(
-    const std::vector<std::string> &flags) {
-  auto lr = new LinkResolver(linker_cc_, linker_cc_flags_, flags);
+::btool::node::Node::Resolver *ResolverFactoryImpl::NewLinkCC() {
+  auto lr = new LinkResolver(linker_cc_, linker_cc_flags_);
   allocations_.push_back(lr);
   return lr;
 }

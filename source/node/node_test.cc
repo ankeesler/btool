@@ -3,8 +3,6 @@
 #include <sstream>
 #include <vector>
 
-// workaround for bug-00
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "node/testing/node.h"

@@ -2,8 +2,6 @@
 
 #include <sstream>
 
-// workaround for bug-00
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include "node/node.h"

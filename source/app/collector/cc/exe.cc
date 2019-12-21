@@ -54,10 +54,7 @@ void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
     n->dependencies()->push_back(lib);
   }
 
-  std::vector<std::string> flags;
-  CollectLinkFlags(*n, &flags);
-
-  auto r = (ext == ".cc" ? rf_->NewLinkCC(flags) : rf_->NewLinkC(flags));
+  auto r = (ext == ".cc" ? rf_->NewLinkCC() : rf_->NewLinkC());
   n->set_resolver(r);
 
   Notify(s, n->name());
