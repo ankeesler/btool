@@ -14,9 +14,6 @@
 
 namespace btool::app::collector::cc {
 
-void CollectLinkFlags(const ::btool::node::Node &n,
-                      std::vector<std::string> *flags);
-
 void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
   if (::btool::util::fs::Ext(name) != "") {
     return;
@@ -117,16 +114,6 @@ bool Exe::CollectLibraries(::btool::app::collector::Store *s,
   }
 
   return true;
-}
-
-void CollectLinkFlags(const ::btool::node::Node &n,
-                      std::vector<std::string> *flags) {
-  ::btool::app::collector::CollectStringsProperties(
-      n, flags,
-      [](const ::btool::node::PropertyStore *ps)
-          -> const std::vector<std::string> * {
-        return Properties::LinkFlags(ps);
-      });
 }
 
 }  // namespace btool::app::collector::cc
