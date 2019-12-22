@@ -5,8 +5,6 @@
 
 #include "gtest/gtest.h"
 
-// workaround for bug-02
-#include "app/collector/base_collectini.h"
 #include "app/collector/cc/properties.h"
 #include "app/collector/cc/testing/cc.h"
 #include "app/collector/properties.h"

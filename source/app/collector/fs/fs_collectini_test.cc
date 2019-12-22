@@ -4,8 +4,6 @@
 
 #include "gtest/gtest.h"
 
-// workaround for bug-02
-#include "app/collector/base_collectini.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"

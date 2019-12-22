@@ -3,8 +3,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-// workaround for bug-02
-#include "app/collector/base_collectini.h"
 #include "app/collector/cc/properties.h"
 #include "app/collector/cc/testing/cc.h"
 #include "app/collector/properties.h"
@@ -44,15 +42,16 @@ TEST_F(ExeTest, C) {
   ::btool::app::collector::testing::SpyCollectini sc;
 
   e_.OnNotify(&s_, "tuna");
-  EXPECT_EQ(13UL, s_.Size());
+  EXPECT_EQ(16UL, s_.Size());
 
   auto n = s_.Get("tuna");
-  EXPECT_EQ(5UL, n->dependencies()->size());
+  EXPECT_EQ(6UL, n->dependencies()->size());
   EXPECT_EQ("tuna.o", n->dependencies()->at(0)->name());
-  EXPECT_EQ("a.o", n->dependencies()->at(1)->name());
-  EXPECT_EQ("b.o", n->dependencies()->at(2)->name());
+  EXPECT_EQ("c.o", n->dependencies()->at(1)->name());
+  EXPECT_EQ("a.o", n->dependencies()->at(2)->name());
   EXPECT_EQ("marlin.o", n->dependencies()->at(3)->name());
-  EXPECT_EQ("lib.a", n->dependencies()->at(4)->name());
+  EXPECT_EQ("b.o", n->dependencies()->at(4)->name());
+  EXPECT_EQ("lib.a", n->dependencies()->at(5)->name());
   EXPECT_EQ(&mr_, n->resolver());
 
   EXPECT_THAT(
@@ -70,15 +69,16 @@ TEST_F(ExeTest, CC) {
   ::btool::app::collector::testing::SpyCollectini sc;
 
   e_.OnNotify(&s_, "tuna");
-  EXPECT_EQ(13UL, s_.Size());
+  EXPECT_EQ(16UL, s_.Size());
 
   auto n = s_.Get("tuna");
-  EXPECT_EQ(5UL, n->dependencies()->size());
+  EXPECT_EQ(6UL, n->dependencies()->size());
   EXPECT_EQ("tuna.o", n->dependencies()->at(0)->name());
-  EXPECT_EQ("a.o", n->dependencies()->at(1)->name());
-  EXPECT_EQ("b.o", n->dependencies()->at(2)->name());
+  EXPECT_EQ("c.o", n->dependencies()->at(1)->name());
+  EXPECT_EQ("a.o", n->dependencies()->at(2)->name());
   EXPECT_EQ("marlin.o", n->dependencies()->at(3)->name());
-  EXPECT_EQ("lib.a", n->dependencies()->at(4)->name());
+  EXPECT_EQ("b.o", n->dependencies()->at(4)->name());
+  EXPECT_EQ("lib.a", n->dependencies()->at(5)->name());
   EXPECT_EQ(&mr_, n->resolver());
 
   EXPECT_THAT(
@@ -91,6 +91,7 @@ TEST_F(ExeTest, CC) {
 void BuildGraph(::btool::app::collector::Store *s, const std::string ext) {
   // tuna -> a -> b -> marlin
   // tuna -> marlin
+  // a -> c
 
   s->Put("lib.a");
 
@@ -102,6 +103,12 @@ void BuildGraph(::btool::app::collector::Store *s, const std::string ext) {
   auto marlino = s->Put("marlin.o");
   marlino->dependencies()->push_back(marlinc);
 
+  auto ch = s->Put("c.h");
+  auto cc = s->Put("c" + ext);
+  cc->dependencies()->push_back(ch);
+  auto co = s->Put("c.o");
+  co->dependencies()->push_back(cc);
+
   auto bh = s->Put("b.h");
   bh->dependencies()->push_back(marlinh);
   auto bc = s->Put("b" + ext);
@@ -110,6 +117,7 @@ void BuildGraph(::btool::app::collector::Store *s, const std::string ext) {
   bo->dependencies()->push_back(bc);
 
   auto ah = s->Put("a.h");
+  ah->dependencies()->push_back(ch);
   auto ac = s->Put("a" + ext);
   ac->dependencies()->push_back(ah);
   ac->dependencies()->push_back(bh);

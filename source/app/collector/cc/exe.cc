@@ -60,8 +60,6 @@ void Exe::OnNotify(::btool::app::collector::Store *s, const std::string &name) {
 bool Exe::CollectObjects(::btool::app::collector::Store *s,
                          ::btool::node::Node *n, const std::string &ext,
                          std::vector<::btool::node::Node *> *objs) {
-  DEBUGS() << "collect from src " << n->name() << std::endl;
-
   auto obj_name = ::btool::util::string::Replace(n->name(), ext, ".o");
   auto obj = s->Get(obj_name);
   if (obj == nullptr) {
@@ -73,23 +71,20 @@ bool Exe::CollectObjects(::btool::app::collector::Store *s,
   }
   objs->push_back(obj);
 
-  for (auto d : *n->dependencies()) {
-    DEBUGS() << "considering dependency " << d->name() << std::endl;
-    if (::btool::util::string::HasSuffix(d->name().c_str(), ".h")) {
-      auto src_name = ::btool::util::string::Replace(d->name(), ".h", ext);
+  bool success = true;
+  n->Visit([this, s, &ext, &success, objs](const ::btool::node::Node *nn) {
+    if (::btool::util::string::HasSuffix(nn->name(), ".h")) {
+      auto src_name = ::btool::util::string::Replace(nn->name(), ".h", ext);
       auto src = s->Get(src_name);
       if (src == nullptr) {
         DEBUGS() << "no src for src_name " << src_name << std::endl;
       } else {
-        bool success = CollectObjects(s, src, ext, objs);
-        if (!success) {
-          return false;
-        }
+        success = CollectObjects(s, src, ext, objs);
       }
     }
-  }
+  });
 
-  return true;
+  return success;
 }
 
 bool Exe::CollectLibraries(::btool::app::collector::Store *s,
