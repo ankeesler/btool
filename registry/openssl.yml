@@ -35,7 +35,6 @@ nodes:
     config:
       path: make
       args:
-        - "-j"
         - include/openssl/opensslconf.h
       dir: openssl-OpenSSL_1_1_1d
 
@@ -47,7 +46,6 @@ nodes:
     config:
       path: make
       args:
-        - "-j"
         - build_generated
         - libcrypto.pc
       dir: openssl-OpenSSL_1_1_1d
