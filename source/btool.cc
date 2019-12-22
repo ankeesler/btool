@@ -40,7 +40,7 @@
 #include "util/fs/fs.h"
 #include "util/string/string.h"
 
-const static std::string version_string = "0.7";
+const static std::string version_string = "0.8";
 
 #ifdef __linux__
 static const char *compiler_c = "gcc";
