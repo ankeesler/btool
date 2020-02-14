@@ -1,0 +1,42 @@
+---
+nodes:
+  # Archives
+  - name: mcgoo-0.0.1.tar.gz
+    dependencies:
+      - $this
+    resolver:
+      name: io.btool.collector.registry.resolvers/download
+      config:
+        url: https://github.com/ankeesler/mcgoo/archive/0.0.1.tar.gz
+        sha256: 7a91bfd1b6c5fcd871b6154061768e29bd6c2df879aa098dc6bd2e998eec9ab2
+
+  # Headers
+  - name: mcgoo-0.0.1/c/unit-test.h
+    dependencies:
+      - mcgoo-0.0.1.tar.gz
+    resolver:
+      name: io.btool.collector.registry.resolvers/untar
+    labels:
+      io.btool.collector.cc.properties/libraries:
+        - mcgoo.a
+
+  # Sources
+  - name: mcgoo-0.0.1/c/unit-test.c
+    dependencies:
+      - mcgoo-0.0.1.tar.gz
+    resolver:
+      name: io.btool.collector.registry.resolvers/untar
+
+  # Objects
+  - name: mcgoo-0.0.1/c/unit-test.o
+    dependencies:
+      - mcgoo-0.0.1/c/unit-test.c
+    resolver:
+      name: io.btool.collector.cc.resolvers/compileC
+
+  # Libraries
+  - name: mcgoo.a
+    dependencies:
+      - mcgoo-0.0.1/c/unit-test.o
+    resolver:
+      name: io.btool.collector.cc.resolvers/archive
