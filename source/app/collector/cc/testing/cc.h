@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-
 #include "app/collector/cc/resolver_factory.h"
+#include "gmock/gmock.h"
 #include "node/node.h"
 
 namespace btool::app::collector::cc::testing {

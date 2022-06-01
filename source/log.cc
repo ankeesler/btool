@@ -2,7 +2,6 @@
 
 #include <cstdarg>
 #include <cstdio>
-
 #include <fstream>
 #include <ostream>
 

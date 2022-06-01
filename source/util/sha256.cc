@@ -6,10 +6,9 @@
 #include <string>
 #include <vector>
 
-#include "openssl/sha.h"
-
 #include "err.h"
 #include "log.h"
+#include "openssl/sha.h"
 #include "util/util.h"
 
 namespace btool::util {

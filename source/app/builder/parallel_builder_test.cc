@@ -3,10 +3,9 @@
 #include <functional>
 #include <queue>
 
+#include "err.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "err.h"
 #include "node/node.h"
 #include "node/testing/node.h"
 

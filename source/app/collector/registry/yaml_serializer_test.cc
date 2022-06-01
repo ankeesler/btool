@@ -3,9 +3,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "gtest/gtest.h"
-
 #include "app/collector/registry/registry.h"
+#include "gtest/gtest.h"
 #include "log.h"
 
 TEST(YamlSerializer, Index) {

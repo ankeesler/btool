@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "gtest/gtest.h"
-
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
+#include "gtest/gtest.h"
 
 TEST(BaseCollectini, A) {
   ::btool::app::collector::testing::SpyCollectini a;

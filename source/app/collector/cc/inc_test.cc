@@ -5,13 +5,12 @@
 #include <utility>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
 #include "app/collector/cc/properties.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 using ::testing::_;
 using ::testing::ElementsAre;

@@ -1,9 +1,8 @@
 #include "app/collector/registry/http_registry.h"
 
-#include "gtest/gtest.h"
-
 #include "app/collector/registry/registry.h"
 #include "app/collector/registry/yaml_serializer.h"
+#include "gtest/gtest.h"
 #include "util/fs/fs.h"
 
 TEST(HttpRegistry, DoesItFail) {

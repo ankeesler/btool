@@ -1,17 +1,16 @@
 #include "util/unzip_btool.h"
 
 #include <errno.h>
+
 #include <cstdlib>
 #include <cstring>
-
 #include <fstream>
 #include <iostream>
-
-#include "zip.h"
 
 #include "err.h"
 #include "log.h"
 #include "util/fs/fs.h"
+#include "zip.h"
 
 namespace btool::util {
 

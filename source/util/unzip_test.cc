@@ -1,9 +1,7 @@
-#include "util/unzip_btool.h"
-
 #include "gtest/gtest.h"
-
 #include "util/download.h"
 #include "util/fs/fs.h"
+#include "util/unzip_btool.h"
 
 TEST(Unzip, Success) {
   auto dir = ::btool::util::fs::TempDir();

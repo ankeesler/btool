@@ -2,7 +2,6 @@
 #define BTOOL_UTIL_FLAGS_H_
 
 #include <cstring>
-
 #include <iostream>
 #include <map>
 #include <ostream>

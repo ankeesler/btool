@@ -2,11 +2,10 @@
 
 #include <vector>
 
-#include "gtest/gtest.h"
-
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
+#include "gtest/gtest.h"
 #include "util/fs/fs.h"
 
 using ::testing::Contains;

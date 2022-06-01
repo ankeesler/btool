@@ -1,8 +1,7 @@
 #include "dep-1/dep-1.h"
 
-#include "gtest/gtest.h"
-
 #include "dep-0/dep-0.h"
+#include "gtest/gtest.h"
 
 TEST(Hey, Sup) {
   EXPECT_EQ(1, 1);

@@ -3,11 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
 #include "app/collector/store.h"
 #include "err.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 using ::testing::_;
 using ::testing::HasSubstr;

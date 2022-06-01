@@ -1,7 +1,6 @@
 #include "util/download.h"
 
 #include "gtest/gtest.h"
-
 #include "util/fs/fs.h"
 
 TEST(Download, Success) {

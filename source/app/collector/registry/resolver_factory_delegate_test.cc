@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
+#include "app/collector/properties.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "app/collector/properties.h"
 #include "node/node.h"
 #include "node/testing/node.h"
 

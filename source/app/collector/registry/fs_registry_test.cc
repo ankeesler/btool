@@ -2,10 +2,9 @@
 
 #include <string>
 
+#include "app/collector/registry/testing/registry.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "app/collector/registry/testing/registry.h"
 #include "node/node.h"
 #include "util/fs/fs.h"
 

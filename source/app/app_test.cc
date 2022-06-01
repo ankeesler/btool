@@ -2,10 +2,9 @@
 
 #include <string>
 
+#include "err.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "err.h"
 #include "node/node.h"
 
 using ::testing::_;

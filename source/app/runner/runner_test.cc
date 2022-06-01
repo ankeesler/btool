@@ -4,7 +4,6 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
 #include "node/node.h"
 
 using ::testing::Ref;

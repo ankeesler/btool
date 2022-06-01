@@ -31,7 +31,7 @@ files="$(find . -name "*.h" -or -name "*.cc")"
 diff_exists=0
 for file in $files; do
   clang-format -style=Google "$file" > /tmp/btool-lint-tmp
-  if ! diff /tmp/btool-lint-tmp "$file" >/dev/null; then
+  if ! diff /tmp/btool-lint-tmp "$file"; then
      diff_exists=1
   fi
   mv /tmp/btool-lint-tmp "$file"

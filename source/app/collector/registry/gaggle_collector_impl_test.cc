@@ -1,12 +1,11 @@
 #include "app/collector/registry/gaggle_collector_impl.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
 #include "app/collector/properties.h"
 #include "app/collector/registry/registry.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "node/node.h"
 #include "node/testing/node.h"
 

@@ -5,10 +5,9 @@
 #include <ostream>
 #include <string>
 
-#include "gmock/gmock.h"
-
 #include "app/collector/registry/registry.h"
 #include "app/collector/registry/serializer.h"
+#include "gmock/gmock.h"
 
 namespace btool::app::collector::registry::testing {
 

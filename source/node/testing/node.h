@@ -5,10 +5,9 @@
 #include <string>
 #include <vector>
 
+#include "err.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "err.h"
 #include "node/node.h"
 
 namespace btool::node::testing {

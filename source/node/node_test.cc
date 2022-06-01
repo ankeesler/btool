@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-
 #include "node/testing/node.h"
 
 class NodeTest : public ::btool::node::testing::NodeTest {};

@@ -1,13 +1,13 @@
 #include "currenter_impl.h"
 
 #include <errno.h>
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
 #include "node/testing/node.h"
 
 class CurrenterTest : public ::btool::node::testing::NodeTest {};

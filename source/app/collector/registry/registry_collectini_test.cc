@@ -1,11 +1,10 @@
 #include "app/collector/registry/registry_collectini.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-
 #include "app/collector/registry/registry.h"
 #include "app/collector/registry/testing/registry.h"
 #include "app/collector/store.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "util/testing/util.h"
 
 using ::testing::_;

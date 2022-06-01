@@ -4,10 +4,9 @@
 #include <string>
 #include <thread>
 
+#include "app/collector/registry/testing/registry.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "app/collector/registry/testing/registry.h"
 
 using ::testing::_;
 using ::testing::InSequence;

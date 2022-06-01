@@ -4,7 +4,6 @@
 #include <string>
 
 #include "gmock/gmock.h"
-
 #include "util/cache.h"
 
 namespace btool::util::testing {

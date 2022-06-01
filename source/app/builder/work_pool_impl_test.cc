@@ -1,8 +1,7 @@
 #include "app/builder/work_pool_impl.h"
 
-#include "gtest/gtest.h"
-
 #include "err.h"
+#include "gtest/gtest.h"
 #include "node/node.h"
 #include "node/testing/node.h"
 

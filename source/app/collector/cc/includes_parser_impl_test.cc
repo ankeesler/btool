@@ -6,7 +6,6 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
 #include "util/fs/fs.h"
 
 using ::testing::ElementsAre;

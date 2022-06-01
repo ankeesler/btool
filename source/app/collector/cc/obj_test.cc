@@ -3,14 +3,13 @@
 #include <string>
 #include <vector>
 
-#include "gtest/gtest.h"
-
 #include "app/collector/cc/properties.h"
 #include "app/collector/cc/testing/cc.h"
 #include "app/collector/properties.h"
 #include "app/collector/store.h"
 #include "app/collector/testing/collector.h"
 #include "err.h"
+#include "gtest/gtest.h"
 #include "node/testing/node.h"
 
 using ::testing::ElementsAre;

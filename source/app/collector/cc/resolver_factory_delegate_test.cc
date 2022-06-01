@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
+#include "app/collector/cc/testing/cc.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "app/collector/cc/testing/cc.h"
 #include "node/testing/node.h"
 
 using ::testing::Return;

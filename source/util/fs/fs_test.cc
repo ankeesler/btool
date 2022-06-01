@@ -4,10 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "err.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-
-#include "err.h"
 
 using ::testing::Gt;
 using ::testing::Lt;

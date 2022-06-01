@@ -4,10 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "gmock/gmock.h"
-
 #include "app/collector/base_collectini.h"
 #include "app/collector/resolver_factory_delegate.h"
+#include "gmock/gmock.h"
 #include "node/node.h"
 
 namespace btool::app::collector::testing {

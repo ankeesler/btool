@@ -4,9 +4,8 @@
 #include <ostream>
 #include <vector>
 
-#include "yaml-cpp/yaml.h"
-
 #include "err.h"
+#include "yaml-cpp/yaml.h"
 
 namespace YAML {
 
