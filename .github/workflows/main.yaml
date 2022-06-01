@@ -54,8 +54,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: ./script/build-registry.sh -o build
-      with:
-        go-version: 1.18
     - uses: JamesIves/github-pages-deploy-action@v4.3.3
       with:
         branch: gh-pages
