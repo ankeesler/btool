@@ -1,14 +1,14 @@
 ---
 files:
 - path: googletest.yml
-  sha256: (stdin)= bc9caeef5e6f6025ed5e11901786b7706b26b79100a71026f36ffe331bb9b987
+  sha256: bc9caeef5e6f6025ed5e11901786b7706b26b79100a71026f36ffe331bb9b987
 - path: index.yml
-  sha256: (stdin)= 82734b4afda325d3dd89700cdc446a90fd8dbb4d4c1db5fb81f7f71f67d35601
+  sha256: 01e4a22411809764c97915847a9e3b5d66611d3ca1e505263c09f787cc65041a
 - path: libzip.yml
-  sha256: (stdin)= 804e5202a0771094ca46f97cfd1147e7cf55ce3918f200cd49049dea5996beab
+  sha256: 804e5202a0771094ca46f97cfd1147e7cf55ce3918f200cd49049dea5996beab
 - path: mcgoo.yml
-  sha256: (stdin)= 94968eef64a928c9c86c06d4d856a4570d5eeef2eb028fb358a9ea5092742e61
+  sha256: 94968eef64a928c9c86c06d4d856a4570d5eeef2eb028fb358a9ea5092742e61
 - path: openssl.yml
-  sha256: (stdin)= 2bcbb4bda1c3c790aec7fa02f6530a67c6c362434be3f924bdd470fa4ba2edbd
+  sha256: 2bcbb4bda1c3c790aec7fa02f6530a67c6c362434be3f924bdd470fa4ba2edbd
 - path: yaml-cpp.yml
-  sha256: (stdin)= b4b19422a3fcf9faa9da0dbd5c8e847a7736f0cf504bb692fab5bd1a6d2daf51
+  sha256: b4b19422a3fcf9faa9da0dbd5c8e847a7736f0cf504bb692fab5bd1a6d2daf51
