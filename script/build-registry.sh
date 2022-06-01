@@ -39,6 +39,6 @@ EOF
 for f in $(find "$outdir" -name "*.yml" | sort); do
   cat <<EOF >>"$outdir/index.yml"
 - path: $(basename "$f")
-  sha256: $(cat "$f" | openssl sha256)
+  sha256: $(cat "$f" | openssl sha256 -hex | cut -f 2 -d ' ')
 EOF
 done
