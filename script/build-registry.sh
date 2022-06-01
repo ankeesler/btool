@@ -36,10 +36,9 @@ cat <<EOF >"$outdir/index.yml"
 ---
 files:
 EOF
-pushd "$outdir" >/dev/null
-  find . -name "*.yml" \
-    | sed -e 's#./##'  \
-    | sort \
-    | xargs -n1 shasum -a 256 \
-    | awk '{printf "- path: %s\n  sha256: %s\n", $2, $1}' >> "$outdir/index.yml"
-popd >/dev/null
+for f in $(find "$outdir" -name "*.yml" | sort); do
+  cat <<EOF >>"$outdir/index.yml"
+- path: $(basename "$f")
+  sha256: $(cat "$f" | openssl sha256)
+EOF
+done
