@@ -1,0 +1,62 @@
+nodes:
+# Archives
+- name: OpenSSL_1_1_1d.tar.gz
+  dependencies:
+    - $this
+  resolver:
+    name: io.btool.collector.registry.resolvers/download
+    config:
+      url: https://github.com/openssl/openssl/archive/OpenSSL_1_1_1d.tar.gz
+      sha256: 23011a5cc78e53d0dc98dfa608c51e72bcd350aa57df74c5d5574ba4ffb62e74
+
+# Build
+- name: openssl-OpenSSL_1_1_1d/config
+  dependencies:
+    - OpenSSL_1_1_1d.tar.gz
+  resolver:
+    name: io.btool.collector.registry.resolvers/untar
+
+- name: openssl-OpenSSL_1_1_1d/Makefile
+  dependencies:
+    - openssl-OpenSSL_1_1_1d/config
+  resolver:
+    name: io.btool.collector.registry.resolvers/cmd
+    config:
+      path: ./config
+      args:
+        - "--debug"
+      dir: openssl-OpenSSL_1_1_1d
+
+- name: openssl-OpenSSL_1_1_1d/include/openssl/opensslconf.h
+  dependencies:
+    - openssl-OpenSSL_1_1_1d/Makefile
+  resolver:
+    name: io.btool.collector.registry.resolvers/cmd
+    config:
+      path: make
+      args:
+        - include/openssl/opensslconf.h
+      dir: openssl-OpenSSL_1_1_1d
+
+- name: openssl-OpenSSL_1_1_1d/libcrypto.a
+  dependencies:
+    - openssl-OpenSSL_1_1_1d/Makefile
+  resolver:
+    name: io.btool.collector.registry.resolvers/cmd
+    config:
+      path: make
+      args:
+        - build_generated
+        - libcrypto.pc
+      dir: openssl-OpenSSL_1_1_1d
+
+# Headers
+- name: openssl-OpenSSL_1_1_1d/include/openssl/sha.h
+  dependencies:
+    - openssl-OpenSSL_1_1_1d/config
+    - openssl-OpenSSL_1_1_1d/include/openssl/opensslconf.h
+  labels:
+    io.btool.collector.cc.properties/libraries:
+      - openssl-OpenSSL_1_1_1d/libcrypto.a
+    io.btool.collector.cc.properties/includePaths:
+      - openssl-OpenSSL_1_1_1d/include
