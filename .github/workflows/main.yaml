@@ -30,7 +30,7 @@ jobs:
     - run: ./script/bench.sh
 
   build:
-    needs: [lint, test-unit, test-integration, bench]
+    # needs: [lint, test-unit, test-integration, bench]
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
@@ -49,7 +49,7 @@ jobs:
           tags: ankeesler/btool:latest
 
   deploy:
-    needs: [build]
+    # needs: [build]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3

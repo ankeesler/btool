@@ -7,7 +7,7 @@ if [[ -z "$BTOOL" ]]; then
 fi 
 
 if [[ -z "$REGISTRY" ]]; then
-  REGISTRY="https://btoolregistry.cfapps.io"
+  REGISTRY="https://ankeesler.github.io/btool"
 fi 
 
 usage() {
